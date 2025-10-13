@@ -1,0 +1,2 @@
+<img src="<?php echo e(asset('vitswhite.png')); ?>" alt="VITS logo" <?php echo e($attributes->merge(['class' => 'block'])); ?> />
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views/components/app-logo-icon.blade.php ENDPATH**/ ?>
