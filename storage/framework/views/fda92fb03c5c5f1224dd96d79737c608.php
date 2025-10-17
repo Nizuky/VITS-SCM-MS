@@ -57,12 +57,8 @@
             @media (prefers-color-scheme: dark) { #site-header { background: #ffffffff; } }
         </style>
     </head>
-    <body class="text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col"
-        style="background-image: url('<?php echo e(asset('storage/vits_bg.png')); ?>'); background-repeat: no-repeat; background-position: center top; background-size: cover; background-attachment: fixed;">
-
-        <header id="site-header">
-            <img src="<?php echo e(asset('storage/vits_header.png')); ?>" alt="VITS Header" style="width:100%; height:100%; object-fit:cover; display:block; pointer-events: auto;">
-        </header>
+    <body class="text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
+        <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
         </header>
             <div style="background: white; border-radius: 20px; padding: 20px 25px; width: 400px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); border-bottom: 6px solid #4b64f2;">

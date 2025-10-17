@@ -36,8 +36,10 @@
     32 => 'Termwind\\Laravel\\TermwindServiceProvider',
     33 => 'Pest\\Laravel\\PestServiceProvider',
     34 => 'App\\Providers\\AppServiceProvider',
-    35 => 'App\\Providers\\FortifyServiceProvider',
-    36 => 'App\\Providers\\VoltServiceProvider',
+    35 => 'Livewire\\LivewireServiceProvider',
+    36 => 'Livewire\\Volt\\VoltServiceProvider',
+    37 => 'App\\Providers\\FortifyViewServiceProvider',
+    38 => 'App\\Providers\\VoltServiceProvider',
   ),
   'eager' => 
   array (
@@ -61,8 +63,10 @@
     17 => 'Termwind\\Laravel\\TermwindServiceProvider',
     18 => 'Pest\\Laravel\\PestServiceProvider',
     19 => 'App\\Providers\\AppServiceProvider',
-    20 => 'App\\Providers\\FortifyServiceProvider',
-    21 => 'App\\Providers\\VoltServiceProvider',
+    20 => 'Livewire\\LivewireServiceProvider',
+    21 => 'Livewire\\Volt\\VoltServiceProvider',
+    22 => 'App\\Providers\\FortifyViewServiceProvider',
+    23 => 'App\\Providers\\VoltServiceProvider',
   ),
   'deferred' => 
   array (

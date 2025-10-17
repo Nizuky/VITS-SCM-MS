@@ -15,7 +15,7 @@
         <form id="admin-login-form" method="POST" action="<?php echo e(route('admin.login.submit')); ?>">
             <?php echo csrf_field(); ?>
             <?php if(session('success')): ?>
-                <div class="mb-3 p-3 rounded text-sm" style="background:#e6ffef; border-left:4px solid #24a148; color:#064e3b;"><?php echo e(session('success')); ?></div>
+                <div class="mb-3 p-3 rounded text-sm" style="background:#ecfdf5; border-left:4px solid #10b981; color:#065f46;"><?php echo e(session('success')); ?></div>
             <?php endif; ?>
             <?php if(session('error')): ?>
                 <div class="mb-3 p-3 rounded text-sm" style="background:#fff3f2; border-left:4px solid #ef4444; color:#7f1d1d;"><?php echo e(session('error')); ?></div>

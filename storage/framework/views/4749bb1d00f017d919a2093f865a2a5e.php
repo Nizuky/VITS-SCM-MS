@@ -16,16 +16,14 @@
             }
 
             /* desktop default body padding so content isn't covered */
-            body { padding-top: var(--header-desktop-h); background-image: url('<?php echo e(asset('storage/vits_bg.png')); ?>'); background-repeat: no-repeat; background-position: center top; background-size: cover; background-attachment: fixed; }
+            body { padding-top: var(--header-desktop-h); background-image: url('<?php echo e(asset('storage/vitsbg.png')); ?>'); background-repeat: no-repeat; background-position: center top; background-size: cover; background-attachment: fixed; }
 
             /* Dark mode tweak */
             @media (prefers-color-scheme: dark) { #site-header { background: rgba(255, 255, 255); } }
         </style>
     </head>
     <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <header id="site-header">
-            <img src="<?php echo e(asset('storage/vits_header.png')); ?>" alt="VITS Header" style="width:100%; height:100%; object-fit:cover; display:block;" />
-        </header>
+        <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div class="flex w-full max-w-sm flex-col gap-2">
                 <a href="<?php echo e(route('home')); ?>" class="flex flex-col items-center gap-2 font-medium" wire:navigate>

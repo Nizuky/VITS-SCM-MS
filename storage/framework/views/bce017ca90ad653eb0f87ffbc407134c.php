@@ -51,11 +51,8 @@
         </style>
 
     </head>
-    <body style="background-image: url('<?php echo e(asset('storage/vits_bg.png')); ?>'); background-repeat: no-repeat; background-position: center top; background-size: cover; background-attachment: fixed; min-height:100vh;">
-
-        <header id="site-header">
-            <img src="<?php echo e(asset('storage/vits_header.png')); ?>" alt="VITS Header" style="width:100%; height:100%; object-fit:cover; display:block;">
-        </header>
+    <body style="min-height:100vh;">
+        <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <main style="display:flex; align-items:center; justify-content:center; padding:48px 20px; min-height: calc(100vh - var(--header-desktop-h));">
             <div class="card">
