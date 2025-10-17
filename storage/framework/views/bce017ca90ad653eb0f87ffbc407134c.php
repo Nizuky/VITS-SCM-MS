@@ -3,7 +3,12 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Student Dashboard — VITS</title>
+    <title>Student Dashboard — VITS</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <!-- Prevent caching so back button after logout won't show this page -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
         <link rel="icon" href="/vitswhite.png" sizes="any">
         <style>
             :root { --header-desktop-h: 115px; --header-mobile-h: 72px; }
@@ -52,7 +57,67 @@
 
     </head>
     <body style="min-height:100vh;">
-        <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <script>
+            // If this page is restored from the back-forward cache after logout, force reload
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            });
+
+            // Auto-logout non-remembered users when the tab/window is closed or navigates away externally
+            (function(){
+                const remembered = Boolean(<?php echo json_encode(session('remembered', false), 512) ?>);
+                if (remembered) return; // only apply for non-remembered sessions
+
+                let internalNav = false;
+
+                // Treat same-origin link clicks and form submits as internal navigation (no auto-logout)
+                document.addEventListener('click', function(e){
+                    const a = e.target && e.target.closest ? e.target.closest('a') : null;
+                    if (a) {
+                        try {
+                            const url = new URL(a.href, window.location.href);
+                            if (url.origin === window.location.origin) {
+                                internalNav = true;
+                            }
+                        } catch(_) {}
+                    }
+                }, true);
+
+                document.addEventListener('submit', function(){ internalNav = true; }, true);
+
+                function sendLogout(){
+                    const logoutUrl = <?php echo json_encode(route('logout'), 15, 512) ?>;
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    const csrf = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                    try {
+                        const params = new URLSearchParams();
+                        params.append('_token', csrf);
+                        const blob = new Blob([params.toString()], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+                        if (!navigator.sendBeacon || !navigator.sendBeacon(logoutUrl, blob)) {
+                            fetch(logoutUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                                body: params.toString(),
+                                keepalive: true
+                            });
+                        }
+                    } catch (_) { /* ignore */ }
+                }
+
+                function maybeLogout(){ if (!internalNav) sendLogout(); }
+
+                // Fire on pagehide, beforeunload, and when visibility becomes hidden
+                window.addEventListener('pagehide', maybeLogout);
+                window.addEventListener('beforeunload', maybeLogout);
+                document.addEventListener('visibilitychange', function(){
+                    if (document.visibilityState === 'hidden') maybeLogout();
+                });
+            })();
+        </script>
+    <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <main style="display:flex; align-items:center; justify-content:center; padding:48px 20px; min-height: calc(100vh - var(--header-desktop-h));">
             <div class="card">
@@ -106,6 +171,8 @@
                                 }
                             }, { passive: true });
                         })();
+
+                        // Auto-logout on tab close is handled in the top <script> via pagehide
                     </script>
                 <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display:none;"><?php echo csrf_field(); ?></form>
             </div>

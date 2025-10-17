@@ -10211,3 +10211,57 @@ into your web browser: <span class="break-all" style="box-sizing: border-box; fo
 [stacktrace]
 #0 {main}
 "} 
+[2025-10-17 09:31:09] local.ERROR: Target class [DatabaseSeeder] does not exist. {"exception":"[object] (Illuminate\\Contracts\\Container\\BindingResolutionException(code: 0): Target class [DatabaseSeeder] does not exist. at C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php:1163)
+[stacktrace]
+#0 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(972): Illuminate\\Container\\Container->build('DatabaseSeeder')
+#1 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1078): Illuminate\\Container\\Container->resolve('DatabaseSeeder', Array, true)
+#2 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(903): Illuminate\\Foundation\\Application->resolve('DatabaseSeeder', Array)
+#3 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1058): Illuminate\\Container\\Container->make('DatabaseSeeder', Array)
+#4 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(99): Illuminate\\Foundation\\Application->make('DatabaseSeeder')
+#5 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(71): Illuminate\\Database\\Console\\Seeds\\SeedCommand->getSeeder()
+#6 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Concerns\\GuardsAttributes.php(157): Illuminate\\Database\\Console\\Seeds\\SeedCommand->{closure:Illuminate\\Database\\Console\\Seeds\\SeedCommand::handle():70}()
+#7 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(70): Illuminate\\Database\\Eloquent\\Model::unguarded(Object(Closure))
+#8 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Database\\Console\\Seeds\\SeedCommand->handle()
+#9 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(43): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#10 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#11 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#12 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#13 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(211): Illuminate\\Container\\Container->call(Array)
+#14 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Command\\Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#15 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#16 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(1110): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(359): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Seeds\\SeedCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(194): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 C:\\Users\\janar\\Herd\\scms\\artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#22 {main}
+
+[previous exception] [object] (ReflectionException(code: -1): Class \"DatabaseSeeder\" does not exist at C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php:1161)
+[stacktrace]
+#0 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(1161): ReflectionClass->__construct('DatabaseSeeder')
+#1 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(972): Illuminate\\Container\\Container->build('DatabaseSeeder')
+#2 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1078): Illuminate\\Container\\Container->resolve('DatabaseSeeder', Array, true)
+#3 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(903): Illuminate\\Foundation\\Application->resolve('DatabaseSeeder', Array)
+#4 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1058): Illuminate\\Container\\Container->make('DatabaseSeeder', Array)
+#5 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(99): Illuminate\\Foundation\\Application->make('DatabaseSeeder')
+#6 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(71): Illuminate\\Database\\Console\\Seeds\\SeedCommand->getSeeder()
+#7 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Concerns\\GuardsAttributes.php(157): Illuminate\\Database\\Console\\Seeds\\SeedCommand->{closure:Illuminate\\Database\\Console\\Seeds\\SeedCommand::handle():70}()
+#8 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Seeds\\SeedCommand.php(70): Illuminate\\Database\\Eloquent\\Model::unguarded(Object(Closure))
+#9 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Database\\Console\\Seeds\\SeedCommand->handle()
+#10 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(43): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#11 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#12 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#13 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#14 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(211): Illuminate\\Container\\Container->call(Array)
+#15 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Command\\Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#16 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#17 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(1110): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(359): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Seeds\\SeedCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\console\\Application.php(194): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 C:\\Users\\janar\\Herd\\scms\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#22 C:\\Users\\janar\\Herd\\scms\\artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#23 {main}
+"} 
+[2025-10-17 09:55:56] local.WARNING: SuperAdmin login failed {"identifier":"admin2025","ip":"127.0.0.1"} 

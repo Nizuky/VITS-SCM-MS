@@ -157,6 +157,8 @@
 
         {{ $slot }}
 
+        @include('partials.auto_logout')
+
         @fluxScripts
     </body>
 </html>

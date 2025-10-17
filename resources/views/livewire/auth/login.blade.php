@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -41,7 +42,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
         if (! $user->hasVerifiedEmail()) {
             Auth::login($user, false); // do not remember until verified
             RateLimiter::clear($this->throttleKey());
+            Session::put('remembered', false);
             Session::regenerate();
+
+            // Ensure no stale remember cookie keeps the user logged in after browser close
+            try {
+                $recaller = Auth::guard()->getRecallerName();
+                Cookie::queue(Cookie::forget($recaller));
+            } catch (\Throwable $e) { /* ignore */ }
 
             $this->redirect(route('verification.prompt'), navigate: true);
             return;
@@ -59,8 +67,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
         }
 
     Auth::login($user, $this->remember);
-    // Mark session with active guard
+    // If remember is NOT checked, ensure any existing remember cookie is cleared
+    if (! $this->remember) {
+        try {
+            $recaller = Auth::guard()->getRecallerName();
+            Cookie::queue(Cookie::forget($recaller));
+        } catch (\Throwable $e) { /* ignore */ }
+    }
+    // Mark session with active guard and remember choice
     session(['auth_guard' => 'web']);
+    Session::put('remembered', (bool) $this->remember);
 
     RateLimiter::clear($this->throttleKey());
     Session::regenerate();
