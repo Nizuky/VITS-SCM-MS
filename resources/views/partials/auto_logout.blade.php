@@ -1,11 +1,15 @@
 @php
     // Only apply to the default web guard (students)
     $isWeb = auth('web')->check();
+    // Determine if the session is set to be remembered by checking Laravel's remember-me cookie
+    $rememberCookieName = \Illuminate\Support\Facades\Auth::getRecallerName();
+    $isRemembered = request()->cookies->has($rememberCookieName);
 @endphp
 @if($isWeb)
     <script>
         (function(){
-            const remembered = Boolean(@json(session('remembered', false)));
+            // If "Remember me" is enabled, skip auto-logout on tab/app exit
+            const remembered = Boolean(@json($isRemembered));
             if (remembered) return; // Only affect non-remembered sessions
 
             const logoutUrl = @json(route('logout'));
@@ -14,6 +18,8 @@
             const csrf = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
             let internalNav = false;
+            let reloadIntent = false; // best-effort flag to detect user-initiated refresh
+
             // Detect internal same-origin navigation to avoid logging out on link clicks within app
             document.addEventListener('click', function(e){
                 const a = e.target && e.target.closest ? e.target.closest('a') : null;
@@ -27,6 +33,16 @@
                 }
             }, true);
             document.addEventListener('submit', function(){ internalNav = true; }, true);
+
+            // Detect common reload shortcuts to avoid auto-logout on page refresh
+            document.addEventListener('keydown', function(e){
+                try {
+                    const key = e.key || '';
+                    if (key === 'F5' || (key.toLowerCase() === 'r' && (e.ctrlKey || e.metaKey))) {
+                        reloadIntent = true;
+                    }
+                } catch (_) {}
+            }, true);
 
             function postLogoutKeepalive() {
                 try {
@@ -49,24 +65,33 @@
                 try { localStorage.setItem('scms_force_logout', String(Date.now())); } catch(_) {}
             }
 
+            function isReload() {
+                // Heuristic: user pressed reload keys or the navigation entry indicates reload
+                if (reloadIntent) return true;
+                try {
+                    const entries = performance && performance.getEntriesByType ? performance.getEntriesByType('navigation') : [];
+                    if (entries && entries.length && entries[0].type === 'reload') return true;
+                    // legacy API fallback
+                    if (performance && performance.navigation && performance.navigation.type === 1) return true; // 1 === TYPE_RELOAD
+                } catch (_) {}
+                return false;
+            }
+
             function handleExit() {
                 if (internalNav) return; // don’t logout when navigating inside the app
+                if (isReload()) return; // skip auto-logout on page refresh
                 broadcastLogout();
                 postLogoutKeepalive();
             }
 
-            // Trigger on tab close or navigating away
+            // Trigger on tab close or navigating away (includes reload)
             window.addEventListener('pagehide', handleExit);
             window.addEventListener('beforeunload', handleExit);
-            document.addEventListener('visibilitychange', function(){
-                if (document.visibilityState === 'hidden') handleExit();
-            });
 
             // If another tab logs out, follow along
             window.addEventListener('storage', function(ev){
                 if (ev.key === 'scms_force_logout' && ev.newValue) {
-                    // Best effort logout then go to login
-                    postLogoutKeepalive();
+                    // Redirect to login
                     try { window.location.replace(loginUrl); } catch(_) { window.location.href = loginUrl; }
                 }
             });

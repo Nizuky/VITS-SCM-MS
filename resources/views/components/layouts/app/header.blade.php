@@ -78,12 +78,33 @@
 
                     <flux:menu.separator />
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    <form id="header-logout-form" method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
                             {{ __('Log Out') }}
                         </flux:menu.item>
                     </form>
+
+                    <script>
+                        // Ensure the logout form submits even if the menu system intercepts clicks
+                        (function(){
+                            try {
+                                const form = document.getElementById('header-logout-form');
+                                if (!form) return;
+                                // If the menu library renders something clickable that isn't a native button,
+                                // ensure clicking it triggers a form submit as a fallback.
+                                form.addEventListener('click', function(e){
+                                    const target = e.target && e.target.closest ? e.target.closest('[data-test="logout-button"]') : null;
+                                    if (target && target.getAttribute('type') !== 'submit') {
+                                        // Force submit in a next tick to allow any framework handlers first
+                                        setTimeout(() => {
+                                            try { form.submit(); } catch(_) { /* best effort */ }
+                                        }, 0);
+                                    }
+                                }, true);
+                            } catch (_) {}
+                        })();
+                    </script>
                 </flux:menu>
             </flux:dropdown>
         </flux:header>

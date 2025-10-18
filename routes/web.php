@@ -12,6 +12,45 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// CSRF cookie preflight: ensures XSRF-TOKEN cookie is set for AJAX
+Route::get('/api/csrf-cookie', function (
+    \Illuminate\Http\Request $request
+) {
+    try {
+        \Illuminate\Support\Facades\Log::debug('csrf-cookie called', [
+            'session_id' => $request->session()->getId(),
+            'cookies' => $request->cookies->all(),
+            'is_authenticated' => $request->user() ? true : false,
+            'path' => $request->getPathInfo(),
+        ]);
+    } catch (\Throwable $_) { /* ignore logging errors */ }
+    // Mirror Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::addCookieToResponse
+    $token = $request->session()->token() ?: csrf_token();
+    $cookieValue = rawurlencode($token);
+
+    $cookie = cookie(
+        'XSRF-TOKEN',
+        $cookieValue,
+        0,
+        config('session.path', '/'),
+        config('session.domain', null),
+        config('session.secure', false),
+        false
+    );
+
+    return response()->noContent()->withCookie($cookie);
+})->name('csrf.cookie');
+
+// Social Contract records API for the authenticated student
+Route::middleware(['auth', 'verified'])->group(function () {
+    // contracts
+    Route::get('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'index'])->name('social-contracts.index');
+    Route::post('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'store'])->name('social-contracts.store');
+    Route::get('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'index'])->name('social-contract.records.index');
+    Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
+    Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
+});
+
 // Admin users auth routes (separate from superadmin)
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest-only pages for the admin guard (prevents web-authenticated users from being redirected here)

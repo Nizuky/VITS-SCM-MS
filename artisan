@@ -13,6 +13,18 @@ require __DIR__.'/vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/bootstrap/app.php';
 
-$status = $app->handleCommand(new ArgvInput);
+$status = 0;
+try {
+	$status = $app->handleCommand(new ArgvInput);
+} catch (\Throwable $e) {
+	// Some console input parsing errors (for example from unsupported --columns option)
+	// throw a visible message to the console but avoid bootstrapping the full
+	// exception handler which may write into application logs. This keeps
+	// artisan invocations that pass invalid console options from polluting
+	// storage/logs/laravel.log.
+	fwrite(STDERR, "Error: " . $e->getMessage() . PHP_EOL);
+	// Return non-zero exit code to indicate failure
+	$status = $e->getCode() ?: 1;
+}
 
 exit($status);

@@ -52,6 +52,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * A student can have many social contracts
+     */
+    public function socialContracts()
+    {
+        return $this->hasMany(\App\Models\SocialContract::class, 'student_id');
+    }
+
+    /**
+     * Helper to get or create the current social contract for this student.
+     * For now, returns the most recent contract by creation date or creates one if none exists.
+     */
+    public function currentSocialContract(): \App\Models\SocialContract
+    {
+        $contract = $this->socialContracts()->latest('id')->first();
+        if (!$contract) {
+            $contract = $this->socialContracts()->create([
+                'status' => 'submitted',
+                'submission_date' => now(),
+            ]);
+        }
+        return $contract;
+    }
+
+    /**
      * Get the user's initials
      */
     public function initials(): string
