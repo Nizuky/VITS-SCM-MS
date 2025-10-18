@@ -10265,3 +10265,7 @@ into your web browser: <span class="break-all" style="box-sizing: border-box; fo
 #23 {main}
 "} 
 [2025-10-17 09:55:56] local.WARNING: SuperAdmin login failed {"identifier":"admin2025","ip":"127.0.0.1"} 
+[2025-10-17 14:55:56] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:\\Users\\janar\\Herd\\scms\\vendor\\symfony\\mailer\\Transport\\Smtp\\Stream\\AbstractStream.php:82)
+[stacktrace]
+#0 {main}
+"} 
