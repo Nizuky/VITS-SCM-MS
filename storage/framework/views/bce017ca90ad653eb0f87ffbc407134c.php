@@ -46,6 +46,17 @@
         .active-nav { background-color: #6D28D9; color: #ffffff; border-radius: 0.5rem; }
         .flex-1-dynamic { flex: 1 1 auto; min-height: 0; }
         .content-area-auto { height: auto; max-height: 100%; }
+        /* Strong button color override to avoid DaisyUI theme side-effects */
+    .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+    .btn-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+    .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
+    .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
+    .btn-primary-purple svg { stroke: #ffffff !important; }
+    /* Consistent status badges (independent from DaisyUI badge theme) */
+    .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
+    .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
+    .scms-badge--verified { background-color: #CCEED6 !important; color: #399552 !important; }
+    .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
         /* Optional utility for static-looking inputs */
         .static-input { border: none !important; box-shadow: none !important; padding-left: 0 !important; background-color: transparent !important; cursor: default !important; }
         /* Page background image */
@@ -65,6 +76,7 @@
 </head>
 <body class="min-h-screen bg-custom">
     <script>window.__SCMS_DISABLE_AUTO_LOGOUT = true;</script>
+    <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php
         // Combined: compute base path and user initials for header/avatar
@@ -235,7 +247,7 @@
 
             <div id="record-status-page" class="page-content flex flex-col flex-1-dynamic">
                 <div class="flex justify-between items-center px-4 mb-6">
-                    <button class="btn bg-primary-purple hover:bg-primary-purple-hover text-white rounded-lg" onclick="document.getElementById('add_record_modal').showModal()">
+                    <button class="btn btn-primary-purple rounded-lg border-0" onclick="document.getElementById('add_record_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
@@ -392,7 +404,7 @@
                             </div>
                             
                             <div class="col-span-2 pt-6 flex justify-end">
-                                <button type="submit" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg" onclick="showViewMode()">
+                                <button type="button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg" onclick="showViewMode()">
                                     Save Changes
                                 </button>
                             </div>
@@ -854,13 +866,13 @@
         // execute attachLogoutHandler once after DOM ready
         try { attachLogoutHandler(); } catch (_) {}
         function renderStatusBadge(status) {
-            if (status === 'Verified') {
-                return '<div class="badge text-badge-verified-text bg-badge-verified-bg font-semibold border-0">Verified</div>';
+            if (status === 'Verified' || status === 'Approved') {
+                return '<span class="scms-badge scms-badge--verified">Verified</span>';
             }
             if (status === 'Rejected') {
-                return '<div class="badge text-badge-rejected-text bg-badge-rejected-bg font-semibold border-0">Rejected</div>';
+                return '<span class="scms-badge scms-badge--rejected">Rejected</span>';
             }
-            return '<div class="badge text-badge-pending-text bg-badge-pending-bg font-semibold border-0">Pending</div>';
+            return '<span class="scms-badge scms-badge--pending">Pending</span>';
         }
         function filterTableByStatus(status, event) {
             const tableBody = document.getElementById('record-table-body');
