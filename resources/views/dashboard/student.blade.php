@@ -49,16 +49,16 @@
         .flex-1-dynamic { flex: 1 1 auto; min-height: 0; }
         .content-area-auto { height: auto; max-height: 100%; }
         /* Strong button color override to avoid DaisyUI theme side-effects */
-    .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
-    .btn-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
-    .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
-    .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
-    .btn-primary-purple svg { stroke: #ffffff !important; }
-    /* Consistent status badges (independent from DaisyUI badge theme) */
-    .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
-    .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
-    .scms-badge--verified { background-color: #CCEED6 !important; color: #399552 !important; }
-    .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
+        .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+        .btn-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+        .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
+        .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
+        .btn-primary-purple svg { stroke: #ffffff !important; }
+        /* Consistent status badges (independent from DaisyUI badge theme) */
+        .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
+        .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
+        .scms-badge--verified { background-color: #CCEED6 !important; color: #399552 !important; }
+        .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
         /* Optional utility for static-looking inputs */
         .static-input { border: none !important; box-shadow: none !important; padding-left: 0 !important; background-color: transparent !important; cursor: default !important; }
         /* Page background image */
@@ -84,7 +84,6 @@
     </style>
 </head>
 <body class="min-h-screen bg-custom">
-    @include('partials.vits_branding')
     @include('partials.auto_logout')
     @php
         // Combined: compute base path and user initials for header/avatar
@@ -190,9 +189,45 @@
                     </ul>
                 </div>
             </div>
-
+           
             <!-- Dashboard overview page with summary cards and charts -->
             <div id="dashboard-page" class="page-content hidden flex-col flex-1-dynamic">
+
+                <!-- Personalized greeting and summary cards -->
+                <!-- Outer wrapper (for background and overlay effect) -->
+                <div class="relative rounded-2xl p-2 mb-6 h-[250px]">
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 justify-between  h-[300px] w-[800px] rounded-2xl  flex items-center">
+                        <!-- Image overlay (on top of everything) -->
+                        <div class="absolute right-0 bottom-4 transform translate-x-[-25%] -translate-y-[16%] z-30">
+                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[300px] h-auto object-contain drop-shadow-lg" />
+                        </div>
+
+                        <!-- Main card container -->
+                        <div id="personalized-greeting" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white flex items-center v rounded-2xl overflow-hidden h-[160px] w-[90%] max-w-[800px] shadow-lg">
+
+                                <!-- Purple curved accent (top-left corner) -->
+                                <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-r from-purple-400 to-transparent rounded-br-full -translate-x-8 -translate-y-8 opacity-70"></div>
+
+                                <!-- Left text content -->
+                                <div class="relative z-10 ml-2 pl-10">
+                                    <h2 class="text-3xl font-semibold text-gray-800">
+                                        Good Morning, 
+                                        <span class="text-primary-purple font-bold">
+                                            {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
+                                        </span>
+                                    </h2>
+                                    <p class="text-gray-600 text-base mt-1">
+                                        Have a productive day!
+                                    </p>
+                                </div>
+
+                                <!-- Empty space for right-side alignment (optional balance) -->
+                            <div class="w-[120px]"></div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
                     <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
                     <p class="text-sm text-text-muted mb-4">Contract Status Overview (Approved, Pending, Rejected)</p>
