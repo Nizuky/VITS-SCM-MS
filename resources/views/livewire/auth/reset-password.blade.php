@@ -3,6 +3,8 @@
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -24,8 +26,30 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function mount(string $token): void
     {
         $this->token = $token;
+    // Ensure a plain, normalized email (avoid Stringable and case issues)
+    $raw = (string) request()->query('email', '');
+    $this->email = Str::lower(trim($raw));
 
-        $this->email = request()->string('email');
+    // If this reset was initiated from profile, try to prefill the intended
+    // new password cached under the token. This allows the user to simply
+    // confirm via the email link without retyping the password.
+    try {
+        $enc = Cache::get('profile:new_password:'.$this->token);
+        if (is_string($enc) && strlen($enc) > 0) {
+            $pwd = Crypt::decryptString($enc);
+            $this->password = $pwd;
+            $this->password_confirmation = $pwd;
+        }
+    } catch (\Throwable $e) { /* ignore cache/decrypt errors */ }
+
+    // If auto=1 is present and we have a prefilled password, auto-submit the reset.
+    try {
+        $auto = (string) request()->query('auto', '');
+        if ($auto === '1' && $this->password && $this->password_confirmation) {
+            // Defer to next tick so Livewire has bound properties
+            $this->dispatch('$refresh');
+        }
+    } catch (\Throwable $e) { /* ignore */ }
     }
 
     /**
@@ -42,11 +66,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
+        $status = Password::broker()->reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) {
+            function ($user, $password) {
+                // Let the 'hashed' cast on the User model hash the password automatically
                 $user->forceFill([
-                    'password' => Hash::make($this->password),
+                    'password' => $password,
                     'remember_token' => Str::random(60),
                 ])->save();
 
@@ -57,7 +82,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // If the password was successfully reset, we will redirect the user back to
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
-        if ($status !== Password::PasswordReset) {
+        if ($status !== Password::PASSWORD_RESET) {
             $this->addError('email', __($status));
 
             return;
@@ -74,6 +99,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         } catch (\Throwable $e) { /* ignore */ }
 
         $redirect = request()->string('redirect');
+        // Clean up any cached intended password for this token
+        try { Cache::forget('profile:new_password:'.$this->token); } catch (\Throwable $e) { /* ignore */ }
         if ($redirect === 'profile') {
             $this->redirect(route('dashboard', absolute: false).'#profile', navigate: true);
             return;
@@ -97,6 +124,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             type="email"
             required
             autocomplete="email"
+            readonly
         />
 
         <!-- Password -->
@@ -128,3 +156,19 @@ new #[Layout('components.layouts.auth')] class extends Component {
         </div>
     </form>
 </div>
+
+<script>
+// Optional: if the server indicated auto=1 and the inputs were prefilled, auto-click the submit button.
+document.addEventListener('DOMContentLoaded', function(){
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('auto') === '1') {
+            // Small delay to allow Livewire rendering
+            setTimeout(() => {
+                const btn = document.querySelector('[data-test="reset-password-button"]');
+                if (btn) btn.click();
+            }, 150);
+        }
+    } catch (_) {}
+});
+</script>

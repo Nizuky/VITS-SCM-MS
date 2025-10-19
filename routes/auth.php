@@ -23,10 +23,11 @@ Route::middleware('guest')->group(function () {
     Volt::route('forgot-password', 'auth.forgot-password')
         ->name('password.request');
 
-    Volt::route('reset-password/{token}', 'auth.reset-password')
-        ->name('password.reset');
-
 });
+
+// Make password reset page reachable even if the user is authenticated (used by profile-confirmation flow)
+Volt::route('reset-password/{token}', 'auth.reset-password')
+    ->name('password.reset');
 
 // Make register page reachable even when a user is remembered (avoid RedirectIfAuthenticated)
 Volt::route('register', 'auth.register')->name('register');

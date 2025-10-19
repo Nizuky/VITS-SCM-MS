@@ -10,6 +10,8 @@
     <title>Student Contract Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/vitswhite.png" sizes="any">
+    <link rel="icon" href="/vitswhite.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -203,7 +205,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="approved-count">8</span> Records</h3>
                                 <p class="text-green-800 font-semibold">Approved</p>
-                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                             </div>
                         </div>
                         <!-- Pending Records -->
@@ -214,7 +216,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="pending-count">8</span> Records</h3>
                                 <p class="text-yellow-800 font-semibold">Pending</p>
-                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1" id="summary-last-updated-2-row">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
                             </div>
                         </div>
                         <!-- Rejected Records -->
@@ -225,7 +227,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Record</h3>
                                 <p class="text-red-800 font-semibold">Rejected</p>
-                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                             </div>
                         </div>
                     </div>
@@ -517,11 +519,7 @@
             alertDiv.innerHTML = `<span class="max-w-[22rem]">${message.replace(/</g, '&lt;')}</span>`;
             // Close on click
             alertDiv.addEventListener('click', () => alertDiv.remove());
-                let lastDate = null; // global last date (not shown directly anymore)
-                // Track per-status last update dates
-                let lastApprovedDate = null; // for Verified/Approved/Accepted
-                let lastPendingDate = null;  // for Pending (created/submitted)
-                let lastRejectedDate = null; // for Rejected
+            root.appendChild(alertDiv);
             // Animate in
             requestAnimationFrame(() => {
                 alertDiv.classList.remove('opacity-0', 'scale-95');
@@ -538,27 +536,17 @@
         } catch (_) { try { alert(message); } catch {} }
     }
     // --- Page Navigation Functions ---
-                    const isApproved = (status === 'Verified' || status === 'Approved' || status === 'Accepted');
-                    if (isApproved) {
+        function showPage(pageId) {
             document.querySelectorAll('aside a').forEach(a => {
                 a.classList.remove('bg-primary-purple', 'active-nav', 'rounded-lg');
             });
             document.querySelectorAll('.page-content').forEach(p => { p.classList.add('hidden'); });
             const greetingElement = document.getElementById('main-greeting');
             const notificationContainer = document.getElementById('notification-dropdown-container');
-                        // last update for approved bucket: prefer verified/approved timestamps, then updated_at, then event date
-                        const dA = pickDate(r, ['verified_at','approved_at','status_updated_at','updated_at','date','created_at']);
-                        if (dA && (!lastApprovedDate || dA > lastApprovedDate)) lastApprovedDate = dA;
             if (pageId === 'profile') { greetingElement.classList.add('hidden'); notificationContainer.classList.add('hidden'); }
             else { greetingElement.classList.remove('hidden'); notificationContainer.classList.remove('hidden'); }
-                        // last update for pending: prefer created/submitted, then event date
-                        const dP = pickDate(r, ['created_at','submitted_at','date','updated_at']);
-                        if (dP && (!lastPendingDate || dP > lastPendingDate)) lastPendingDate = dP;
             const newPage = document.getElementById(pageId + '-page'); if (newPage) newPage.classList.remove('hidden');
             const navLink = document.getElementById('nav-' + pageId); if (navLink) navLink.classList.add('bg-primary-purple', 'active-nav', 'rounded-lg');
-                        // last update for rejected: prefer rejected timestamp, then updated_at, then event date
-                        const dR = pickDate(r, ['rejected_at','status_updated_at','updated_at','date','created_at']);
-                        if (dR && (!lastRejectedDate || dR > lastRejectedDate)) lastRejectedDate = dR;
             if (pageId === 'profile') { showViewMode(); }
             if (pageId === 'dashboard' && typeof renderCharts === 'function') { renderCharts(); }
         }
@@ -678,7 +666,8 @@
             const hoursInput = document.getElementById('hours-rendered');
             const searchInput = document.getElementById('record-search');
             const profileSaveBtn = document.getElementById('profile-save-btn');
-            showPage('record-status');
+            // Show Dashboard as the initial page
+            showPage('dashboard');
             // Load existing records for the current student's latest social contract (single-account mode)
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             let allRecords = [];
@@ -846,21 +835,55 @@
             if (profileSaveBtn) {
                 profileSaveBtn.addEventListener('click', async () => {
                     try {
+                        // Gather and validate password fields
+                        const wantEdit = !document.getElementById('password-edit-fields').classList.contains('hidden');
+                        if (!wantEdit) {
+                            showToast('Nothing to change. Click "Reset Password?" first.', 'warning');
+                            return;
+                        }
+                        const currentPwd = (document.getElementById('current-password')?.value || '').trim();
+                        const newPwd = (document.getElementById('new-password')?.value || '').trim();
+                        const confirmPwd = (document.getElementById('confirm-password')?.value || '').trim();
+                        if (!currentPwd || !newPwd || !confirmPwd) {
+                            showToast('Please fill in all password fields.', 'warning');
+                            return;
+                        }
+                        if (newPwd !== confirmPwd) {
+                            showToast('New password and confirm password do not match.', 'error');
+                            return;
+                        }
+                        if (newPwd.length < 8) {
+                            showToast('Password must be at least 8 characters.', 'error');
+                            return;
+                        }
+
+                        await ensureCsrfCookie();
                         const res = await fetch(`${BASE_PATH}/api/profile/send-reset-link`, {
                             method: 'POST',
                             headers: {
                                 'Accept': 'application/json',
+                                'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
                                 'X-CSRF-TOKEN': csrf,
                             },
-                            credentials: 'same-origin'
+                            credentials: 'same-origin',
+                            body: JSON.stringify({
+                                current_password: currentPwd,
+                                password: newPwd,
+                                password_confirmation: confirmPwd,
+                            })
                         });
+                        const ct = res.headers.get('content-type') || '';
+                        const data = ct.includes('application/json') ? await res.json().catch(() => ({})) : {};
                         if (!res.ok) {
-                            const data = await res.json().catch(() => ({}));
-                            showToast(data.message || 'Failed to send verification email.', 'error');
+                            const msg = (data && data.message) ? data.message : 'Failed to send verification email.';
+                            showToast(msg, 'error');
                             return;
                         }
-                        showToast('Verification email sent to your PLV address. Please check your inbox to confirm changes.', 'success');
+                        const who = data.email ? ` (${data.email})` : '';
+                        showToast(`Verification email sent${who}. Please check your inbox to confirm changes.`, 'success');
+                        // Back to view mode
+                        togglePasswordForm('hide');
                         showViewMode();
                     } catch (e) {
                         showToast('Failed to send verification email.', 'error');
@@ -1059,11 +1082,17 @@
 
                 const counts = { Approved: 0, Verified: 0, Pending: 0, Rejected: 0 };
                 let totalHours = 0;
-                let lastDate = null;
+                // Track last update per status
+                let lastApproved = null; // includes Verified/Approved
+                let lastPending = null;
+                let lastRejected = null;
                 const yearMap = new Map(); // year -> approved count
 
                 for (const r of records) {
                     const status = String(r.status || '').trim();
+                    // prefer explicit timestamps when available; fallback to record date
+                    const createdAt = safeDate(r.created_at || r.createdAt || r.date);
+                    const updatedAt = safeDate(r.updated_at || r.updatedAt || r.date);
                     if (status === 'Verified' || status === 'Approved') {
                         counts.Verified++;
                         // aggregate yearly approved
@@ -1071,34 +1100,34 @@
                         if (y !== null) {
                             yearMap.set(y, (yearMap.get(y) || 0) + 1);
                         }
+                        const basis = updatedAt || createdAt;
+                        if (basis && (!lastApproved || basis > lastApproved)) lastApproved = basis;
                     } else if (status === 'Pending') {
                         counts.Pending++;
+                        if (createdAt && (!lastPending || createdAt > lastPending)) lastPending = createdAt;
                     } else if (status === 'Rejected') {
                         counts.Rejected++;
+                        const basis = updatedAt || createdAt;
+                        if (basis && (!lastRejected || basis > lastRejected)) lastRejected = basis;
                     }
                     // hours
                     const h = Number(r.hours_rendered || 0);
                     if (!Number.isNaN(h)) totalHours += h;
-                    // last date
-                    const d = safeDate(r.date);
-                    if (d && (!lastDate || d > lastDate)) lastDate = d;
                 }
 
                 // Update cards (treat Verified as Approved)
                 if (elApproved) elApproved.textContent = String(counts.Verified);
                 if (elPending) elPending.textContent = String(counts.Pending);
                 if (elRejected) elRejected.textContent = String(counts.Rejected);
+                // Per-status last update text & row visibility
                 const fmt = (d) => d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : '';
-                const approvedTxt = fmt(lastApprovedDate);
-                const pendingTxt  = fmt(lastPendingDate);
-                const rejectedTxt = fmt(lastRejectedDate);
-                setTextIf('#summary-last-updated', approvedTxt); // Approved/Verified
-                setTextIf('#summary-last-updated-2', pendingTxt);  // Pending
-                setTextIf('#summary-last-updated-3', rejectedTxt); // Rejected
-                // If blank, clear the 'last update:' label by hiding parent p
-                hideIfEmpty('#summary-last-updated');
-                hideIfEmpty('#summary-last-updated-2');
-                hideIfEmpty('#summary-last-updated-3');
+                const approvedText = fmt(lastApproved);
+                const pendingText = fmt(lastPending);
+                const rejectedText = fmt(lastRejected);
+                setTextIf('#summary-last-updated', approvedText);
+                setTextIf('#summary-last-updated-2', pendingText);
+                setTextIf('#summary-last-updated-3', rejectedText);
+                // Leave labels visible; if no data, the value spans are empty (blank)
 
                 // Hours completion percent: if there's a target, use it; else derive a soft target (e.g., 100 hours)
                 const targetHours = window.__SCMS_TARGET_HOURS || 100;
@@ -1124,17 +1153,6 @@
             try {
                 const el = document.querySelector(selector);
                 if (el) el.textContent = text;
-            } catch (_) {}
-        }
-
-        function hideIfEmpty(selector) {
-            try {
-                const el = document.querySelector(selector);
-                if (!el) return;
-                const container = el.closest('p');
-                if (!container) return;
-                const hasText = (el.textContent || '').trim().length > 0;
-                container.style.display = hasText ? '' : 'none';
             } catch (_) {}
         }
 

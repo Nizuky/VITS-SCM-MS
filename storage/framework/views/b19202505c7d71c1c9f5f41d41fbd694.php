@@ -70,6 +70,7 @@
     </style>
 </head>
 <body class="min-h-screen bg-background-light">
+    <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo $__env->make('partials.auto_logout_admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <div class="flex p-4 gap-4 min-h-screen"> 
         <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm">

@@ -3,6 +3,8 @@
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -61,14 +63,14 @@ use Livewire\Volt\Component;
         <!-- Email Address -->
         <?php if (isset($component)) { $__componentOriginal26c546557cdc09040c8dd00b2090afd0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal26c546557cdc09040c8dd00b2090afd0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::input.index','data' => ['wire:model' => 'email','label' => __('Email'),'type' => 'email','required' => true,'autocomplete' => 'email']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::input.index','data' => ['wire:model' => 'email','label' => __('Email'),'type' => 'email','required' => true,'autocomplete' => 'email','readonly' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('flux::input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'email','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Email')),'type' => 'email','required' => true,'autocomplete' => 'email']); ?>
+<?php $component->withAttributes(['wire:model' => 'email','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Email')),'type' => 'email','required' => true,'autocomplete' => 'email','readonly' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal26c546557cdc09040c8dd00b2090afd0)): ?>
@@ -127,14 +129,14 @@ use Livewire\Volt\Component;
         <div class="flex items-center justify-end">
             <?php if (isset($component)) { $__componentOriginalc04b147acd0e65cc1a77f86fb0e81580 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::button.index','data' => ['type' => 'submit','variant' => 'primary','class' => 'w-full','dataTest' => 'reset-password-button']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::button.index','data' => ['type' => 'submit','variant' => 'primary','class' => 'w-full scms-primary-btn','dataTest' => 'reset-password-button']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('flux::button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['type' => 'submit','variant' => 'primary','class' => 'w-full','data-test' => 'reset-password-button']); ?>
+<?php $component->withAttributes(['type' => 'submit','variant' => 'primary','class' => 'w-full scms-primary-btn','data-test' => 'reset-password-button']); ?>
                 <?php echo e(__('Reset password')); ?>
 
              <?php echo $__env->renderComponent(); ?>
@@ -149,4 +151,20 @@ use Livewire\Volt\Component;
 <?php endif; ?>
         </div>
     </form>
-</div><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/reset-password.blade.php ENDPATH**/ ?>
+</div>
+
+<script>
+// Optional: if the server indicated auto=1 and the inputs were prefilled, auto-click the submit button.
+document.addEventListener('DOMContentLoaded', function(){
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('auto') === '1') {
+            // Small delay to allow Livewire rendering
+            setTimeout(() => {
+                const btn = document.querySelector('[data-test="reset-password-button"]');
+                if (btn) btn.click();
+            }, 150);
+        }
+    } catch (_) {}
+});
+</script><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/reset-password.blade.php ENDPATH**/ ?>

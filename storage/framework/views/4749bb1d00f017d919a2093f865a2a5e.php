@@ -18,6 +18,12 @@
             /* desktop default body padding so content isn't covered */
             body { padding-top: var(--header-desktop-h); background-image: url('<?php echo e(asset('storage/vitsbg.png')); ?>'); background-repeat: no-repeat; background-position: center top; background-size: cover; background-attachment: fixed; }
 
+            /* Brand primary button (shared across auth pages) */
+            .scms-primary-btn { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+            .scms-primary-btn:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+            .scms-primary-btn:focus { outline: none !important; box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.35) !important; }
+            .scms-primary-btn:active { background-color: #4C1D95 !important; }
+
             /* Dark mode tweak */
             @media (prefers-color-scheme: dark) { #site-header { background: rgba(255, 255, 255); } }
         </style>
