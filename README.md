@@ -41,3 +41,22 @@ Notes
 - Foreign key checks are handled per driver (MySQL/SQLite/PGSQL) during truncation/inserts.
 - To exclude certain tables, use `--exclude=table1,table2`.
 - If you need to re-export, simply run `php artisan seed:export` again and re-commit updated files.
+
+## Mail configuration (password reset & profile flow)
+
+This app sends password reset emails (including the profile “Save Changes” flow which emails a reset link to the student's plv.edu.ph address). Make sure your environment has valid mail settings in `.env`:
+
+- MAIL_MAILER=smtp
+- MAIL_HOST=your.smtp.host
+- MAIL_PORT=587
+- MAIL_USERNAME=your_username
+- MAIL_PASSWORD=your_password
+- MAIL_ENCRYPTION=tls
+- MAIL_FROM_ADDRESS=noreply@yourdomain.tld
+- MAIL_FROM_NAME="VITS SCM"
+
+Tips
+
+- Use Mailpit, Mailhog, or a real SMTP to verify emails locally.
+- Ensure the user's email ends with `@plv.edu.ph`; the profile flow enforces this domain.
+- If emails don't arrive, check `storage/logs/laravel.log` and your SMTP provider logs.

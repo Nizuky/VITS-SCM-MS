@@ -49,6 +49,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'index'])->name('social-contract.records.index');
     Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
     Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
+
+    // Profile: send password reset link to PLV email with redirect back to profile
+    Route::post('/api/profile/send-reset-link', [\App\Http\Controllers\ProfileController::class, 'sendPasswordResetLink'])
+        ->name('profile.sendResetLink');
 });
 
 // Admin users auth routes (separate from superadmin)

@@ -1,5 +1,9 @@
 /* Tailwind CSS v4 entrypoint */
 @import "tailwindcss";
+/* Flux UI styles */
+@import "../../vendor/livewire/flux/dist/flux.css";
+
+/* Dark variant is handled by utility classes in Tailwind v4 */
 
 /* Your global styles can go below */
 /* :root { } */

@@ -122,15 +122,15 @@
 
             <ul class="menu p-0">
                 <li>
-                    <a class="py-3" id="nav-profile" onclick="showPage('profile')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <a class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0" id="nav-profile" onclick="showPage('profile')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         Profile
                     </a>
                 </li>
                 <li>
                     <form id="logout-form-visible" action="<?php echo e(route('logout')); ?>" method="POST" class="m-0 p-0" novalidate>
                         <?php echo csrf_field(); ?>
-                        <button id="logout-button-visible" type="button" class="py-3 w-full text-left flex items-center gap-2">
+                        <button id="logout-button-visible" type="button" class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             Log Out
                         </button>
@@ -405,7 +405,7 @@
                             </div>
                             
                             <div class="col-span-2 pt-6 flex justify-end">
-                                <button type="button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg" onclick="showViewMode()">
+                                <button type="button" id="profile-save-btn" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
                                     Save Changes
                                 </button>
                             </div>
@@ -623,6 +623,7 @@
             const tableBody = document.getElementById('record-table-body');
             const hoursInput = document.getElementById('hours-rendered');
             const searchInput = document.getElementById('record-search');
+            const profileSaveBtn = document.getElementById('profile-save-btn');
             showPage('record-status');
             // Load existing records for the current student's latest social contract (single-account mode)
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -787,6 +788,31 @@
                     confirmationModal.close();
                 });
             });
+            // Send reset link to PLV email for profile change confirmation
+            if (profileSaveBtn) {
+                profileSaveBtn.addEventListener('click', async () => {
+                    try {
+                        const res = await fetch(`${BASE_PATH}/api/profile/send-reset-link`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrf,
+                            },
+                            credentials: 'same-origin'
+                        });
+                        if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            alert(data.message || 'Failed to send verification email.');
+                            return;
+                        }
+                        alert('A verification email was sent to your PLV email. Please open it to reset your password and confirm changes.');
+                        showViewMode();
+                    } catch (e) {
+                        alert('Failed to send verification email.');
+                    }
+                });
+            }
             document.getElementById('delete-selected').addEventListener('click', () => {
                 const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const ids = Array.from(document.querySelectorAll('#record-table-body tr'))
@@ -820,11 +846,72 @@
                 .catch((err) => { console.error('Failed to delete selected records', err); });
             });
         }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initDashboard, { once: true });
-        } else {
-            initDashboard();
+        // Floating portal for the status filter menu (avoid overflow clipping)
+        function setupStatusFilterPortal() {
+            try {
+                const dd = document.getElementById('status-filter-dropdown');
+                if (!dd) return;
+                const toggle = dd.querySelector('[role="button"]');
+                const menu = dd.querySelector('ul');
+                if (!toggle || !menu) return;
+
+                function closePortal(){
+                    const portal = document.getElementById('status-filter-portal');
+                    if (!portal) return;
+                    const ul = portal.querySelector('ul');
+                    if (ul) dd.appendChild(ul);
+                    portal.remove();
+                    document.removeEventListener('click', onDocClick, true);
+                    window.removeEventListener('keydown', onEsc);
+                    window.removeEventListener('scroll', onScroll, { passive: true });
+                    window.removeEventListener('resize', onScroll);
+                }
+                function onDocClick(e){
+                    const portal = document.getElementById('status-filter-portal');
+                    if (!portal) return;
+                    if (!portal.contains(e.target) && e.target !== toggle) closePortal();
+                }
+                function onEsc(e){ if (e.key === 'Escape') closePortal(); }
+                function onScroll(){ closePortal(); }
+
+                toggle.addEventListener('click', function(ev){
+                    ev.preventDefault(); ev.stopPropagation();
+                    const portalExisting = document.getElementById('status-filter-portal');
+                    if (portalExisting) { closePortal(); return; }
+                    const rect = toggle.getBoundingClientRect();
+                    const portal = document.createElement('div');
+                    portal.id = 'status-filter-portal';
+                    portal.style.position = 'fixed';
+                    portal.style.zIndex = '3000';
+                    document.body.appendChild(portal);
+                    portal.appendChild(menu);
+                    // Prepare for measurement
+                    const menuWidth = Math.max(menu.offsetWidth || 128, 128);
+                    menu.style.minWidth = menuWidth + 'px';
+                    menu.style.visibility = 'hidden';
+                    portal.style.left = '-9999px';
+                    portal.style.top = '0px';
+                    // Measure to decide placement
+                    const mRect = menu.getBoundingClientRect();
+                    const mH = mRect.height || 160;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const openAbove = spaceBelow < mH + 12; // flip if not enough space
+                    const left = Math.min(Math.max(8, rect.right - menuWidth), window.innerWidth - menuWidth - 8);
+                    const top = openAbove ? Math.max(8, rect.top - 6 - mH) : (rect.bottom + 6);
+                    portal.style.left = left + 'px';
+                    portal.style.top = top + 'px';
+                    menu.style.visibility = 'visible';
+                    document.addEventListener('click', onDocClick, true);
+                    window.addEventListener('keydown', onEsc);
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('resize', onScroll);
+                });
+            } catch (_) {}
         }
+
+        function boot(){ initDashboard(); setupStatusFilterPortal(); }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
+        else { boot(); }
         // Attach logout handler after DOM is ready to avoid inline script rendering issues
         function attachLogoutHandler() {
             try {
@@ -882,13 +969,16 @@
                 const rowStatus = row.children[6].textContent.trim();
                 row.style.display = (status === 'All' || rowStatus === status) ? '' : 'none';
             });
-            if (event && event.target) {
-                let dropdownContainer = event.target.closest('.dropdown');
-                if (dropdownContainer) {
-                    const dropdownToggle = dropdownContainer.querySelector('[tabindex="0"]');
-                    if (dropdownToggle) { dropdownToggle.click(); }
+            // Close the floating menu if open
+            try {
+                const portal = document.getElementById('status-filter-portal');
+                if (portal) {
+                    const ul = portal.querySelector('ul');
+                    const dd = document.getElementById('status-filter-dropdown');
+                    if (ul && dd) dd.appendChild(ul);
+                    portal.remove();
                 }
-            }
+            } catch (_) {}
         }
 
         // --- Dashboard metrics from records ---

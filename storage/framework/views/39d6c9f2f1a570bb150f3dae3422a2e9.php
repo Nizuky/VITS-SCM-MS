@@ -16,7 +16,7 @@ use Livewire\Volt\Component;
 
 ?>
 
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6 scms-login">
     <?php if (isset($component)) { $__componentOriginale5d2f2831f58fdbe96ad6d7cbd41a7dd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginale5d2f2831f58fdbe96ad6d7cbd41a7dd = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auth-header','data' => ['title' => __('Student Login'),'description' => __('Enter your plv  email, student number, and password below to log in')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -154,39 +154,25 @@ use Livewire\Volt\Component;
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </div>
 
-        <!-- Remember Me -->
-        <?php if (isset($component)) { $__componentOriginal9384bd05e996fcc8c16dc84e6bbc1c8f = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9384bd05e996fcc8c16dc84e6bbc1c8f = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::checkbox.index','data' => ['wire:model' => 'remember','label' => __('Remember me')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::checkbox'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'remember','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Remember me'))]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9384bd05e996fcc8c16dc84e6bbc1c8f)): ?>
-<?php $attributes = $__attributesOriginal9384bd05e996fcc8c16dc84e6bbc1c8f; ?>
-<?php unset($__attributesOriginal9384bd05e996fcc8c16dc84e6bbc1c8f); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9384bd05e996fcc8c16dc84e6bbc1c8f)): ?>
-<?php $component = $__componentOriginal9384bd05e996fcc8c16dc84e6bbc1c8f; ?>
-<?php unset($__componentOriginal9384bd05e996fcc8c16dc84e6bbc1c8f); ?>
-<?php endif; ?>
+        <!-- Remember Me (native checkbox for consistent styling) -->
+        <div class="scms-remember select-none">
+            <label for="remember" class="inline-flex items-center gap-2 cursor-pointer">
+                <input id="remember" type="checkbox" wire:model="remember" class="h-4 w-4 rounded-4" />
+                <span><?php echo e(__('Remember me')); ?></span>
+            </label>
+        </div>
 
         <div class="flex items-center justify-end">
             <?php if (isset($component)) { $__componentOriginalc04b147acd0e65cc1a77f86fb0e81580 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::button.index','data' => ['variant' => 'primary','type' => 'submit','class' => 'w-full','dataTest' => 'login-button']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::button.index','data' => ['variant' => 'primary','type' => 'submit','class' => 'w-full scms-primary-btn','dataTest' => 'login-button']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('flux::button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['variant' => 'primary','type' => 'submit','class' => 'w-full','data-test' => 'login-button']); ?>
+<?php $component->withAttributes(['variant' => 'primary','type' => 'submit','class' => 'w-full scms-primary-btn','data-test' => 'login-button']); ?>
                 <?php echo e(__('Log in')); ?>
 
              <?php echo $__env->renderComponent(); ?>
@@ -226,4 +212,27 @@ use Livewire\Volt\Component;
 <?php endif; ?>
         </div>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <style>
+    /* Scoped overrides for login page */
+    .scms-login .scms-primary-btn {
+        background-color: #6D28D9 !important; /* primary purple */
+        color: #ffffff !important;
+        border-color: transparent !important;
+    }
+    .scms-login .scms-primary-btn:hover {
+        background-color: #5B21B6 !important; /* darker hover */
+    }
+    .scms-login .scms-primary-btn:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.35) !important;
+    }
+
+    /* Force the checkbox check/track to use our brand color */
+    .scms-login input[type="checkbox"] {
+        accent-color: #6D28D9; /* modern browsers */
+    }
+
+    /* Optional: ensure label next to checkbox inherits readable color */
+    .scms-login label { color: inherit; }
+    </style>
 </div><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/login.blade.php ENDPATH**/ ?>

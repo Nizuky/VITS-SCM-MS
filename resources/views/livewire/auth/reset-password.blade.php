@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
@@ -63,6 +64,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
         }
 
         Session::flash('status', __($status));
+
+        // Optional: if already authenticated, keep session; else sign in and redirect appropriately
+        try {
+            if (!Auth::check()) {
+                $user = \App\Models\User::where('email', $this->email)->first();
+                if ($user) { Auth::login($user, false); }
+            }
+        } catch (\Throwable $e) { /* ignore */ }
+
+        $redirect = request()->string('redirect');
+        if ($redirect === 'profile') {
+            $this->redirect(route('dashboard', absolute: false).'#profile', navigate: true);
+            return;
+        }
 
         $this->redirectRoute('login', navigate: true);
     }

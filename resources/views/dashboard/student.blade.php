@@ -75,6 +75,11 @@
         /* Notification bell dot: force consistent color and visibility */
         .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border: 2px solid #ffffff !important; border-radius: 9999px; box-sizing: content-box; }
     </style>
+    <style>
+        /* Toast root tweaks: allow individual toasts to receive pointer events */
+        #toast-root { pointer-events: none; }
+        #toast-root .alert { pointer-events: auto; }
+    </style>
 </head>
 <body class="min-h-screen bg-custom">
     @include('partials.vits_branding')
@@ -122,15 +127,15 @@
 
             <ul class="menu p-0">
                 <li>
-                    <a class="py-3" id="nav-profile" onclick="showPage('profile')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <a class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0" id="nav-profile" onclick="showPage('profile')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         Profile
                     </a>
                 </li>
                 <li>
                     <form id="logout-form-visible" action="{{ route('logout') }}" method="POST" class="m-0 p-0" novalidate>
                         @csrf
-                        <button id="logout-button-visible" type="button" class="py-3 w-full text-left flex items-center gap-2">
+                        <button id="logout-button-visible" type="button" class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             Log Out
                         </button>
@@ -405,7 +410,7 @@
                             </div>
                             
                             <div class="col-span-2 pt-6 flex justify-end">
-                                <button type="button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg" onclick="showViewMode()">
+                                <button type="button" id="profile-save-btn" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
                                     Save Changes
                                 </button>
                             </div>
@@ -492,7 +497,42 @@
         </div>
     </dialog>
 
+    <!-- DaisyUI toast root (bottom-right) -->
+    <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
+
     <script>
+    // --- Toast helper using DaisyUI ---
+    function showToast(message, type = 'info') {
+        try {
+            const root = document.getElementById('toast-root');
+            if (!root) return alert(message);
+            const alertDiv = document.createElement('div');
+            const typeClass = {
+                info: 'alert-info',
+                success: 'alert-success',
+                warning: 'alert-warning',
+                error: 'alert-error'
+            }[type] || 'alert-info';
+            alertDiv.className = `alert ${typeClass} shadow-md transition transform duration-150 ease-out opacity-0 scale-95`;
+            alertDiv.innerHTML = `<span class="max-w-[22rem]">${message.replace(/</g, '&lt;')}</span>`;
+            // Close on click
+            alertDiv.addEventListener('click', () => alertDiv.remove());
+            root.appendChild(alertDiv);
+            // Animate in
+            requestAnimationFrame(() => {
+                alertDiv.classList.remove('opacity-0', 'scale-95');
+                alertDiv.classList.add('opacity-100', 'scale-100');
+            });
+            // Auto dismiss
+            setTimeout(() => {
+                try {
+                    alertDiv.classList.remove('opacity-100', 'scale-100');
+                    alertDiv.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => alertDiv.remove(), 160);
+                } catch (_) { alertDiv.remove(); }
+            }, 4500);
+        } catch (_) { try { alert(message); } catch {} }
+    }
     // --- Page Navigation Functions ---
         function showPage(pageId) {
             document.querySelectorAll('aside a').forEach(a => {
@@ -623,6 +663,7 @@
             const tableBody = document.getElementById('record-table-body');
             const hoursInput = document.getElementById('hours-rendered');
             const searchInput = document.getElementById('record-search');
+            const profileSaveBtn = document.getElementById('profile-save-btn');
             showPage('record-status');
             // Load existing records for the current student's latest social contract (single-account mode)
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -778,15 +819,40 @@
                     console.error('Failed to save record', err);
                     if (err && err.status === 422 && err.err && err.err.errors) {
                         const messages = Object.values(err.err.errors).flat().join('\n');
-                        alert('Validation error:\n' + messages);
+                        showToast('Validation error: ' + messages, 'error');
                     } else if (err && err.status === 401) {
                         window.location.href = `${BASE_PATH}/login`;
                     } else {
-                        alert('Failed to save record. Please sign in again if your session expired.');
+                        showToast('Failed to save record. Please sign in again if your session expired.', 'error');
                     }
                     confirmationModal.close();
                 });
             });
+            // Send reset link to PLV email for profile change confirmation
+            if (profileSaveBtn) {
+                profileSaveBtn.addEventListener('click', async () => {
+                    try {
+                        const res = await fetch(`${BASE_PATH}/api/profile/send-reset-link`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrf,
+                            },
+                            credentials: 'same-origin'
+                        });
+                        if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            showToast(data.message || 'Failed to send verification email.', 'error');
+                            return;
+                        }
+                        showToast('Verification email sent to your PLV address. Please check your inbox to confirm changes.', 'success');
+                        showViewMode();
+                    } catch (e) {
+                        showToast('Failed to send verification email.', 'error');
+                    }
+                });
+            }
             document.getElementById('delete-selected').addEventListener('click', () => {
                 const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const ids = Array.from(document.querySelectorAll('#record-table-body tr'))
@@ -820,11 +886,84 @@
                 .catch((err) => { console.error('Failed to delete selected records', err); });
             });
         }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initDashboard, { once: true });
-        } else {
-            initDashboard();
+        // Floating portal for the status filter menu (avoid overflow clipping)
+        function setupStatusFilterPortal() {
+            try {
+                const dd = document.getElementById('status-filter-dropdown');
+                if (!dd) return;
+                const toggle = dd.querySelector('[role="button"]');
+                const menu = dd.querySelector('ul');
+                if (!toggle || !menu) return;
+
+                function closePortal(){
+                    const portal = document.getElementById('status-filter-portal');
+                    if (!portal) return;
+                    const ul = portal.querySelector('ul');
+                    if (ul) dd.appendChild(ul);
+                    portal.remove();
+                    document.removeEventListener('click', onDocClick, true);
+                    window.removeEventListener('keydown', onEsc);
+                    window.removeEventListener('scroll', onScroll, { passive: true });
+                    window.removeEventListener('resize', onScroll);
+                }
+                function onDocClick(e){
+                    const portal = document.getElementById('status-filter-portal');
+                    if (!portal) return;
+                    if (!portal.contains(e.target) && e.target !== toggle) closePortal();
+                }
+                function onEsc(e){ if (e.key === 'Escape') closePortal(); }
+                function onScroll(){ closePortal(); }
+
+                toggle.addEventListener('click', function(ev){
+                    ev.preventDefault(); ev.stopPropagation();
+                    const portalExisting = document.getElementById('status-filter-portal');
+                    if (portalExisting) { closePortal(); return; }
+                    const rect = toggle.getBoundingClientRect();
+                    const portal = document.createElement('div');
+                    portal.id = 'status-filter-portal';
+                    portal.className = 'fixed z-[3000]';
+                    document.body.appendChild(portal);
+                    portal.appendChild(menu);
+                    // Prepare for measurement
+                    const menuWidth = Math.max(menu.offsetWidth || 128, 128);
+                    menu.style.minWidth = menuWidth + 'px';
+                    menu.style.visibility = 'hidden';
+                    portal.style.left = '-9999px';
+                    portal.style.top = '0px';
+                    // Measure to decide placement
+                    const mRect = menu.getBoundingClientRect();
+                    const mH = mRect.height || 160;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const openAbove = spaceBelow < mH + 12; // flip if not enough space
+                    const left = Math.min(Math.max(8, rect.right - menuWidth), window.innerWidth - menuWidth - 8);
+                    const offset = 10; // space for caret
+                    const top = openAbove ? Math.max(8, rect.top - offset - mH) : (rect.bottom + offset);
+                    portal.style.left = left + 'px';
+                    portal.style.top = top + 'px';
+                    // Caret
+                    const caret = document.createElement('div');
+                    caret.className = 'absolute w-3 h-3 bg-base-100 rotate-45 shadow';
+                    caret.style.right = '12px';
+                    if (openAbove) { caret.style.top = (mH + 2) + 'px'; } else { caret.style.top = '-6px'; }
+                    portal.appendChild(caret);
+                    // Animate menu in
+                    menu.classList.add('transition', 'ease-out', 'duration-150', 'transform', 'opacity-0', 'scale-95');
+                    menu.style.visibility = 'visible';
+                    requestAnimationFrame(() => {
+                        menu.classList.remove('opacity-0', 'scale-95');
+                        menu.classList.add('opacity-100', 'scale-100');
+                    });
+                    document.addEventListener('click', onDocClick, true);
+                    window.addEventListener('keydown', onEsc);
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('resize', onScroll);
+                });
+            } catch (_) {}
         }
+
+        function boot(){ initDashboard(); setupStatusFilterPortal(); }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
+        else { boot(); }
         // Attach logout handler after DOM is ready to avoid inline script rendering issues
         function attachLogoutHandler() {
             try {
@@ -882,13 +1021,16 @@
                 const rowStatus = row.children[6].textContent.trim();
                 row.style.display = (status === 'All' || rowStatus === status) ? '' : 'none';
             });
-            if (event && event.target) {
-                let dropdownContainer = event.target.closest('.dropdown');
-                if (dropdownContainer) {
-                    const dropdownToggle = dropdownContainer.querySelector('[tabindex="0"]');
-                    if (dropdownToggle) { dropdownToggle.click(); }
+            // Close the floating menu if open
+            try {
+                const portal = document.getElementById('status-filter-portal');
+                if (portal) {
+                    const ul = portal.querySelector('ul');
+                    const dd = document.getElementById('status-filter-dropdown');
+                    if (ul && dd) dd.appendChild(ul);
+                    portal.remove();
                 }
-            }
+            } catch (_) {}
         }
 
         // --- Dashboard metrics from records ---

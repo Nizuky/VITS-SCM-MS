@@ -162,7 +162,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
     }
 }; ?>
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6 scms-login">
     <x-auth-header :title="__('Student Login')" :description="__('Enter your plv  email, student number, and password below to log in')" />
 
     <!-- Session Status -->
@@ -207,11 +207,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
             @endif
         </div>
 
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" :label="__('Remember me')" />
+        <!-- Remember Me (native checkbox for consistent styling) -->
+        <div class="scms-remember select-none">
+            <label for="remember" class="inline-flex items-center gap-2 cursor-pointer">
+                <input id="remember" type="checkbox" wire:model="remember" class="h-4 w-4 rounded-4" />
+                <span>{{ __('Remember me') }}</span>
+            </label>
+        </div>
 
         <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
+            <flux:button variant="primary" type="submit" class="w-full scms-primary-btn" data-test="login-button">
                 {{ __('Log in') }}
             </flux:button>
         </div>
@@ -223,4 +228,27 @@ new #[Layout('components.layouts.auth')] class extends Component {
             <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
         </div>
     @endif
+    <style>
+    /* Scoped overrides for login page */
+    .scms-login .scms-primary-btn {
+        background-color: #6D28D9 !important; /* primary purple */
+        color: #ffffff !important;
+        border-color: transparent !important;
+    }
+    .scms-login .scms-primary-btn:hover {
+        background-color: #5B21B6 !important; /* darker hover */
+    }
+    .scms-login .scms-primary-btn:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.35) !important;
+    }
+
+    /* Force the checkbox check/track to use our brand color */
+    .scms-login input[type="checkbox"] {
+        accent-color: #6D28D9; /* modern browsers */
+    }
+
+    /* Optional: ensure label next to checkbox inherits readable color */
+    .scms-login label { color: inherit; }
+    </style>
 </div>

@@ -110,4 +110,24 @@ Route::middleware('auth:superadmin')->group(function () {
         ->name('superadmin.logout');
 });
 
+// Admin protected beacon logout routes (separate from web guard)
+Route::middleware('auth:admin')->group(function(){
+    Route::get('admin/logout-beacon', function (\Illuminate\Http\Request $request) {
+        \Illuminate\Support\Facades\Auth::guard('admin')->logout();
+        try { $request->session()->invalidate(); } catch (\Throwable $e) {}
+        try { $request->session()->regenerateToken(); } catch (\Throwable $e) {}
+        $acceptsJson = $request->expectsJson() || str_contains(strtolower($request->header('accept', '')), 'application/json') || $request->ajax();
+        if ($acceptsJson) return response()->noContent();
+        return redirect()->route('admin.login');
+    })->name('admin.logout.beacon');
+
+    Route::post('admin/logout-beacon', function () {
+        \Illuminate\Support\Facades\Auth::guard('admin')->logout();
+        try { request()->session()->invalidate(); } catch (\Throwable $e) {}
+        try { request()->session()->regenerateToken(); } catch (\Throwable $e) {}
+        return response()->noContent();
+    })->name('admin.logout.beacon.post')
+      ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+});
+
 
