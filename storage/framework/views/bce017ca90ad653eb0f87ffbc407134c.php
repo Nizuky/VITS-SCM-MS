@@ -72,10 +72,11 @@
         .bg-gradient-approved { background-image: linear-gradient(to bottom, #DCFCE7, #81FFAC); }
         .bg-gradient-pending { background-image: linear-gradient(to bottom, #FFF4DE, #FFE0A2); }
         .bg-gradient-rejected { background-image: linear-gradient(to bottom, #FFE2E5, #FFB7BE); }
+        /* Notification bell dot: force consistent color and visibility */
+        .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border: 2px solid #ffffff !important; border-radius: 9999px; box-sizing: content-box; }
     </style>
 </head>
 <body class="min-h-screen bg-custom">
-    <script>window.__SCMS_DISABLE_AUTO_LOGOUT = true;</script>
     <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php
@@ -146,13 +147,13 @@
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
-                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Notifications" title="Notifications">
                         <div class="indicator">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                            <span class="badge badge-xs indicator-item bg-primary-purple border-0"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <span id="notif-dot" class="indicator-item scms-notif-dot" aria-hidden="true"></span>
                         </div>
                     </div>
-                    <ul tabindex="0" class="dropdown-content z-[1] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden">
+                    <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden">
                         
                         <li class="p-4 font-bold text-gray-700 border-b">Notifications</li>
 

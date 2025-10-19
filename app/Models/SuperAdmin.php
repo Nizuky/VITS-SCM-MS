@@ -14,7 +14,7 @@ class SuperAdmin extends Authenticatable implements MustVerifyEmail
     protected $table = 'super_admins';
 
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'email_verified_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];

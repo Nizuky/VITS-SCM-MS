@@ -60,6 +60,21 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * A student has many social contract records through their contracts.
+     */
+    public function socialContractRecords()
+    {
+        return $this->hasManyThrough(
+            \App\Models\SocialContractRecord::class,
+            \App\Models\SocialContract::class,
+            'student_id',           // Foreign key on SocialContract referencing users.id
+            'social_contract_id',   // Foreign key on SocialContractRecord referencing social_contracts.id
+            'id',                   // Local key on users
+            'id'                    // Local key on social_contracts
+        );
+    }
+
+    /**
      * Helper to get or create the current social contract for this student.
      * For now, returns the most recent contract by creation date or creates one if none exists.
      */

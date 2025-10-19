@@ -71,6 +71,31 @@ Route::middleware('auth')->group(function () {
         try { request()->session()->regenerateToken(); } catch (\Throwable $e) {}
         return redirect()->route('home');
     })->name('logout');
+
+    // Beacon-friendly logout endpoint: allows immediate logout during page/tab close or back navigation.
+    // Uses GET to avoid CSRF requirements and is protected by auth middleware.
+    // Returns 204 No Content for reliability with keepalive fetch.
+    Route::get('logout-beacon', function (\Illuminate\Http\Request $request) {
+        \Illuminate\Support\Facades\Auth::guard('web')->logout();
+        try { $request->session()->invalidate(); } catch (\Throwable $e) {}
+        try { $request->session()->regenerateToken(); } catch (\Throwable $e) {}
+        // If this was called via fetch/beacon (expects JSON/XHR), return 204.
+        // If a user navigated to this URL directly, redirect to home to avoid a blank page.
+        $acceptsJson = $request->expectsJson() || str_contains(strtolower($request->header('accept', '')), 'application/json') || $request->ajax();
+        if ($acceptsJson) {
+            return response()->noContent(); 
+        }
+        return redirect()->route('home');
+    })->name('logout.beacon');
+
+    // POST beacon endpoint for navigator.sendBeacon (which always sends POST)
+    Route::post('logout-beacon', function () {
+        \Illuminate\Support\Facades\Auth::guard('web')->logout();
+        try { request()->session()->invalidate(); } catch (\Throwable $e) {}
+        try { request()->session()->regenerateToken(); } catch (\Throwable $e) {}
+        return response()->noContent();
+    })->name('logout.beacon.post')
+      ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 });
 
 // Super-admin protected routes (use superadmin guard)

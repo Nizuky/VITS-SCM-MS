@@ -37,6 +37,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $user = $this->validateCredentials();
 
+        // Defense-in-depth: regenerate session ID before switching auth state
+        try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
+
         // If the user's email is not verified yet, log them in non-persistently
         // and send them to the verification prompt where they can resend the link.
         if (! $user->hasVerifiedEmail()) {
@@ -47,8 +50,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
             // Ensure no stale remember cookie keeps the user logged in after browser close
             try {
-                $recaller = Auth::guard()->getRecallerName();
-                Cookie::queue(Cookie::forget($recaller));
+                $recaller = Auth::guard('web')->getRecallerName();
+                // Ensure we forget the cookie with the same path/domain as it was set
+                Cookie::queue(Cookie::forget(
+                    $recaller,
+                    config('session.path', '/'),
+                    config('session.domain')
+                ));
             } catch (\Throwable $e) { /* ignore */ }
 
             $this->redirect(route('verification.prompt'), navigate: true);
@@ -66,12 +74,28 @@ new #[Layout('components.layouts.auth')] class extends Component {
             return;
         }
 
+    // If remember is NOT checked, proactively clear any stale recaller cookie before new login
+    if (! $this->remember) {
+        try {
+            $recaller = Auth::guard('web')->getRecallerName();
+            Cookie::queue(Cookie::forget(
+                $recaller,
+                config('session.path', '/'),
+                config('session.domain')
+            ));
+        } catch (\Throwable $e) { /* ignore */ }
+    }
+
     Auth::login($user, $this->remember);
     // If remember is NOT checked, ensure any existing remember cookie is cleared
     if (! $this->remember) {
         try {
-            $recaller = Auth::guard()->getRecallerName();
-            Cookie::queue(Cookie::forget($recaller));
+            $recaller = Auth::guard('web')->getRecallerName();
+            Cookie::queue(Cookie::forget(
+                $recaller,
+                config('session.path', '/'),
+                config('session.domain')
+            ));
         } catch (\Throwable $e) { /* ignore */ }
     }
     // Mark session with active guard and remember choice
@@ -79,7 +103,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
     Session::put('remembered', (bool) $this->remember);
 
     RateLimiter::clear($this->throttleKey());
-    Session::regenerate();
+    // Regenerate again after login per best practices
+    try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }

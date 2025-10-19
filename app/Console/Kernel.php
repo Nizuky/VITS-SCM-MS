@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SendTestVerification::class,
         \App\Console\Commands\CreateAdminUsers::class,
         \App\Console\Commands\ExportSeeders::class,
+        \App\Console\Commands\SetSuperAdmin::class,
     ];
 
     /**

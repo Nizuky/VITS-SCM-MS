@@ -84,6 +84,14 @@
         <?php app('livewire')->forceAssetInjection(); ?>
 <?php echo app('flux')->scripts(); ?>
 
+        <script>
+            // On auth pages (login/register/etc), clear any pending logout flags so they don't affect login
+            (function(){
+                try { localStorage.removeItem('scms_force_logout_pending'); } catch (_) {}
+                try { localStorage.removeItem('scms_force_logout'); } catch (_) {}
+                try { document.cookie = 'scms_force_logout_pending=; Max-Age=0; path=/'; } catch (_) {}
+            })();
+        </script>
     </body>
 </html>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/components/layouts/auth/simple.blade.php ENDPATH**/ ?>

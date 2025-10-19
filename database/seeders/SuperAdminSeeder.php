@@ -14,8 +14,8 @@ class SuperAdminSeeder extends Seeder
             'email' => 'janarafael.sanandres@gmail.com',
         ], [
             'name' => 'admin2025',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('softdev2025'),
             'email_verified_at' => now(),
-        ]); 
+        ]);
     }
 }

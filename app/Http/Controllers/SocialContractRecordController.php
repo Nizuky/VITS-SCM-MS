@@ -20,8 +20,20 @@ class SocialContractRecordController extends Controller
         } catch (\Throwable $_) { }
 
         $user = Auth::user();
+        $all = (string) $request->query('all', '0') === '1';
         $contractId = $request->query('contract_id');
-        $contract = $contractId ? $user->socialContracts()->whereKey($contractId)->firstOrFail() : $user->currentSocialContract();
+
+        if ($all) {
+            $records = $user->socialContractRecords()->latest('date')->get();
+            return response()->json([
+                'contract' => null,
+                'records' => $records,
+            ]);
+        }
+
+        $contract = $contractId
+            ? $user->socialContracts()->whereKey($contractId)->firstOrFail()
+            : $user->currentSocialContract();
 
         $records = $contract->records()->latest('date')->get();
 

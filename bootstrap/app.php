@@ -24,7 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\VoltServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        // You can customize middleware registration here if needed.
+        // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)
+        $middleware->append(App\Http\Middleware\ForcePendingLogout::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // You can customize exception handling here if needed.
