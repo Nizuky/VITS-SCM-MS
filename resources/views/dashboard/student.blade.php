@@ -203,7 +203,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="approved-count">8</span> Records</h3>
                                 <p class="text-green-800 font-semibold">Approved</p>
-                                <p class="text-xs text-text-muted mt-1">last update: <span id="summary-last-updated">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                             </div>
                         </div>
                         <!-- Pending Records -->
@@ -214,7 +214,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="pending-count">8</span> Records</h3>
                                 <p class="text-yellow-800 font-semibold">Pending</p>
-                                <p class="text-xs text-text-muted mt-1">last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
                             </div>
                         </div>
                         <!-- Rejected Records -->
@@ -225,7 +225,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Record</h3>
                                 <p class="text-red-800 font-semibold">Rejected</p>
-                                <p class="text-xs text-text-muted mt-1">last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
+                                <p class="text-xs text-text-muted mt-1">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                             </div>
                         </div>
                     </div>
@@ -517,7 +517,11 @@
             alertDiv.innerHTML = `<span class="max-w-[22rem]">${message.replace(/</g, '&lt;')}</span>`;
             // Close on click
             alertDiv.addEventListener('click', () => alertDiv.remove());
-            root.appendChild(alertDiv);
+                let lastDate = null; // global last date (not shown directly anymore)
+                // Track per-status last update dates
+                let lastApprovedDate = null; // for Verified/Approved/Accepted
+                let lastPendingDate = null;  // for Pending (created/submitted)
+                let lastRejectedDate = null; // for Rejected
             // Animate in
             requestAnimationFrame(() => {
                 alertDiv.classList.remove('opacity-0', 'scale-95');
@@ -534,17 +538,27 @@
         } catch (_) { try { alert(message); } catch {} }
     }
     // --- Page Navigation Functions ---
-        function showPage(pageId) {
+                    const isApproved = (status === 'Verified' || status === 'Approved' || status === 'Accepted');
+                    if (isApproved) {
             document.querySelectorAll('aside a').forEach(a => {
                 a.classList.remove('bg-primary-purple', 'active-nav', 'rounded-lg');
             });
             document.querySelectorAll('.page-content').forEach(p => { p.classList.add('hidden'); });
             const greetingElement = document.getElementById('main-greeting');
             const notificationContainer = document.getElementById('notification-dropdown-container');
+                        // last update for approved bucket: prefer verified/approved timestamps, then updated_at, then event date
+                        const dA = pickDate(r, ['verified_at','approved_at','status_updated_at','updated_at','date','created_at']);
+                        if (dA && (!lastApprovedDate || dA > lastApprovedDate)) lastApprovedDate = dA;
             if (pageId === 'profile') { greetingElement.classList.add('hidden'); notificationContainer.classList.add('hidden'); }
             else { greetingElement.classList.remove('hidden'); notificationContainer.classList.remove('hidden'); }
+                        // last update for pending: prefer created/submitted, then event date
+                        const dP = pickDate(r, ['created_at','submitted_at','date','updated_at']);
+                        if (dP && (!lastPendingDate || dP > lastPendingDate)) lastPendingDate = dP;
             const newPage = document.getElementById(pageId + '-page'); if (newPage) newPage.classList.remove('hidden');
             const navLink = document.getElementById('nav-' + pageId); if (navLink) navLink.classList.add('bg-primary-purple', 'active-nav', 'rounded-lg');
+                        // last update for rejected: prefer rejected timestamp, then updated_at, then event date
+                        const dR = pickDate(r, ['rejected_at','status_updated_at','updated_at','date','created_at']);
+                        if (dR && (!lastRejectedDate || dR > lastRejectedDate)) lastRejectedDate = dR;
             if (pageId === 'profile') { showViewMode(); }
             if (pageId === 'dashboard' && typeof renderCharts === 'function') { renderCharts(); }
         }
@@ -1074,10 +1088,17 @@
                 if (elApproved) elApproved.textContent = String(counts.Verified);
                 if (elPending) elPending.textContent = String(counts.Pending);
                 if (elRejected) elRejected.textContent = String(counts.Rejected);
-                const lastUpdatedText = lastDate ? lastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : 'n/a';
-                setTextIf('#summary-last-updated', lastUpdatedText);
-                setTextIf('#summary-last-updated-2', lastUpdatedText);
-                setTextIf('#summary-last-updated-3', lastUpdatedText);
+                const fmt = (d) => d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : '';
+                const approvedTxt = fmt(lastApprovedDate);
+                const pendingTxt  = fmt(lastPendingDate);
+                const rejectedTxt = fmt(lastRejectedDate);
+                setTextIf('#summary-last-updated', approvedTxt); // Approved/Verified
+                setTextIf('#summary-last-updated-2', pendingTxt);  // Pending
+                setTextIf('#summary-last-updated-3', rejectedTxt); // Rejected
+                // If blank, clear the 'last update:' label by hiding parent p
+                hideIfEmpty('#summary-last-updated');
+                hideIfEmpty('#summary-last-updated-2');
+                hideIfEmpty('#summary-last-updated-3');
 
                 // Hours completion percent: if there's a target, use it; else derive a soft target (e.g., 100 hours)
                 const targetHours = window.__SCMS_TARGET_HOURS || 100;
@@ -1103,6 +1124,17 @@
             try {
                 const el = document.querySelector(selector);
                 if (el) el.textContent = text;
+            } catch (_) {}
+        }
+
+        function hideIfEmpty(selector) {
+            try {
+                const el = document.querySelector(selector);
+                if (!el) return;
+                const container = el.closest('p');
+                if (!container) return;
+                const hasText = (el.textContent || '').trim().length > 0;
+                container.style.display = hasText ? '' : 'none';
             } catch (_) {}
         }
 
