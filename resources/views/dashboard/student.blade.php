@@ -1,3 +1,4 @@
+@tailwind('resources/css/app.css')
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -128,13 +129,13 @@
 
             <ul class="menu p-0">
                 <li>
-                    <a class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0" id="nav-profile" onclick="showPage('profile')">
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0" id="nav-profile" onclick="showPage('profile')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         Profile
                     </a>
                 </li>
                 <li>
-                    <form id="logout-form-visible" action="{{ route('logout') }}" method="POST" class="m-0 p-0" novalidate>
+                    <form id="logout-form-visible" action="{{ route('logout') }}" method="POST" class="m-0 p-0 pl-2 pr-0" novalidate>
                         @csrf
                         <button id="logout-button-visible" type="button" class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -148,8 +149,7 @@
         <main class="flex-1 flex flex-col gap-6" id="page-container">
             <div class="flex justify-between items-center p-4">
                 <div id="main-greeting" class="text-white drop-shadow-md"> 
-                    <p class="text-sm opacity-90">Hi {{ Str::of(auth()->user()->name)->explode(' ')->first() }},</p>
-                    <h1 class="text-2xl font-extrabold">Welcome to Student Contract Management System!</h1>
+                    
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
@@ -206,18 +206,23 @@
                         <div id="personalized-greeting" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white flex items-center v rounded-2xl overflow-hidden h-[160px] w-[90%] max-w-[800px] shadow-lg">
 
                                 <!-- Purple curved accent (top-left corner) -->
-                                <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-r from-purple-400 to-transparent rounded-br-full -translate-x-8 -translate-y-8 opacity-70"></div>
+                                <div class="absolute top-0 left-0 w-40 h-40 bg-gradient-to-r from-primary-purple to-transparent rounded-br-full -translate-x-8 -translate-y-8 opacity-70"></div>
 
                                 <!-- Left text content -->
                                 <div class="relative z-10 ml-2 pl-10">
                                     <h2 class="text-3xl font-semibold text-gray-800">
-                                        Good Morning, 
+                                        Good Day, 
                                         <span class="text-primary-purple font-bold">
                                             {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
                                         </span>
                                     </h2>
+                                    <br>
                                     <p class="text-gray-600 text-base mt-1">
-                                        Have a productive day!
+                                        Welcome to Student Social Contract <br>
+                                        Monitoring & Management System.
+                                    </p>
+                                    <p class="text-primary-purple font-bold text-base mt-1">
+                                        A platform for ka-VITS!
                                     </p>
                                 </div>
 
