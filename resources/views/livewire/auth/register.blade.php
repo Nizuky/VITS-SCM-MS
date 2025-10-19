@@ -106,7 +106,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         />
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
+            <flux:button type="submit" variant="primary" class="w-full scms-primary-btn" data-test="register-user-button">
                 {{ __('Sign up') }}
             </flux:button>
         </div>

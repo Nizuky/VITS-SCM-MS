@@ -39,7 +39,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             placeholder="name@plv.edu.ph"
         />
 
-        <flux:button variant="primary" type="submit" class="w-full" data-test="email-password-reset-link-button">
+        <flux:button variant="primary" type="submit" class="w-full scms-primary-btn" data-test="email-password-reset-link-button">
             {{ __('Email password reset link') }}
         </flux:button>
     </form>

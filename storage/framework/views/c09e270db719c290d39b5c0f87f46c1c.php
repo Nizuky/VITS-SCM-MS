@@ -75,6 +75,11 @@
         /* Notification bell dot: force consistent color and visibility */
         .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border: 2px solid #ffffff !important; border-radius: 9999px; box-sizing: content-box; }
     </style>
+    <style>
+        /* Toast root tweaks: allow individual toasts to receive pointer events */
+        #toast-root { pointer-events: none; }
+        #toast-root .alert { pointer-events: auto; }
+    </style>
 </head>
 <body class="min-h-screen bg-custom">
     <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -492,7 +497,42 @@
         </div>
     </dialog>
 
+    <!-- DaisyUI toast root (bottom-right) -->
+    <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
+
     <script>
+    // --- Toast helper using DaisyUI ---
+    function showToast(message, type = 'info') {
+        try {
+            const root = document.getElementById('toast-root');
+            if (!root) return alert(message);
+            const alertDiv = document.createElement('div');
+            const typeClass = {
+                info: 'alert-info',
+                success: 'alert-success',
+                warning: 'alert-warning',
+                error: 'alert-error'
+            }[type] || 'alert-info';
+            alertDiv.className = `alert ${typeClass} shadow-md transition transform duration-150 ease-out opacity-0 scale-95`;
+            alertDiv.innerHTML = `<span class="max-w-[22rem]">${message.replace(/</g, '&lt;')}</span>`;
+            // Close on click
+            alertDiv.addEventListener('click', () => alertDiv.remove());
+            root.appendChild(alertDiv);
+            // Animate in
+            requestAnimationFrame(() => {
+                alertDiv.classList.remove('opacity-0', 'scale-95');
+                alertDiv.classList.add('opacity-100', 'scale-100');
+            });
+            // Auto dismiss
+            setTimeout(() => {
+                try {
+                    alertDiv.classList.remove('opacity-100', 'scale-100');
+                    alertDiv.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => alertDiv.remove(), 160);
+                } catch (_) { alertDiv.remove(); }
+            }, 4500);
+        } catch (_) { try { alert(message); } catch {} }
+    }
     // --- Page Navigation Functions ---
         function showPage(pageId) {
             document.querySelectorAll('aside a').forEach(a => {
@@ -779,11 +819,11 @@
                     console.error('Failed to save record', err);
                     if (err && err.status === 422 && err.err && err.err.errors) {
                         const messages = Object.values(err.err.errors).flat().join('\n');
-                        alert('Validation error:\n' + messages);
+                        showToast('Validation error: ' + messages, 'error');
                     } else if (err && err.status === 401) {
                         window.location.href = `${BASE_PATH}/login`;
                     } else {
-                        alert('Failed to save record. Please sign in again if your session expired.');
+                        showToast('Failed to save record. Please sign in again if your session expired.', 'error');
                     }
                     confirmationModal.close();
                 });
@@ -803,13 +843,13 @@
                         });
                         if (!res.ok) {
                             const data = await res.json().catch(() => ({}));
-                            alert(data.message || 'Failed to send verification email.');
+                            showToast(data.message || 'Failed to send verification email.', 'error');
                             return;
                         }
-                        alert('A verification email was sent to your PLV email. Please open it to reset your password and confirm changes.');
+                        showToast('Verification email sent to your PLV address. Please check your inbox to confirm changes.', 'success');
                         showViewMode();
                     } catch (e) {
-                        alert('Failed to send verification email.');
+                        showToast('Failed to send verification email.', 'error');
                     }
                 });
             }
@@ -881,8 +921,7 @@
                     const rect = toggle.getBoundingClientRect();
                     const portal = document.createElement('div');
                     portal.id = 'status-filter-portal';
-                    portal.style.position = 'fixed';
-                    portal.style.zIndex = '3000';
+                    portal.className = 'fixed z-[3000]';
                     document.body.appendChild(portal);
                     portal.appendChild(menu);
                     // Prepare for measurement
@@ -897,10 +936,23 @@
                     const spaceBelow = window.innerHeight - rect.bottom;
                     const openAbove = spaceBelow < mH + 12; // flip if not enough space
                     const left = Math.min(Math.max(8, rect.right - menuWidth), window.innerWidth - menuWidth - 8);
-                    const top = openAbove ? Math.max(8, rect.top - 6 - mH) : (rect.bottom + 6);
+                    const offset = 10; // space for caret
+                    const top = openAbove ? Math.max(8, rect.top - offset - mH) : (rect.bottom + offset);
                     portal.style.left = left + 'px';
                     portal.style.top = top + 'px';
+                    // Caret
+                    const caret = document.createElement('div');
+                    caret.className = 'absolute w-3 h-3 bg-base-100 rotate-45 shadow';
+                    caret.style.right = '12px';
+                    if (openAbove) { caret.style.top = (mH + 2) + 'px'; } else { caret.style.top = '-6px'; }
+                    portal.appendChild(caret);
+                    // Animate menu in
+                    menu.classList.add('transition', 'ease-out', 'duration-150', 'transform', 'opacity-0', 'scale-95');
                     menu.style.visibility = 'visible';
+                    requestAnimationFrame(() => {
+                        menu.classList.remove('opacity-0', 'scale-95');
+                        menu.classList.add('opacity-100', 'scale-100');
+                    });
                     document.addEventListener('click', onDocClick, true);
                     window.addEventListener('keydown', onEsc);
                     window.addEventListener('scroll', onScroll, { passive: true });
