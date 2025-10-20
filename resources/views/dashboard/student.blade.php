@@ -1,4 +1,4 @@
-@tailwind('resources/css/app.css')
+
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -9,15 +9,9 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="/vitswhite.png" sizes="any">
-    <link rel="icon" href="/vitswhite.png" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Define Tailwind config BEFORE loading the Tailwind CDN script -->
     <script>
+        tailwind = typeof tailwind === 'object' ? tailwind : {};
         tailwind.config = {
             theme: {
                 extend: {
@@ -41,8 +35,47 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
-        }
+        };
     </script>
+        <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
+        <script>
+            tailwind = typeof tailwind === 'object' ? tailwind : {};
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'background-light': '#EDF1FA',
+                            'primary-purple': '#6D28D9',
+                            'primary-purple-hover': '#5B21B6',
+                            'text-header': '#2B3674',
+                            'text-muted': '#707EAE',
+                            'badge-pending-text': '#E29C44',
+                            'badge-pending-bg': '#FAEAD0',
+                            'badge-verified-text': '#399552',
+                            'badge-verified-bg': '#CCEED6',
+                            'badge-rejected-text': '#CC525D',
+                            'badge-rejected-bg': '#FFD7DB',
+                            'success-green': '#4CAF50',
+                            'success-green-hover': '#45a049',
+                            'danger-red': '#CC525D',
+                            'danger-red-hover': '#b33e46',
+                        },
+                        fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    }
+                }
+            };
+        </script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" href="/vitswhite.png" sizes="any">
+    <link rel="icon" href="/vitswhite.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         body { font-family: 'Inter', sans-serif; }
         /* Ensure active nav exactly matches primary purple */
@@ -83,6 +116,7 @@
         #toast-root { pointer-events: none; }
         #toast-root .alert { pointer-events: auto; }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-custom">
     @include('partials.auto_logout')

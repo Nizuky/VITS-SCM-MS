@@ -1,6 +1,5 @@
 /* Tailwind CSS v4 entrypoint */
 @import "tailwindcss";
-@plugin "daisyui";
 /* Flux UI styles */
 @import "../../vendor/livewire/flux/dist/flux.css";
 
