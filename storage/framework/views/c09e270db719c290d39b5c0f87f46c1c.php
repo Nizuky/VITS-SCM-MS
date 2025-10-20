@@ -71,6 +71,15 @@
         .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn-primary-purple svg { stroke: #ffffff !important; }
+    /* Success button override: keep consistent across themes and over DaisyUI */
+    .btn.bg-success-green,
+    .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+    .btn.bg-success-green:hover,
+    .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+    .btn.bg-success-green:active,
+    .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+    .btn.bg-success-green:focus,
+    .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.35) !important; }
         /* Consistent status badges (independent from DaisyUI badge theme) */
         .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
         .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
@@ -145,6 +154,15 @@
         [data-theme="dark"] .text-badge-verified-text { color: #a3ffbcff !important; }
         [data-theme="dark"] .text-badge-rejected-text { color: #ffc8c8ff !important; }
         [data-theme="dark"] .text-badge-pending-text { color: #ffcd91ff !important; }
+    /* Preserve success-green button styling in dark mode */
+    [data-theme="dark"] .btn.bg-success-green,
+    [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+    [data-theme="dark"] .btn.bg-success-green:hover,
+    [data-theme="dark"] .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+    [data-theme="dark"] .btn.bg-success-green:active,
+    [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+    [data-theme="dark"] .btn.bg-success-green:focus,
+    [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
             /* Dark theme: card/background overrides */
         [data-theme="dark"] .bg-custom {
             background-color: #0b0f19; /* deeper fallback */
