@@ -9,34 +9,17 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
-    <!-- Define Tailwind config BEFORE loading the Tailwind CDN script -->
-    <script>
-        tailwind = typeof tailwind === 'object' ? tailwind : {};
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'background-light': '#EDF1FA',
-                        'primary-purple': '#6D28D9',
-                        'primary-purple-hover': '#5B21B6',
-                        'text-header': '#2B3674',
-                        'text-muted': '#707EAE',
-                        'badge-pending-text': '#E29C44',
-                        'badge-pending-bg': '#FAEAD0',
-                        'badge-verified-text': '#399552',
-                        'badge-verified-bg': '#CCEED6',
-                        'badge-rejected-text': '#CC525D',
-                        'badge-rejected-bg': '#FFD7DB',
-                        'success-green': '#4CAF50',
-                        'success-green-hover': '#45a049',
-                        'danger-red': '#CC525D',
-                        'danger-red-hover': '#b33e46',
-                    },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
-                }
-            }
-        };
-    </script>
+        <script>
+            // Apply saved theme ASAP to reduce flash
+            (function(){
+                try {
+                    var saved = localStorage.getItem('scms_theme');
+                    if (saved === 'dark' || saved === 'light') {
+                        document.documentElement.setAttribute('data-theme', saved);
+                    }
+                } catch(_){}
+            })();
+        </script>
         <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
         <script>
             tailwind = typeof tailwind === 'object' ? tailwind : {};
@@ -67,14 +50,14 @@
         </script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <link rel="icon" href="/vitswhite.png" sizes="any">
-    <link rel="icon" href="/vitswhite.png" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <link rel="icon" href="/vitswhite.png" sizes="any">
+        <link rel="icon" href="/vitswhite.png" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -88,6 +71,15 @@
         .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn-primary-purple svg { stroke: #ffffff !important; }
+    /* Success button override: keep consistent across themes and over DaisyUI */
+    .btn.bg-success-green,
+    .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+    .btn.bg-success-green:hover,
+    .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+    .btn.bg-success-green:active,
+    .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+    .btn.bg-success-green:focus,
+    .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.35) !important; }
         /* Consistent status badges (independent from DaisyUI badge theme) */
         .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
         .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
@@ -98,12 +90,13 @@
         /* Page background image */
         .bg-custom {
             background-color: #EDF1FA; /* fallback */
-            background-image: url('{{ asset('vits_bg.png') }}');
+            background-image: url('{{ asset('vits_bg_white.png') }}');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
+        .bg-gradient-primary-purple { background-image: linear-gradient(to bottom, #bbacffff, #6D28D9); }
         /* Gradients for summary cards */
         .bg-gradient-approved { background-image: linear-gradient(to bottom, #DCFCE7, #81FFAC); }
         .bg-gradient-pending { background-image: linear-gradient(to bottom, #FFF4DE, #FFE0A2); }
@@ -113,8 +106,120 @@
     </style>
     <style>
         /* Toast root tweaks: allow individual toasts to receive pointer events */
-        #toast-root { pointer-events: none; }
+        #toast-root { position: fixed; right: 1rem; bottom: 1rem; z-index: 2000; display: flex; flex-direction: column; gap: .75rem; pointer-events: none; }
         #toast-root .alert { pointer-events: auto; }
+        /* Refined toast look */
+        .scms-toast { position: relative; display: inline-flex; align-items: center; gap: .5rem; padding: .625rem .875rem; border-radius: 9999px; color: #fff; box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08); border: 1px solid rgba(255,255,255,0.08); max-width: 520px; }
+        .scms-toast--success { background: linear-gradient(90deg, #16A34A, #22C55E); }
+        .scms-toast--error { background: linear-gradient(90deg, #EF4444, #DC2626); }
+        .scms-toast--info { background: linear-gradient(90deg, #6D28D9, #7C3AED); }
+        .scms-toast__msg { font-weight: 600; font-size: .925rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .scms-toast__close { margin-left: .25rem; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9999px; background: rgba(255,255,255,0.12); color: #fff; border: 0; cursor: pointer; transition: background .18s ease, transform .12s ease; }
+        .scms-toast__close:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+        .scms-toast__progress { position: absolute; left: 6px; right: 6px; bottom: 4px; height: 3px; border-radius: 9999px; background: rgba(255,255,255,0.55); transform-origin: left center; }
+        @keyframes scms-toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+        [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
+    </style>
+    <style>
+        /* Dark theme: turn typical dark text utilities to white for readability */
+        [data-theme="dark"] body { color: #ffffff; }
+        [data-theme="dark"] .text-black,
+        [data-theme="dark"] .text-gray-900,
+        [data-theme="dark"] .text-gray-800,
+        [data-theme="dark"] .text-gray-700,
+        [data-theme="dark"] .text-gray-600,
+        [data-theme="dark"] .text-gray-500,
+        [data-theme="dark"] .text-text-header,
+        [data-theme="dark"] .text-text-muted,
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4,
+        [data-theme="dark"] h5,
+        [data-theme="dark"] h6,
+        [data-theme="dark"] p,
+        [data-theme="dark"] span,
+        [data-theme="dark"] label,
+        [data-theme="dark"] td,
+        [data-theme="dark"] th,
+        [data-theme="dark"] a { color: #ffffff !important; }
+        /* Preserve status colors in dark mode (do not force white for these) */
+        [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
+        [data-theme="dark"] .scms-badge--verified { background-color: #009b29ff !important; color: #ffffffff!important; }
+        [data-theme="dark"] .scms-badge--rejected { background-color: #b8000fff !important; color: #ffffffff!important; }
+        /* Summary labels and inline status text */
+        [data-theme="dark"] .text-yellow-800 { color: #ffcd91ff !important; }
+        [data-theme="dark"] .text-green-800 { color: #a3ffbcff !important; }
+        [data-theme="dark"] .text-red-800 { color: #ffc8c8ff !important; }
+        [data-theme="dark"] .text-badge-verified-text { color: #a3ffbcff !important; }
+        [data-theme="dark"] .text-badge-rejected-text { color: #ffc8c8ff !important; }
+        [data-theme="dark"] .text-badge-pending-text { color: #ffcd91ff !important; }
+    /* Preserve success-green button styling in dark mode */
+    [data-theme="dark"] .btn.bg-success-green,
+    [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+    [data-theme="dark"] .btn.bg-success-green:hover,
+    [data-theme="dark"] .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+    [data-theme="dark"] .btn.bg-success-green:active,
+    [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+    [data-theme="dark"] .btn.bg-success-green:focus,
+    [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
+            /* Dark theme: card/background overrides */
+        [data-theme="dark"] .bg-custom {
+            background-color: #0b0f19; /* deeper fallback */
+            background-image: url('{{ asset('storage/vits_bg_black.png') }}');
+        }
+         /* Tables in dark mode */
+        [data-theme="dark"] .table thead,
+        [data-theme="dark"] .table thead tr,
+        [data-theme="dark"] .table thead th { background-color: #374151 !important; }
+        [data-theme="dark"] .table th,
+        [data-theme="dark"] .table td { border-color: #374151 !important; }
+        [data-theme="dark"] .bg-white { background-color: #1f2937 !important; } /* gray-800 */
+        [data-theme="dark"] .bg-gray-100 { background-color: #374151 !important; } /* gray-700 */
+        [data-theme="dark"] .border-gray-200 { border-color: #374151 !important; } /* gray-700 */
+        [data-theme="dark"] .bg-base-100 { background-color: #111827 !important; } /* gray-900 for DaisyUI surfaces */
+        /* Replace pastel gradients with solid dark gray in dark mode */
+        [data-theme="dark"] .bg-gradient-approved { background-image: linear-gradient(to top, #6D28D9, #81FFAC); }
+        [data-theme="dark"] .bg-gradient-pending { background-image: linear-gradient(to top, #6D28D9, #FFE0A2); }
+        [data-theme="dark"] .bg-gradient-rejected { background-image: linear-gradient(to top, #6D28D9, #FFB7BE); }
+        /* Checkboxes: purple accent in light; custom dark styling */
+        .record-checkbox { accent-color: #6D28D9 !important; }
+        /* Ensure light theme is purple even if accent-color unsupported */
+        :root:not([data-theme="dark"]) .record-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border: 2px solid #9ca3af; /* gray-400 */
+            background-color: #ffffff;
+            border-radius: 0.25rem;
+            display: inline-grid; place-content: center;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        :root:not([data-theme="dark"]) .record-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(109,40,217,0.35); }
+        :root:not([data-theme="dark"]) .record-checkbox:checked { background-color: #6D28D9; border-color: #6D28D9; }
+        :root:not([data-theme="dark"]) .record-checkbox:checked::after {
+            content: "";
+            width: 0.25rem; height: 0.5rem;
+            border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+        }
+        [data-theme="dark"] .record-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border: 2px solid #374151; /* gray-700 */
+            background-color: #111827;  /* gray-900 */
+            border-radius: 0.25rem;
+            display: inline-grid; place-content: center;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        [data-theme="dark"] .record-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(109,40,217,0.45); }
+        [data-theme="dark"] .record-checkbox:checked { background-color: #6D28D9; border-color: #6D28D9; }
+        [data-theme="dark"] .record-checkbox:checked::after {
+            content: "";
+            width: 0.25rem; height: 0.5rem;
+            border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+        }
+        [data-theme="dark"] .record-checkbox:disabled { opacity: .4; cursor: not-allowed; }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -135,7 +240,7 @@
         }
     @endphp
     <div class="flex p-4 gap-4 min-h-screen"> 
-        <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm">
+        <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
                     <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
@@ -182,14 +287,14 @@
 
         <main class="flex-1 flex flex-col gap-6" id="page-container">
             <div class="flex justify-between items-center p-4">
-                <div id="main-greeting" class="text-white drop-shadow-md"> 
-                    
+                <div id="main-greeting" class="text-white"> 
+                    <h4 class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Notifications" title="Notifications">
                         <div class="indicator">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                             <span id="notif-dot" class="indicator-item scms-notif-dot" aria-hidden="true"></span>
                         </div>
                     </div>
@@ -229,42 +334,58 @@
 
                 <!-- Personalized greeting and summary cards -->
                 <!-- Outer wrapper (for background and overlay effect) -->
-                <div class="relative rounded-2xl p-2 mb-6 h-[250px]">
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 justify-between  h-[300px] w-[800px] rounded-2xl  flex items-center">
+                <div class="relative rounded-2xl bg-transparent p-2 mb-10 h-[250px]">
+                    <!-- Inner gray container -->
+                    <div class="absolute inset-x-0 bottom-0 rounded-2xl bg-transparent text-white mb-2 p-2 h-[250px] flex justify-center items-end overflow-hidden z-10">
+                        
                         <!-- Image overlay (on top of everything) -->
-                        <div class="absolute right-0 bottom-4 transform translate-x-[-25%] -translate-y-[16%] z-30">
-                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[300px] h-auto object-contain drop-shadow-lg" />
+                        <div class="absolute right-50 bottom-0 z-20">
+                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
                         </div>
 
-                        <!-- Main card container -->
-                        <div id="personalized-greeting" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white flex items-center v rounded-2xl overflow-hidden h-[160px] w-[90%] max-w-[800px] shadow-lg">
+                        <!-- Main card container (centered & behind) -->
+                        <div 
+                            id="personalized-greeting" 
+                            class="absolute bottom-0 bg-gradient-primary-purple flex items-center rounded-2xl h-[190px] w-[90%] max-w-[800px] shadow-lg z-0 mx-auto left-0 right-0"
+                        >
+                            <!-- Purple curved accent -->
+                           <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
 
-                                <!-- Purple curved accent (top-left corner) -->
-                                <div class="absolute top-0 left-0 w-40 h-40 bg-gradient-to-r from-primary-purple to-transparent rounded-br-full -translate-x-8 -translate-y-8 opacity-70"></div>
-
-                                <!-- Left text content -->
-                                <div class="relative z-10 ml-2 pl-10">
-                                    <h2 class="text-3xl font-semibold text-gray-800">
-                                        Good Day, 
-                                        <span class="text-primary-purple font-bold">
-                                            {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
-                                        </span>
-                                    </h2>
-                                    <br>
-                                    <p class="text-gray-600 text-base mt-1">
-                                        Welcome to Student Social Contract <br>
-                                        Monitoring & Management System.
-                                    </p>
-                                    <p class="text-primary-purple font-bold text-base mt-1">
-                                        A platform for ka-VITS!
-                                    </p>
+                            <!-- Left text content -->
+                            <div class="relative z-10 ml-2 pl-10">
+                                <h2 class="text-3xl font-semibold text-white0">
+                                    Good Day, 
+                                    <span class="text-white font-bold">
+                                        {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
+                                    </span>
+                                </h2>
+                                <br>
+                                <p class="text-white text-base mt-1">
+                                    Here you can manage your social <br>
+                                    contract and track your progress.
+                                </p>
+                                <p class="text-white font-bold text-base mt-1">
+                                    We make it easier for you ka-VITS!
+                                </p>
+                            </div>
+                            <!-- Pending hours donut -->
+                            <div class="flex flex-col items-center ml-auto">
+                                <h2 class="text-xl font-bold text-white mb-4">Pending Hours</h2>
+                                <div class="relative w-40 h-40">
+                                    <canvas id="pendingHoursChart"></canvas>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-3xl font-bold text-white" id="pending-hours-label">0%</span>
+                                        <p class="text-sm text-white" id="pending-amount">0h of 160h</p>
+                                    </div>
                                 </div>
-
-                                <!-- Empty space for right-side alignment (optional balance) -->
+                            </div>
+                            <div class="absolute top-0 right-0 w-[300px] h-full pointer-events-none"></div>
+                            <!-- Optional space for balance -->
                             <div class="w-[120px]"></div>
                         </div>
                     </div>
                 </div>
+
 
 
                 <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
@@ -299,7 +420,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Record</h3>
+                                <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Records</h3>
                                 <p class="text-red-800 font-semibold">Rejected</p>
                                 <p class="text-xs text-text-muted mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                             </div>
@@ -314,15 +435,22 @@
                             <canvas id="yearlyRecordsChart"></canvas>
                         </div>
                     </div>
-                    <div class="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center">
-                        <h2 class="text-xl font-bold text-text-header mb-4">Rendered Hours Completion</h2>
-                        <div class="relative w-40 h-40">
-                            <canvas id="hoursCompletionChart"></canvas>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-3xl font-bold text-primary-purple" id="hours-completion-label">80%</span>
-                                <p class="text-sm text-text-muted">Rendered Hours</p>
+                    <div class="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center gap-6">
+                        <!-- Approved / Completion donut -->
+                        <div class="flex flex-col items-center">
+                            <h2 class="text-xl font-bold text-text-header mb-4">Approved Hours Completion</h2>
+                            <div class="relative w-40 h-40">
+                                <canvas id="hoursCompletionChart"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span class="text-3xl font-bold text-[#6D28D9]" id="hours-completion-label">0%</span>
+                                    <p class="text-sm text-text-muted" id="hours-amount">0h of 160h</p>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="divider my-0"></div>
+
+        
                     </div>
                 </div>
             </div>
@@ -375,7 +503,7 @@
                                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
                                                     <li><a onclick="filterTableByStatus('All', event)">All</a></li>
                                                     <li><a onclick="filterTableByStatus('Pending', event)">Pending</a></li>
-                                                    <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
+                                                    <li><a onclick="filterTableByStatus('Verified', event)">Approved</a></li>
                                                     <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
                                                 </ul>
                                             </div>
@@ -390,7 +518,13 @@
             </div> 
 
             <div id="profile-page" class="page-content hidden">
-                <h1 class="text-2xl font-bold p-4 text-white drop-shadow-md">Profile Information</h1>
+                <div class="flex items-center justify-between p-4">
+                    <h4 class="text-4xl font-bold text-primary-purple">Profile Information</h4>
+                    <label class="label cursor-pointer flex items-center gap-3">
+                        <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
+                        <input id="theme-toggle" type="checkbox" class="toggle toggle-primary" />
+                    </label>
+                </div>
                 
                 <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
 
@@ -648,14 +782,20 @@
             input.type = input.type === 'password' ? 'text' : 'password';
         }
         // Charts state
-        let yearlyChart = null;
-        let hoursChart = null;
+    let yearlyChart = null;
+    let hoursChart = null;
+    let pendingChart = null;
 
         function renderCharts() {
             try {
                 const yearlyCanvas = document.getElementById('yearlyRecordsChart');
                 const hoursCanvas = document.getElementById('hoursCompletionChart');
+                const pendingCanvas = document.getElementById('pendingHoursChart');
                 if (!yearlyCanvas || !hoursCanvas) return;
+                const isDark = (document.documentElement.getAttribute('data-theme') === 'dark');
+                const axisTextColor = isDark ? '#FFFFFF' : '#2B3674';
+                const gridColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
+                const borderColor = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)';
 
                 const yearlyCtx = yearlyCanvas.getContext('2d');
                 if (yearlyChart) { yearlyChart.destroy(); }
@@ -678,10 +818,27 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false, labels: { color: axisTextColor } },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: isDark ? '#111827' : '#ffffff',
+                                titleColor: isDark ? '#ffffff' : '#111827',
+                                bodyColor: isDark ? '#ffffff' : '#111827',
+                                borderColor: isDark ? borderColor : '#e5e7eb',
+                                borderWidth: 1
+                            }
+                        },
                         scales: {
-                            y: { beginAtZero: true, grid: { display: false } },
-                            x: { grid: { display: false } }
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: axisTextColor },
+                                grid: { color: gridColor, borderColor }
+                            },
+                            x: {
+                                ticks: { color: axisTextColor },
+                                grid: { color: gridColor, borderColor }
+                            }
                         }
                     }
                 });
@@ -694,7 +851,7 @@
                         datasets: [{
                             data: (typeof window.__scms_hoursPercent === 'number')
                                 ? [window.__scms_hoursPercent, Math.max(0, 100 - window.__scms_hoursPercent)]
-                                : [80, 20],
+                                : [0, 100],
                             backgroundColor: ['#6D28D9', '#E9D5FF'],
                             borderWidth: 0,
                         }]
@@ -702,9 +859,37 @@
                     options: {
                         responsive: true,
                         cutout: '80%',
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
                     }
                 });
+
+                if (pendingCanvas) {
+                    const pendingCtx = pendingCanvas.getContext('2d');
+                    if (pendingChart) { pendingChart.destroy(); }
+                    pendingChart = new Chart(pendingCtx, {
+                        type: 'doughnut',
+                        data: {
+                            datasets: [{
+                                data: (typeof window.__scms_pendingPercent === 'number')
+                                    ? [window.__scms_pendingPercent, Math.max(0, 100 - window.__scms_pendingPercent)]
+                                    : [0, 100],
+                                backgroundColor: ['#6D28D9', '#E9D5FF'],
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: '80%',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            }
+                        }
+                    });
+                }
             } catch (_) {}
         }
 
@@ -1072,9 +1257,77 @@
             } catch (_) {}
         }
 
-        function boot(){ initDashboard(); setupStatusFilterPortal(); }
+        function initThemeToggle(){
+            try {
+                const toggle = document.getElementById('theme-toggle');
+                const label = document.getElementById('theme-label');
+                const applyTheme = (mode) => {
+                    document.documentElement.setAttribute('data-theme', mode);
+                    try { localStorage.setItem('scms_theme', mode); } catch(_) {}
+                    if (label) label.textContent = (mode === 'dark') ? 'Dark theme' : 'Light theme';
+                    if (toggle) toggle.checked = (mode === 'dark');
+                    // Re-render charts to pick up new colors
+                    try { if (typeof renderCharts === 'function') renderCharts(); } catch(_) {}
+                };
+                let saved = 'light';
+                try { saved = (localStorage.getItem('scms_theme') === 'dark') ? 'dark' : 'light'; } catch(_) {}
+                applyTheme(saved);
+                if (toggle) {
+                    toggle.addEventListener('change', () => {
+                        applyTheme(toggle.checked ? 'dark' : 'light');
+                    });
+                }
+            } catch(_) {}
+        }
+
+        function boot(){ initDashboard(); setupStatusFilterPortal(); initThemeToggle(); }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
         else { boot(); }
+        
+        // Lightweight toast API
+        function ensureToastRoot(){
+            let root = document.getElementById('toast-root');
+            if (!root) {
+                root = document.createElement('div');
+                root.id = 'toast-root';
+                document.body.appendChild(root);
+            }
+            return root;
+        }
+        function showToast(message, { type = 'success', timeout = 3500 } = {}){
+            const root = ensureToastRoot();
+            const el = document.createElement('div');
+            el.className = `scms-toast scms-toast--${type}`;
+            el.setAttribute('role', 'status');
+            el.setAttribute('aria-live', 'polite');
+            el.style.pointerEvents = 'auto';
+            el.innerHTML = `
+                <span class="scms-toast__msg"></span>
+                <button class="scms-toast__close" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <div class="scms-toast__progress"></div>
+            `;
+            el.querySelector('.scms-toast__msg').textContent = String(message ?? '');
+            const closeBtn = el.querySelector('.scms-toast__close');
+            const progress = el.querySelector('.scms-toast__progress');
+            if (progress && timeout > 0) {
+                progress.style.animation = `scms-toast-progress ${timeout}ms linear forwards`;
+            }
+            let removeTimer = null;
+            const remove = () => {
+                try { clearTimeout(removeTimer); } catch(_) {}
+                el.style.opacity = '0'; el.style.transform = 'translateY(6px)';
+                setTimeout(() => el.remove(), 180);
+            };
+            closeBtn.addEventListener('click', remove, { passive: true });
+            root.appendChild(el);
+            // animate in
+            el.style.opacity = '0'; el.style.transform = 'translateY(6px)';
+            requestAnimationFrame(() => { el.style.transition = 'opacity .18s ease, transform .18s ease'; el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+            if (timeout > 0) removeTimer = setTimeout(remove, timeout);
+            return { close: remove, el };
+        }
         // Attach logout handler after DOM is ready to avoid inline script rendering issues
         function attachLogoutHandler() {
             try {
@@ -1151,11 +1404,16 @@
                 const elPending = document.getElementById('pending-count');
                 const elRejected = document.getElementById('rejected-count');
                 const elHoursLabel = document.getElementById('hours-completion-label');
+                const elHoursAmount = document.getElementById('hours-amount');
+                const elPendingLabel = document.getElementById('pending-hours-label');
+                const elPendingAmount = document.getElementById('pending-amount');
 
                 if (!Array.isArray(records)) records = [];
 
                 const counts = { Approved: 0, Verified: 0, Pending: 0, Rejected: 0 };
-                let totalHours = 0;
+                let totalHours = 0; // all hours, informational only
+                let approvedHours = 0; // Approved + Verified
+                let pendingHours = 0;  // Pending only
                 // Track last update per status
                 let lastApproved = null; // includes Verified/Approved
                 let lastPending = null;
@@ -1186,7 +1444,11 @@
                     }
                     // hours
                     const h = Number(r.hours_rendered || 0);
-                    if (!Number.isNaN(h)) totalHours += h;
+                    if (!Number.isNaN(h)) {
+                        totalHours += h;
+                        if (status === 'Verified' || status === 'Approved') approvedHours += h;
+                        else if (status === 'Pending') pendingHours += h;
+                    }
                 }
 
                 // Update cards (treat Verified as Approved)
@@ -1203,11 +1465,18 @@
                 setTextIf('#summary-last-updated-3', rejectedText);
                 // Leave labels visible; if no data, the value spans are empty (blank)
 
-                // Hours completion percent: if there's a target, use it; else derive a soft target (e.g., 100 hours)
-                const targetHours = window.__SCMS_TARGET_HOURS || 100;
-                const pct = Math.max(0, Math.min(100, Math.round((totalHours / targetHours) * 100)));
-                if (elHoursLabel) elHoursLabel.textContent = pct + '%';
-                window.__scms_hoursPercent = pct;
+                // Hours: explicit 120-hour target for both approved (completion) and pending
+                const targetHours = 160;
+                const approvedPct = Math.max(0, Math.min(100, Math.round(((approvedHours || 0) / targetHours) * 100)));
+                const pendingPct = Math.max(0, Math.min(100, Math.round(((pendingHours || 0) / targetHours) * 100)));
+                // Update labels
+                if (elHoursLabel) elHoursLabel.textContent = approvedPct + '%';
+                if (elHoursAmount) elHoursAmount.textContent = `${approvedHours || 0}h of ${targetHours}h`;
+                if (elPendingLabel) elPendingLabel.textContent = pendingPct + '%';
+                if (elPendingAmount) elPendingAmount.textContent = `${pendingHours || 0}h of ${targetHours}h`;
+                // Values for charts
+                window.__scms_hoursPercent = approvedPct;
+                window.__scms_pendingPercent = pendingPct;
 
                 // Build yearly chart data from yearMap (sorted by year)
                 const sortedYears = Array.from(yearMap.keys()).sort((a,b) => a - b);

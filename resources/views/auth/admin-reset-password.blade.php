@@ -22,7 +22,7 @@
                 <label class="block mb-1">Confirm Password</label>
                 <input name="password_confirmation" type="password" required class="w-full p-2 border rounded" />
             </div>
-            <button class="px-4 py-2 bg-green-600 text-white rounded">Reset Password</button>
+            <button class="btn btn-primary-purple rounded">Reset Password</button>
         </form>
          <x-return-to-welcome />
     </div>

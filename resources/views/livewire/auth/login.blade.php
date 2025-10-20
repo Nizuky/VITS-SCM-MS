@@ -248,6 +248,36 @@ new #[Layout('components.layouts.auth')] class extends Component {
         accent-color: #6D28D9; /* modern browsers */
     }
 
+    /* Fallback for environments where accent-color isn't applied */
+    @supports not (accent-color: #000) {
+        .scms-login input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border: 2px solid #9ca3af; /* gray-400 */
+            background-color: #ffffff;
+            border-radius: 0.25rem !important;
+            display: inline-grid; place-content: center;
+            cursor: pointer;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        .scms-login input[type="checkbox"]:focus { outline: none; box-shadow: 0 0 0 2px rgba(109,40,217,0.35); }
+        .scms-login input[type="checkbox"]:checked { background-color: #6D28D9 !important; border-color: #6D28D9 !important; }
+        .scms-login input[type="checkbox"]:checked::after {
+            content: "";
+            width: 0.25rem; height: 0.5rem;
+            border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+        }
+    }
+
+    /* Dark scheme tweaks for the fallback */
+    @media (prefers-color-scheme: dark) {
+        @supports not (accent-color: #000) {
+            .scms-login input[type="checkbox"] { background-color: #111827; border-color: #374151; }
+            .scms-login input[type="checkbox"]:focus { box-shadow: 0 0 0 2px rgba(109,40,217,0.45); }
+        }
+    }
+
     /* Optional: ensure label next to checkbox inherits readable color */
     .scms-login label { color: inherit; }
     </style>

@@ -6,4 +6,35 @@
 /* Dark variant is handled by utility classes in Tailwind v4 */
 
 /* Your global styles can go below */
-/* :root { } */
+:root {
+	--color-primary-purple: #6D28D9;
+	--color-primary-purple-hover: #5B21B6;
+	--color-text-header: #2B3674;
+	--color-text-muted: #707EAE;
+}
+
+/* Explicit utility fallbacks for custom tokens */
+.text-primary-purple { color: var(--color-primary-purple) !important; }
+.bg-primary-purple { background-color: var(--color-primary-purple) !important; }
+.hover\:bg-primary-purple-hover:hover { background-color: var(--color-primary-purple-hover) !important; }
+.text-text-header { color: var(--color-text-header) !important; }
+.text-text-muted { color: var(--color-text-muted) !important; }
+
+/* Common button style: primary purple (DaisyUI-compatible) */
+.btn-primary-purple {
+	background-color: var(--color-primary-purple) !important;
+	color: #ffffff !important;
+	border-color: transparent !important;
+}
+.btn-primary-purple:hover {
+	background-color: var(--color-primary-purple-hover) !important;
+	color: #ffffff !important;
+}
+.btn-primary-purple:focus {
+	outline: none !important;
+	box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.35) !important;
+}
+.btn-primary-purple:active {
+	background-color: #4C1D95 !important; /* slightly deeper for active */
+	color: #ffffff !important;
+}

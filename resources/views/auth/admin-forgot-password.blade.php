@@ -31,7 +31,7 @@
                 @endif
             </div>
 
-            <button class="px-4 py-2 bg-yellow-600 text-white rounded">Send Reset Link</button>
+            <button class="btn btn-primary-purple rounded">Send Reset Link</button>
         </form>
         <x-return-to-welcome />
     </div>

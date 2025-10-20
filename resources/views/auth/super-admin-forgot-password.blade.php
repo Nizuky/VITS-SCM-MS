@@ -14,7 +14,7 @@
             </div>
                 <x-return-to-welcome />
 
-                <button class="px-4 py-2 bg-blue-600 text-white rounded">Send reset link</button>
+                <button class="btn btn-primary-purple rounded">Send reset link</button>
         </form>
     </div>
 @endcomponent
