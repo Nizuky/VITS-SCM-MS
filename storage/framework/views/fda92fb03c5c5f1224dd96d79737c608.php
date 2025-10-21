@@ -5,9 +5,31 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>VITS Social Contract Monitoring and Management System</title>
-
-        <link rel="icon" href="/vitswhite.png" sizes="any">
-        <link rel="icon" href="/vitswhite.png" type="image">
+        <?php
+                $iconCandidates = [
+                    'vits_white.png',
+                    'storage/vits_whites.png',
+                    'vits_whites.png',
+                    'vitswhite.png',
+                    'vitslogo.png',
+                    'storage/vits_white.png',
+                    'storage/vits_header.png',
+                ];
+                $iconUrl = null;
+                $iconMTime = null;
+                foreach ($iconCandidates as $relPath) {
+                    try {
+                        $full = public_path($relPath);
+                        if (file_exists($full)) { $iconUrl = asset($relPath); try { $iconMTime = @filemtime($full) ?: null; } catch (Throwable $e) {} break; }
+                    } catch (Throwable $e) {}
+                }
+                if (!$iconUrl) { $iconUrl = asset('vits_white.png'); }
+                if ($iconUrl && $iconMTime) { $iconUrl .= '?v=' . $iconMTime; }
+            ?>
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="apple-touch-icon" href="<?php echo e($iconUrl); ?>">
         <style>
             :root { --header-desktop-h: 115px; --header-mobile-h: 72px; }
             #site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-desktop-h); z-index: 1000; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 12px rgba(0,0,0,0.12); background: rgba(255,255,255,0.9); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .32s cubic-bezier(.22,.9,.32,1), background .28s ease, opacity .28s ease; opacity: 0.98; -webkit-backface-visibility: hidden; backface-visibility: hidden; pointer-events: none; }

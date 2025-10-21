@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Super Admin Dashboard — VITS</title>
-        <link rel="icon" href="/vitswhite.png" sizes="any">
-        <link rel="icon" href="/vitswhite.png" type="image">
+    <link rel="icon" href="/vits_white.png" sizes="any">
+    <link rel="icon" href="/vits_white.png" type="image/png">
         <style>
             :root { --header-desktop-h: 115px; --header-mobile-h: 72px; }
             body, button, input, h1, h2, h3, p, a, span { font-family: Arial, Helvetica, sans-serif; }

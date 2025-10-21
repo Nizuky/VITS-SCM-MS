@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Submission Management</title>
-    <link rel="icon" href="/vitswhite.png" sizes="any">
-    <link rel="icon" href="/vitswhite.png" type="image">
+    <link rel="icon" href="/vits_white.png" sizes="any">
+    <link rel="icon" href="/vits_white.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

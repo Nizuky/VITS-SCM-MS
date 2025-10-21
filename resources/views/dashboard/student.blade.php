@@ -52,8 +52,30 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
         <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-        <link rel="icon" href="/vitswhite.png" sizes="any">
-        <link rel="icon" href="/vitswhite.png" type="image/x-icon">
+        @php
+            $iconCandidates = [
+                 'vits_white.png',
+                 'storage/vits_whites.png',
+                 'vits_whites.png',
+                 'vitswhite.png',
+                 'vitslogo.png',
+                'public/storage/vits_white.png',
+                'storage/vits_header.png',
+            ];
+            $iconUrl = null;
+            $iconMTime = null;
+            foreach ($iconCandidates as $relPath) {
+                try {
+                    $full = public_path($relPath);
+                    if (file_exists($full)) { $iconUrl = asset($relPath); try { $iconMTime = @filemtime($full) ?: null; } catch (Throwable $e) {} break; }
+                } catch (Throwable $e) {}
+            }
+            if (!$iconUrl) { $iconUrl = asset('vits_white.png'); }
+            if ($iconUrl && $iconMTime) { $iconUrl .= '?v=' . $iconMTime; }
+        @endphp
+        <link rel="icon" href="{{ $iconUrl }}" sizes="any">
+        <link rel="icon" href="{{ $iconUrl }}" type="image/png">
+        <link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -71,15 +93,15 @@
         .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn-primary-purple svg { stroke: #ffffff !important; }
-    /* Success button override: keep consistent across themes and over DaisyUI */
-    .btn.bg-success-green,
-    .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
-    .btn.bg-success-green:hover,
-    .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
-    .btn.bg-success-green:active,
-    .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
-    .btn.bg-success-green:focus,
-    .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.35) !important; }
+    /* Success button overrid   e: keep consistent across themes and over DaisyUI */
+        .btn.bg-success-green,
+        .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+        .btn.bg-success-green:hover,
+        .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+        .btn.bg-success-green:active,
+        .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+        .btn.bg-success-green:focus,
+        .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.35) !important; }
         /* Consistent status badges (independent from DaisyUI badge theme) */
         .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
         .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
@@ -154,16 +176,16 @@
         [data-theme="dark"] .text-badge-verified-text { color: #a3ffbcff !important; }
         [data-theme="dark"] .text-badge-rejected-text { color: #ffc8c8ff !important; }
         [data-theme="dark"] .text-badge-pending-text { color: #ffcd91ff !important; }
-    /* Preserve success-green button styling in dark mode */
-    [data-theme="dark"] .btn.bg-success-green,
-    [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
-    [data-theme="dark"] .btn.bg-success-green:hover,
-    [data-theme="dark"] .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
-    [data-theme="dark"] .btn.bg-success-green:active,
-    [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
-    [data-theme="dark"] .btn.bg-success-green:focus,
-    [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
-            /* Dark theme: card/background overrides */
+        /* Preserve success-green button styling in dark mode */
+        [data-theme="dark"] .btn.bg-success-green,
+        [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
+        [data-theme="dark"] .btn.bg-success-green:hover,
+        [data-theme="dark"] .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-success-green:active,
+        [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-success-green:focus,
+        [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
+                /* Dark theme: card/background overrides */
         [data-theme="dark"] .bg-custom {
             background-color: #0b0f19; /* deeper fallback */
             background-image: url('{{ asset('storage/vits_bg_black.png') }}');
@@ -339,7 +361,7 @@
                     <div class="absolute inset-x-0 bottom-0 rounded-2xl bg-transparent text-white mb-2 p-2 h-[250px] flex justify-center items-end overflow-hidden z-10">
                         
                         <!-- Image overlay (on top of everything) -->
-                        <div class="absolute right-50 bottom-0 z-20">
+                        <div class="absolute right-100 bottom-0 z-20">
                             <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
                         </div>
 
