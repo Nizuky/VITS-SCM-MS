@@ -8,8 +8,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard.student')
-    ->middleware(['auth', 'verified'])
+Route::view('dashboard', 'dashboards.student')
+       ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 // CSRF cookie preflight: ensures XSRF-TOKEN cookie is set for AJAX
