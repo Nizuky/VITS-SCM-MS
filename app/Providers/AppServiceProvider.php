@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Auth;
+use App\Models\SocialContractRecord;
+use App\Observers\SocialContractRecordObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +25,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Do NOT customize RedirectIfAuthenticated globally
         // Each guard will handle its own redirects via guard-specific middleware
+        
+        // Register observers
+        SocialContractRecord::observe(SocialContractRecordObserver::class);
     }
 }

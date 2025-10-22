@@ -86,24 +86,38 @@
             setLoading(true);
 
             const data = new FormData(form);
-            const token = document.querySelector('input[name="_token"]').value;
+            const tokenInput = document.querySelector('input[name="_token"]');
+            const token = tokenInput ? tokenInput.value : '';
 
             fetch(form.action, {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                headers: { 
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
                 body: data,
                 credentials: 'same-origin'
             }).then(res => {
                 if (res.ok) return res.json();
-                return res.json().then(j => Promise.reject(j));
+                // Try to get error message from response
+                return res.json().then(j => Promise.reject(j)).catch(() => {
+                    // If JSON parsing fails, reject with status text
+                    return Promise.reject({ message: res.statusText || 'Login failed' });
+                });
             }).then(json => {
-                if (json.redirect) window.location.href = json.redirect;
-                else setLoading(false);
+                if (json.redirect) {
+                    window.location.href = json.redirect;
+                } else {
+                    setLoading(false);
+                }
             }).catch(err => {
                 setLoading(false);
                 // show error banner
                 let msg = 'Invalid credentials.';
                 if (err && err.message) msg = err.message;
+                if (err && err.errors && err.errors.name) msg = err.errors.name[0];
+                
                 let existing = document.querySelector('.superadmin-error-banner');
                 if (!existing){
                     const d = document.createElement('div');

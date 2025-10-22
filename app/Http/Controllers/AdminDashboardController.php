@@ -12,6 +12,52 @@ use Carbon\Carbon;
 class AdminDashboardController extends Controller
 {
     /**
+     * Get dashboard statistics
+     */
+    public function getDashboardStats()
+    {
+        try {
+            $now = Carbon::now();
+            $weekAgo = $now->copy()->subDays(7);
+
+            // Count pending requests (all time)
+            $pendingCount = SocialContractRecord::where('status', 'Pending')->count();
+
+            // Count verified (accepted) this week - using updated_at since that's when status changed
+            $verifiedThisWeek = SocialContractRecord::where('status', 'Verified')
+                ->where('updated_at', '>=', $weekAgo)
+                ->count();
+
+            // Count rejected this week
+            $rejectedThisWeek = SocialContractRecord::where('status', 'Rejected')
+                ->where('updated_at', '>=', $weekAgo)
+                ->count();
+
+            \Log::info('Dashboard Stats', [
+                'pending' => $pendingCount,
+                'verified_this_week' => $verifiedThisWeek,
+                'rejected_this_week' => $rejectedThisWeek,
+                'week_ago' => $weekAgo->toDateTimeString(),
+                'now' => $now->toDateTimeString()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'pending' => $pendingCount,
+                    'verified_this_week' => $verifiedThisWeek,
+                    'rejected_this_week' => $rejectedThisWeek
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch dashboard stats: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get all submissions with student information
      */
     public function getSubmissions()
@@ -40,6 +86,11 @@ class AdminDashboardController extends Controller
                 'data' => $submissions
             ]);
         } catch (\Exception $e) {
+            \Log::error('Failed to fetch admin submissions', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch submissions: ' . $e->getMessage()
@@ -62,23 +113,7 @@ class AdminDashboardController extends Controller
             $record->status = 'Verified';
             $record->save();
             
-            // Log verification
-            \App\Models\SocialContractRecordVerification::create([
-                'social_contract_record_id' => $record->id,
-                'verified_by' => auth('admin')->id(),
-                'verified_at' => now(),
-                'verification_notes' => 'Verified by admin'
-            ]);
-            
-            // Log status change
-            \App\Models\SocialContractRecordStatusHistory::create([
-                'social_contract_record_id' => $record->id,
-                'old_status' => $oldStatus,
-                'new_status' => 'Verified',
-                'changed_by' => auth('admin')->id(),
-                'changed_at' => now(),
-                'change_reason' => 'Record verified by admin'
-            ]);
+            // Observer will automatically create approval record in social_contract_approvals table
             
             DB::commit();
             
@@ -110,25 +145,6 @@ class AdminDashboardController extends Controller
             // Update status
             $record->status = 'Rejected';
             $record->save();
-            
-            // Log rejection
-            \App\Models\SocialContractRecordRejection::create([
-                'social_contract_record_id' => $record->id,
-                'rejected_by' => auth('admin')->id(),
-                'rejected_at' => now(),
-                'rejection_reason' => 'Rejected by admin',
-                'rejection_notes' => null
-            ]);
-            
-            // Log status change
-            \App\Models\SocialContractRecordStatusHistory::create([
-                'social_contract_record_id' => $record->id,
-                'old_status' => $oldStatus,
-                'new_status' => 'Rejected',
-                'changed_by' => auth('admin')->id(),
-                'changed_at' => now(),
-                'change_reason' => 'Record rejected by admin'
-            ]);
             
             DB::commit();
             

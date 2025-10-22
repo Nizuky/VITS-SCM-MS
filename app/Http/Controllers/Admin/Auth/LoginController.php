@@ -24,7 +24,9 @@ class LoginController extends Controller
             $request->session()->regenerate();
             // Mark this session as an active admin session. Middleware will enforce this marker
             // IMPORTANT: never use remember_me for admins - always expire on tab close
-            session(['auth_guard' => 'admin', 'admin_session_active' => true]);
+            $request->session()->put('auth_guard', 'admin');
+            $request->session()->put('admin_session_active', true);
+            $request->session()->save(); // Ensure session is saved immediately
             $redirect = route('admin.dashboard');
 
             if ($request->expectsJson()) {

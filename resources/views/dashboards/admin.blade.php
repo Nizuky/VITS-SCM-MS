@@ -73,7 +73,7 @@ body{font-family:'Inter',sans-serif}
 .btn-action-reject:hover{background-color:#CC525D;color:white}
 .bg-gradient-primary-purple{background-image:linear-gradient(to bottom,#bbacffff,#6D28D9)}
 .bg-gradient-pending{background-image:linear-gradient(to bottom,#FFF4DE,#FFE0A2)}
-.bg-gradient-accepted{background-image:linear-gradient(to bottom,#DCFCE7,#81FFAC)}
+.bg-gradient-accepted{background-image:linear-gradient(to bottom,#e1fff8ff,#2ce0e0ff)}
 .bg-gradient-rejected{background-image:linear-gradient(to bottom,#FFE2E5,#FFB7BE)}
 .custom-tab-wrapper{background-color:white;border-radius:0.5rem;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);padding:0.5rem}
 .custom-tab{font-weight:600;color:#707EAE;padding:0.5rem 1.25rem;border-bottom:3px solid transparent;transition:all 0.2s ease-in-out;cursor:pointer}
@@ -86,7 +86,8 @@ body{font-family:'Inter',sans-serif}
 .status-badge.rejected{background-color:#FFD1D3;color:#CC525D}
 .scms-badge{display:inline-flex;align-items:center;justify-content:center;font-weight:600;border-radius:9999px;padding:0.25rem 0.5rem;font-size:0.75rem;line-height:1;border:0!important}
 .scms-badge--pending{background-color:#FAEAD0!important;color:#E29C44!important}
-.scms-badge--verified{background-color:#CCEED6!important;color:#399552!important}
+.scms-badge--verified{background-color:#B2F5EA!important;color:#0D9488!important}
+.scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
 .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
 .bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
 #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
@@ -103,10 +104,11 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] body{color:#fff}
 [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
 [data-theme="dark"] .scms-badge--pending{background-color:#ff9d26ff!important;color:#ffffffff!important}
-[data-theme="dark"] .scms-badge--verified{background-color:#009b29ff!important;color:#ffffffff!important}
+[data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
+[data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
 [data-theme="dark"] .scms-badge--rejected{background-color:#b8000fff!important;color:#ffffffff!important}
 [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
-[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
+[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
 [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
 [data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('{{ asset("storage/vits_bg_black.png") }}')}
 [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
@@ -118,6 +120,24 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
 [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
 [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+#status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
+#status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.1)}
+#status-filter-dropdown svg{fill:#707EAE}
+#status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+#status-filter-dropdown{position:relative!important}
+#status-filter-dropdown .dropdown-content{position:fixed!important;box-shadow:0 10px 25px rgba(0,0,0,0.15)!important;z-index:9999!important}
+.dropdown-content li a{font-size:0.875rem;padding:0.5rem 1rem}
+.dropdown-content li a:hover{background-color:#6D28D9;color:#fff}
+[data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+[data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+[data-theme="dark"] #status-filter-dropdown .btn{color:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.2)}
+[data-theme="dark"] #status-filter-dropdown svg{fill:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+thead{overflow:visible!important}
+table{overflow:visible!important}
+#submission-page .overflow-x-auto{overflow:visible!important}
+#action-status-header{overflow:visible!important;position:relative}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -253,8 +273,18 @@ body{font-family:'Inter',sans-serif}
                 
                 <!-- Statistics Cards -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
-                    <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
-                    <p class="text-sm text-text-muted mb-4">Contract requests overview for this week</p>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
+                            <p class="text-sm text-text-muted">Contract requests overview for this week</p>
+                        </div>
+                        <button onclick="loadDashboardStats(); loadActivityData();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                            <span class="hidden md:inline">Refresh</span>
+                        </button>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Pending Requests -->
                         <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2">
@@ -279,7 +309,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-green-800 font-semibold">Accepted This Week</p>
+                                <p class="text-[#0e4848ff] font-semibold">Verified This Week</p>
                                 <p class="text-xs text-text-muted mt-1">Successfully verified</p>
                             </div>
                         </div>
@@ -344,6 +374,14 @@ body{font-family:'Inter',sans-serif}
                         </svg>
                         <input type="text" class="grow bg-transparent" placeholder="Search" id="search-input">
                     </label>
+                    
+                    <!-- Refresh Button -->
+                    <button onclick="loadSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        <span class="hidden md:inline">Refresh</span>
+                    </button>
                 </div>
 
                 <!-- Submission Table -->
@@ -358,7 +396,27 @@ body{font-family:'Inter',sans-serif}
                                     <th class="w-[15%] text-center">Organization</th>
                                     <th class="w-[12%] text-center">Hours Rendered</th>
                                     <th class="w-[10%] text-center">Date</th>
-                                    <th class="w-[18%] text-center">Action</th>
+                                    <th class="w-[18%] text-center" id="action-status-header">
+                                        <span id="action-label">Action</span>
+                                        <div class="hidden" id="status-header-wrapper">
+                                            <div class="flex items-center justify-center gap-1">
+                                                <span>Status</span>
+                                                <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
+                                                    <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1.5A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
+                                                        <li><a onclick="filterTableByStatus('All', event)">All</a></li>
+                                                        <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
+                                                        <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
+                                                        <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body">
@@ -562,14 +620,53 @@ body{font-family:'Inter',sans-serif}
         var allSubmissions = []; // Store all submissions data
         var BASE_PATH = @json($BASE_PATH);
 
+        // Load dashboard statistics
+        function loadDashboardStats() {
+            fetch('/admin/api/dashboard-stats', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard stats');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                if (result.success && result.data) {
+                    // Update the counts in the dashboard
+                    document.getElementById('pending-requests-count').textContent = result.data.pending;
+                    document.getElementById('accepted-requests-count').textContent = result.data.verified_this_week;
+                    document.getElementById('rejected-requests-count').textContent = result.data.rejected_this_week;
+                    
+                    // Update the donut chart
+                    updatePendingRequestsChart(result.data.pending);
+                } else {
+                    console.warn('Invalid dashboard stats format');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading dashboard stats:', error);
+            });
+        }
+
         // Load submissions from database
-        function loadSubmissions() {
+        var lastSubmissionsData = null; // Store last data to detect changes
+        
+        function loadSubmissions(showLoading = true) {
             var tbody = document.getElementById('submission-table-body');
             
-            // Show loading state
-            tbody.innerHTML = '<tr id="loading-row"><td colspan="7" class="text-center py-8">' +
-                '<span class="loading loading-spinner loading-lg text-primary-purple"></span>' +
-                '<p class="mt-2 text-text-muted">Loading submissions...</p></td></tr>';
+            // Only show loading state on initial load
+            if (showLoading) {
+                tbody.innerHTML = '<tr id="loading-row"><td colspan="7" class="text-center py-8">' +
+                    '<span class="loading loading-spinner loading-lg text-primary-purple"></span>' +
+                    '<p class="mt-2 text-text-muted">Loading submissions...</p></td></tr>';
+            }
             
             // Fetch submissions from API
             fetch('/admin/api/submissions', {
@@ -588,19 +685,26 @@ body{font-family:'Inter',sans-serif}
                 return response.json();
             })
             .then(function(result) {
-                console.log('API Response:', result);
                 if (result.success && result.data) {
-                    allSubmissions = result.data;
-                    renderSubmissions(result.data);
-                    updateWeeklySummaryFromData(result.data);
+                    // Check if data actually changed
+                    var dataChanged = JSON.stringify(result.data) !== JSON.stringify(lastSubmissionsData);
+                    
+                    if (dataChanged || showLoading) {
+                        lastSubmissionsData = result.data;
+                        allSubmissions = result.data;
+                        renderSubmissions(result.data);
+                        updateWeeklySummaryFromData(result.data);
+                    }
                 } else {
                     throw new Error('Invalid response format');
                 }
             })
             .catch(function(error) {
                 console.error('Error loading submissions:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">' +
-                    'Failed to load submissions. Please refresh the page.</td></tr>';
+                if (showLoading) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">' +
+                        'Failed to load submissions. Please refresh the page.</td></tr>';
+                }
             });
         }
         
@@ -619,6 +723,7 @@ body{font-family:'Inter',sans-serif}
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
                 var isVerified = status === 'Verified';
+                var isApproved = status === 'Approved';
                 var isRejected = status === 'Rejected';
                 
                 var dataStatus = isPending ? 'Pending' : 'Archived';
@@ -645,6 +750,8 @@ body{font-family:'Inter',sans-serif}
                             '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
                             '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
                             '</div>';
+                } else if (isApproved) {
+                    html += '<span class="scms-badge scms-badge--approved">Approved</span>';
                 } else if (isVerified) {
                     html += '<span class="scms-badge scms-badge--verified">Verified</span>';
                 } else if (isRejected) {
@@ -780,11 +887,48 @@ body{font-family:'Inter',sans-serif}
             var nl = document.getElementById('nav-' + p);
             if (nl) nl.classList.add('active-nav');
             
+            // Save current page to localStorage for admin
+            try {
+                localStorage.setItem('scms_admin_current_page', p);
+            } catch(_) {}
+            
             // Load submissions when showing submission page
             if (p === 'submission') {
                 loadSubmissions();
+                
+                // Restore saved tab or default to pending
+                setTimeout(function() {
+                    var savedTab = 'pending';
+                    try {
+                        savedTab = localStorage.getItem('scms_admin_current_tab') || 'pending';
+                    } catch(_) {}
+                    
+                    // Find the tab element based on saved tab
+                    var tabs = document.querySelectorAll('.custom-tab');
+                    var targetTab = null;
+                    
+                    tabs.forEach(function(tab) {
+                        var tabText = tab.textContent.trim().toLowerCase();
+                        if (tabText === savedTab || tabText === savedTab.replace('-', ' ')) {
+                            targetTab = tab;
+                        }
+                    });
+                    
+                    // If no matching tab found, use first tab
+                    if (!targetTab && tabs.length > 0) {
+                        targetTab = tabs[0];
+                    }
+                    
+                    if (targetTab) {
+                        targetTab.classList.add('custom-tab-active');
+                        filterSubmissions(savedTab, targetTab);
+                    }
+                }, 100);
             }
         }
+
+        // Global variable to track current status filter
+        var currentStatusFilter = 'All';
 
         // Filter submissions by status
         function filterSubmissions(s, t) {
@@ -792,6 +936,26 @@ body{font-family:'Inter',sans-serif}
                 tb.classList.remove('custom-tab-active');
             });
             t.classList.add('custom-tab-active');
+            
+            // Save current tab for admin
+            try {
+                localStorage.setItem('scms_admin_current_tab', s);
+            } catch(_) {}
+            
+            // Update header based on tab
+            var actionLabel = document.getElementById('action-label');
+            var statusWrapper = document.getElementById('status-header-wrapper');
+            
+            if (s === 'Archived') {
+                actionLabel.classList.add('hidden');
+                statusWrapper.classList.remove('hidden');
+            } else {
+                actionLabel.classList.remove('hidden');
+                statusWrapper.classList.add('hidden');
+            }
+            
+            // Reset status filter when switching tabs
+            currentStatusFilter = 'All';
             
             var st = document.getElementById('search-input').value.toLowerCase();
             var rs = document.querySelectorAll('#submission-table-body tr');
@@ -808,6 +972,44 @@ body{font-family:'Inter',sans-serif}
                          sb.includes(st) || hr.includes(st) || dt.includes(st);
                 
                 if (rs === s && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
+        }
+
+        // Filter table by status (for Archived tab)
+        function filterTableByStatus(status, event) {
+            if (event) event.preventDefault();
+            
+            currentStatusFilter = status;
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rowStatus = r.dataset.status;
+                var archiveStatus = r.dataset.archiveStatus;
+                
+                // Only filter rows that are in the Archived tab
+                if (rowStatus !== 'Archived') {
+                    return;
+                }
+                
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                // Apply both status filter and search filter
+                var statusMatch = status === 'All' || archiveStatus === status;
+                
+                if (statusMatch && ms) {
                     r.classList.remove('hidden');
                 } else {
                     r.classList.add('hidden');
@@ -963,54 +1165,113 @@ body{font-family:'Inter',sans-serif}
 
         // DOM ready
         document.addEventListener('DOMContentLoaded', function() {
-            showPage('dashboard');
+            // Restore saved page for admin, default to dashboard
+            var savedPage = 'dashboard';
+            try {
+                savedPage = localStorage.getItem('scms_admin_current_page') || 'dashboard';
+            } catch(_) {}
+            
+            showPage(savedPage);
             initThemeToggle();
             attachLogoutHandler();
+            loadDashboardStats(); // Load dashboard statistics
             loadActivityData(); // Load activity calendar with API data
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
             
+            // Auto-refresh removed - use manual refresh buttons instead
+            
+            // Fix dropdown positioning
+            var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                        if (dropdown) {
+                            var btnRect = dropdownBtn.getBoundingClientRect();
+                            dropdown.style.position = 'fixed';
+                            dropdown.style.left = (btnRect.left - 100) + 'px';
+                            dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                        }
+                    }, 10);
+                });
+            }
+            
             // Confirm verify button handler
-            document.getElementById('confirm-verify-btn').addEventListener('click', function() {
+            document.getElementById('confirm-verify-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
                     
-                    // TODO: Make API call to verify the submission
-                    // fetch('/admin/api/submissions/' + recordId + '/verify', {...})
-                    
-                    // For now, update UI optimistically
-                    activeRow.dataset.status = 'Archived';
-                    activeRow.dataset.archiveStatus = 'Verified';
-                    activeRow.cells[6].innerHTML = '<span class="scms-badge scms-badge--verified">Verified</span>';
-                    
-                    showToast('Submission has been verified.', 'success');
-                    activeRow = null;
-                    
-                    // Reload submissions to get fresh data
-                    loadSubmissions();
-                    loadActivityData(); // Refresh calendar to show new activity
+                    try {
+                        // Make API call to verify the submission
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/verify`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast('Submission has been verified successfully.', 'success');
+                            document.getElementById('verify_modal').close();
+                            activeRow = null;
+                            
+                            // Reload submissions to get fresh data from database
+                            loadSubmissions();
+                            loadActivityData(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
+                        } else {
+                            showToast(data.message || 'Failed to verify submission.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error verifying submission:', error);
+                        showToast('Failed to verify submission. Please try again.', 'error');
+                    }
                 }
             });
             
             // Confirm reject button handler
-            document.getElementById('confirm-reject-btn').addEventListener('click', function() {
+            document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
                     
-                    // TODO: Make API call to reject the submission
-                    // fetch('/admin/api/submissions/' + recordId + '/reject', {...})
-                    
-                    // For now, update UI optimistically
-                    activeRow.dataset.status = 'Archived';
-                    activeRow.dataset.archiveStatus = 'Rejected';
-                    activeRow.cells[6].innerHTML = '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-                    
-                    showToast('Submission has been rejected.', 'success');
-                    activeRow = null;
-                    
-                    // Reload submissions to get fresh data
-                    loadSubmissions();
-                    loadActivityData(); // Refresh calendar to show new activity
+                    try {
+                        // Make API call to reject the submission
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/reject`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast('Submission has been rejected.', 'success');
+                            document.getElementById('reject_modal').close();
+                            activeRow = null;
+                            
+                            // Reload submissions to get fresh data from database
+                            loadSubmissions();
+                            loadActivityData(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
+                        } else {
+                            showToast(data.message || 'Failed to reject submission.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error rejecting submission:', error);
+                        showToast('Failed to reject submission. Please try again.', 'error');
+                    }
                 }
             });
             
@@ -1018,7 +1279,13 @@ body{font-family:'Inter',sans-serif}
             document.getElementById('search-input').addEventListener('keyup', function() {
                 var at = document.querySelector('.custom-tab-active');
                 var as = at.textContent.trim();
-                filterSubmissions(as, at);
+                
+                // If on Archived tab and there's a status filter active, use filterTableByStatus
+                if (as === 'Archived' && currentStatusFilter !== 'All') {
+                    filterTableByStatus(currentStatusFilter, null);
+                } else {
+                    filterSubmissions(as, at);
+                }
             });
             
             // Password change handlers
@@ -1041,6 +1308,8 @@ body{font-family:'Inter',sans-serif}
                 spm.close();
                 showToast('Your password has been updated.', 'success');
             });
+            
+            // Auto-refresh removed - use manual refresh buttons instead
         });
 
         // Generate Activity Calendar (GitHub-style)
@@ -1184,7 +1453,7 @@ body{font-family:'Inter',sans-serif}
 
         // Initialize Pending Requests Donut Chart
         var pendingRequestsChartInstance = null;
-        function initPendingRequestsChart() {
+        function initPendingRequestsChart(pendingCount) {
             var canvas = document.getElementById('pendingRequestsChart');
             if (!canvas) return;
             
@@ -1195,8 +1464,11 @@ body{font-family:'Inter',sans-serif}
                 pendingRequestsChartInstance.destroy();
             }
             
-            // Sample data - replace with actual data from API
-            var pendingCount = 12;
+            // Default to 0 if not provided
+            if (typeof pendingCount === 'undefined') {
+                pendingCount = 0;
+            }
+            
             var totalCapacity = 50; // Example total capacity
             var percentage = Math.round((pendingCount / totalCapacity) * 100);
             
@@ -1204,7 +1476,7 @@ body{font-family:'Inter',sans-serif}
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [pendingCount, totalCapacity - pendingCount],
+                        data: [pendingCount, Math.max(0, totalCapacity - pendingCount)],
                         backgroundColor: ['#FFFFFF', 'rgba(255, 255, 255, 0.2)'],
                         borderWidth: 0
                     }]
@@ -1222,6 +1494,11 @@ body{font-family:'Inter',sans-serif}
             
             // Update label
             document.getElementById('pending-requests-label').textContent = pendingCount;
+        }
+
+        // Update chart with new data
+        function updatePendingRequestsChart(pendingCount) {
+            initPendingRequestsChart(pendingCount);
         }
 
         // Load Activity Calendar Data from API

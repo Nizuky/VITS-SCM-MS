@@ -15,6 +15,11 @@ class EnsureAdminSessionActive
     {
         // If the admin is authenticated but our session marker is missing, force logout.
         if (Auth::guard('admin')->check() && ! $request->session()->has('admin_session_active')) {
+            \Log::warning('Admin session marker missing, forcing logout', [
+                'url' => $request->url(),
+                'session_id' => $request->session()->getId(),
+                'admin_id' => Auth::guard('admin')->id(),
+            ]);
             Auth::guard('admin')->logout();
             try { $request->session()->invalidate(); } catch (\Throwable $e) {}
             try { $request->session()->regenerateToken(); } catch (\Throwable $e) {}

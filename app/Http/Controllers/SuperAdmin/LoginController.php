@@ -74,11 +74,25 @@ class LoginController extends Controller
                 ->with('error', 'Invalid credentials.');
         }
 
-    // Login via the 'superadmin' guard
-    // IMPORTANT: never use remember_me for super admins - always expire on tab close
-    Auth::guard('superadmin')->login($admin, false);
-    // Mark session with active guard to avoid ambiguity with other guards/remember cookies
-    $request->session()->put('auth_guard', 'superadmin');
+        // Login via the 'superadmin' guard
+        // IMPORTANT: never use remember_me for super admins - always expire on tab close
+        Auth::guard('superadmin')->login($admin, false);
+        
+        // Regenerate session to prevent session fixation
+        $request->session()->regenerate();
+        
+        // Mark session with active guard to avoid ambiguity with other guards/remember cookies
+        $request->session()->put('auth_guard', 'superadmin');
+        $request->session()->put('superadmin_session_active', true);
+        $request->session()->save(); // Ensure session is saved immediately
+        
+        // Log successful login
+        \Log::info('SuperAdmin login successful', [
+            'admin_id' => $admin->id,
+            'admin_name' => $admin->name,
+            'session_id' => $request->session()->getId(),
+            'session_marker' => $request->session()->get('superadmin_session_active'),
+        ]);
 
         // AJAX/json request -> return JSON with redirect
         if ($request->ajax() || $request->wantsJson()) {
@@ -95,6 +109,7 @@ class LoginController extends Controller
 
     // Remove guard marker and destroy session
     $request->session()->forget('auth_guard');
+    $request->session()->forget('superadmin_session_active');
     $request->session()->invalidate();
         $request->session()->regenerateToken();
 

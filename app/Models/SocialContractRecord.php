@@ -36,59 +36,11 @@ class SocialContractRecord extends Model
     }
 
     /**
-     * Get all verifications for this record.
+     * Get the approval record for this social contract record.
      */
-    public function verifications(): HasMany
+    public function approval(): HasOne
     {
-        return $this->hasMany(SocialContractRecordVerification::class);
-    }
-
-    /**
-     * Get the latest verification for this record.
-     */
-    public function latestVerification(): HasOne
-    {
-        return $this->hasOne(SocialContractRecordVerification::class)->latestOfMany('verified_at');
-    }
-
-    /**
-     * Get all rejections for this record.
-     */
-    public function rejections(): HasMany
-    {
-        return $this->hasMany(SocialContractRecordRejection::class);
-    }
-
-    /**
-     * Get the latest rejection for this record.
-     */
-    public function latestRejection(): HasOne
-    {
-        return $this->hasOne(SocialContractRecordRejection::class)->latestOfMany('rejected_at');
-    }
-
-    /**
-     * Get all approvals for this record.
-     */
-    public function approvals(): HasMany
-    {
-        return $this->hasMany(SocialContractRecordApproval::class);
-    }
-
-    /**
-     * Get the latest approval for this record.
-     */
-    public function latestApproval(): HasOne
-    {
-        return $this->hasOne(SocialContractRecordApproval::class)->latestOfMany('approved_at');
-    }
-
-    /**
-     * Get the status history for this record.
-     */
-    public function statusHistory(): HasMany
-    {
-        return $this->hasMany(SocialContractRecordStatusHistory::class)->orderBy('changed_at', 'desc');
+        return $this->hasOne(SocialContractApproval::class);
     }
 
     /**

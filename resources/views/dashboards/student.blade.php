@@ -104,7 +104,8 @@
         /* Consistent status badges (independent from DaisyUI badge theme) */
         .scms-badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 9999px; padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1; border: 0 !important; }
         .scms-badge--pending { background-color: #FAEAD0 !important; color: #E29C44 !important; }
-        .scms-badge--verified { background-color: #CCEED6 !important; color: #399552 !important; }
+        .scms-badge--verified { background-color: #B2F5EA !important; color: #0D9488 !important; }
+        .scms-badge--approved { background-color: #C8E6C9 !important; color: #2E7D32 !important; }
         .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
         /* Optional utility for static-looking inputs */
         .static-input { border: none !important; box-shadow: none !important; padding-left: 0 !important; background-color: transparent !important; cursor: default !important; }
@@ -166,7 +167,8 @@
         [data-theme="dark"] a { color: #ffffff !important; }
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
-        [data-theme="dark"] .scms-badge--verified { background-color: #009b29ff !important; color: #ffffffff!important; }
+        [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
+        [data-theme="dark"] .scms-badge--approved { background-color: #4CAF50 !important; color: #ffffffff!important; }
         [data-theme="dark"] .scms-badge--rejected { background-color: #b8000fff !important; color: #ffffffff!important; }
         /* Summary labels and inline status text */
         [data-theme="dark"] .text-yellow-800 { color: #ffcd91ff !important; }
@@ -241,6 +243,24 @@
             border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
         [data-theme="dark"] .record-checkbox:disabled { opacity: .4; cursor: not-allowed; }
+        /* Status filter dropdown styles */
+        #status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
+        #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.1)}
+        #status-filter-dropdown svg{fill:#707EAE}
+        #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+        #status-filter-dropdown{position:relative!important}
+        #status-filter-dropdown .dropdown-content{position:fixed!important;box-shadow:0 10px 25px rgba(0,0,0,0.15)!important;z-index:9999!important}
+        .dropdown-content li a{font-size:0.875rem;padding:0.5rem 1rem}
+        .dropdown-content li a:hover{background-color:#6D28D9;color:#fff}
+        [data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+        [data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+        [data-theme="dark"] #status-filter-dropdown .btn{color:#fff}
+        [data-theme="dark"] #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.2)}
+        [data-theme="dark"] #status-filter-dropdown svg{fill:#fff}
+        [data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+        thead{overflow:visible!important}
+        table{overflow:visible!important}
+        #record-status-page .overflow-x-auto{overflow:visible!important}
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -410,8 +430,18 @@
 
 
                 <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-                    <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
-                    <p class="text-sm text-text-muted mb-4">Contract Status Overview (Approved, Pending, Rejected)</p>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
+                            <p class="text-sm text-text-muted">Contract Status Overview (Approved, Pending, Rejected)</p>
+                        </div>
+                        <button onclick="loadDashboardStats();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                            <span class="hidden md:inline">Refresh</span>
+                        </button>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Approved Records -->
                         <div class="bg-gradient-approved p-4 rounded-2xl flex flex-col gap-2">
@@ -489,6 +519,14 @@
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" /></svg>
                             <input id="record-search" type="text" class="grow" placeholder="Search by event, venue, or organization" />
                         </label>
+                        
+                        <!-- Refresh Button -->
+                        <button onclick="loadRecords()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh records">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                            <span class="hidden md:inline">Refresh</span>
+                        </button>
                     </div>
                 </div>
 
@@ -524,7 +562,8 @@
                                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
                                                     <li><a onclick="filterTableByStatus('All', event)">All</a></li>
                                                     <li><a onclick="filterTableByStatus('Pending', event)">Pending</a></li>
-                                                    <li><a onclick="filterTableByStatus('Verified', event)">Approved</a></li>
+                                                    <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
+                                                    <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
                                                     <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
                                                 </ul>
                                             </div>
@@ -776,6 +815,12 @@
             else { greetingElement.classList.remove('hidden'); notificationContainer.classList.remove('hidden'); }
             const newPage = document.getElementById(pageId + '-page'); if (newPage) newPage.classList.remove('hidden');
             const navLink = document.getElementById('nav-' + pageId); if (navLink) navLink.classList.add('bg-primary-purple', 'active-nav', 'rounded-lg');
+            
+            // Save current page to localStorage for student
+            try {
+                localStorage.setItem('scms_student_current_page', pageId);
+            } catch(_) {}
+            
             if (pageId === 'profile') { showViewMode(); }
             if (pageId === 'dashboard' && typeof renderCharts === 'function') { renderCharts(); }
         }
@@ -970,8 +1015,13 @@
                 // Fallback to locale formatting
                 try { return new Date(dateVal).toLocaleDateString('en-GB').replace(/\//g, '-'); } catch { return s; }
             }
-            function loadRecords() {
-                tableBody.innerHTML = '';
+            var lastRecordsData = null; // Store last data to detect changes
+            
+            function loadRecords(showLoading = true) {
+                if (showLoading) {
+                    tableBody.innerHTML = '';
+                }
+                
                 fetch(`${BASE_PATH}/api/social-contract/records`, {
                     headers: {
                         'Accept': 'application/json',
@@ -993,9 +1043,15 @@
                         return r.json();
                     })
                     .then(({ records }) => {
-                        allRecords = records;
-                        renderTable();
-                        updateDashboardFromRecords(allRecords);
+                        // Check if data actually changed
+                        var dataChanged = JSON.stringify(records) !== JSON.stringify(lastRecordsData);
+                        
+                        if (dataChanged || showLoading) {
+                            lastRecordsData = records;
+                            allRecords = records;
+                            renderTable();
+                            updateDashboardFromRecords(allRecords);
+                        }
                     })
                     .catch((err) => { console.error('Failed to load records', err); });
             }
@@ -1301,7 +1357,40 @@
             } catch(_) {}
         }
 
-        function boot(){ initDashboard(); setupStatusFilterPortal(); initThemeToggle(); }
+        function boot(){ 
+            // Restore saved page for student, default to dashboard
+            var savedPage = 'dashboard';
+            try {
+                savedPage = localStorage.getItem('scms_student_current_page') || 'dashboard';
+            } catch(_) {}
+            
+            initDashboard(); 
+            setupStatusFilterPortal(); 
+            initThemeToggle();
+            
+            // Fix dropdown positioning for status filter
+            var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                        if (dropdown) {
+                            var btnRect = dropdownBtn.getBoundingClientRect();
+                            dropdown.style.position = 'fixed';
+                            dropdown.style.left = (btnRect.left - 100) + 'px';
+                            dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                        }
+                    }, 10);
+                });
+            }
+            
+            // Show the saved page
+            if (savedPage !== 'dashboard') {
+                showPage(savedPage);
+            }
+            
+            // Auto-refresh removed - use manual refresh buttons instead
+        }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
         else { boot(); }
         
@@ -1391,7 +1480,10 @@
         // execute attachLogoutHandler once after DOM ready
         try { attachLogoutHandler(); } catch (_) {}
         function renderStatusBadge(status) {
-            if (status === 'Verified' || status === 'Approved') {
+            if (status === 'Approved') {
+                return '<span class="scms-badge scms-badge--approved">Approved</span>';
+            }
+            if (status === 'Verified') {
                 return '<span class="scms-badge scms-badge--verified">Verified</span>';
             }
             if (status === 'Rejected') {
@@ -1447,7 +1539,8 @@
                     const createdAt = safeDate(r.created_at || r.createdAt || r.date);
                     const updatedAt = safeDate(r.updated_at || r.updatedAt || r.date);
                     if (status === 'Verified' || status === 'Approved') {
-                        counts.Verified++;
+                        // Count both Verified and Approved as "Approved" for display
+                        counts.Approved++;
                         // aggregate yearly approved
                         const y = safeYear(r.date);
                         if (y !== null) {
@@ -1472,8 +1565,8 @@
                     }
                 }
 
-                // Update cards (treat Verified as Approved)
-                if (elApproved) elApproved.textContent = String(counts.Verified);
+                // Update cards (show combined Verified + Approved as "Approved")
+                if (elApproved) elApproved.textContent = String(counts.Approved);
                 if (elPending) elPending.textContent = String(counts.Pending);
                 if (elRejected) elRejected.textContent = String(counts.Rejected);
                 // Per-status last update text & row visibility

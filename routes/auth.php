@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -38,6 +39,11 @@ Volt::route('register', 'auth.register')
 // Super-admin guest routes (use a guard-specific guest middleware to avoid conflicting with web remember-me)
 Route::middleware('guest:superadmin')->group(function () {
     Route::get('super-admin/login', function () {
+        // If already authenticated as superadmin, redirect to dashboard
+        if (Auth::guard('superadmin')->check()) {
+            return redirect()->route('superadmin.dashboard');
+        }
+        
         $admin = App\Models\SuperAdmin::first();
         $defaultName = $admin ? $admin->name : null;
         return view('auth.super-admin-login', ['defaultAdminName' => $defaultName]);
@@ -103,11 +109,19 @@ Route::middleware('auth:web')->group(function () {
 });
 
 // Super-admin protected routes (use superadmin guard)
-Route::middleware('auth:superadmin')->group(function () {
+Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessionActive::class])->group(function () {
     // Redirect to the main super admin dashboard view defined in routes/web.php
         Route::get('super-admin/dashboard', function () {
             return view('dashboards.super_admin');
         })->name('superadmin.dashboard');
+
+    // Super-admin API endpoints
+    Route::get('super-admin/api/dashboard-stats', [App\Http\Controllers\SuperAdminDashboardController::class, 'getDashboardStats']);
+    Route::get('super-admin/api/submissions', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSubmissions']);
+    Route::post('super-admin/api/submissions/{id}/verify', [App\Http\Controllers\SuperAdminDashboardController::class, 'verifySubmission']);
+    Route::post('super-admin/api/submissions/{id}/approve', [App\Http\Controllers\SuperAdminDashboardController::class, 'approveSubmission']);
+    Route::post('super-admin/api/submissions/{id}/reject', [App\Http\Controllers\SuperAdminDashboardController::class, 'rejectSubmission']);
+    Route::get('super-admin/api/activity-calendar', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityCalendar']);
 
     // Super-admin logout
     Route::post('super-admin/logout', [App\Http\Controllers\SuperAdmin\LoginController::class, 'logout'])

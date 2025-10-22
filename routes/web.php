@@ -8,17 +8,6 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Temporary route to reset admin password (REMOVE IN PRODUCTION)
-Route::get('/reset-admin-pw', function() {
-    $admin = \App\Models\AdminUser::where('email', 'janarafael.sanandres@gmail.com')->first();
-    if ($admin) {
-        $admin->password = \Illuminate\Support\Facades\Hash::make('Admin123!');
-        $admin->save();
-        return 'Admin password reset to: Admin123!<br>Email: ' . $admin->email . '<br>Name: ' . $admin->name . '<br><a href="/admin/login">Go to Admin Login</a>';
-    }
-    return 'Admin not found';
-});
-
 // Student dashboard route (web guard)
 Route::view('dashboard', 'dashboards.student')
        ->middleware(['auth:web', 'verified', \App\Http\Middleware\EnsureCorrectGuard::class.':web'])
@@ -91,6 +80,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Admin API routes for managing student submissions
         Route::prefix('api')->name('api.')->group(function () {
+            Route::get('dashboard-stats', [App\Http\Controllers\AdminDashboardController::class, 'getDashboardStats'])->name('dashboard-stats');
             Route::get('submissions', [App\Http\Controllers\AdminDashboardController::class, 'getSubmissions'])->name('submissions');
             Route::post('submissions/{id}/verify', [App\Http\Controllers\AdminDashboardController::class, 'verifySubmission'])->name('submissions.verify');
             Route::post('submissions/{id}/reject', [App\Http\Controllers\AdminDashboardController::class, 'rejectSubmission'])->name('submissions.reject');
