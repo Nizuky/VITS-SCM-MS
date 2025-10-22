@@ -20,9 +20,10 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::guard('admin')->attempt(['name' => $credentials['name'], 'password' => $credentials['password']])) {
+        if (Auth::guard('admin')->attempt(['name' => $credentials['name'], 'password' => $credentials['password']], false)) {
             $request->session()->regenerate();
             // Mark this session as an active admin session. Middleware will enforce this marker
+            // IMPORTANT: never use remember_me for admins - always expire on tab close
             session(['auth_guard' => 'admin', 'admin_session_active' => true]);
             $redirect = route('admin.dashboard');
 

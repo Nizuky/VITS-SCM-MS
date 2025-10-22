@@ -8,8 +8,20 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Temporary route to reset admin password (REMOVE IN PRODUCTION)
+Route::get('/reset-admin-pw', function() {
+    $admin = \App\Models\AdminUser::where('email', 'janarafael.sanandres@gmail.com')->first();
+    if ($admin) {
+        $admin->password = \Illuminate\Support\Facades\Hash::make('Admin123!');
+        $admin->save();
+        return 'Admin password reset to: Admin123!<br>Email: ' . $admin->email . '<br>Name: ' . $admin->name . '<br><a href="/admin/login">Go to Admin Login</a>';
+    }
+    return 'Admin not found';
+});
+
+// Student dashboard route (web guard)
 Route::view('dashboard', 'dashboards.student')
-       ->middleware(['auth', 'verified'])
+       ->middleware(['auth:web', 'verified', \App\Http\Middleware\EnsureCorrectGuard::class.':web'])
     ->name('dashboard');
 
 // CSRF cookie preflight: ensures XSRF-TOKEN cookie is set for AJAX
@@ -42,7 +54,7 @@ Route::get('/api/csrf-cookie', function (
 })->name('csrf.cookie');
 
 // Social Contract records API for the authenticated student
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth:web', 'verified'])->group(function () {
     // contracts
     Route::get('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'index'])->name('social-contracts.index');
     Route::post('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'store'])->name('social-contracts.store');
@@ -76,6 +88,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', function () {
             return view('dashboards.admin');
         })->name('dashboard');
+
+        // Admin API routes for managing student submissions
+        Route::prefix('api')->name('api.')->group(function () {
+            Route::get('submissions', [App\Http\Controllers\AdminDashboardController::class, 'getSubmissions'])->name('submissions');
+            Route::post('submissions/{id}/verify', [App\Http\Controllers\AdminDashboardController::class, 'verifySubmission'])->name('submissions.verify');
+            Route::post('submissions/{id}/reject', [App\Http\Controllers\AdminDashboardController::class, 'rejectSubmission'])->name('submissions.reject');
+            Route::get('activity-calendar', [App\Http\Controllers\AdminDashboardController::class, 'getActivityCalendar'])->name('activity-calendar');
+        });
     });
 });
 

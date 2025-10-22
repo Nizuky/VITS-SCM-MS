@@ -27,21 +27,52 @@ class ResetPasswordController extends Controller
             'password' => 'required|confirmed|min:8',
         ]);
 
+        \Illuminate\Support\Facades\Log::info('Admin password reset attempt', [
+            'email' => $request->input('email'),
+            'name' => $request->input('name'),
+            'token' => $request->input('token')
+        ]);
+
         // Ensure the submitted name matches an AdminUser record for the given email
-        $admin = AdminUser::where('email', $request->input('email'))->where('name', $request->input('name'))->first();
+        $admin = AdminUser::where('email', $request->input('email'))
+            ->where('name', $request->input('name'))
+            ->first();
+            
         if (! $admin) {
+            \Illuminate\Support\Facades\Log::warning('Admin not found for password reset', [
+                'email' => $request->input('email'),
+                'name' => $request->input('name')
+            ]);
             return back()->withErrors(['email' => ['No admin found matching that name and email.']]);
         }
 
+        \Illuminate\Support\Facades\Log::info('Admin found, attempting password reset', [
+            'admin_id' => $admin->id,
+            'admin_name' => $admin->name
+        ]);
+
         $status = Password::broker('admin_users')->reset(
-            $request->only('name', 'email', 'password', 'password_confirmation', 'token'),
+            $request->only('email', 'password', 'password_confirmation', 'token'),
             function (AdminUser $user, $password) use ($request) {
-                // Update password and save. Do NOT auto-login here — we'll require the admin to sign in
-                // explicitly after resetting their password for security and clarity.
+                \Illuminate\Support\Facades\Log::info('Password reset callback executed', [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email
+                ]);
+                
+                // Update password and save
                 $user->password = Hash::make($password);
                 $user->save();
+                
+                \Illuminate\Support\Facades\Log::info('Password updated successfully', [
+                    'user_id' => $user->id
+                ]);
             }
         );
+
+        \Illuminate\Support\Facades\Log::info('Password reset status', [
+            'status' => $status,
+            'expected' => Password::PASSWORD_RESET
+        ]);
 
         if ($status === Password::PASSWORD_RESET) {
             // Ensure no admin session is active, then redirect to admin login with a success message

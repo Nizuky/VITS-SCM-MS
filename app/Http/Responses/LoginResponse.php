@@ -14,21 +14,22 @@ class LoginResponse implements LoginResponseContract
     {
         $user = $request->user();
 
-        // determine destination based on role
-        $role = $user->role ?? 'student';
+        // Determine destination based on which guard authenticated the user
+        // Check if user is authenticated via admin guard
+        if ($request->user('admin')) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
 
+        // Check if user is authenticated via superadmin guard
+        if ($request->user('superadmin')) {
+            return redirect()->intended(route('superadmin.dashboard'));
+        }
+
+        // Default to student dashboard for web guard
         if ($request->wantsJson()) {
             return response()->json(['two_factor' => false]);
         }
 
-        if ($role === 'super_admin') {
-            return redirect()->intended(route('superadmin.dashboard'));
-        }
-
-        if ($role === 'admin') {
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
-        return redirect()->intended(route('student.dashboard'));
+        return redirect()->intended(route('dashboard'));
     }
 }

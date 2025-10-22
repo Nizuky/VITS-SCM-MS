@@ -21,26 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Redirect authenticated users to their guard-specific dashboards
-        RedirectIfAuthenticated::redirectUsing(function ($request) {
-            // Superadmin guard
-            if (Auth::guard('superadmin')->check() && 
-                \Illuminate\Support\Facades\Route::has('superadmin.dashboard')) {
-                return route('superadmin.dashboard');
-            }
-
-            // Admin guard
-            if (Auth::guard('admin')->check() && 
-                \Illuminate\Support\Facades\Route::has('admin.dashboard')) {
-                return route('admin.dashboard');
-            }
-
-            // Default to the main dashboard or home
-            if (\Illuminate\Support\Facades\Route::has('dashboard')) {
-                return route('dashboard');
-            }
-
-            return '/';
-        });
+        // Do NOT customize RedirectIfAuthenticated globally
+        // Each guard will handle its own redirects via guard-specific middleware
     }
 }

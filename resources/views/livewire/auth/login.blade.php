@@ -43,7 +43,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // If the user's email is not verified yet, log them in non-persistently
         // and send them to the verification prompt where they can resend the link.
         if (! $user->hasVerifiedEmail()) {
-            Auth::login($user, false); // do not remember until verified
+            Auth::guard('web')->login($user, false); // explicitly use web guard for students
             RateLimiter::clear($this->throttleKey());
             Session::put('remembered', false);
             Session::regenerate();
@@ -74,37 +74,39 @@ new #[Layout('components.layouts.auth')] class extends Component {
             return;
         }
 
-    // If remember is NOT checked, proactively clear any stale recaller cookie before new login
-    if (! $this->remember) {
-        try {
-            $recaller = Auth::guard('web')->getRecallerName();
-            Cookie::queue(Cookie::forget(
-                $recaller,
-                config('session.path', '/'),
-                config('session.domain')
-            ));
-        } catch (\Throwable $e) { /* ignore */ }
-    }
+        // If remember is NOT checked, proactively clear any stale recaller cookie before new login
+        if (! $this->remember) {
+            try {
+                $recaller = Auth::guard('web')->getRecallerName();
+                Cookie::queue(Cookie::forget(
+                    $recaller,
+                    config('session.path', '/'),
+                    config('session.domain')
+                ));
+            } catch (\Throwable $e) { /* ignore */ }
+        }
 
-    Auth::login($user, $this->remember);
-    // If remember is NOT checked, ensure any existing remember cookie is cleared
-    if (! $this->remember) {
-        try {
-            $recaller = Auth::guard('web')->getRecallerName();
-            Cookie::queue(Cookie::forget(
-                $recaller,
-                config('session.path', '/'),
-                config('session.domain')
-            ));
-        } catch (\Throwable $e) { /* ignore */ }
-    }
-    // Mark session with active guard and remember choice
-    session(['auth_guard' => 'web']);
-    Session::put('remembered', (bool) $this->remember);
+        Auth::guard('web')->login($user, $this->remember); // explicitly use web guard for students
+        
+        // If remember is NOT checked, ensure any existing remember cookie is cleared
+        if (! $this->remember) {
+            try {
+                $recaller = Auth::guard('web')->getRecallerName();
+                Cookie::queue(Cookie::forget(
+                    $recaller,
+                    config('session.path', '/'),
+                    config('session.domain')
+                ));
+            } catch (\Throwable $e) { /* ignore */ }
+        }
+        
+        // Mark session with active guard and remember choice
+        session(['auth_guard' => 'web']);
+        Session::put('remembered', (bool) $this->remember);
 
-    RateLimiter::clear($this->throttleKey());
-    // Regenerate again after login per best practices
-    try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
+        RateLimiter::clear($this->throttleKey());
+        // Regenerate again after login per best practices
+        try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
@@ -114,15 +116,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
      */
     protected function validateCredentials(): User
     {
+        // Use the web guard explicitly for student authentication
+        $guard = Auth::guard('web');
+        
         // Try to retrieve the user by email first. If student_id provided, include it in the query.
         $credentials = ['email' => $this->email];
         if (! empty($this->student_id)) {
             $credentials['student_id'] = $this->student_id;
         }
 
-        $user = Auth::getProvider()->retrieveByCredentials(array_merge($credentials, ['password' => $this->password]));
+        $user = $guard->getProvider()->retrieveByCredentials(array_merge($credentials, ['password' => $this->password]));
 
-        if (! $user || ! Auth::getProvider()->validateCredentials($user, ['password' => $this->password])) {
+        if (! $user || ! $guard->getProvider()->validateCredentials($user, ['password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

@@ -75,7 +75,8 @@ class LoginController extends Controller
         }
 
     // Login via the 'superadmin' guard
-    Auth::guard('superadmin')->login($admin);
+    // IMPORTANT: never use remember_me for super admins - always expire on tab close
+    Auth::guard('superadmin')->login($admin, false);
     // Mark session with active guard to avoid ambiguity with other guards/remember cookies
     $request->session()->put('auth_guard', 'superadmin');
 

@@ -4,7 +4,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest:web')->group(function () {
     Volt::route('login', 'auth.login')
         ->name('login');
 
@@ -27,10 +27,13 @@ Route::middleware('guest')->group(function () {
 
 // Make password reset page reachable even if the user is authenticated (used by profile-confirmation flow)
 Volt::route('reset-password/{token}', 'auth.reset-password')
+    ->middleware('guest:web')
     ->name('password.reset');
 
 // Make register page reachable even when a user is remembered (avoid RedirectIfAuthenticated)
-Volt::route('register', 'auth.register')->name('register');
+Volt::route('register', 'auth.register')
+    ->middleware('guest:web')
+    ->name('register');
 
 // Super-admin guest routes (use a guard-specific guest middleware to avoid conflicting with web remember-me)
 Route::middleware('guest:superadmin')->group(function () {
@@ -55,7 +58,7 @@ Route::get('email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:web')->group(function () {
     // Our custom verification prompt page that includes a resend link
     Volt::route('verify-email', 'auth.verify-email')
         ->name('verification.prompt');
