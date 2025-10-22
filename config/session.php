@@ -7,8 +7,9 @@ return [
     // Minutes the session can remain idle before it expires
     'lifetime' => env('SESSION_LIFETIME', 120),
 
-    // IMPORTANT: Expire session when the browser closes (so non-remembered users are logged out)
-    'expire_on_close' => true,
+    // Set to false so sessions persist across page refreshes
+    // Sessions will expire after 'lifetime' minutes of inactivity instead
+    'expire_on_close' => false,
 
     // Session encryption
     'encrypt' => false,

@@ -390,12 +390,27 @@ table{overflow:visible!important}
                         <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <th class="w-[10%] text-center">Student ID</th>
+                                    <th class="w-[10%] text-center">
+                                        <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
+                                            Student ID
+                                            <span id="studentid-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
                                     <th class="w-[15%] text-center">Student Name</th>
                                     <th class="w-[20%] text-center">Event Name</th>
                                     <th class="w-[15%] text-center">Organization</th>
-                                    <th class="w-[12%] text-center">Hours Rendered</th>
-                                    <th class="w-[10%] text-center">Date</th>
+                                    <th class="w-[12%] text-center">
+                                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
+                                            Hours Rendered
+                                            <span id="hours-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[10%] text-center">
+                                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
+                                            Date
+                                            <span id="date-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
                                     <th class="w-[18%] text-center" id="action-status-header">
                                         <span id="action-label">Action</span>
                                         <div class="hidden" id="status-header-wrapper">
@@ -619,6 +634,10 @@ table{overflow:visible!important}
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
         var BASE_PATH = @json($BASE_PATH);
+        var hoursSortDirection = 'desc'; // 'asc' or 'desc'
+        var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
+        var dateSortDirection = 'desc'; // 'asc' or 'desc'
+        var currentSortBy = null; // 'hours', 'studentid', or 'date'
 
         // Load dashboard statistics
         function loadDashboardStats() {
@@ -709,7 +728,7 @@ table{overflow:visible!important}
         }
         
         // Render submissions in the table
-        function renderSubmissions(submissions) {
+        function renderSubmissions(submissions, sortBy = null) {
             var tbody = document.getElementById('submission-table-body');
             
             if (!submissions || submissions.length === 0) {
@@ -718,8 +737,30 @@ table{overflow:visible!important}
                 return;
             }
             
+            // Sort if requested
+            var sortedSubmissions = submissions.slice(); // Create a copy
+            if (sortBy === 'hours') {
+                sortedSubmissions.sort(function(a, b) {
+                    var ha = parseInt(a.hours_rendered) || 0;
+                    var hb = parseInt(b.hours_rendered) || 0;
+                    return hoursSortDirection === 'asc' ? ha - hb : hb - ha;
+                });
+            } else if (sortBy === 'studentid') {
+                sortedSubmissions.sort(function(a, b) {
+                    var idA = (a.student_id || '').toString();
+                    var idB = (b.student_id || '').toString();
+                    return studentIdSortDirection === 'asc' ? idA.localeCompare(idB) : idB.localeCompare(idA);
+                });
+            } else if (sortBy === 'date') {
+                sortedSubmissions.sort(function(a, b) {
+                    var dateA = new Date(a.date || 0);
+                    var dateB = new Date(b.date || 0);
+                    return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                });
+            }
+            
             var html = '';
-            submissions.forEach(function(record) {
+            sortedSubmissions.forEach(function(record) {
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
                 var isVerified = status === 'Verified';
@@ -1178,6 +1219,54 @@ table{overflow:visible!important}
             loadActivityData(); // Load activity calendar with API data
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
+            
+            // Hours sort toggle event listener
+            var hoursSortToggle = document.getElementById('hours-sort-toggle');
+            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
+            if (hoursSortToggle && hoursSortIndicator) {
+                hoursSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'hours';
+                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('studentid-sort-indicator').textContent = '▼';
+                    document.getElementById('date-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'hours');
+                });
+            }
+            
+            // Student ID sort toggle event listener
+            var studentIdSortToggle = document.getElementById('studentid-sort-toggle');
+            var studentIdSortIndicator = document.getElementById('studentid-sort-indicator');
+            if (studentIdSortToggle && studentIdSortIndicator) {
+                studentIdSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentid';
+                    studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('hours-sort-indicator').textContent = '▼';
+                    document.getElementById('date-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'studentid');
+                });
+            }
+            
+            // Date sort toggle event listener
+            var dateSortToggle = document.getElementById('date-sort-toggle');
+            var dateSortIndicator = document.getElementById('date-sort-indicator');
+            if (dateSortToggle && dateSortIndicator) {
+                dateSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'date';
+                    dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('hours-sort-indicator').textContent = '▼';
+                    document.getElementById('studentid-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'date');
+                });
+            }
             
             // Auto-refresh removed - use manual refresh buttons instead
             

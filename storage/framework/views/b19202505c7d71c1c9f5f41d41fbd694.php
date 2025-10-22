@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Super Admin - Student Contract Management</title>
+<title>Admin - Student Contract Management</title>
 <script>
-(function(){try{var s=localStorage.getItem('scms_superadmin_theme');if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}}catch(_){}})();
+(function(){try{var s=localStorage.getItem('scms_admin_theme');if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}}catch(_){}})();
 </script>
 <script>
 tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{colors:{'background-light':'#EDF1FA','primary-purple':'#6D28D9','primary-purple-hover':'#5B21B6','text-header':'#2B3674','text-muted':'#707EAE','badge-pending-text':'#E29C44','badge-pending-bg':'#FAEAD0','badge-verified-text':'#399552','badge-verified-bg':'#CCEED6','badge-rejected-text':'#CC525D','badge-rejected-bg':'#FFD7DB','success-green':'#4CAF50','success-green-hover':'#45a049','danger-red':'#CC525D','danger-red-hover':'#b33e46'},fontFamily:{sans:['Inter','sans-serif']}}}};
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css">
-@php
+<?php
     $iconCandidates = ['vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
     $iconUrl = null;
     $iconMTime = null;
@@ -40,16 +40,15 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
     if ($iconUrl && $iconMTime) {
         $iconUrl .= '?v=' . $iconMTime;
     }
-@endphp
-<link rel="icon" href="{{ $iconUrl }}" sizes="any">
-<link rel="icon" href="{{ $iconUrl }}" type="image/png">
-<link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
+?>
+<link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+<link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+<link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
+<style>
 body{font-family:'Inter',sans-serif}
 .active-nav{background-color:#6D28D9;color:#fff;border-radius:0.5rem}
 .flex-1-dynamic{flex:1 1 auto;min-height:0}
@@ -70,13 +69,11 @@ body{font-family:'Inter',sans-serif}
 .btn-action{font-weight:600;border-width:1.5px;border-radius:6px;padding:4px 12px;font-size:0.75rem;height:auto;min-height:auto;background-color:transparent;transition:all 0.2s ease-in-out}
 .btn-action-verify{border-color:#13AAAA;color:#13AAAA}
 .btn-action-verify:hover{background-color:#13AAAA;color:white}
-.btn-action-approve{border-color:#4CAF50;color:#4CAF50}
-.btn-action-approve:hover{background-color:#4CAF50;color:white}
 .btn-action-reject{border-color:#CC525D;color:#CC525D}
 .btn-action-reject:hover{background-color:#CC525D;color:white}
 .bg-gradient-primary-purple{background-image:linear-gradient(to bottom,#bbacffff,#6D28D9)}
 .bg-gradient-pending{background-image:linear-gradient(to bottom,#FFF4DE,#FFE0A2)}
-.bg-gradient-accepted{background-image:linear-gradient(to bottom,#DCFCE7,#81FFAC)}
+.bg-gradient-accepted{background-image:linear-gradient(to bottom,#e1fff8ff,#2ce0e0ff)}
 .bg-gradient-rejected{background-image:linear-gradient(to bottom,#FFE2E5,#FFB7BE)}
 .custom-tab-wrapper{background-color:white;border-radius:0.5rem;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);padding:0.5rem}
 .custom-tab{font-weight:600;color:#707EAE;padding:0.5rem 1.25rem;border-bottom:3px solid transparent;transition:all 0.2s ease-in-out;cursor:pointer}
@@ -86,16 +83,13 @@ body{font-family:'Inter',sans-serif}
 .details-label{font-weight:600;color:#374151;margin-bottom:0.5rem;display:block}
 .status-badge{display:inline-flex;align-items:center;padding:0.5rem 1.25rem;border-radius:0.5rem;font-weight:600;font-size:0.875rem}
 .status-badge.verified{background-color:#D1FAE5;color:#065F46}
-.status-badge.approved{background-color:#D1FAE5;color:#065F46}
 .status-badge.rejected{background-color:#FFD1D3;color:#CC525D}
-.status-badge.for-approval{background-color:#FFF4DE;color:#E29C44}
 .scms-badge{display:inline-flex;align-items:center;justify-content:center;font-weight:600;border-radius:9999px;padding:0.25rem 0.5rem;font-size:0.75rem;line-height:1;border:0!important}
 .scms-badge--pending{background-color:#FAEAD0!important;color:#E29C44!important}
 .scms-badge--verified{background-color:#B2F5EA!important;color:#0D9488!important}
 .scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
 .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
-.scms-badge--for-approval{background-color:#FFF4DE!important;color:#E29C44!important}
-.bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
+.bg-custom{background-color:#EDF1FA;background-image:url('<?php echo e(asset("vits_bg_white.png")); ?>');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
 #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
 #toast-root .alert{pointer-events:auto}
 .scms-toast{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 0.875rem;border-radius:9999px;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,0.18),0 2px 6px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.08);max-width:520px}
@@ -113,11 +107,10 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
 [data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
 [data-theme="dark"] .scms-badge--rejected{background-color:#b8000fff!important;color:#ffffffff!important}
-[data-theme="dark"] .scms-badge--for-approval{background-color:#ff9d26ff!important;color:#ffffffff!important}
 [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
-[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
+[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
 [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
-[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('{{ asset("storage/vits_bg_black.png") }}')}
+[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('<?php echo e(asset("storage/vits_bg_black.png")); ?>')}
 [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
 [data-theme="dark"] .table th,[data-theme="dark"] .table td{border-color:#374151!important}
 [data-theme="dark"] .bg-white{background-color:#1f2937!important}
@@ -127,14 +120,31 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
 [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
 [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+#status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
+#status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.1)}
+#status-filter-dropdown svg{fill:#707EAE}
+#status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+#status-filter-dropdown{position:relative!important}
+#status-filter-dropdown .dropdown-content{position:fixed!important;box-shadow:0 10px 25px rgba(0,0,0,0.15)!important;z-index:9999!important}
+.dropdown-content li a{font-size:0.875rem;padding:0.5rem 1rem}
+.dropdown-content li a:hover{background-color:#6D28D9;color:#fff}
+[data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+[data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+[data-theme="dark"] #status-filter-dropdown .btn{color:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.2)}
+[data-theme="dark"] #status-filter-dropdown svg{fill:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+thead{overflow:visible!important}
+table{overflow:visible!important}
+#submission-page .overflow-x-auto{overflow:visible!important}
+#action-status-header{overflow:visible!important;position:relative}
 </style>
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
-
 <body class="min-h-screen bg-custom">
-@php
+<?php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
-    $fullName = trim(auth('superadmin')->user()->name ?? 'Super Admin');
+    $fullName = trim(auth('admin')->user()->name ?? 'Admin');
     $nameWords = $fullName !== '' ? preg_split('/\s+/', $fullName) : [];
     $initials = '';
     if (!empty($nameWords)) {
@@ -144,8 +154,8 @@ body{font-family:'Inter',sans-serif}
         }
     }
     if (!$initials)
-        $initials = 'SA';
-@endphp
+        $initials = 'AD';
+?>
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
@@ -154,13 +164,13 @@ body{font-family:'Inter',sans-serif}
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
                     <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" 
-                         title="{{ $fullName }}" 
-                         aria-label="{{ $fullName }}">
-                        <span class="text-3xl font-bold leading-none">{{ $initials }}</span>
+                         title="<?php echo e($fullName); ?>" 
+                         aria-label="<?php echo e($fullName); ?>">
+                        <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 class="font-bold text-lg">{{ $fullName }}</h2>
-                <p class="text-sm text-gray-500">Super Administrator</p>
+                <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
+                <p class="text-sm text-gray-500">Administrator</p>
             </div>
 
             <!-- Main Navigation -->
@@ -197,21 +207,31 @@ body{font-family:'Inter',sans-serif}
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" onclick="document.getElementById('logout_modal').showModal()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        Log Out
-                    </a>
+                    <form id="logout-form-visible" 
+                          action="<?php echo e(route('admin.logout')); ?>" 
+                          method="POST" 
+                          class="m-0 p-0 pl-2 pr-0" 
+                          novalidate>
+                        <?php echo csrf_field(); ?>
+                        <button id="logout-button-visible" 
+                                type="button" 
+                                class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Log Out
+                        </button>
+                    </form>
                 </li>
             </ul>
         </aside>
 
+        <!-- Main Content -->
         <main class="flex-1 flex flex-col gap-6" id="page-container">
             
             <!-- Dashboard Overview Page -->
             <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
-                <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Super Admin Dashboard</h1>
+                <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Admin Dashboard</h1>
                 
                 <!-- Welcome Greeting Card -->
                 <div class="relative rounded-2xl bg-transparent p-2 mb-6 h-[190px]">
@@ -224,16 +244,17 @@ body{font-family:'Inter',sans-serif}
                             <h2 class="text-3xl font-semibold text-white">
                                 Welcome, 
                                 <span class="text-white font-bold">
-                                    {{ Str::of(auth('superadmin')->user()->name)->explode(' ')->first() }}
+                                    <?php echo e(Str::of(auth('admin')->user()->name)->explode(' ')->first()); ?>
+
                                 </span>
                             </h2>
                             <br>
                             <p class="text-white text-base mt-1">
-                                Manage admin submissions and <br>
-                                oversee social contract compliance.
+                                Manage student submissions and <br>
+                                monitor social contract compliance.
                             </p>
                             <p class="text-white font-bold text-base mt-1">
-                                Empowering ka-VITS through efficient super administration!
+                                Empowering ka-VITS through efficient administration!
                             </p>
                         </div>
                         
@@ -258,7 +279,7 @@ body{font-family:'Inter',sans-serif}
                             <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
                             <p class="text-sm text-text-muted">Contract requests overview for this week</p>
                         </div>
-                        <button onclick="loadDashboardStats(); generateActivityCalendar();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
+                        <button onclick="loadDashboardStats(); loadActivityData();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
@@ -289,7 +310,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-green-800 font-semibold">Approved This Week</p>
+                                <p class="text-[#0e4848ff] font-semibold">Verified This Week</p>
                                 <p class="text-xs text-text-muted mt-1">Successfully verified</p>
                             </div>
                         </div>
@@ -331,6 +352,7 @@ body{font-family:'Inter',sans-serif}
                     </div>
                     <div id="activity-calendar" class="overflow-x-auto pb-2">
                         <!-- Calendar will be dynamically generated by JavaScript -->
+                        <!-- Data source: loadActivityData() function calls API endpoint -->
                     </div>
                 </div>
             </div>
@@ -341,21 +363,9 @@ body{font-family:'Inter',sans-serif}
                 
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
                     <!-- Tabs -->
-                    <!-- 
-                        Workflow:
-                        1. Pending: Records submitted by students (not yet reviewed by anyone)
-                        2. For Approval: Records with "Verified" status (admin verified from their archived section) - awaiting super admin's final decision
-                        3. Archived: Records with super admin's final decision (Approved or Rejected)
-                        
-                        Status mapping: 
-                        - DB Status "Pending" → Shows in "Pending" tab
-                        - DB Status "Verified" → Shows in "For Approval" tab (these are admin's archived verified records)
-                        - DB Status "Approved"/"Rejected" → Shows in "Archived" tab (super admin's final decisions)
-                    -->
                     <div class="flex space-x-2 custom-tab-wrapper">
-                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('for-approval',this)">For Approval</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('archived',this)">Archived</a>
+                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('Pending',this)">Pending</a>
+                        <a role="tab" class="custom-tab" onclick="filterSubmissions('Archived',this)">Archived</a>
                     </div>
                     
                     <!-- Search -->
@@ -402,7 +412,27 @@ body{font-family:'Inter',sans-serif}
                                             <span id="date-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">Action</th>
+                                    <th class="w-[18%] text-center" id="action-status-header">
+                                        <span id="action-label">Action</span>
+                                        <div class="hidden" id="status-header-wrapper">
+                                            <div class="flex items-center justify-center gap-1">
+                                                <span>Status</span>
+                                                <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
+                                                    <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1.5A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
+                                                        <li><a onclick="filterTableByStatus('All', event)">All</a></li>
+                                                        <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
+                                                        <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
+                                                        <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body">
@@ -497,11 +527,11 @@ body{font-family:'Inter',sans-serif}
     <dialog id="verify_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg">Verify Submission</h3>
-            <p class="py-4">Are you sure you want to verify this submission? This will move it to "For Approval" status.</p>
+            <p class="py-4">Are you sure you want to verify this submission?</p>
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
                     <button class="btn">Cancel</button>
-                    <button id="confirm-verify-btn" class="btn btn-action-verify text-white" style="background-color: #13AAAA;">
+                    <button id="confirm-verify-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
                         Yes, verify
                     </button>
                 </form>
@@ -509,32 +539,11 @@ body{font-family:'Inter',sans-serif}
         </div>
     </dialog>
 
-    <!-- Approve Modal -->
-    <dialog id="approve_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Approve Submission</h3>
-            <p class="py-4">Are you sure you want to approve this submission?</p>
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg mb-4" role="alert">
-                <p class="font-bold">Important Notice</p>
-                <p>Once approved, this record will now appear on the Students page and this action cannot be undone.</p>
-            </div>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-approve-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Yes, approve
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Reject Modal with Reason -->
+    <!-- Reject Modal -->
     <dialog id="reject_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg">Reject Submission</h3>
-            <p class="py-4">Please provide a reason for rejecting this submission. The student will be notified.</p>
-            <textarea id="rejection-reason" class="textarea textarea-bordered w-full" placeholder="Reason for rejection..." rows="4"></textarea>
+            <p class="py-4">Are you sure you want to reject this submission?</p>
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
                     <button class="btn">Cancel</button>
@@ -556,22 +565,6 @@ body{font-family:'Inter',sans-serif}
                     <button class="btn">Cancel</button>
                     <button id="confirm-save-password-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
                         Yes, save
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Logout Modal -->
-    <dialog id="logout_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Log Out?</h3>
-            <p class="py-4">Are you sure you want to log out?</p>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-logout-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
-                        Yes, log out
                     </button>
                 </form>
             </div>
@@ -636,203 +629,20 @@ body{font-family:'Inter',sans-serif}
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
 
-
     <!-- Scripts -->
     <script>
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
-        var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
-        var BASE_PATH = @json($BASE_PATH);
+        var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
         var currentSortBy = null; // 'hours', 'studentid', or 'date'
 
-        // Toast notification function
-        function showToast(m, t) {
-            t = t || 'success';
-            try {
-                var r = document.getElementById('toast-root');
-                if (!r) return alert(m);
-                
-                var e = document.createElement('div');
-                e.className = 'scms-toast scms-toast--' + t;
-                e.setAttribute('role', 'status');
-                e.setAttribute('aria-live', 'polite');
-                e.style.pointerEvents = 'auto';
-                e.innerHTML = '<span class="scms-toast__msg">' + ((m || '').replace(/</g, '&lt;')) + '</span>' +
-                    '<button class="scms-toast__close" aria-label="Close">' +
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                    '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>' +
-                    '</svg></button>' +
-                    '<div class="scms-toast__progress"></div>';
-                
-                var c = e.querySelector('.scms-toast__close');
-                var p = e.querySelector('.scms-toast__progress');
-                
-                if (p) p.style.animation = 'scms-toast-progress 3500ms linear forwards';
-                
-                var rm = null;
-                var remove = function() {
-                    try { clearTimeout(rm); } catch(_) {}
-                    e.style.opacity = '0';
-                    e.style.transform = 'translateY(6px)';
-                    setTimeout(function() { e.remove(); }, 180);
-                };
-                
-                c.addEventListener('click', remove, {passive: true});
-                r.appendChild(e);
-                e.style.opacity = '0';
-                e.style.transform = 'translateY(6px)';
-                
-                requestAnimationFrame(function() {
-                    e.style.transition = 'opacity .18s ease, transform .18s ease';
-                    e.style.opacity = '1';
-                    e.style.transform = 'translateY(0)';
-                });
-                
-                rm = setTimeout(remove, 3500);
-            } catch(_) {
-                try { alert(m); } catch {}
-            }
-        }
-
-        // Ensure CSRF cookie exists
-        async function ensureCsrfCookie() {
-            try {
-                await fetch(`${BASE_PATH}/sanctum/csrf-cookie`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-            } catch (e) {
-                console.warn('Could not fetch CSRF cookie:', e);
-            }
-        }
-
-        // Toggle password visibility
-        function togglePasswordVisibility(i) {
-            var inp = document.getElementById(i);
-            if (inp) inp.type = inp.type === "password" ? "text" : "password";
-        }
-
-        // Show/hide pages
-        function showPage(p) {
-            document.querySelectorAll('aside a').forEach(function(a) {
-                a.classList.remove('active-nav');
-            });
-            document.querySelectorAll('.page-content').forEach(function(pg) {
-                pg.classList.add('hidden');
-            });
-            
-            var np = document.getElementById(p + '-page');
-            if (np) np.classList.remove('hidden');
-            
-            var nl = document.getElementById('nav-' + p);
-            if (nl) nl.classList.add('active-nav');
-            
-            // Save current page to localStorage for super admin
-            try {
-                localStorage.setItem('scms_superadmin_current_page', p);
-            } catch(_) {}
-            
-            // Load submissions when showing submission page
-            if (p === 'submission') {
-                loadSubmissions();
-                
-                // Restore saved tab or default to pending
-                setTimeout(function() {
-                    var savedTab = 'pending';
-                    try {
-                        savedTab = localStorage.getItem('scms_superadmin_current_tab') || 'pending';
-                    } catch(_) {}
-                    
-                    // Find the tab element based on saved tab
-                    var tabs = document.querySelectorAll('.custom-tab');
-                    var targetTab = null;
-                    
-                    tabs.forEach(function(tab) {
-                        var tabText = tab.textContent.trim().toLowerCase();
-                        if (tabText === savedTab || tabText === savedTab.replace('-', ' ')) {
-                            targetTab = tab;
-                        }
-                    });
-                    
-                    // If no matching tab found, use first tab
-                    if (!targetTab) {
-                        targetTab = tabs[0];
-                    }
-                    
-                    if (targetTab) {
-                        targetTab.classList.add('custom-tab-active');
-                        filterSubmissions(savedTab, targetTab);
-                    }
-                }, 100);
-            }
-        }
-
-        // Filter submissions by status
-        function filterSubmissions(s, t) {
-            document.querySelectorAll('.custom-tab').forEach(function(tb) {
-                tb.classList.remove('custom-tab-active');
-            });
-            t.classList.add('custom-tab-active');
-            
-            // Save current tab for super admin
-            try {
-                localStorage.setItem('scms_superadmin_current_tab', s);
-            } catch(_) {}
-            
-            var st = document.getElementById('search-input').value.toLowerCase();
-            var rs = document.querySelectorAll('#submission-table-body tr');
-            
-            // Normalize the status string for comparison
-            var normalizedStatus = s.toLowerCase().trim();
-            var statusMap = {
-                'pending': 'pending',
-                'for approval': 'for approval',
-                'for-approval': 'for approval',
-                'forapproval': 'for approval',
-                'verified': 'for approval', // Admin verified records appear in "For Approval" tab
-                'archived': 'archived'
-            };
-            var filterStatus = statusMap[normalizedStatus] || normalizedStatus;
-            
-            rs.forEach(function(r) {
-                // Skip if it's the loading row or header row
-                if (!r.dataset.status) {
-                    return;
-                }
-                
-                var dataStatus = (r.dataset.status || '').toLowerCase().trim();
-                
-                // Check if status matches
-                var statusMatch = (dataStatus === filterStatus);
-                
-                // For search term matching
-                var ms = true;
-                if (st) {
-                    var id = r.cells[0].textContent.toLowerCase();
-                    var sn = r.cells[1].textContent.toLowerCase();
-                    var en = r.cells[2].textContent.toLowerCase();
-                    var sb = r.cells[3].textContent.toLowerCase();
-                    var hr = r.cells[4].textContent.toLowerCase();
-                    var dt = r.cells[5].textContent.toLowerCase();
-                    ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
-                         sb.includes(st) || hr.includes(st) || dt.includes(st);
-                }
-                
-                if (statusMatch && ms) {
-                    r.classList.remove('hidden');
-                } else {
-                    r.classList.add('hidden');
-                }
-            });
-        }
-
         // Load dashboard statistics
         function loadDashboardStats() {
-            fetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
+            fetch('/admin/api/dashboard-stats', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -851,8 +661,11 @@ body{font-family:'Inter',sans-serif}
                 if (result.success && result.data) {
                     // Update the counts in the dashboard
                     document.getElementById('pending-requests-count').textContent = result.data.pending;
-                    document.getElementById('accepted-requests-count').textContent = result.data.approved_this_week;
+                    document.getElementById('accepted-requests-count').textContent = result.data.verified_this_week;
                     document.getElementById('rejected-requests-count').textContent = result.data.rejected_this_week;
+                    
+                    // Update the donut chart
+                    updatePendingRequestsChart(result.data.pending);
                 } else {
                     console.warn('Invalid dashboard stats format');
                 }
@@ -876,7 +689,7 @@ body{font-family:'Inter',sans-serif}
             }
             
             // Fetch submissions from API
-            fetch(`${BASE_PATH}/super-admin/api/submissions`, {
+            fetch('/admin/api/submissions', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -900,7 +713,7 @@ body{font-family:'Inter',sans-serif}
                         lastSubmissionsData = result.data;
                         allSubmissions = result.data;
                         renderSubmissions(result.data);
-                        updateDashboardStats(result.data);
+                        updateWeeklySummaryFromData(result.data);
                     }
                 } else {
                     throw new Error('Invalid response format');
@@ -951,13 +764,12 @@ body{font-family:'Inter',sans-serif}
             sortedSubmissions.forEach(function(record) {
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
-                var isVerified = status === 'Verified'; // Admin verified - shown in "For Approval" tab
+                var isVerified = status === 'Verified';
                 var isApproved = status === 'Approved';
                 var isRejected = status === 'Rejected';
                 
-                // Map status to tab: Pending → Pending tab, Verified → For Approval tab, Approved/Rejected → Archived tab
-                var dataStatus = isPending ? 'Pending' : (isVerified ? 'For Approval' : 'Archived');
-                var dataArchiveStatus = (isApproved || isRejected) ? status : '';
+                var dataStatus = isPending ? 'Pending' : 'Archived';
+                var dataArchiveStatus = isPending ? '' : status;
                 
                 var dateStr = record.date ? formatDate(record.date) : '—';
                 
@@ -966,7 +778,6 @@ body{font-family:'Inter',sans-serif}
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
-                        'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
@@ -981,14 +792,10 @@ body{font-family:'Inter',sans-serif}
                             '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
                             '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
                             '</div>';
-                } else if (isVerified) {
-                    // Admin verified records - awaiting super admin approval/rejection
-                    html += '<div class="space-x-2">' +
-                            '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
-                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                            '</div>';
                 } else if (isApproved) {
                     html += '<span class="scms-badge scms-badge--approved">Approved</span>';
+                } else if (isVerified) {
+                    html += '<span class="scms-badge scms-badge--verified">Verified</span>';
                 } else if (isRejected) {
                     html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
                 }
@@ -998,17 +805,10 @@ body{font-family:'Inter',sans-serif}
             
             tbody.innerHTML = html;
             
-            // Apply current filter or default to pending
+            // Apply current filter
             var activeTab = document.querySelector('.custom-tab-active');
             if (activeTab) {
-                filterSubmissions(activeTab.textContent.trim().toLowerCase(), activeTab);
-            } else {
-                // If no active tab, activate the first tab (Pending)
-                var firstTab = document.querySelector('.custom-tab');
-                if (firstTab) {
-                    firstTab.classList.add('custom-tab-active');
-                    filterSubmissions('pending', firstTab);
-                }
+                filterSubmissions(activeTab.textContent.trim(), activeTab);
             }
         }
         
@@ -1025,36 +825,238 @@ body{font-family:'Inter',sans-serif}
             }
         }
         
-        // Update dashboard statistics
-        function updateDashboardStats(submissions) {
+        // Update weekly summary from loaded data
+        function updateWeeklySummaryFromData(submissions) {
             var now = new Date();
             var weekAgo = new Date(now);
             weekAgo.setDate(weekAgo.getDate() - 7);
             
-            var pending = 0, approved = 0, rejected = 0;
+            var pending = 0, accepted = 0, rejected = 0;
             
             submissions.forEach(function(record) {
-                var recordDate = new Date(record.updated_at || record.created_at || record.date);
+                var recordDate = new Date(record.updated_at || record.created_at);
                 var isThisWeek = recordDate >= weekAgo && recordDate <= now;
                 
-                // Count Pending and Verified (admin verified, awaiting super admin decision) as pending
-                if (record.status === 'Pending' || record.status === 'Verified') {
+                if (record.status === 'Pending') {
                     pending++;
-                }
-                if (record.status === 'Approved' && isThisWeek) {
-                    approved++;
-                }
-                if (record.status === 'Rejected' && isThisWeek) {
+                } else if (record.status === 'Verified' && isThisWeek) {
+                    accepted++;
+                } else if (record.status === 'Rejected' && isThisWeek) {
                     rejected++;
                 }
             });
             
             document.getElementById('pending-requests-count').textContent = pending;
-            document.getElementById('accepted-requests-count').textContent = approved;
+            document.getElementById('accepted-requests-count').textContent = accepted;
             document.getElementById('rejected-requests-count').textContent = rejected;
             
             // Update the donut chart
-            updatePendingRequestsChart(pending);
+            if (pendingRequestsChartInstance) {
+                var totalCapacity = 50;
+                pendingRequestsChartInstance.data.datasets[0].data = [pending, Math.max(0, totalCapacity - pending)];
+                pendingRequestsChartInstance.update();
+                document.getElementById('pending-requests-label').textContent = pending;
+            }
+        }
+
+        // Toast notification function
+        function showToast(m, t) {
+            t = t || 'success';
+            try {
+                var r = document.getElementById('toast-root');
+                if (!r) return alert(m);
+                
+                var e = document.createElement('div');
+                e.className = 'scms-toast scms-toast--' + t;
+                e.setAttribute('role', 'status');
+                e.setAttribute('aria-live', 'polite');
+                e.style.pointerEvents = 'auto';
+                e.innerHTML = '<span class="scms-toast__msg">' + ((m || '').replace(/</g, '&lt;')) + '</span>' +
+                    '<button class="scms-toast__close" aria-label="Close">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>' +
+                    '</svg></button>' +
+                    '<div class="scms-toast__progress"></div>';
+                
+                var c = e.querySelector('.scms-toast__close');
+                var p = e.querySelector('.scms-toast__progress');
+                
+                if (p) p.style.animation = 'scms-toast-progress 3500ms linear forwards';
+                
+                var rm = null;
+                var remove = function() {
+                    try { clearTimeout(rm); } catch(_) {}
+                    e.style.opacity = '0';
+                    e.style.transform = 'translateY(6px)';
+                    setTimeout(function() { e.remove(); }, 180);
+                };
+                
+                c.addEventListener('click', remove, {passive: true});
+                r.appendChild(e);
+                e.style.opacity = '0';
+                e.style.transform = 'translateY(6px)';
+                
+                requestAnimationFrame(function() {
+                    e.style.transition = 'opacity .18s ease, transform .18s ease';
+                    e.style.opacity = '1';
+                    e.style.transform = 'translateY(0)';
+                });
+                
+                rm = setTimeout(remove, 3500);
+            } catch(_) {
+                try { alert(m); } catch {}
+            }
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(i) {
+            var inp = document.getElementById(i);
+            if (inp) inp.type = inp.type === "password" ? "text" : "password";
+        }
+
+        // Show/hide pages
+        function showPage(p) {
+            document.querySelectorAll('aside a').forEach(function(a) {
+                a.classList.remove('active-nav');
+            });
+            document.querySelectorAll('.page-content').forEach(function(pg) {
+                pg.classList.add('hidden');
+            });
+            
+            var np = document.getElementById(p + '-page');
+            if (np) np.classList.remove('hidden');
+            
+            var nl = document.getElementById('nav-' + p);
+            if (nl) nl.classList.add('active-nav');
+            
+            // Save current page to localStorage for admin
+            try {
+                localStorage.setItem('scms_admin_current_page', p);
+            } catch(_) {}
+            
+            // Load submissions when showing submission page
+            if (p === 'submission') {
+                loadSubmissions();
+                
+                // Restore saved tab or default to pending
+                setTimeout(function() {
+                    var savedTab = 'pending';
+                    try {
+                        savedTab = localStorage.getItem('scms_admin_current_tab') || 'pending';
+                    } catch(_) {}
+                    
+                    // Find the tab element based on saved tab
+                    var tabs = document.querySelectorAll('.custom-tab');
+                    var targetTab = null;
+                    
+                    tabs.forEach(function(tab) {
+                        var tabText = tab.textContent.trim().toLowerCase();
+                        if (tabText === savedTab || tabText === savedTab.replace('-', ' ')) {
+                            targetTab = tab;
+                        }
+                    });
+                    
+                    // If no matching tab found, use first tab
+                    if (!targetTab && tabs.length > 0) {
+                        targetTab = tabs[0];
+                    }
+                    
+                    if (targetTab) {
+                        targetTab.classList.add('custom-tab-active');
+                        filterSubmissions(savedTab, targetTab);
+                    }
+                }, 100);
+            }
+        }
+
+        // Global variable to track current status filter
+        var currentStatusFilter = 'All';
+
+        // Filter submissions by status
+        function filterSubmissions(s, t) {
+            document.querySelectorAll('.custom-tab').forEach(function(tb) {
+                tb.classList.remove('custom-tab-active');
+            });
+            t.classList.add('custom-tab-active');
+            
+            // Save current tab for admin
+            try {
+                localStorage.setItem('scms_admin_current_tab', s);
+            } catch(_) {}
+            
+            // Update header based on tab
+            var actionLabel = document.getElementById('action-label');
+            var statusWrapper = document.getElementById('status-header-wrapper');
+            
+            if (s === 'Archived') {
+                actionLabel.classList.add('hidden');
+                statusWrapper.classList.remove('hidden');
+            } else {
+                actionLabel.classList.remove('hidden');
+                statusWrapper.classList.add('hidden');
+            }
+            
+            // Reset status filter when switching tabs
+            currentStatusFilter = 'All';
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rs = r.dataset.status;
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                if (rs === s && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
+        }
+
+        // Filter table by status (for Archived tab)
+        function filterTableByStatus(status, event) {
+            if (event) event.preventDefault();
+            
+            currentStatusFilter = status;
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rowStatus = r.dataset.status;
+                var archiveStatus = r.dataset.archiveStatus;
+                
+                // Only filter rows that are in the Archived tab
+                if (rowStatus !== 'Archived') {
+                    return;
+                }
+                
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                // Apply both status filter and search filter
+                var statusMatch = status === 'All' || archiveStatus === status;
+                
+                if (statusMatch && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
         }
 
         // Open verify modal
@@ -1062,13 +1064,6 @@ body{font-family:'Inter',sans-serif}
             e.stopPropagation();
             activeRow = b.closest('tr');
             document.getElementById('verify_modal').showModal();
-        }
-
-        // Open approve modal
-        function openApproveModal(b, e) {
-            e.stopPropagation();
-            activeRow = b.closest('tr');
-            document.getElementById('approve_modal').showModal();
         }
 
         // Open reject modal
@@ -1084,16 +1079,17 @@ body{font-family:'Inter',sans-serif}
             var s = r.dataset.status;
             var v = r.dataset.venue;
             var en = r.cells[2].textContent;
-            var org = r.cells[3].textContent;
+            var sn = r.cells[3].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
+            var oc = r.cells[2].textContent;
             
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = org;
+            document.getElementById('details-supervisor-name').value = sn;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
-            document.getElementById('details-organizing-committee').value = org;
+            document.getElementById('details-organizing-committee').value = oc;
             
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
@@ -1107,20 +1103,13 @@ body{font-family:'Inter',sans-serif}
                 ab.classList.remove('hidden');
                 ab.innerHTML = '<button class="btn btn-action btn-action-verify flex-1" onclick="handleDetailsVerify()">Verify</button>' +
                                '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
-            } else if (s === 'For Approval') {
-                // Records verified by admin - awaiting super admin approval/rejection
-                ss.classList.add('hidden');
-                ab.classList.remove('hidden');
-                ab.innerHTML = '<button class="btn btn-action btn-action-approve flex-1" onclick="handleDetailsApprove()">Approve</button>' +
-                               '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
             } else {
-                // Archived records - show final status (Approved or Rejected by super admin)
                 ss.classList.remove('hidden');
                 ab.classList.add('hidden');
                 var as = r.dataset.archiveStatus;
                 sb.textContent = as;
-                if (as === 'Approved') {
-                    sb.className = 'status-badge approved';
+                if (as === 'Verified') {
+                    sb.className = 'status-badge verified';
                 } else if (as === 'Rejected') {
                     sb.className = 'status-badge rejected';
                 }
@@ -1133,12 +1122,6 @@ body{font-family:'Inter',sans-serif}
         function handleDetailsVerify() {
             document.getElementById('submission_details_modal').close();
             document.getElementById('verify_modal').showModal();
-        }
-
-        // Handle approve from details modal
-        function handleDetailsApprove() {
-            document.getElementById('submission_details_modal').close();
-            document.getElementById('approve_modal').showModal();
         }
 
         // Handle reject from details modal
@@ -1155,7 +1138,7 @@ body{font-family:'Inter',sans-serif}
                 var ap = function(m) {
                     document.documentElement.setAttribute('data-theme', m);
                     try {
-                        localStorage.setItem('scms_superadmin_theme', m);
+                        localStorage.setItem('scms_admin_theme', m);
                     } catch(_) {}
                     if (lb) lb.textContent = (m === 'dark') ? 'Dark theme' : 'Light theme';
                     if (tg) tg.checked = (m === 'dark');
@@ -1163,7 +1146,7 @@ body{font-family:'Inter',sans-serif}
                 
                 var sv = 'light';
                 try {
-                    sv = (localStorage.getItem('scms_superadmin_theme') === 'dark') ? 'dark' : 'light';
+                    sv = (localStorage.getItem('scms_admin_theme') === 'dark') ? 'dark' : 'light';
                 } catch(_) {}
                 
                 ap(sv);
@@ -1174,6 +1157,388 @@ body{font-family:'Inter',sans-serif}
                     });
                 }
             } catch(_) {}
+        }
+
+        // Attach logout handler
+        function attachLogoutHandler() {
+            try {
+                var f = document.getElementById('logout-form-visible');
+                var b = document.getElementById('logout-button-visible');
+                if (!f || !b) return;
+                
+                var cm = document.querySelector('meta[name="csrf-token"]');
+                var cs = cm ? cm.getAttribute('content') : '';
+                
+                b.replaceWith(b.cloneNode(true));
+                var fb = document.getElementById('logout-button-visible');
+                if (!fb) return;
+                
+                fb.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    try {
+                        fetch(f.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': cs,
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin',
+                            body: new URLSearchParams({'_token': cs}).toString(),
+                            keepalive: true
+                        }).finally(function() {
+                            try {
+                                window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
+                            } catch(_) {
+                                window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
+                            }
+                        });
+                    } catch(err) {
+                        try {
+                            window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
+                        } catch(_) {
+                            window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
+                        }
+                    }
+                }, {passive: true});
+            } catch(_) {}
+        }
+
+        // DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore saved page for admin, default to dashboard
+            var savedPage = 'dashboard';
+            try {
+                savedPage = localStorage.getItem('scms_admin_current_page') || 'dashboard';
+            } catch(_) {}
+            
+            showPage(savedPage);
+            initThemeToggle();
+            attachLogoutHandler();
+            loadDashboardStats(); // Load dashboard statistics
+            loadActivityData(); // Load activity calendar with API data
+            loadSubmissions(); // Load initial submissions data
+            initPendingRequestsChart();
+            
+            // Hours sort toggle event listener
+            var hoursSortToggle = document.getElementById('hours-sort-toggle');
+            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
+            if (hoursSortToggle && hoursSortIndicator) {
+                hoursSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'hours';
+                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('studentid-sort-indicator').textContent = '▼';
+                    document.getElementById('date-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'hours');
+                });
+            }
+            
+            // Student ID sort toggle event listener
+            var studentIdSortToggle = document.getElementById('studentid-sort-toggle');
+            var studentIdSortIndicator = document.getElementById('studentid-sort-indicator');
+            if (studentIdSortToggle && studentIdSortIndicator) {
+                studentIdSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentid';
+                    studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('hours-sort-indicator').textContent = '▼';
+                    document.getElementById('date-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'studentid');
+                });
+            }
+            
+            // Date sort toggle event listener
+            var dateSortToggle = document.getElementById('date-sort-toggle');
+            var dateSortIndicator = document.getElementById('date-sort-indicator');
+            if (dateSortToggle && dateSortIndicator) {
+                dateSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'date';
+                    dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    document.getElementById('hours-sort-indicator').textContent = '▼';
+                    document.getElementById('studentid-sort-indicator').textContent = '▼';
+                    renderSubmissions(allSubmissions, 'date');
+                });
+            }
+            
+            // Auto-refresh removed - use manual refresh buttons instead
+            
+            // Fix dropdown positioning
+            var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                        if (dropdown) {
+                            var btnRect = dropdownBtn.getBoundingClientRect();
+                            dropdown.style.position = 'fixed';
+                            dropdown.style.left = (btnRect.left - 100) + 'px';
+                            dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                        }
+                    }, 10);
+                });
+            }
+            
+            // Confirm verify button handler
+            document.getElementById('confirm-verify-btn').addEventListener('click', async function() {
+                if (activeRow) {
+                    var recordId = activeRow.dataset.recordId;
+                    
+                    try {
+                        // Make API call to verify the submission
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/verify`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast('Submission has been verified successfully.', 'success');
+                            document.getElementById('verify_modal').close();
+                            activeRow = null;
+                            
+                            // Reload submissions to get fresh data from database
+                            loadSubmissions();
+                            loadActivityData(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
+                        } else {
+                            showToast(data.message || 'Failed to verify submission.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error verifying submission:', error);
+                        showToast('Failed to verify submission. Please try again.', 'error');
+                    }
+                }
+            });
+            
+            // Confirm reject button handler
+            document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
+                if (activeRow) {
+                    var recordId = activeRow.dataset.recordId;
+                    
+                    try {
+                        // Make API call to reject the submission
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/reject`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast('Submission has been rejected.', 'success');
+                            document.getElementById('reject_modal').close();
+                            activeRow = null;
+                            
+                            // Reload submissions to get fresh data from database
+                            loadSubmissions();
+                            loadActivityData(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
+                        } else {
+                            showToast(data.message || 'Failed to reject submission.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error rejecting submission:', error);
+                        showToast('Failed to reject submission. Please try again.', 'error');
+                    }
+                }
+            });
+            
+            // Search input handler
+            document.getElementById('search-input').addEventListener('keyup', function() {
+                var at = document.querySelector('.custom-tab-active');
+                var as = at.textContent.trim();
+                
+                // If on Archived tab and there's a status filter active, use filterTableByStatus
+                if (as === 'Archived' && currentStatusFilter !== 'All') {
+                    filterTableByStatus(currentStatusFilter, null);
+                } else {
+                    filterSubmissions(as, at);
+                }
+            });
+            
+            // Password change handlers
+            var spb = document.getElementById('save-password-button');
+            var spm = document.getElementById('save_password_modal');
+            var csp = document.getElementById('confirm-save-password-btn');
+            var pcf = document.getElementById('password-change-form');
+            
+            spb.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (pcf.checkValidity()) {
+                    spm.showModal();
+                } else {
+                    pcf.reportValidity();
+                }
+            });
+            
+            csp.addEventListener('click', function() {
+                pcf.reset();
+                spm.close();
+                showToast('Your password has been updated.', 'success');
+            });
+            
+            // Auto-refresh removed - use manual refresh buttons instead
+        });
+
+        // Generate Activity Calendar (GitHub-style)
+        function generateActivityCalendar() {
+            var container = document.getElementById('activity-calendar');
+            if (!container) return;
+            
+            // TODO: Replace with actual API call to get admin activity data
+            // Expected format: { "2024-10-22": 3, "2024-10-23": 1, ... }
+            // For now, generate sample data
+            var today = new Date();
+            var yearAgo = new Date(today);
+            yearAgo.setFullYear(today.getFullYear() - 1);
+            
+            // Sample activity data - will be replaced with API call
+            var activityData = generateSampleActivityData(yearAgo, today);
+            
+            // Get color based on activity level
+            function getColor(level) {
+                var colors = ['#E5E7EB', '#E5D4FF', '#C9A9FF', '#A475FF', '#6D28D9'];
+                return colors[Math.min(level, 4)] || colors[0];
+            }
+            
+            // Calculate weeks to display
+            var startDate = new Date(yearAgo);
+            startDate.setDate(startDate.getDate() - startDate.getDay()); // Start from Sunday
+            
+            var weeks = [];
+            var currentWeek = new Date(startDate);
+            
+            while (currentWeek <= today) {
+                var week = [];
+                for (var i = 0; i < 7; i++) {
+                    var date = new Date(currentWeek);
+                    date.setDate(date.getDate() + i);
+                    week.push(date);
+                }
+                weeks.push(week);
+                currentWeek.setDate(currentWeek.getDate() + 7);
+            }
+            
+            // Build HTML
+            var html = '<div class="flex gap-2">';
+            
+            // Day labels column
+            html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
+            var days = ['Mon', 'Wed', 'Fri'];
+            var dayIndices = [1, 3, 5];
+            for (var d = 0; d < 3; d++) {
+                html += '<div class="h-3 leading-3">' + days[d] + '</div>';
+            }
+            html += '</div>';
+            
+            // Calendar grid with month labels
+            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
+            
+            // Month labels row
+            html += '<div class="flex gap-1 mb-2">';
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var lastMonth = -1;
+            var monthPositions = [];
+            
+            for (var w = 0; w < weeks.length; w++) {
+                var weekMonth = weeks[w][0].getMonth();
+                if (weekMonth !== lastMonth && w > 0) {
+                    monthPositions.push({ week: w, month: weekMonth });
+                    lastMonth = weekMonth;
+                }
+            }
+            
+            for (var w = 0; w < weeks.length; w++) {
+                var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
+                if (showMonth) {
+                    html += '<div class="text-xs text-text-muted" style="min-width: 13px;">' + months[showMonth.month] + '</div>';
+                } else {
+                    html += '<div style="min-width: 13px;"></div>';
+                }
+            }
+            html += '</div>';
+            
+            // Grid rows (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+            for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
+                html += '<div class="flex gap-1 mb-1">';
+                
+                for (var w = 0; w < weeks.length; w++) {
+                    var date = weeks[w][dayIndex];
+                    var dateStr = date.toISOString().split('T')[0];
+                    var level = activityData[dateStr] || 0;
+                    var color = getColor(level);
+                    
+                    var isToday = date.toDateString() === today.toDateString();
+                    var isFuture = date > today;
+                    
+                    var title = dateStr;
+                    if (!isFuture) {
+                        title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
+                    } else {
+                        title += ': No data';
+                    }
+                    
+                    var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
+                    var opacity = isFuture ? 'opacity-30' : '';
+                    
+                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 cursor-pointer ' + borderClass + ' ' + opacity + '" ' +
+                            'style="background-color: ' + color + ';" ' +
+                            'title="' + title + '"></div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            html += '</div></div></div>';
+            container.innerHTML = html;
+        }
+        
+        // Generate sample activity data (will be replaced with API call)
+        function generateSampleActivityData(startDate, endDate) {
+            var data = {};
+            var current = new Date(startDate);
+            
+            while (current <= endDate) {
+                var dateStr = current.toISOString().split('T')[0];
+                // Random activity level (0-4), with higher probability for lower values
+                var random = Math.random();
+                if (random < 0.3) {
+                    data[dateStr] = 0;
+                } else if (random < 0.6) {
+                    data[dateStr] = 1;
+                } else if (random < 0.8) {
+                    data[dateStr] = 2;
+                } else if (random < 0.95) {
+                    data[dateStr] = 3;
+                } else {
+                    data[dateStr] = 4;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return data;
         }
 
         // Initialize Pending Requests Donut Chart
@@ -1195,6 +1560,7 @@ body{font-family:'Inter',sans-serif}
             }
             
             var totalCapacity = 50; // Example total capacity
+            var percentage = Math.round((pendingCount / totalCapacity) * 100);
             
             pendingRequestsChartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -1225,8 +1591,39 @@ body{font-family:'Inter',sans-serif}
             initPendingRequestsChart(pendingCount);
         }
 
-        // Generate Activity Calendar
-        function generateActivityCalendar() {
+        // Load Activity Calendar Data from API
+        function loadActivityData() {
+            fetch('/admin/api/activity-calendar', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch activity data');
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.success && result.data) {
+                    // API returns data in format: { "2024-10-22": 3, "2024-10-23": 1, ... }
+                    generateActivityCalendarWithData(result.data);
+                } else {
+                    console.warn('Invalid activity data format, using fallback');
+                    generateActivityCalendar();
+                }
+            })
+            .catch(error => {
+                console.error('Failed to load activity data:', error);
+                // Fall back to sample data
+                generateActivityCalendar();
+            });
+        }
+        
+        // Generate calendar with provided activity data
+        function generateActivityCalendarWithData(activityData) {
             var container = document.getElementById('activity-calendar');
             if (!container) return;
             
@@ -1234,14 +1631,14 @@ body{font-family:'Inter',sans-serif}
             var yearAgo = new Date(today);
             yearAgo.setFullYear(today.getFullYear() - 1);
             
-            // Sample activity data
-            var activityData = generateSampleActivityData(yearAgo, today);
-            
+            // Use the same rendering logic but with provided data
+            // Get color based on activity level
             function getColor(level) {
                 var colors = ['#E5E7EB', '#E5D4FF', '#C9A9FF', '#A475FF', '#6D28D9'];
                 return colors[Math.min(level, 4)] || colors[0];
             }
             
+            // Calculate weeks to display
             var startDate = new Date(yearAgo);
             startDate.setDate(startDate.getDate() - startDate.getDay());
             
@@ -1259,6 +1656,7 @@ body{font-family:'Inter',sans-serif}
                 currentWeek.setDate(currentWeek.getDate() + 7);
             }
             
+            // Build HTML (same as generateActivityCalendar but uses activityData parameter)
             var html = '<div class="flex gap-2">';
             
             html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
@@ -1326,278 +1724,6 @@ body{font-family:'Inter',sans-serif}
             html += '</div></div></div>';
             container.innerHTML = html;
         }
-        
-        // Generate sample activity data
-        function generateSampleActivityData(startDate, endDate) {
-            var data = {};
-            var current = new Date(startDate);
-            
-            while (current <= endDate) {
-                var dateStr = current.toISOString().split('T')[0];
-                var random = Math.random();
-                if (random < 0.3) {
-                    data[dateStr] = 0;
-                } else if (random < 0.6) {
-                    data[dateStr] = 1;
-                } else if (random < 0.8) {
-                    data[dateStr] = 2;
-                } else if (random < 0.95) {
-                    data[dateStr] = 3;
-                } else {
-                    data[dateStr] = 4;
-                }
-                current.setDate(current.getDate() + 1);
-            }
-            
-            return data;
-        }
-
-        // DOM ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Restore saved page for super admin, default to dashboard
-            var savedPage = 'dashboard';
-            try {
-                savedPage = localStorage.getItem('scms_superadmin_current_page') || 'dashboard';
-            } catch(_) {}
-            
-            showPage(savedPage);
-            initThemeToggle();
-            loadSubmissions();
-            initPendingRequestsChart();
-            generateActivityCalendar();
-            
-            // Hours sort toggle event listener
-            var hoursSortToggle = document.getElementById('hours-sort-toggle');
-            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
-            if (hoursSortToggle && hoursSortIndicator) {
-                hoursSortToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    currentSortBy = 'hours';
-                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
-                    renderSubmissions(allSubmissions, 'hours');
-                });
-            }
-            
-            // Student ID sort toggle event listener
-            var studentIdSortToggle = document.getElementById('studentid-sort-toggle');
-            var studentIdSortIndicator = document.getElementById('studentid-sort-indicator');
-            if (studentIdSortToggle && studentIdSortIndicator) {
-                studentIdSortToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    currentSortBy = 'studentid';
-                    studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
-                    renderSubmissions(allSubmissions, 'studentid');
-                });
-            }
-            
-            // Date sort toggle event listener
-            var dateSortToggle = document.getElementById('date-sort-toggle');
-            var dateSortIndicator = document.getElementById('date-sort-indicator');
-            if (dateSortToggle && dateSortIndicator) {
-                dateSortToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    currentSortBy = 'date';
-                    dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
-                    renderSubmissions(allSubmissions, 'date');
-                });
-            }
-            
-            // Confirm verify button handler
-            document.getElementById('confirm-verify-btn').addEventListener('click', async function() {
-                if (activeRow) {
-                    var recordId = activeRow.dataset.recordId;
-                    
-                    try {
-                        // Make API call to verify the submission
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/verify`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            credentials: 'same-origin'
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            showToast('Submission has been verified successfully.', 'success');
-                            document.getElementById('verify_modal').close();
-                            activeRow = null;
-                            
-                            // Reload submissions to get fresh data from database
-                            loadSubmissions();
-                            loadDashboardStats();
-                        } else {
-                            showToast(data.message || 'Failed to verify submission.', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error verifying submission:', error);
-                        showToast('Failed to verify submission. Please try again.', 'error');
-                    }
-                }
-            });
-            
-            // Confirm approve button handler
-            document.getElementById('confirm-approve-btn').addEventListener('click', async function() {
-                if (activeRow) {
-                    var recordId = activeRow.dataset.recordId;
-                    console.log('Approving submission with ID:', recordId);
-                    
-                    try {
-                        await ensureCsrfCookie();
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/approve`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            credentials: 'same-origin'
-                        });
-                        
-                        console.log('Response status:', response.status);
-                        const data = await response.json();
-                        console.log('Response data:', data);
-                        
-                        if (data.success) {
-                            showToast('Submission has been approved.', 'success');
-                            document.getElementById('approve_modal').close();
-                            activeRow = null;
-                            
-                            // Reload to update stats and table
-                            loadSubmissions();
-                        } else {
-                            console.error('Approval failed:', data);
-                            showToast(data.message || 'Failed to approve submission.', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error approving submission:', error);
-                        showToast('Failed to approve submission. Please try again.', 'error');
-                    }
-                }
-            });
-            
-            // Confirm reject button handler
-            document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
-                if (activeRow) {
-                    var recordId = activeRow.dataset.recordId;
-                    var reason = document.getElementById('rejection-reason').value;
-                    
-                    if (!reason.trim()) {
-                        showToast('Please provide a reason for rejection.', 'error');
-                        return;
-                    }
-                    
-                    console.log('Rejecting submission with ID:', recordId, 'Reason:', reason);
-                    
-                    try {
-                        await ensureCsrfCookie();
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/reject`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            credentials: 'same-origin',
-                            body: JSON.stringify({
-                                reason: reason
-                            })
-                        });
-                        
-                        console.log('Response status:', response.status);
-                        const data = await response.json();
-                        console.log('Response data:', data);
-                        
-                        if (data.success) {
-                            showToast('Submission has been rejected.', 'success');
-                            document.getElementById('rejection-reason').value = '';
-                            document.getElementById('reject_modal').close();
-                            activeRow = null;
-                            
-                            // Reload to update stats and table
-                            loadSubmissions();
-                        } else {
-                            console.error('Rejection failed:', data);
-                            showToast(data.message || 'Failed to reject submission.', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error rejecting submission:', error);
-                        showToast('Failed to reject submission. Please try again.', 'error');
-                    }
-                }
-            });
-            
-            // Search input handler
-            document.getElementById('search-input').addEventListener('keyup', function() {
-                var at = document.querySelector('.custom-tab-active');
-                if (at) {
-                    var as = at.textContent.trim().toLowerCase();
-                    filterSubmissions(as, at);
-                }
-            });
-            
-            // Password change handlers
-            var spb = document.getElementById('save-password-button');
-            var spm = document.getElementById('save_password_modal');
-            var csp = document.getElementById('confirm-save-password-btn');
-            var pcf = document.getElementById('password-change-form');
-            
-            spb.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (pcf.checkValidity()) {
-                    spm.showModal();
-                } else {
-                    pcf.reportValidity();
-                }
-            });
-            
-            csp.addEventListener('click', function() {
-                // TODO: Make API call to change password
-                pcf.reset();
-                spm.close();
-                showToast('Your password has been updated.', 'success');
-            });
-
-            // Logout handler
-            document.getElementById('confirm-logout-btn').addEventListener('click', function() {
-                // Call the logout API endpoint
-                fetch(`${BASE_PATH}/super-admin/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(function() {
-                    // Redirect to super admin login page after successful logout
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                })
-                .catch(function(error) {
-                    console.error('Logout error:', error);
-                    // Still redirect even if there's an error
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                });
-            });
-            
-            // Auto-refresh removed - use manual refresh buttons instead
-        });
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>

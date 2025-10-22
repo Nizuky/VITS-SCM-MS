@@ -380,7 +380,7 @@
                     <div class="absolute inset-x-0 bottom-0 rounded-2xl bg-transparent text-white mb-2 p-2 h-[250px] flex justify-center items-end overflow-hidden z-10">
                         
                         <!-- Image overlay (on top of everything) -->
-                        <div class="absolute right-100 bottom-0 z-20">
+                        <div class="absolute right-150 bottom-0 z-20">
                             <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
                         </div>
 
@@ -435,7 +435,7 @@
                             <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
                             <p class="text-sm text-text-muted">Contract Status Overview (Approved, Pending, Rejected)</p>
                         </div>
-                        <button onclick="loadDashboardStats();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
+                        <button onclick="loadRecords();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
@@ -549,7 +549,12 @@
                                     <th class="text-center w-2/6">Event Name</th>
                                     <th class="text-center w-1/6">Venue</th>
                                     <th class="text-center w-1/6">Organization</th>
-                                    <th class="text-center w-1/6">Hours Rendered</th>
+                                    <th class="text-center w-1/6">
+                                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
+                                            Hours Rendered
+                                            <span id="hours-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
                                     <th class="text-center w-1/6">
                                         <div class="flex items-center justify-center gap-1">
                                             <span>Status</span>
@@ -1000,6 +1005,11 @@
             let dateSortDirection = 'desc';
             const dateSortToggle = document.getElementById('date-sort-toggle');
             const dateSortIndicator = document.getElementById('date-sort-indicator');
+            // Hours sort: 'desc' by default for highest hours first
+            let hoursSortDirection = 'desc';
+            let currentSortBy = 'date'; // 'date' or 'hours'
+            const hoursSortToggle = document.getElementById('hours-sort-toggle');
+            const hoursSortIndicator = document.getElementById('hours-sort-indicator');
             // Normalize API date to YYYY-MM-DD and format to DD-MM-YYYY without timezone shifts
             function normalizeDateString(dateVal) {
                 if (!dateVal) return '';
@@ -1055,6 +1065,9 @@
                     })
                     .catch((err) => { console.error('Failed to load records', err); });
             }
+            
+            // Make loadRecords globally accessible for onclick handlers
+            window.loadRecords = loadRecords;
             function renderTable() {
                 tableBody.innerHTML = '';
                 const query = (searchInput.value || '').toLowerCase().trim();
@@ -1067,14 +1080,21 @@
                         (r.organization || '').toLowerCase().includes(query)
                     );
                 });
-                // sort by date
+                // sort by current sort column
                 filtered.sort((a, b) => {
-                    const da = new Date(a.date);
-                    const db = new Date(b.date);
-                    if (isNaN(da) && isNaN(db)) return 0;
-                    if (isNaN(da)) return dateSortDirection === 'asc' ? -1 : 1;
-                    if (isNaN(db)) return dateSortDirection === 'asc' ? 1 : -1;
-                    return dateSortDirection === 'asc' ? da - db : db - da;
+                    if (currentSortBy === 'hours') {
+                        const ha = parseInt(a.hours_rendered) || 0;
+                        const hb = parseInt(b.hours_rendered) || 0;
+                        return hoursSortDirection === 'asc' ? ha - hb : hb - ha;
+                    } else {
+                        // sort by date
+                        const da = new Date(a.date);
+                        const db = new Date(b.date);
+                        if (isNaN(da) && isNaN(db)) return 0;
+                        if (isNaN(da)) return dateSortDirection === 'asc' ? -1 : 1;
+                        if (isNaN(db)) return dateSortDirection === 'asc' ? 1 : -1;
+                        return dateSortDirection === 'asc' ? da - db : db - da;
+                    }
                 });
                 filtered.forEach(rec => {
                     const formattedDate = normalizeDateString(rec.date);
@@ -1097,8 +1117,19 @@
             // Date sort toggle
             dateSortToggle.addEventListener('click', (e) => {
                 e.preventDefault();
+                currentSortBy = 'date';
                 dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                 dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                hoursSortIndicator.textContent = '▼'; // Reset hours indicator
+                renderTable();
+            });
+            // Hours sort toggle
+            hoursSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'hours';
+                hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                dateSortIndicator.textContent = '▼'; // Reset date indicator
                 renderTable();
             });
             // Initial load: ensure CSRF cookie exists for consistent behavior

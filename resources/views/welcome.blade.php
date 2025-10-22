@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>VITS Social Contract Monitoring and Management System</title>
         @php
@@ -125,7 +126,7 @@
                     style="max-width:360px; text-align:center; padding:16px; border-radius:20px;">
                     <p class="mb-2 font-semibold text-sm" style="color:white;">Do you have an existing account?</p>
                     <div class="flex flex-wrap gap-2 justify-center mt-2">
-                    <a href="{{ route('login') }}" class="role-btn text-sm">
+                    <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" class="role-btn text-sm">
                         Yes — Login
                     </a>
                     <a href="{{ route('register') }}" class="role-btn text-sm">
@@ -138,8 +139,8 @@
                     style="max-width:360px; text-align:center; padding:16px; border-radius:20px;">
                     <p class="mb-2 font-semibold text -sm" style="color:white;">Select your role (Admin or Super Admin)</p>
                     <div class="flex flex-wrap gap-2 justify-center mt-2">
-                    <button type="button" onclick="window.open('{{ route('admin.login') }}', '_blank')" class="role-btn text-sm">Admin</button>
-                    <button type="button" onclick="window.open('{{ route('superadmin.login') }}', '_blank')" class="role-btn text-sm">Super Admin</button>
+                    <button type="button" onclick="clearSessionAndGoToAdmin()" class="role-btn text-sm">Admin</button>
+                    <button type="button" onclick="clearSessionAndGoToSuperAdmin()" class="role-btn text-sm">Super Admin</button>
                     </div>
                 </div>
                 </div>
@@ -185,6 +186,138 @@
         if (studentExists) studentExists.classList.add('hidden');
         if (nonstudentSelect) nonstudentSelect.classList.add('hidden');
       })();
+
+      // Function to clear any existing session and go to login
+      async function clearSessionAndLogin() {
+        try {
+          // First, logout from all possible guards (web, admin, superadmin)
+          const logoutUrls = [
+            '{{ route('logout') }}',
+            '/admin/logout',
+            '/super-admin/logout'
+          ];
+          
+          const csrfToken = document.querySelector('meta[name="csrf-token"]');
+          const csrf = csrfToken ? csrfToken.getAttribute('content') : '';
+          
+          // Try to logout from all guards
+          for (const url of logoutUrls) {
+            try {
+              await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRF-TOKEN': csrf,
+                  'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+              }).catch(() => {}); // Ignore errors
+            } catch(e) {}
+          }
+          
+          // Clear localStorage
+          localStorage.clear();
+          // Clear sessionStorage
+          sessionStorage.clear();
+          // Clear all cookies
+          document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+          });
+        } catch(e) { 
+          console.log('Error clearing storage:', e); 
+        }
+        
+        // Redirect to login page with a small delay to ensure logout completes
+        setTimeout(function() {
+          window.location.href = '{{ route('login') }}';
+        }, 100);
+      }
+
+      // Function to clear session and redirect to Admin login
+      async function clearSessionAndGoToAdmin() {
+        try {
+          // Logout from all guards
+          const logoutUrls = [
+            '{{ route('logout') }}',
+            '/admin/logout',
+            '/super-admin/logout'
+          ];
+          
+          const csrfToken = document.querySelector('meta[name="csrf-token"]');
+          const csrf = csrfToken ? csrfToken.getAttribute('content') : '';
+          
+          for (const url of logoutUrls) {
+            try {
+              await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRF-TOKEN': csrf,
+                  'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+              }).catch(() => {});
+            } catch(e) {}
+          }
+          
+          // Clear all storage
+          localStorage.clear();
+          sessionStorage.clear();
+          document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+          });
+        } catch(e) { 
+          console.log('Error clearing storage:', e); 
+        }
+        
+        // Redirect to admin login
+        setTimeout(function() {
+          window.location.href = '{{ route('admin.login') }}';
+        }, 100);
+      }
+
+      // Function to clear session and redirect to Super Admin login
+      async function clearSessionAndGoToSuperAdmin() {
+        try {
+          // Logout from all guards
+          const logoutUrls = [
+            '{{ route('logout') }}',
+            '/admin/logout',
+            '/super-admin/logout'
+          ];
+          
+          const csrfToken = document.querySelector('meta[name="csrf-token"]');
+          const csrf = csrfToken ? csrfToken.getAttribute('content') : '';
+          
+          for (const url of logoutUrls) {
+            try {
+              await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRF-TOKEN': csrf,
+                  'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+              }).catch(() => {});
+            } catch(e) {}
+          }
+          
+          // Clear all storage
+          localStorage.clear();
+          sessionStorage.clear();
+          document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+          });
+        } catch(e) { 
+          console.log('Error clearing storage:', e); 
+        }
+        
+        // Redirect to super admin login
+        setTimeout(function() {
+          window.location.href = '{{ route('superadmin.login') }}';
+        }, 100);
+      }
 
             // Header show/hide on scroll: hide when scrolling down, show when scrolling up
             (function(){
