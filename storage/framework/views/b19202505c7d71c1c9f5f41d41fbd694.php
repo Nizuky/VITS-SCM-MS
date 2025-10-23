@@ -346,7 +346,7 @@ table{overflow:visible!important}
                 </div>
 
                 <!-- Activity Calendar -->
-                <div class="bg-white dark:bg-base-200 rounded-2xl p-6 shadow-sm">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
@@ -355,8 +355,8 @@ table{overflow:visible!important}
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-3 text-xs">
                                 <span class="text-text-muted">Less</span>
-                                <div class="flex gap-1 activity-calendar-legend">
-                                     <div class="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" title="No activity"></div>
+                                <div class="flex gap-1">
+                                     <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
@@ -1810,23 +1810,13 @@ table{overflow:visible!important}
             var container = document.getElementById('activity-calendar');
             if (!container) return;
             
-            var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            var monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
             // Get color based on activity level (purple palette)
-            function getColor(level, isDarkMode) {
-                if (level === 0) {
-                    return isDarkMode ? '#374151' : '#e5e7eb'; // No activity (gray-700 dark, gray-200 light)
-                }
+            function getColor(level) {
+                if (level === 0) return '#e5e7eb'; // No activity (gray-200)
                 if (level <= 2) return '#E5D4FF'; // Low (light purple)
                 if (level <= 4) return '#C9A9FF'; // Medium-low (medium purple)
                 if (level <= 6) return '#A475FF'; // Medium-high (darker purple)
                 return '#6D28D9'; // High (darkest purple - 7+)
-            }
-            
-            // Check if dark mode is active
-            function isDarkMode() {
-                return document.documentElement.getAttribute('data-theme') === 'dark';
             }
             
             // Calculate weeks to display (always start from Jan 1, end at Dec 31)
@@ -1853,20 +1843,19 @@ table{overflow:visible!important}
             var html = '<div class="flex gap-2">';
             
             // Day labels column
-            html += '<div class="flex flex-col justify-start text-xs activity-calendar-days" style="padding-top: 28px; height: fit-content;">';
+            html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
             var days = ['Mon', 'Wed', 'Fri'];
-            var dayIndices = [1, 3, 5]; // Monday, Wednesday, Friday indices
             for (var d = 0; d < 3; d++) {
-                var topOffset = dayIndices[d] * 16 + (dayIndices[d] * 4); // 16px height + 4px gap
-                html += '<div class="activity-calendar-day-label" style="height: 12px; line-height: 12px; margin-bottom: ' + (d < 2 ? '24px' : '0') + ';">' + days[d] + '</div>';
+                html += '<div class="h-3 leading-3">' + days[d] + '</div>';
             }
             html += '</div>';
             
             // Calendar grid with month labels
-            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col gap-0">';
+            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
             
             // Month labels row
-            html += '<div class="flex gap-1 mb-2" style="height: 16px;">';
+            html += '<div class="flex gap-1 mb-2">';
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             var lastMonth = -1;
             var monthPositions = [];
             
@@ -1881,34 +1870,30 @@ table{overflow:visible!important}
             for (var w = 0; w < weeks.length; w++) {
                 var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
                 if (showMonth) {
-                    html += '<div class="text-xs activity-calendar-month-label" style="width: 12px; height: 16px; line-height: 16px;">' + monthShort[showMonth.month] + '</div>';
+                    html += '<div class="text-xs text-text-muted" style="min-width: 13px;">' + months[showMonth.month] + '</div>';
                 } else {
-                    html += '<div style="width: 12px; height: 16px;"></div>';
+                    html += '<div style="min-width: 13px;"></div>';
                 }
             }
             html += '</div>';
             
             // Grid rows (Sun through Sat)
             for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
-                html += '<div class="flex gap-1" style="height: 12px; margin-bottom: ' + (dayIndex < 6 ? '4px' : '0') + ';">';
+                html += '<div class="flex gap-1 mb-1">';
                 
                 for (var w = 0; w < weeks.length; w++) {
                     var date = weeks[w][dayIndex];
                     var dateStr = date.toISOString().split('T')[0];
                     var level = activityData[dateStr] || 0;
-                    var darkMode = isDarkMode();
-                    var color = getColor(level, darkMode);
+                    var color = getColor(level);
                     
                     var isToday = date.toDateString() === today.toDateString();
                     var isFuture = date > today;
                     var isInRange = date >= startDate && date <= endDate;
                     
-                    // Format: "Month DD, YYYY: X updates"
-                    var title = monthNames[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+                    var title = dateStr;
                     if (!isFuture && isInRange) {
                         title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
-                    } else if (isFuture) {
-                        title += ': Future date';
                     } else {
                         title += ': No data';
                     }
@@ -1918,7 +1903,7 @@ table{overflow:visible!important}
                     var clickable = (level > 0 && !isFuture && isInRange) ? 'cursor-pointer' : 'cursor-default';
                     var onclick = (level > 0 && !isFuture && isInRange) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '';
                     
-                    html += '<div class="activity-calendar-cell w-3 h-3 rounded-sm transition-all hover:scale-110 ' + borderClass + ' ' + opacity + ' ' + clickable + '" ' +
+                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:scale-110 ' + borderClass + ' ' + opacity + ' ' + clickable + '" ' +
                             onclick + ' ' +
                             'style="background-color: ' + color + ';" ' +
                             'title="' + title + '"></div>';
