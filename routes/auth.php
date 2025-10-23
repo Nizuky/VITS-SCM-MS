@@ -64,6 +64,10 @@ Route::get('email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
+// Super admin password change verification (signed route)
+Route::get('super-admin/password/verify', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'verifyPasswordChange'])
+    ->name('superadmin.password.verify');
+
 Route::middleware('auth:web')->group(function () {
     // Our custom verification prompt page that includes a resend link
     Volt::route('verify-email', 'auth.verify-email')
@@ -122,6 +126,10 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
     Route::post('super-admin/api/submissions/{id}/approve', [App\Http\Controllers\SuperAdminDashboardController::class, 'approveSubmission']);
     Route::post('super-admin/api/submissions/{id}/reject', [App\Http\Controllers\SuperAdminDashboardController::class, 'rejectSubmission']);
     Route::get('super-admin/api/activity-calendar', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityCalendar']);
+
+    // Super-admin Settings API endpoints
+    Route::post('super-admin/api/settings/update-name', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'updateName'])->name('superadmin.settings.updateName');
+    Route::post('super-admin/api/settings/request-password-change', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'requestPasswordChange'])->name('superadmin.settings.requestPasswordChange');
 
     // Super-admin logout
     Route::post('super-admin/logout', [App\Http\Controllers\SuperAdmin\LoginController::class, 'logout'])

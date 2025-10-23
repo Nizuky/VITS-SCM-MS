@@ -209,6 +209,20 @@ body{font-family:'Inter',sans-serif}
 
         <main class="flex-1 flex flex-col gap-6" id="page-container">
             
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div class="alert alert-success shadow-lg mx-4" id="flash-message">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-error shadow-lg mx-4" id="flash-message">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+            
             <!-- Dashboard Overview Page -->
             <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
                 <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Super Admin Dashboard</h1>
@@ -430,9 +444,31 @@ body{font-family:'Inter',sans-serif}
                 </div>
                 
                 <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-                    <h2 class="text-xl font-bold text-text-header mb-6">Change Password</h2>
-                    
-                    <form id="password-change-form" class="space-y-4 max-w-md">
+                    <!-- Change Name Section -->
+                    <div class="border-b border-gray-200 pb-6">
+                        <h2 class="text-xl font-bold text-text-header mb-4">Change Name</h2>
+                        <form id="name-change-form" class="space-y-4 max-w-md">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text font-semibold">Full Name</span>
+                                </div>
+                                <input id="admin-name" type="text" value="{{ auth()->guard('superadmin')->user()->name }}" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
+                            </label>
+                            
+                            <div class="pt-4 flex justify-end">
+                                <button type="button" id="save-name-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
+                                    Update Name
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Password Section -->
+                    <div>
+                        <h2 class="text-xl font-bold text-text-header mb-4">Change Password</h2>
+                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong>{{ auth()->guard('superadmin')->user()->email }}</strong> to confirm your password change.</p>
+                        
+                        <form id="password-change-form" class="space-y-4 max-w-md">
                         <!-- Current Password -->
                         <label class="form-control w-full">
                             <div class="label">
@@ -483,10 +519,11 @@ body{font-family:'Inter',sans-serif}
 
                         <div class="pt-4 flex justify-end">
                             <button type="button" id="save-password-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
-                                Save Changes
+                                Request Password Change
                             </button>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </main>
@@ -540,22 +577,6 @@ body{font-family:'Inter',sans-serif}
                     <button class="btn">Cancel</button>
                     <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                         Yes, reject
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Save Password Modal -->
-    <dialog id="save_password_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Save Changes?</h3>
-            <p class="py-4">Are you sure you want to save the new password?</p>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-save-password-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Yes, save
                     </button>
                 </form>
             </div>
@@ -1552,26 +1573,111 @@ body{font-family:'Inter',sans-serif}
                 }
             });
             
-            // Password change handlers
-            var spb = document.getElementById('save-password-button');
-            var spm = document.getElementById('save_password_modal');
-            var csp = document.getElementById('confirm-save-password-btn');
-            var pcf = document.getElementById('password-change-form');
-            
-            spb.addEventListener('click', function(e) {
+            // Name change handler
+            var snb = document.getElementById('save-name-button');
+            snb.addEventListener('click', async function(e) {
                 e.preventDefault();
-                if (pcf.checkValidity()) {
-                    spm.showModal();
-                } else {
-                    pcf.reportValidity();
+                var nameInput = document.getElementById('admin-name');
+                var newName = nameInput.value.trim();
+                
+                if (!newName) {
+                    showToast('Please enter a valid name.', 'error');
+                    return;
+                }
+                
+                try {
+                    snb.disabled = true;
+                    snb.textContent = 'Updating...';
+                    
+                    var response = await fetch(`${BASE_PATH}/super-admin/api/settings/update-name`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ name: newName })
+                    });
+                    
+                    var data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showToast(data.message || 'Name updated successfully!', 'success');
+                        // Update the name in the sidebar
+                        location.reload();
+                    } else {
+                        showToast(data.message || 'Failed to update name.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error updating name:', error);
+                    showToast('Failed to update name. Please try again.', 'error');
+                } finally {
+                    snb.disabled = false;
+                    snb.textContent = 'Update Name';
                 }
             });
             
-            csp.addEventListener('click', function() {
-                // TODO: Make API call to change password
-                pcf.reset();
-                spm.close();
-                showToast('Your password has been updated.', 'success');
+            // Password change handler with email verification
+            var spb = document.getElementById('save-password-button');
+            var pcf = document.getElementById('password-change-form');
+            
+            spb.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                if (!pcf.checkValidity()) {
+                    pcf.reportValidity();
+                    return;
+                }
+                
+                var currentPassword = document.getElementById('current-password').value;
+                var newPassword = document.getElementById('new-password').value;
+                var confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (newPassword !== confirmPassword) {
+                    showToast('New password and confirm password do not match.', 'error');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    showToast('New password must be at least 8 characters long.', 'error');
+                    return;
+                }
+                
+                try {
+                    spb.disabled = true;
+                    spb.textContent = 'Sending...';
+                    
+                    var response = await fetch(`${BASE_PATH}/super-admin/api/settings/request-password-change`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            current_password: currentPassword,
+                            new_password: newPassword,
+                            new_password_confirmation: confirmPassword
+                        })
+                    });
+                    
+                    var data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showToast(data.message, 'success');
+                        pcf.reset();
+                    } else {
+                        showToast(data.message || 'Failed to process password change request.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error requesting password change:', error);
+                    showToast('Failed to process password change request. Please try again.', 'error');
+                } finally {
+                    spb.disabled = false;
+                    spb.textContent = 'Request Password Change';
+                }
             });
 
             // Logout handler
@@ -1597,6 +1703,18 @@ body{font-family:'Inter',sans-serif}
             });
             
             // Auto-refresh removed - use manual refresh buttons instead
+            
+            // Auto-hide flash messages after 5 seconds
+            var flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                setTimeout(function() {
+                    flashMessage.style.transition = 'opacity 0.5s';
+                    flashMessage.style.opacity = '0';
+                    setTimeout(function() {
+                        flashMessage.remove();
+                    }, 500);
+                }, 5000);
+            }
         });
     </script>
 </body>
