@@ -28,7 +28,7 @@ class SocialContractRecordObserver
                     // Create new approval record
                     SocialContractApproval::create([
                         'social_contract_record_id' => $socialContractRecord->id,
-                        'student_id' => $student->student_id ?? $student->id,
+                        'student_id' => $student->student_id ?? 'N/A',
                         'student_name' => $student->name,
                         'event_name' => $socialContractRecord->event_name,
                         'organization' => $socialContractRecord->organization,

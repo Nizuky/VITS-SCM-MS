@@ -95,7 +95,7 @@ class SuperAdminDashboardController extends Controller
                     
                     return [
                         'id' => $record->id,
-                        'student_id' => $student->student_id ?? $student->id ?? '',
+                        'student_id' => $student ? ($student->student_id ?? 'N/A') : 'N/A',
                         'student_name' => $student->name ?? '',
                         'event_name' => $record->event_name,
                         'organization' => $record->organization,
