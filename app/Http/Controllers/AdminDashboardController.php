@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SocialContractRecord;
 use App\Models\SocialContract;
 use App\Models\User;
+use App\Models\StudentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -109,12 +110,21 @@ class AdminDashboardController extends Controller
         try {
             DB::beginTransaction();
             
-            $record = SocialContractRecord::findOrFail($id);
+            $record = SocialContractRecord::with('socialContract')->findOrFail($id);
             $oldStatus = $record->status;
             
             // Update status
             $record->status = 'Verified';
             $record->save();
+            
+            // Create notification for student
+            StudentNotification::create([
+                'user_id' => $record->socialContract->student_id,
+                'social_contract_record_id' => $record->id,
+                'type' => 'verified',
+                'message' => 'Your social contract submission has been verified by the admin.',
+                'is_read' => false,
+            ]);
             
             // Observer will automatically create approval record in social_contract_approvals table
             
@@ -147,13 +157,24 @@ class AdminDashboardController extends Controller
             
             DB::beginTransaction();
             
-            $record = SocialContractRecord::findOrFail($id);
+            $record = SocialContractRecord::with('socialContract')->findOrFail($id);
             $oldStatus = $record->status;
             
-            // Update status and rejection reason
+            // Update status, rejection reason and timestamp
             $record->status = 'Rejected';
             $record->rejection_reason = $validated['reason'];
+            $record->rejected_at = now();
             $record->save();
+            
+            // Create notification for student
+            StudentNotification::create([
+                'user_id' => $record->socialContract->student_id,
+                'social_contract_record_id' => $record->id,
+                'type' => 'rejected',
+                'message' => 'Your social contract submission has been rejected by the admin.',
+                'rejection_reason' => $validated['reason'],
+                'is_read' => false,
+            ]);
             
             DB::commit();
             

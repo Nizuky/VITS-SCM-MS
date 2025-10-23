@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SocialContractRecord;
 use App\Models\SocialContractApproval;
 use App\Models\SuperAdminActivityLog;
+use App\Models\StudentNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -239,8 +240,18 @@ class SuperAdminDashboardController extends Controller
                 
                 // Update the original record status
                 if ($approval->socialContractRecord) {
+                    $approval->socialContractRecord->load('socialContract');
                     $approval->socialContractRecord->status = 'Approved';
                     $approval->socialContractRecord->save();
+                    
+                    // Create notification for student
+                    StudentNotification::create([
+                        'user_id' => $approval->socialContractRecord->socialContract->student_id,
+                        'social_contract_record_id' => $approval->social_contract_record_id,
+                        'type' => 'approved',
+                        'message' => 'Your social contract submission has been approved by the super admin.',
+                        'is_read' => false,
+                    ]);
                 }
                 
                 // Log activity for calendar
@@ -394,9 +405,21 @@ class SuperAdminDashboardController extends Controller
                     
                     // Update the original record status and rejection reason
                     if ($approval->socialContractRecord) {
+                        $approval->socialContractRecord->load('socialContract');
                         $approval->socialContractRecord->status = 'Rejected';
                         $approval->socialContractRecord->rejection_reason = $reason;
+                        $approval->socialContractRecord->rejected_at = now();
                         $approval->socialContractRecord->save();
+                        
+                        // Create notification for student
+                        StudentNotification::create([
+                            'user_id' => $approval->socialContractRecord->socialContract->student_id,
+                            'social_contract_record_id' => $approval->social_contract_record_id,
+                            'type' => 'rejected',
+                            'message' => 'Your social contract submission has been rejected by the super admin.',
+                            'rejection_reason' => $reason,
+                            'is_read' => false,
+                        ]);
                     }
                     
                     // Log activity for calendar
@@ -446,6 +469,7 @@ class SuperAdminDashboardController extends Controller
                     // Update the record status to Rejected
                     $record->status = 'Rejected';
                     $record->rejection_reason = $reason;
+                    $record->rejected_at = now();
                     $record->save();
                     
                     // Log activity for calendar

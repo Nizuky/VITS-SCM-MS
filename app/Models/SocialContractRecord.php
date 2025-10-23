@@ -21,11 +21,13 @@ class SocialContractRecord extends Model
         'hours_rendered',
         'status',
         'rejection_reason',
+        'rejected_at',
     ];
 
     protected $casts = [
         'date' => 'date',
         'hours_rendered' => 'integer',
+        'rejected_at' => 'datetime',
     ];
 
     /**
@@ -74,5 +76,13 @@ class SocialContractRecord extends Model
     public function isApproved(): bool
     {
         return $this->status === 'Approved';
+    }
+
+    /**
+     * Get the student user who owns this record through social contract
+     */
+    public function getUserIdAttribute()
+    {
+        return $this->socialContract->student_id ?? null;
     }
 }

@@ -305,6 +305,24 @@
             background-color: #374151;
             color: #9ca3af;
         }
+        /* Force variant states to keep bright colors even in dark theme */
+        [data-theme="dark"] .step-circle.active {
+            background-color: #3B82F6 !important; /* blue */
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .step-circle.completed {
+            background-color: #4CAF50 !important; /* green */
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .step-circle.rejected {
+            background-color: #EF4444 !important; /* red */
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        [data-theme="dark"] .step-circle.pending {
+            background-color: #F59E0B !important; /* yellow/orange */
+            color: #ffffff !important;
+        }
         
         [data-theme="dark"] .step-sublabel {
             color: #9ca3af;
@@ -312,6 +330,13 @@
         
         [data-theme="dark"] .step-connector {
             background-color: #374151;
+        }
+        /* Force connector colors to match light theme variants in dark mode */
+        [data-theme="dark"] .step-connector.active {
+            background-color: #3B82F6 !important; /* blue */
+        }
+        [data-theme="dark"] .step-connector.completed {
+            background-color: #4CAF50 !important; /* green */
         }
         
         /* Status Modal Animations */
@@ -360,6 +385,51 @@
         [data-theme="dark"] .bg-gradient-verified { background-image: linear-gradient(to top, #6D28D9, #5EEAD4); }
         [data-theme="dark"] .bg-gradient-pending { background-image: linear-gradient(to top, #6D28D9, #FFE0A2); }
         [data-theme="dark"] .bg-gradient-rejected { background-image: linear-gradient(to top, #6D28D9, #FFB7BE); }
+        /* FAQ active/open state: force primary purple background and white text for the title */
+        /* Make active/open FAQ whole item purple with white text and subtle shadow */
+        .collapse:focus-within,
+        .collapse.collapse-open,
+        .collapse.open,
+        .collapse[aria-expanded="true"] {
+            background-color: #5B21B6 !important; /* slightly darker primary */
+            border-color: rgba(91,33,182,0.25) !important;
+            box-shadow: 0 6px 18px rgba(91,33,182,0.12) !important;
+        }
+        /* Make the expanded content readable on the purple background */
+        .collapse:focus-within .collapse-content,
+        .collapse.collapse-open .collapse-content,
+        .collapse.open .collapse-content,
+        .collapse[aria-expanded="true"] .collapse-content {
+            color: #ffffff !important;
+        }
+        .collapse:focus-within .collapse-content p,
+        .collapse.collapse-open .collapse-content p,
+        .collapse.open .collapse-content p,
+        .collapse[aria-expanded="true"] .collapse-content p {
+            color: rgba(255,255,255,0.92) !important;
+        }
+        .collapse:focus-within .collapse-content a,
+        .collapse.collapse-open .collapse-content a,
+        .collapse.open .collapse-content a,
+        .collapse[aria-expanded="true"] .collapse-content a {
+            color: #ffffff !important;
+            text-decoration: underline !important;
+        }
+        .collapse:focus-within > .collapse-title,
+        .collapse.collapse-open > .collapse-title,
+        .collapse.open > .collapse-title,
+        .collapse[aria-expanded="true"] > .collapse-title {
+            background-color: transparent !important;
+            color: #ffffff !important;
+        }
+        /* Also ensure the arrow/chevron is white when active */
+        .collapse:focus-within > .collapse-title svg,
+        .collapse.collapse-open > .collapse-title svg,
+        .collapse.open > .collapse-title svg,
+        .collapse[aria-expanded="true"] > .collapse-title svg {
+            color: #ffffff !important;
+            stroke: #ffffff !important;
+        }
         /* Checkboxes: purple accent in light; custom dark styling */
         .record-checkbox { accent-color: #6D28D9 !important; }
         /* Ensure light theme is purple even if accent-color unsupported */
@@ -464,7 +534,7 @@
 
             <ul class="menu p-0">
                 <li>
-                    <a class="py-3" id="nav-faqs" onclick="showPage('faqs')">
+                    <a class="py-3 pl-2" id="nav-faqs" onclick="showPage('faqs')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -501,35 +571,24 @@
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Notifications" title="Notifications">
                         <div class="indicator">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                            <span id="notif-dot" class="indicator-item scms-notif-dot" aria-hidden="true"></span>
+                            <span id="notif-dot" class="indicator-item scms-notif-dot hidden" aria-hidden="true"></span>
                         </div>
                     </div>
-                    <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden">
+                    <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden max-h-[500px] overflow-y-auto">
                         
-                        <li class="p-4 font-bold text-gray-700 border-b">Notifications</li>
+                        <li class="p-4 font-bold text-gray-700 dark:text-black border-b sticky top-0 bg-base-100 z-10">Notifications</li>
 
-                        <li>
-                            <div class="flex items-start p-3 w-full border-b border-gray-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-badge-verified-text mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-800">Well done! Your submitted form has been <span class="text-badge-verified-text">Verified</span>.</p>
-                                    <p class="text-xs text-gray-500 mt-1">Yesterday</p>
+                        <div id="notifications-list">
+                            <!-- Notifications will be loaded here dynamically -->
+                            <li>
+                                <div class="flex items-center justify-center p-8">
+                                    <span class="loading loading-spinner loading-md text-primary-purple"></span>
                                 </div>
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="flex items-start p-3 w-full border-b border-gray-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-badge-rejected-text mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-800">Your record has been <span class="text-badge-rejected-text">Rejected</span> due to the reason attached</p>
-                                    <p class="text-xs text-gray-500 mt-1">23 June 2024</p>
-                                </div>
-                            </div>
-                        </li>
+                            </li>
+                        </div>
                         
-                        <li class="border-t border-gray-100">
-                            <a class="text-center text-sm py-2">See All Notifications</a>
+                        <li class="border-t border-gray-100 sticky bottom-0 bg-base-100">
+                            <a class="text-center text-sm py-2 hover:bg-gray-100 dark:hover:bg-gray-700" id="see-all-notifications">See All Notifications</a>
                         </li>
                     </ul>
                 </div>
@@ -543,7 +602,7 @@
                 <div class="relative rounded-2xl bg-transparent p-2 mb-10 h-[250px]">
                     <!-- Inner gray container -->
                     <div class="absolute inset-x-0 bottom-0 rounded-2xl bg-transparent text-white mb-2 p-2 h-[250px] flex justify-center items-end overflow-hidden z-10">
-                        
+                        sd
                         <!-- Image overlay (on top of everything) -->
                         <div class="absolute right-150 bottom-0 z-20">
                             <img src="<?php echo e(asset('storage/images/PLVgirl.png')); ?>" class="w-[270px] h-auto object-contain drop-shadow-lg" />
@@ -1177,6 +1236,44 @@
         </form>
     </dialog>
 
+    <!-- All Notifications Modal -->
+    <dialog id="all_notifications_modal" class="modal">
+        <div class="modal-box max-w-2xl max-h-[80vh]">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-primary-purple p-3 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-text-header">All Notifications</h3>
+                        <p class="text-sm text-text-muted">Your recent activity updates</p>
+                    </div>
+                </div>
+                <button id="mark-all-read-btn" class="btn btn-sm btn-ghost text-primary-purple hover:bg-primary-purple/10">
+                    Mark all as read
+                </button>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div id="all-notifications-list" class="space-y-2 overflow-y-auto max-h-[500px]">
+                <!-- All notifications will be loaded here -->
+                <div class="flex items-center justify-center py-8">
+                    <span class="loading loading-spinner loading-md text-primary-purple"></span>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
 
     <!-- DaisyUI toast root (bottom-right) -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
@@ -1712,6 +1809,362 @@
             // Make it globally accessible
             window.showRejectionReason = showRejectionReason;
             
+            // ========== NOTIFICATION SYSTEM ==========
+            
+            // Load recent notifications (max 3 for dropdown)
+            async function loadRecentNotifications() {
+                try {
+                    const response = await fetch('/api/notifications/recent', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to fetch notifications');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        updateNotificationDropdown(data.notifications);
+                        updateNotificationBadge(data.unread_count);
+                    }
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                    document.getElementById('notifications-list').innerHTML = `
+                        <li><div class="p-4 text-center text-sm text-gray-500">Failed to load notifications</div></li>
+                    `;
+                }
+            }
+            
+            // Update notification dropdown with recent notifications
+            function updateNotificationDropdown(notifications) {
+                const list = document.getElementById('notifications-list');
+                
+                if (!notifications || notifications.length === 0) {
+                    list.innerHTML = `
+                        <li><div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">No notifications yet</div></li>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = notifications.map(notif => createNotificationHTML(notif, false)).join('');
+                
+                // Add click handlers for rejection reasons
+                notifications.forEach(notif => {
+                    if (notif.type === 'rejected' && notif.rejection_reason) {
+                        const notifEl = document.getElementById(`notif-${notif.id}`);
+                        if (notifEl) {
+                            const reasonBtn = notifEl.querySelector('.view-reason-btn');
+                            if (reasonBtn) {
+                                reasonBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    showRejectionReason(notif.rejection_reason);
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update notification badge (red dot)
+            function updateNotificationBadge(unreadCount) {
+                const badge = document.getElementById('notif-dot');
+                if (badge) {
+                    if (unreadCount > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            }
+            
+            // Create notification HTML
+            function createNotificationHTML(notif, showDeleteBtn = true) {
+                let icon, iconColor, statusText, statusColor, statusHex;
+                
+                switch(notif.type) {
+                    case 'verified':
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />';
+                        iconColor = 'text-blue-500';
+                        statusText = 'Verified';
+                        statusColor = 'text-blue-600 dark:text-blue-600';
+                        statusHex = '#4a80f4ff';
+                        break;
+                    case 'approved':
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                        iconColor = 'text-green-500';
+                        statusText = 'Approved';
+                        statusColor = 'text-green-600 dark:text-green-600';
+                        statusHex = '#29bb5eff';
+                        break;
+                    case 'rejected':
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                        iconColor = 'text-red-500';
+                        statusText = 'Rejected';
+                        statusColor = 'text-red-600 dark:text-red-600';
+                        statusHex = '#f85050ff';
+                        break;
+                    default:
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                        iconColor = 'text-gray-500';
+                        statusText = 'Updated';
+                        statusColor = 'text-gray-700 dark:text-gray-700';
+                        statusHex = '#374151';
+                }
+                
+                const isUnread = !notif.is_read;
+                const bgClass = isUnread ? 'bg-purple-50 dark:bg-purple-900/10' : '';
+                
+                // Event details
+                let eventDetails = '';
+                    if (notif.event_name || notif.venue) {
+                    eventDetails = `
+                        <p class="text-xs text-gray-700 dark:text-gray mt-1">
+                            ${notif.event_name ? `<span class="font-medium">${notif.event_name}</span>` : ''}
+                            ${notif.event_name && notif.venue ? ' • ' : ''}
+                            ${notif.venue ? notif.venue : ''}
+                        </p>
+                    `;
+                }
+                
+                let reasonSection = '';
+                let expandedReasonSection = '';
+                if (notif.type === 'rejected' && notif.rejection_reason) {
+                    if (showDeleteBtn) {
+                        // For "All Notifications" modal - inline expandable reason
+                        reasonSection = `
+                            <button class="view-reason-btn text-xs text-primary-purple hover:underline mt-1 flex items-center gap-1" data-notif-id="${notif.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 chevron-icon transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                                View reason
+                            </button>
+                            <div class="reason-content hidden mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                <p class="text-xs font-semibold text-red-700 dark:text-red mb-1">Rejection Reason:</p>
+                                <p class="text-sm text-gray-900 dark:text-black whitespace-pre-wrap">${notif.rejection_reason}</p>
+                            </div>
+                        `;
+                    } else {
+                        // For dropdown - opens modal
+                        reasonSection = `
+                            <button class="view-reason-btn text-xs text-primary-purple hover:underline mt-1 flex items-center gap-1" data-notif-id="${notif.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                View reason
+                            </button>
+                        `;
+                    }
+                }
+                
+                const deleteBtn = showDeleteBtn ? `
+                    <button class="delete-notif-btn btn btn-ghost btn-xs btn-circle absolute top-2 right-2" data-notif-id="${notif.id}" title="Delete notification">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                ` : '';
+                
+                return `
+                    <li id="notif-${notif.id}" class="relative ${bgClass}">
+                        <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${iconColor} mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                ${icon}
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-black">
+                                    Your submission has been <span class="${statusColor} font-bold" ${statusHex ? `style="color: ${statusHex} !important"` : ''}>${statusText}</span>
+                                </p>
+                                ${eventDetails}
+                                <p class="text-xs text-gray dark:text-gray mt-1">${notif.created_at}</p>
+                                ${reasonSection}
+                            </div>
+                            ${deleteBtn}
+                        </div>
+                    </li>
+                `;
+            }
+            
+            // Load all notifications for modal
+            async function loadAllNotifications() {
+                try {
+                    const response = await fetch('/api/notifications/all', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to fetch all notifications');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        updateAllNotificationsModal(data.notifications);
+                    }
+                } catch (error) {
+                    console.error('Error loading all notifications:', error);
+                    document.getElementById('all-notifications-list').innerHTML = `
+                        <div class="p-4 text-center text-sm text-gray-500">Failed to load notifications</div>
+                    `;
+                }
+            }
+            
+            // Update all notifications modal
+            function updateAllNotificationsModal(notifications) {
+                const list = document.getElementById('all-notifications-list');
+                
+                if (!notifications || notifications.length === 0) {
+                    list.innerHTML = `
+                        <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <p>No notifications yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = notifications.map(notif => createNotificationHTML(notif, true)).join('');
+                
+                // Add click handlers for rejection reasons in "All Notifications" modal
+                notifications.forEach(notif => {
+                    if (notif.type === 'rejected' && notif.rejection_reason) {
+                        // scope search to modal list to avoid ID collisions with dropdown
+                        const notifEl = list.querySelector(`#notif-${notif.id}`);
+                        if (notifEl) {
+                            const reasonBtn = notifEl.querySelector('.view-reason-btn');
+                            const reasonContent = notifEl.querySelector('.reason-content');
+                            const chevronIcon = notifEl.querySelector('.chevron-icon');
+                            
+                            if (reasonBtn && reasonContent) {
+                                console.debug('Attaching view-reason handler for notif (modal)', notif.id);
+                                reasonBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                        // Toggle the reason content
+                                        const isHidden = reasonContent.classList.contains('hidden');
+                                        if (isHidden) {
+                                            reasonContent.classList.remove('hidden');
+                                            if (chevronIcon) chevronIcon.style.transform = 'rotate(180deg)';
+                                            const firstSvg = reasonBtn.querySelector('svg');
+                                            // Rebuild button content safely
+                                            reasonBtn.innerHTML = '';
+                                            if (firstSvg) reasonBtn.appendChild(firstSvg.cloneNode(true));
+                                            reasonBtn.appendChild(document.createTextNode(' Hide reason'));
+                                        } else {
+                                            reasonContent.classList.add('hidden');
+                                            if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                                            const firstSvg = reasonBtn.querySelector('svg');
+                                            reasonBtn.innerHTML = '';
+                                            if (firstSvg) reasonBtn.appendChild(firstSvg.cloneNode(true));
+                                            reasonBtn.appendChild(document.createTextNode(' View reason'));
+                                        }
+                                        console.debug('Toggled reason visibility for notif (modal)', notif.id, !isHidden);
+                                    } catch (err) {
+                                        console.error('Error toggling reason for notif (modal)', notif.id, err);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                
+                // Add delete handlers scoped to modal
+                list.querySelectorAll('.delete-notif-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const notifId = btn.getAttribute('data-notif-id');
+                        await deleteNotification(notifId);
+                    });
+                });
+            }
+            
+            // Delete notification
+            async function deleteNotification(notifId) {
+                try {
+                    const response = await fetch(`/api/notifications/${notifId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to delete notification');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Remove from UI
+                        const notifEl = document.getElementById(`notif-${notifId}`);
+                        if (notifEl) {
+                            notifEl.style.opacity = '0';
+                            notifEl.style.transform = 'translateX(100%)';
+                            setTimeout(() => notifEl.remove(), 300);
+                        }
+                        
+                        // Reload notifications
+                        setTimeout(() => {
+                            loadRecentNotifications();
+                            loadAllNotifications();
+                        }, 300);
+                        
+                        showToast('Notification deleted', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error deleting notification:', error);
+                    showToast('Failed to delete notification', 'error');
+                }
+            }
+            
+            // Mark all notifications as read
+            async function markAllAsRead() {
+                try {
+                    const response = await fetch('/api/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to mark all as read');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        loadRecentNotifications();
+                        loadAllNotifications();
+                        showToast('All notifications marked as read', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error marking all as read:', error);
+                    showToast('Failed to mark notifications as read', 'error');
+                }
+            }
+            
+            // Event listeners for notifications
+            document.getElementById('see-all-notifications')?.addEventListener('click', () => {
+                loadAllNotifications();
+                document.getElementById('all_notifications_modal').showModal();
+            });
+            
+            document.getElementById('mark-all-read-btn')?.addEventListener('click', () => {
+                markAllAsRead();
+            });
+            
+            // Load notifications on page load
+            loadRecentNotifications();
+            
+            // Refresh notifications every 30 seconds
+            setInterval(loadRecentNotifications, 30000);
+            
+            // ========== END NOTIFICATION SYSTEM ==========
+            
             function renderTable() {
                 tableBody.innerHTML = '';
                 const query = (searchInput.value || '').toLowerCase().trim();
@@ -1751,6 +2204,23 @@
                         if (e.target.classList.contains('record-checkbox')) return;
                         toggleRecordDetails(rec, row); 
                     };
+                    // Compute deletion countdown HTML if available
+                    const deletionCountdownHtml = (() => {
+                        try {
+                            const rejectedAtRaw = rec.rejected_at || rec.rejectedAt || rec.updated_at || rec.updatedAt || null;
+                            if (!rejectedAtRaw) return '';
+                            const rej = new Date(String(rejectedAtRaw));
+                            if (isNaN(rej)) return '';
+                            const deleteAt = new Date(rej.getTime() + 7 * 24 * 60 * 60 * 1000);
+                            const now = new Date();
+                            const diff = deleteAt - now;
+                            if (diff <= 0) return '<div class="text-xs text-red-500">Deleting soon</div>'; // fallback
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            return `<div class="text-xs text-gray-400 mt-1">Time left before deletion: ${days} day${days!==1?'s':''} ${hours} hour${hours!==1?'s':''}</div>`;
+                        } catch (e) { return ''; }
+                    })();
+
                     row.innerHTML = `
                         <td class="text-center"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
                         <td class="text-center">${formattedDate}</td>
@@ -1758,7 +2228,7 @@
                         <td class="text-center">${rec.venue}</td>
                         <td class="text-center">${rec.organization}</td>
                         <td class="text-center">${rec.hours_rendered} hours</td>
-                        <td class="text-center">${renderStatusBadge(rec.status)}</td>
+                        <td class="text-center">${renderStatusBadge(rec.status)} ${rec.status === 'Rejected' ? deletionCountdownHtml : ''}</td>
                     `;
                     tableBody.appendChild(row);
                 });

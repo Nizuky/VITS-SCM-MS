@@ -75,6 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Student notifications relationship
+     */
+    public function notifications()
+    {
+        return $this->hasMany(\App\Models\StudentNotification::class);
+    }
+
+    /**
      * Helper to get or create the current social contract for this student.
      * For now, returns the most recent contract by creation date or creates one if none exists.
      */

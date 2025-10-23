@@ -51,6 +51,13 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
     Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
 
+    // Student notifications
+    Route::get('/api/notifications/recent', [\App\Http\Controllers\StudentNotificationController::class, 'getRecent'])->name('notifications.recent');
+    Route::get('/api/notifications/all', [\App\Http\Controllers\StudentNotificationController::class, 'getAll'])->name('notifications.all');
+    Route::post('/api/notifications/{id}/read', [\App\Http\Controllers\StudentNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::delete('/api/notifications/{id}', [\App\Http\Controllers\StudentNotificationController::class, 'delete'])->name('notifications.delete');
+    Route::post('/api/notifications/mark-all-read', [\App\Http\Controllers\StudentNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
     // Profile: send password reset link to PLV email with redirect back to profile
     Route::post('/api/profile/send-reset-link', [\App\Http\Controllers\ProfileController::class, 'sendPasswordResetLink'])
         ->name('profile.sendResetLink');

@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\CreateAdminUsers::class,
         \App\Console\Commands\ExportSeeders::class,
         \App\Console\Commands\SetSuperAdmin::class,
+        \App\Console\Commands\DeleteOldRejectedRecords::class,
     ];
 
     /**
@@ -24,7 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Run once daily to delete rejected records older than 7 days
+        $schedule->command('scms:delete-old-rejected')->daily();
     }
 
     /**
