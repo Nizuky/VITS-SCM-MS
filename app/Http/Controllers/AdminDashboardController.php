@@ -19,26 +19,28 @@ class AdminDashboardController extends Controller
     {
         try {
             $now = Carbon::now();
-            $weekAgo = $now->copy()->subDays(7);
+            $startOfMonth = $now->copy()->startOfMonth(); // First day of current month
+            $endOfMonth = $now->copy()->endOfMonth(); // Last day of current month
 
             // Count pending requests (all time)
             $pendingCount = SocialContractRecord::where('status', 'Pending')->count();
 
-            // Count verified (accepted) this week - using updated_at since that's when status changed
-            $verifiedThisWeek = SocialContractRecord::where('status', 'Verified')
-                ->where('updated_at', '>=', $weekAgo)
+            // Count verified (accepted) this month - using updated_at since that's when status changed
+            $verifiedThisMonth = SocialContractRecord::where('status', 'Verified')
+                ->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
                 ->count();
 
-            // Count rejected this week
-            $rejectedThisWeek = SocialContractRecord::where('status', 'Rejected')
-                ->where('updated_at', '>=', $weekAgo)
+            // Count rejected this month
+            $rejectedThisMonth = SocialContractRecord::where('status', 'Rejected')
+                ->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
                 ->count();
 
             \Log::info('Dashboard Stats', [
                 'pending' => $pendingCount,
-                'verified_this_week' => $verifiedThisWeek,
-                'rejected_this_week' => $rejectedThisWeek,
-                'week_ago' => $weekAgo->toDateTimeString(),
+                'verified_this_month' => $verifiedThisMonth,
+                'rejected_this_month' => $rejectedThisMonth,
+                'start_of_month' => $startOfMonth->toDateTimeString(),
+                'end_of_month' => $endOfMonth->toDateTimeString(),
                 'now' => $now->toDateTimeString()
             ]);
 
@@ -46,8 +48,8 @@ class AdminDashboardController extends Controller
                 'success' => true,
                 'data' => [
                     'pending' => $pendingCount,
-                    'verified_this_week' => $verifiedThisWeek,
-                    'rejected_this_week' => $rejectedThisWeek
+                    'verified_this_week' => $verifiedThisMonth, // Keep same key for frontend compatibility
+                    'rejected_this_week' => $rejectedThisMonth  // Keep same key for frontend compatibility
                 ]
             ]);
         } catch (\Exception $e) {
@@ -135,16 +137,22 @@ class AdminDashboardController extends Controller
     /**
      * Reject a submission
      */
-    public function rejectSubmission($id)
+    public function rejectSubmission(Request $request, $id)
     {
         try {
+            // Validate the rejection reason
+            $validated = $request->validate([
+                'reason' => 'required|string|min:3|max:1000'
+            ]);
+            
             DB::beginTransaction();
             
             $record = SocialContractRecord::findOrFail($id);
             $oldStatus = $record->status;
             
-            // Update status
+            // Update status and rejection reason
             $record->status = 'Rejected';
+            $record->rejection_reason = $validated['reason'];
             $record->save();
             
             DB::commit();
@@ -153,6 +161,11 @@ class AdminDashboardController extends Controller
                 'success' => true,
                 'message' => 'Submission rejected successfully'
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide a valid rejection reason (minimum 3 characters).'
+            ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             

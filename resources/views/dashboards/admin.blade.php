@@ -289,8 +289,8 @@ table{overflow:visible!important}
                 <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
-                            <p class="text-sm text-text-muted">Contract requests overview for this week</p>
+                            <h2 class="text-xl font-bold text-text-header mb-1">Monthly Summary</h2>
+                            <p class="text-sm text-text-muted">Contract requests overview for this month</p>
                         </div>
                         <button onclick="loadDashboardStats(); generateActivityCalendar();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -309,7 +309,7 @@ table{overflow:visible!important}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="pending-requests-count">0</span> Requests</h3>
-                                <p class="text-yellow-800 font-semibold">Pending This Week</p>
+                                <p class="text-yellow-800 font-semibold">Pending</p>
                                 <p class="text-xs text-text-muted mt-1">Awaiting review</p>
                             </div>
                         </div>
@@ -323,7 +323,7 @@ table{overflow:visible!important}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-[#0e4848ff] font-semibold">Verified This Week</p>
+                                <p class="text-[#0e4848ff] font-semibold">Verified This Month</p>
                                 <p class="text-xs text-text-muted mt-1">Successfully verified</p>
                             </div>
                         </div>
@@ -337,7 +337,7 @@ table{overflow:visible!important}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="rejected-requests-count">0</span> Requests</h3>
-                                <p class="text-red-800 font-semibold">Rejected This Week</p>
+                                <p class="text-red-800 font-semibold">Rejected This Month</p>
                                 <p class="text-xs text-text-muted mt-1">Requires corrections</p>
                             </div>
                         </div>
@@ -620,12 +620,21 @@ table{overflow:visible!important}
     <!-- Reject Modal -->
     <dialog id="reject_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg">Reject Submission</h3>
-            <p class="py-4">Are you sure you want to reject this submission?</p>
+            <h3 class="font-bold text-lg text-text-header">Reject Submission</h3>
+            <p class="py-4 text-text-body">Please provide a reason for rejecting this submission. The student will be notified.</p>
+            
+            <div class="form-control">
+                <textarea 
+                    id="reject-reason-textarea" 
+                    class="textarea textarea-bordered h-32 resize-none focus:outline-none focus:border-primary-purple" 
+                    placeholder="Reason for rejection..."
+                    required></textarea>
+            </div>
+            
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                    <button class="btn btn-ghost">Cancel</button>
+                    <button id="confirm-reject-btn" type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                         Yes, reject
                     </button>
                 </form>
@@ -997,21 +1006,26 @@ table{overflow:visible!important}
             var totalCount = document.getElementById('status-modal-total');
             var totalHours = document.getElementById('status-modal-hours');
             
-            // Filter records by status (this week only)
+            // Filter records by status
+            // Pending: Show all pending (no date filter)
+            // Verified/Rejected: Show only this month (resets at end of month)
             var now = new Date();
-            var weekAgo = new Date(now);
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // First day of current month
+            var endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // Last day of current month
             
             var filteredRecords = allSubmissions.filter(function(r) {
                 var recordDate = new Date(r.updated_at || r.created_at);
-                var isThisWeek = recordDate >= weekAgo && recordDate <= now;
+                var isThisMonth = recordDate >= startOfMonth && recordDate <= endOfMonth;
                 
                 if (status === 'Pending') {
+                    // Show ALL pending requests (no time restriction)
                     return r.status === 'Pending';
                 } else if (status === 'Verified') {
-                    return r.status === 'Verified' && isThisWeek;
+                    // Show only verified requests from this month
+                    return r.status === 'Verified' && isThisMonth;
                 } else if (status === 'Rejected') {
-                    return r.status === 'Rejected' && isThisWeek;
+                    // Show only rejected requests from this month
+                    return r.status === 'Rejected' && isThisMonth;
                 }
                 return false;
             });
@@ -1029,12 +1043,12 @@ table{overflow:visible!important}
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
                 bgColorClass = 'bg-gradient-accepted';
                 modalTitle.textContent = filteredRecords.length + ' Verified Requests';
-                modalSubtitle.textContent = 'All verified requests this week';
+                modalSubtitle.textContent = 'All verified requests this month';
             } else if (status === 'Rejected') {
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
                 bgColorClass = 'bg-gradient-rejected';
                 modalTitle.textContent = filteredRecords.length + ' Rejected Requests';
-                modalSubtitle.textContent = 'All rejected requests this week';
+                modalSubtitle.textContent = 'All rejected requests this month';
             }
             
             modalIcon.innerHTML = iconSvg;
@@ -1303,6 +1317,8 @@ table{overflow:visible!important}
         function openRejectModal(b, e) {
             e.stopPropagation();
             activeRow = b.closest('tr');
+            // Clear previous rejection reason
+            document.getElementById('reject-reason-textarea').value = '';
             document.getElementById('reject_modal').showModal();
         }
 
@@ -1563,9 +1579,22 @@ table{overflow:visible!important}
             document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
+                    var reasonTextarea = document.getElementById('reject-reason-textarea');
+                    var reason = reasonTextarea.value.trim();
+                    
+                    // Validate that a reason is provided
+                    if (!reason) {
+                        showToast('Please provide a reason for rejection.', 'error');
+                        reasonTextarea.focus();
+                        return;
+                    }
                     
                     try {
-                        // Make API call to reject the submission
+                        // Disable button to prevent double submission
+                        this.disabled = true;
+                        this.textContent = 'Rejecting...';
+                        
+                        // Make API call to reject the submission with reason
                         const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/reject`, {
                             method: 'POST',
                             headers: {
@@ -1574,7 +1603,8 @@ table{overflow:visible!important}
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                                 'X-Requested-With': 'XMLHttpRequest'
                             },
-                            credentials: 'same-origin'
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ reason: reason })
                         });
                         
                         const data = await response.json();
@@ -1582,6 +1612,7 @@ table{overflow:visible!important}
                         if (data.success) {
                             showToast('Submission has been rejected.', 'success');
                             document.getElementById('reject_modal').close();
+                            reasonTextarea.value = ''; // Clear the textarea
                             activeRow = null;
                             
                             // Reload submissions to get fresh data from database
@@ -1594,6 +1625,10 @@ table{overflow:visible!important}
                     } catch (error) {
                         console.error('Error rejecting submission:', error);
                         showToast('Failed to reject submission. Please try again.', 'error');
+                    } finally {
+                        // Re-enable button and restore text
+                        this.disabled = false;
+                        this.textContent = 'Yes, reject';
                     }
                 }
             });

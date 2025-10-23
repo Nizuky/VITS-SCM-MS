@@ -19,34 +19,38 @@ class SuperAdminDashboardController extends Controller
     public function getDashboardStats()
     {
         try {
-            $weekAgo = Carbon::now()->subDays(7);
+            $now = Carbon::now();
+            $startOfMonth = $now->copy()->startOfMonth(); // First day of current month
+            $endOfMonth = $now->copy()->endOfMonth(); // Last day of current month
             
             // Count verified submissions waiting for approval (all time)
             $pending = SocialContractRecord::where('status', 'Verified')->count();
             
-            // Count approved submissions this week
-            $approvedThisWeek = SocialContractRecord::where('status', 'Approved')
-                ->where('updated_at', '>=', $weekAgo)
+            // Count approved submissions this month
+            $approvedThisMonth = SocialContractRecord::where('status', 'Approved')
+                ->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
                 ->count();
             
-            // Count rejected submissions this week
-            $rejectedThisWeek = SocialContractRecord::where('status', 'Rejected')
-                ->where('updated_at', '>=', $weekAgo)
+            // Count rejected submissions this month
+            $rejectedThisMonth = SocialContractRecord::where('status', 'Rejected')
+                ->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
                 ->count();
             
             Log::info('SuperAdmin Dashboard Stats', [
                 'pending' => $pending,
-                'approved_this_week' => $approvedThisWeek,
-                'rejected_this_week' => $rejectedThisWeek,
-                'week_ago' => $weekAgo->toDateTimeString()
+                'approved_this_month' => $approvedThisMonth,
+                'rejected_this_month' => $rejectedThisMonth,
+                'start_of_month' => $startOfMonth->toDateTimeString(),
+                'end_of_month' => $endOfMonth->toDateTimeString(),
+                'now' => $now->toDateTimeString()
             ]);
             
             return response()->json([
                 'success' => true,
                 'data' => [
                     'pending' => $pending,
-                    'approved_this_week' => $approvedThisWeek,
-                    'rejected_this_week' => $rejectedThisWeek
+                    'approved_this_week' => $approvedThisMonth, // Keep same key for frontend compatibility
+                    'rejected_this_week' => $rejectedThisMonth  // Keep same key for frontend compatibility
                 ]
             ]);
         } catch (\Exception $e) {
@@ -388,9 +392,10 @@ class SuperAdminDashboardController extends Controller
                     $approval->rejection_reason = $reason;
                     $approval->save();
                     
-                    // Update the original record status
+                    // Update the original record status and rejection reason
                     if ($approval->socialContractRecord) {
                         $approval->socialContractRecord->status = 'Rejected';
+                        $approval->socialContractRecord->rejection_reason = $reason;
                         $approval->socialContractRecord->save();
                     }
                     

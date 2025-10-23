@@ -244,6 +244,20 @@
         .step-circle.rejected {
             background-color: #EF4444;
             color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .step-circle.rejected:hover {
+            background-color: #DC2626;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+        
+        .step-circle.rejected:active {
+            transform: scale(1.05);
         }
         
         .step-circle.pending {
@@ -1126,6 +1140,41 @@
         </form>
     </dialog>
 
+    <!-- Rejection Reason Modal -->
+    <dialog id="rejection_reason_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-gradient-rejected p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-text-header">Rejection Reason</h3>
+                    <p class="text-sm text-text-muted">Why this submission was rejected</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p class="text-sm text-gray-900 dark:text-black whitespace-pre-wrap" id="rejection-reason-text">
+                    <!-- Rejection reason will be injected here -->
+                </p>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <p class="text-xs text-text-muted">Please review and correct the issues mentioned above before resubmitting.</p>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 
 
     <!-- DaisyUI toast root (bottom-right) -->
@@ -1431,6 +1480,12 @@
             function toggleRecordDetails(record, rowElement) {
                 const recordId = record.id;
                 
+                // Debug: log rejection reason if status is rejected
+                if (record.status === 'Rejected') {
+                    console.log('Rejected record:', record);
+                    console.log('Rejection reason:', record.rejection_reason);
+                }
+                
                 // If clicking the same row, collapse it
                 if (currentExpandedRecordId === recordId) {
                     const existingDetailsRow = document.querySelector(`tr[data-details-for="${recordId}"]`);
@@ -1488,7 +1543,7 @@
                     // Determine if rejected at step 2 or 3
                     // For now, assume rejection at step 2
                     step2Class = 'rejected';
-                    step2Icon = '2';
+                    step2Icon = '✕';
                     step2Label = 'Rejected';
                     connector1Class = 'completed';
                 }
@@ -1503,7 +1558,9 @@
                                 <div class="step-sublabel">${normalizeDateString(record.date)}</div>
                             </div>
                             <div class="step-item">
-                                <div class="step-circle ${step2Class}">${step2Icon}</div>
+                                <div class="step-circle ${step2Class}" 
+                                     ${record.status === 'Rejected' && record.rejection_reason ? 'data-rejection-reason="' + (record.rejection_reason || '').replace(/"/g, '&quot;') + '" style="cursor: pointer;"' : ''} 
+                                     title="${record.status === 'Rejected' ? 'Click to view rejection reason' : ''}">${step2Icon}</div>
                                 <div class="step-connector ${connector2Class}"></div>
                                 <div class="step-label">Admin Review</div>
                                 <div class="step-sublabel">${step2Label}</div>
@@ -1520,6 +1577,28 @@
                 // Insert after the clicked row
                 rowElement.insertAdjacentElement('afterend', detailsRow);
                 currentExpandedRecordId = recordId;
+                
+                // Add click event listener for rejected status
+                if (record.status === 'Rejected') {
+                    console.log('Setting up click listener for rejected record');
+                    console.log('Has rejection reason:', !!record.rejection_reason);
+                    
+                    const rejectedCircle = detailsRow.querySelector('.step-circle.rejected');
+                    console.log('Found rejected circle:', !!rejectedCircle);
+                    
+                    if (rejectedCircle) {
+                        rejectedCircle.style.cursor = 'pointer';
+                        rejectedCircle.addEventListener('click', function(e) {
+                            console.log('Rejected circle clicked!');
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const reason = record.rejection_reason || 'No specific reason provided.';
+                            console.log('Calling showRejectionReason with:', reason);
+                            showRejectionReason(reason);
+                        });
+                        console.log('Click listener attached successfully');
+                    }
+                }
             }
             
             // Show status modal with filtered records
@@ -1602,6 +1681,35 @@
             
             // Make showStatusModal globally accessible
             window.showStatusModal = showStatusModal;
+            
+            // Function to show rejection reason modal
+            function showRejectionReason(reason) {
+                console.log('showRejectionReason called with:', reason);
+                const modal = document.getElementById('rejection_reason_modal');
+                const reasonText = document.getElementById('rejection-reason-text');
+                
+                if (!modal) {
+                    console.error('rejection_reason_modal not found');
+                    return;
+                }
+                
+                if (!reasonText) {
+                    console.error('rejection-reason-text element not found');
+                    return;
+                }
+                
+                if (reason && reason.trim()) {
+                    reasonText.textContent = reason;
+                } else {
+                    reasonText.textContent = 'No specific reason provided.';
+                }
+                
+                console.log('Opening modal...');
+                modal.showModal();
+            }
+            
+            // Make it globally accessible
+            window.showRejectionReason = showRejectionReason;
             
             function renderTable() {
                 tableBody.innerHTML = '';

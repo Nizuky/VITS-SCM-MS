@@ -20,6 +20,7 @@ class SocialContractRecord extends Model
         'organization',
         'hours_rendered',
         'status',
+        'rejection_reason',
     ];
 
     protected $casts = [

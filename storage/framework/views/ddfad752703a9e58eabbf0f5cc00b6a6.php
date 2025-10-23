@@ -284,8 +284,8 @@ body{font-family:'Inter',sans-serif}
                 <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
-                            <p class="text-sm text-text-muted">Contract requests overview for this week</p>
+                            <h2 class="text-xl font-bold text-text-header mb-1">Monthly Summary</h2>
+                            <p class="text-sm text-text-muted">Contract requests overview for this month</p>
                         </div>
                         <button onclick="loadDashboardStats(); generateActivityCalendar();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -295,7 +295,7 @@ body{font-family:'Inter',sans-serif}
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Pending Requests -->
+                        <!-- Pending Requests (Verified awaiting Super Admin approval) -->
                         <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -304,12 +304,12 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="pending-requests-count">0</span> Requests</h3>
-                                <p class="text-yellow-800 font-semibold">Pending This Week</p>
+                                <p class="text-yellow-800 font-semibold">Pending</p>
                                 <p class="text-xs text-text-muted mt-1">Awaiting review</p>
                             </div>
                         </div>
                         
-                        <!-- Accepted Requests -->
+                        <!-- Approved Requests -->
                         <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Approved')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -318,7 +318,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-green-800 font-semibold">Approved This Week</p>
+                                <p class="text-green-800 font-semibold">Approved This Month</p>
                                 <p class="text-xs text-text-muted mt-1">Successfully verified</p>
                             </div>
                         </div>
@@ -332,7 +332,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="rejected-requests-count">0</span> Requests</h3>
-                                <p class="text-red-800 font-semibold">Rejected This Week</p>
+                                <p class="text-red-800 font-semibold">Rejected This Month</p>
                                 <p class="text-xs text-text-muted mt-1">Requires corrections</p>
                             </div>
                         </div>
@@ -729,13 +729,21 @@ body{font-family:'Inter',sans-serif}
     <!-- Reject Modal with Reason -->
     <dialog id="reject_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg">Reject Submission</h3>
-            <p class="py-4">Please provide a reason for rejecting this submission. The student will be notified.</p>
-            <textarea id="rejection-reason" class="textarea textarea-bordered w-full" placeholder="Reason for rejection..." rows="4"></textarea>
+            <h3 class="font-bold text-lg text-text-header">Reject Submission</h3>
+            <p class="py-4 text-text-body">Please provide a reason for rejecting this submission. The student will be notified.</p>
+            
+            <div class="form-control">
+                <textarea 
+                    id="reject-reason-textarea" 
+                    class="textarea textarea-bordered h-32 resize-none focus:outline-none focus:border-primary-purple" 
+                    placeholder="Reason for rejection..."
+                    required></textarea>
+            </div>
+            
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                    <button class="btn btn-ghost">Cancel</button>
+                    <button id="confirm-reject-btn" type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                         Yes, reject
                     </button>
                 </form>
@@ -1343,21 +1351,26 @@ body{font-family:'Inter',sans-serif}
             var totalCount = document.getElementById('status-modal-total');
             var totalHours = document.getElementById('status-modal-hours');
             
-            // Filter records by status (this week only)
+            // Filter records by status
+            // Verified (Pending for super admin): Show all verified (no date filter)
+            // Approved/Rejected: Show only this month (resets at end of month)
             var now = new Date();
-            var weekAgo = new Date(now);
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // First day of current month
+            var endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // Last day of current month
             
             var filteredRecords = allSubmissions.filter(function(r) {
                 var recordDate = new Date(r.updated_at || r.created_at);
-                var isThisWeek = recordDate >= weekAgo && recordDate <= now;
+                var isThisMonth = recordDate >= startOfMonth && recordDate <= endOfMonth;
                 
                 if (status === 'Verified') {
+                    // Show ALL verified requests (no time restriction)
                     return r.status === 'Verified';
                 } else if (status === 'Approved') {
-                    return r.status === 'Approved' && isThisWeek;
+                    // Show only approved requests from this month
+                    return r.status === 'Approved' && isThisMonth;
                 } else if (status === 'Rejected') {
-                    return r.status === 'Rejected' && isThisWeek;
+                    // Show only rejected requests from this month
+                    return r.status === 'Rejected' && isThisMonth;
                 }
                 return false;
             });
@@ -1375,12 +1388,12 @@ body{font-family:'Inter',sans-serif}
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
                 bgColorClass = 'bg-gradient-accepted';
                 modalTitle.textContent = filteredRecords.length + ' Approved Requests';
-                modalSubtitle.textContent = 'All approved requests this week';
+                modalSubtitle.textContent = 'All approved requests this month';
             } else if (status === 'Rejected') {
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
                 bgColorClass = 'bg-gradient-rejected';
                 modalTitle.textContent = filteredRecords.length + ' Rejected Requests';
-                modalSubtitle.textContent = 'All rejected requests this week';
+                modalSubtitle.textContent = 'All rejected requests this month';
             }
             
             modalIcon.innerHTML = iconSvg;
@@ -1456,6 +1469,8 @@ body{font-family:'Inter',sans-serif}
         function openRejectModal(b, e) {
             e.stopPropagation();
             activeRow = b.closest('tr');
+            // Clear previous rejection reason
+            document.getElementById('reject-reason-textarea').value = '';
             document.getElementById('reject_modal').showModal();
         }
 
@@ -2071,16 +2086,23 @@ body{font-family:'Inter',sans-serif}
             document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
-                    var reason = document.getElementById('rejection-reason').value;
+                    var reasonTextarea = document.getElementById('reject-reason-textarea');
+                    var reason = reasonTextarea.value.trim();
                     
-                    if (!reason.trim()) {
+                    // Validate that a reason is provided
+                    if (!reason) {
                         showToast('Please provide a reason for rejection.', 'error');
+                        reasonTextarea.focus();
                         return;
                     }
                     
                     console.log('Rejecting submission with ID:', recordId, 'Reason:', reason);
                     
                     try {
+                        // Disable button to prevent double submission
+                        this.disabled = true;
+                        this.textContent = 'Rejecting...';
+                        
                         await ensureCsrfCookie();
                         const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/reject`, {
                             method: 'POST',
@@ -2101,12 +2123,14 @@ body{font-family:'Inter',sans-serif}
                         
                         if (data.success) {
                             showToast('Submission has been rejected.', 'success');
-                            document.getElementById('rejection-reason').value = '';
+                            reasonTextarea.value = ''; // Clear the textarea
                             document.getElementById('reject_modal').close();
                             activeRow = null;
                             
                             // Reload to update stats and table
                             loadSubmissions();
+                            generateActivityCalendar(); // Refresh calendar
+                            loadDashboardStats(); // Refresh stats
                         } else {
                             console.error('Rejection failed:', data);
                             showToast(data.message || 'Failed to reject submission.', 'error');
@@ -2114,6 +2138,10 @@ body{font-family:'Inter',sans-serif}
                     } catch (error) {
                         console.error('Error rejecting submission:', error);
                         showToast('Failed to reject submission. Please try again.', 'error');
+                    } finally {
+                        // Re-enable button and restore text
+                        this.disabled = false;
+                        this.textContent = 'Yes, reject';
                     }
                 }
             });
