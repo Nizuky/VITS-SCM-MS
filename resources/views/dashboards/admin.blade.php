@@ -145,14 +145,28 @@ table{overflow:visible!important}
 @php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
     $fullName = trim(auth('admin')->user()->name ?? 'Admin');
-    $nameWords = $fullName !== '' ? preg_split('/\s+/', $fullName) : [];
+    
+    // Check if name starts with "admin" (case-insensitive)
     $initials = '';
-    if (!empty($nameWords)) {
-        $initials = mb_strtoupper(mb_substr($nameWords[0], 0, 1));
-        if (isset($nameWords[1]) && mb_strlen($nameWords[1]) > 0) {
-            $initials .= mb_strtoupper(mb_substr($nameWords[1], 0, 1));
+    if (preg_match('/^admin(.+)/i', $fullName, $matches)) {
+        // Extract the part after "admin"
+        $afterAdmin = trim($matches[1]);
+        if (!empty($afterAdmin)) {
+            $initials = mb_strtoupper(mb_substr($afterAdmin, 0, 1));
         }
     }
+    
+    // Fallback: use standard first letter logic if no "admin" prefix
+    if (!$initials) {
+        $nameWords = $fullName !== '' ? preg_split('/\s+/', $fullName) : [];
+        if (!empty($nameWords)) {
+            $initials = mb_strtoupper(mb_substr($nameWords[0], 0, 1));
+            if (isset($nameWords[1]) && mb_strlen($nameWords[1]) > 0) {
+                $initials .= mb_strtoupper(mb_substr($nameWords[1], 0, 1));
+            }
+        }
+    }
+    
     if (!$initials)
         $initials = 'AD';
 @endphp
@@ -278,7 +292,7 @@ table{overflow:visible!important}
                             <h2 class="text-xl font-bold text-text-header mb-1">Weekly Summary</h2>
                             <p class="text-sm text-text-muted">Contract requests overview for this week</p>
                         </div>
-                        <button onclick="loadDashboardStats(); loadActivityData();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
+                        <button onclick="loadDashboardStats(); generateActivityCalendar();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
@@ -287,7 +301,7 @@ table{overflow:visible!important}
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Pending Requests -->
-                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Pending')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -301,7 +315,7 @@ table{overflow:visible!important}
                         </div>
                         
                         <!-- Accepted Requests -->
-                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -315,7 +329,7 @@ table{overflow:visible!important}
                         </div>
                         
                         <!-- Rejected Requests -->
-                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Rejected')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -337,16 +351,27 @@ table{overflow:visible!important}
                             <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
                             <p class="text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
                         </div>
-                        <div class="flex items-center gap-3 text-xs">
-                            <span class="text-text-muted">Less</span>
-                            <div class="flex gap-1">
-                                <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#6D28D9]" title="7+ updates"></div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="text-text-muted">Less</span>
+                                <div class="flex gap-1">
+                                     <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#6D28D9]" title="7+ updates"></div>
+                                </div>
+                                <span class="text-text-muted">More</span>
                             </div>
-                            <span class="text-text-muted">More</span>
+                            <div class="flex items-center gap-2">
+                                <button id="calendar-prev-year" onclick="changeCalendarYear(-1)" class="btn btn-sm btn-circle btn-ghost">
+                                    ←
+                                </button>
+                                <span id="calendar-year" class="text-sm font-semibold min-w-[3rem] text-center">2025</span>
+                                <button id="calendar-next-year" onclick="changeCalendarYear(1)" class="btn btn-sm btn-circle btn-ghost">
+                                    →
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div id="activity-calendar" class="overflow-x-auto pb-2">
@@ -459,9 +484,31 @@ table{overflow:visible!important}
                 </div>
                 
                 <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-                    <h2 class="text-xl font-bold text-text-header mb-6">Change Password</h2>
-                    
-                    <form id="password-change-form" class="space-y-4 max-w-md">
+                    <!-- Change Name Section -->
+                    <div class="border-b border-gray-200 pb-6">
+                        <h2 class="text-xl font-bold text-text-header mb-4">Change Name</h2>
+                        <form id="name-change-form" class="space-y-4 max-w-md">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text font-semibold">Full Name</span>
+                                </div>
+                                <input id="admin-name" type="text" value="{{ auth()->guard('admin')->user()->name }}" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
+                            </label>
+                            
+                            <div class="pt-4 flex justify-end">
+                                <button type="button" id="save-name-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
+                                    Update Name
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Password Section -->
+                    <div>
+                        <h2 class="text-xl font-bold text-text-header mb-4">Change Password</h2>
+                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong>{{ auth()->guard('admin')->user()->email }}</strong> to confirm your password change.</p>
+                        
+                        <form id="password-change-form" class="space-y-4 max-w-md">
                         <!-- Current Password -->
                         <label class="form-control w-full">
                             <div class="label">
@@ -512,16 +559,48 @@ table{overflow:visible!important}
 
                         <div class="pt-4 flex justify-end">
                             <button type="button" id="save-password-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
-                                Save Changes
+                                Request Password Change
                             </button>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
     <!-- Modals -->
+    <!-- Activity Details Modal -->
+    <!-- Activity Details Modal -->
+    <dialog id="activity_details_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date-header"></span></h3>
+            
+            <div id="activity-details-content" class="space-y-3">
+                <!-- Activity details will be loaded here -->
+            </div>
+            
+            <div id="activity-loading" class="text-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary-purple"></span>
+                <p class="mt-2 text-text-muted">Loading activities...</p>
+            </div>
+            
+            <div id="activity-no-data" class="text-center py-8 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="mt-4 text-text-muted">No activity recorded on this date</p>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+    
     <!-- Verify Modal -->
     <dialog id="verify_modal" class="modal">
         <div class="modal-box">
@@ -548,22 +627,6 @@ table{overflow:visible!important}
                     <button class="btn">Cancel</button>
                     <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                         Yes, reject
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Save Password Modal -->
-    <dialog id="save_password_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Save Changes?</h3>
-            <p class="py-4">Are you sure you want to save the new password?</p>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-save-password-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Yes, save
                     </button>
                 </form>
             </div>
@@ -623,6 +686,71 @@ table{overflow:visible!important}
             
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
         </div>
+    </dialog>
+
+    <!-- Status Records Modal -->
+    <dialog id="status_records_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-5xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div id="status-modal-icon" class="bg-white p-3 rounded-full">
+                    <!-- Icon will be injected here -->
+                </div>
+                <div>
+                    <h3 class="font-bold text-2xl text-text-header" id="status-modal-title">Records</h3>
+                    <p class="text-sm text-text-muted" id="status-modal-subtitle">Showing all records with this status this week</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <!-- Records Table -->
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-200">
+                            <th class="text-center">Student ID</th>
+                            <th class="text-center">Student Name</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Event Name</th>
+                            <th class="text-center">Venue</th>
+                            <th class="text-center">Hours</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="status-modal-table-body">
+                        <!-- Records will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="status-modal-empty" class="hidden text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="text-gray-500 text-lg font-semibold">No records found</p>
+                <p class="text-gray-400 text-sm mt-2">There are no records with this status this week.</p>
+            </div>
+            
+            <!-- Summary Footer -->
+            <div class="bg-base-200 rounded-lg p-4 mt-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-text-muted">Total Records</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-total">0</p>
+                </div>
+                <div>
+                    <p class="text-sm text-text-muted">Total Hours</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-hours">0 hours</p>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
     </dialog>
 
     <!-- Toast Container -->
@@ -857,6 +985,112 @@ table{overflow:visible!important}
                 document.getElementById('pending-requests-label').textContent = pending;
             }
         }
+
+        // Show status modal with filtered records
+        window.showStatusModal = function(status) {
+            var modal = document.getElementById('status_records_modal');
+            var modalTitle = document.getElementById('status-modal-title');
+            var modalSubtitle = document.getElementById('status-modal-subtitle');
+            var modalIcon = document.getElementById('status-modal-icon');
+            var tableBody = document.getElementById('status-modal-table-body');
+            var emptyState = document.getElementById('status-modal-empty');
+            var totalCount = document.getElementById('status-modal-total');
+            var totalHours = document.getElementById('status-modal-hours');
+            
+            // Filter records by status (this week only)
+            var now = new Date();
+            var weekAgo = new Date(now);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            var filteredRecords = allSubmissions.filter(function(r) {
+                var recordDate = new Date(r.updated_at || r.created_at);
+                var isThisWeek = recordDate >= weekAgo && recordDate <= now;
+                
+                if (status === 'Pending') {
+                    return r.status === 'Pending';
+                } else if (status === 'Verified') {
+                    return r.status === 'Verified' && isThisWeek;
+                } else if (status === 'Rejected') {
+                    return r.status === 'Rejected' && isThisWeek;
+                }
+                return false;
+            });
+            
+            // Update modal header based on status
+            var iconSvg = '';
+            var bgColorClass = '';
+            
+            if (status === 'Pending') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                bgColorClass = 'bg-gradient-pending';
+                modalTitle.textContent = filteredRecords.length + ' Pending Requests';
+                modalSubtitle.textContent = 'All pending social contract requests awaiting review';
+            } else if (status === 'Verified') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+                bgColorClass = 'bg-gradient-accepted';
+                modalTitle.textContent = filteredRecords.length + ' Verified Requests';
+                modalSubtitle.textContent = 'All verified requests this week';
+            } else if (status === 'Rejected') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
+                bgColorClass = 'bg-gradient-rejected';
+                modalTitle.textContent = filteredRecords.length + ' Rejected Requests';
+                modalSubtitle.textContent = 'All rejected requests this week';
+            }
+            
+            modalIcon.innerHTML = iconSvg;
+            modalIcon.className = bgColorClass + ' p-3 rounded-full flex items-center justify-center';
+            
+            // Clear table body
+            tableBody.innerHTML = '';
+            
+            // Calculate total hours
+            var hours = filteredRecords.reduce(function(sum, r) {
+                return sum + (parseInt(r.hours_rendered) || 0);
+            }, 0);
+            
+            if (filteredRecords.length === 0) {
+                // Show empty state
+                emptyState.classList.remove('hidden');
+                tableBody.closest('.overflow-x-auto').classList.add('hidden');
+            } else {
+                // Hide empty state and show table
+                emptyState.classList.add('hidden');
+                tableBody.closest('.overflow-x-auto').classList.remove('hidden');
+                
+                // Populate table
+                filteredRecords.forEach(function(rec) {
+                    var row = document.createElement('tr');
+                    var statusBadge = '';
+                    
+                    if (rec.status === 'Pending') {
+                        statusBadge = '<span class="badge badge-warning text-white">Pending</span>';
+                    } else if (rec.status === 'Verified') {
+                        statusBadge = '<span class="badge badge-info text-white">Verified</span>';
+                    } else if (rec.status === 'Rejected') {
+                        statusBadge = '<span class="badge badge-error text-white">Rejected</span>';
+                    } else if (rec.status === 'Approved') {
+                        statusBadge = '<span class="badge badge-success text-white">Approved</span>';
+                    }
+                    
+                    row.innerHTML = 
+                        '<td class="text-center">' + (rec.student_id || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.student_name || '-') + '</td>' +
+                        '<td class="text-center">' + formatDate(rec.date) + '</td>' +
+                        '<td class="text-center">' + (rec.event_name || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.venue || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="text-center">' + statusBadge + '</td>';
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Update summary
+            totalCount.textContent = filteredRecords.length;
+            totalHours.textContent = hours + ' hours';
+            
+            // Show modal
+            modal.showModal();
+        };
 
         // Toast notification function
         function showToast(m, t) {
@@ -1216,7 +1450,7 @@ table{overflow:visible!important}
             initThemeToggle();
             attachLogoutHandler();
             loadDashboardStats(); // Load dashboard statistics
-            loadActivityData(); // Load activity calendar with API data
+            generateActivityCalendar(); // Load activity calendar with API data
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
             
@@ -1313,7 +1547,7 @@ table{overflow:visible!important}
                             
                             // Reload submissions to get fresh data from database
                             loadSubmissions();
-                            loadActivityData(); // Refresh calendar to show new activity
+                            generateActivityCalendar(); // Refresh calendar to show new activity
                             loadDashboardStats(); // Refresh dashboard statistics
                         } else {
                             showToast(data.message || 'Failed to verify submission.', 'error');
@@ -1352,7 +1586,7 @@ table{overflow:visible!important}
                             
                             // Reload submissions to get fresh data from database
                             loadSubmissions();
-                            loadActivityData(); // Refresh calendar to show new activity
+                            generateActivityCalendar(); // Refresh calendar to show new activity
                             loadDashboardStats(); // Refresh dashboard statistics
                         } else {
                             showToast(data.message || 'Failed to reject submission.', 'error');
@@ -1377,59 +1611,223 @@ table{overflow:visible!important}
                 }
             });
             
-            // Password change handlers
-            var spb = document.getElementById('save-password-button');
-            var spm = document.getElementById('save_password_modal');
-            var csp = document.getElementById('confirm-save-password-btn');
-            var pcf = document.getElementById('password-change-form');
-            
-            spb.addEventListener('click', function(e) {
+            // Name change handler
+            var snb = document.getElementById('save-name-button');
+            snb.addEventListener('click', async function(e) {
                 e.preventDefault();
-                if (pcf.checkValidity()) {
-                    spm.showModal();
-                } else {
-                    pcf.reportValidity();
+                var nameInput = document.getElementById('admin-name');
+                var newName = nameInput.value.trim();
+                
+                if (!newName) {
+                    showToast('Please enter a valid name.', 'error');
+                    return;
+                }
+                
+                try {
+                    snb.disabled = true;
+                    snb.textContent = 'Updating...';
+                    
+                    var response = await fetch(`${BASE_PATH}/admin/api/settings/update-name`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ name: newName })
+                    });
+                    
+                    var data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showToast(data.message || 'Name updated successfully!', 'success');
+                        // Update the name in the sidebar
+                        location.reload();
+                    } else {
+                        showToast(data.message || 'Failed to update name.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error updating name:', error);
+                    showToast('Failed to update name. Please try again.', 'error');
+                } finally {
+                    snb.disabled = false;
+                    snb.textContent = 'Update Name';
                 }
             });
             
-            csp.addEventListener('click', function() {
-                pcf.reset();
-                spm.close();
-                showToast('Your password has been updated.', 'success');
+            // Password change handler with email verification
+            var spb = document.getElementById('save-password-button');
+            var pcf = document.getElementById('password-change-form');
+            
+            spb.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                if (!pcf.checkValidity()) {
+                    pcf.reportValidity();
+                    return;
+                }
+                
+                var currentPassword = document.getElementById('current-password').value;
+                var newPassword = document.getElementById('new-password').value;
+                var confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (newPassword !== confirmPassword) {
+                    showToast('New password and confirm password do not match.', 'error');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    showToast('New password must be at least 8 characters long.', 'error');
+                    return;
+                }
+                
+                try {
+                    spb.disabled = true;
+                    spb.textContent = 'Sending...';
+                    
+                    var response = await fetch(`${BASE_PATH}/admin/api/settings/request-password-change`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            current_password: currentPassword,
+                            new_password: newPassword,
+                            new_password_confirmation: confirmPassword
+                        })
+                    });
+                    
+                    var data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showToast(data.message, 'success');
+                        pcf.reset();
+                    } else {
+                        showToast(data.message || 'Failed to process password change request.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error requesting password change:', error);
+                    showToast('Failed to process password change request. Please try again.', 'error');
+                } finally {
+                    spb.disabled = false;
+                    spb.textContent = 'Request Password Change';
+                }
             });
             
             // Auto-refresh removed - use manual refresh buttons instead
         });
 
-        // Generate Activity Calendar (GitHub-style)
+        // Calendar year management
+        var currentCalendarYear = new Date().getFullYear();
+        var activityDataCache = {}; // Cache for activity data by year
+
+        // Generate Activity Calendar (GitHub-style) - Year-based (Jan-Dec)
         function generateActivityCalendar() {
             var container = document.getElementById('activity-calendar');
             if (!container) return;
             
-            // TODO: Replace with actual API call to get admin activity data
-            // Expected format: { "2024-10-22": 3, "2024-10-23": 1, ... }
-            // For now, generate sample data
-            var today = new Date();
-            var yearAgo = new Date(today);
-            yearAgo.setFullYear(today.getFullYear() - 1);
+            // Update year display
+            document.getElementById('calendar-year').textContent = currentCalendarYear;
             
-            // Sample activity data - will be replaced with API call
-            var activityData = generateSampleActivityData(yearAgo, today);
-            
-            // Get color based on activity level
-            function getColor(level) {
-                var colors = ['#E5E7EB', '#E5D4FF', '#C9A9FF', '#A475FF', '#6D28D9'];
-                return colors[Math.min(level, 4)] || colors[0];
+            // Disable next button if viewing current year
+            var nextBtn = document.getElementById('calendar-next-year');
+            var currentYear = new Date().getFullYear();
+            if (nextBtn) {
+                nextBtn.disabled = (currentCalendarYear >= currentYear);
+                if (nextBtn.disabled) {
+                    nextBtn.classList.add('btn-disabled');
+                } else {
+                    nextBtn.classList.remove('btn-disabled');
+                }
             }
             
-            // Calculate weeks to display
-            var startDate = new Date(yearAgo);
-            startDate.setDate(startDate.getDate() - startDate.getDay()); // Start from Sunday
+            // Load activity data for the year
+            loadActivityDataForYear(currentCalendarYear, function(activityData) {
+                var startDate = new Date(currentCalendarYear, 0, 1); // Jan 1
+                var endDate = new Date(currentCalendarYear, 11, 31); // Dec 31
+                var today = new Date();
+                
+                renderCalendar(startDate, endDate, today, activityData);
+            });
+        }
+
+        // Load activity data from API for a specific year
+        function loadActivityDataForYear(year, callback) {
+            // Check cache first
+            if (activityDataCache[year]) {
+                callback(activityDataCache[year]);
+                return;
+            }
+            
+            // Show loading state
+            var container = document.getElementById('activity-calendar');
+            if (container) {
+                container.innerHTML = '<div class="text-center text-text-muted py-8">Loading calendar...</div>';
+            }
+            
+            // Fetch from API
+            fetch(`${BASE_PATH}/admin/api/activity-calendar?year=` + year, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                console.log('Activity calendar response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status + ' ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                console.log('Activity calendar result:', result);
+                if (result.success) {
+                    var activityData = result.data || {};
+                    activityDataCache[year] = activityData; // Cache the data
+                    callback(activityData);
+                } else {
+                    throw new Error(result.message || 'Failed to load activity data');
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to load activity calendar:', error);
+                if (container) {
+                    container.innerHTML = '<div class="text-center text-error py-8">Failed to load calendar: ' + error.message + '</div>';
+                }
+            });
+        }
+
+        // Render the calendar grid
+        function renderCalendar(startDate, endDate, today, activityData) {
+            var container = document.getElementById('activity-calendar');
+            if (!container) return;
+            
+            // Get color based on activity level (purple palette)
+            function getColor(level) {
+                if (level === 0) return '#e5e7eb'; // No activity (gray-200)
+                if (level <= 2) return '#E5D4FF'; // Low (light purple)
+                if (level <= 4) return '#C9A9FF'; // Medium-low (medium purple)
+                if (level <= 6) return '#A475FF'; // Medium-high (darker purple)
+                return '#6D28D9'; // High (darkest purple - 7+)
+            }
+            
+            // Calculate weeks to display (always start from Jan 1, end at Dec 31)
+            var firstDay = new Date(startDate);
+            firstDay.setDate(firstDay.getDate() - firstDay.getDay()); // Start from Sunday before Jan 1
             
             var weeks = [];
-            var currentWeek = new Date(startDate);
+            var currentWeek = new Date(firstDay);
+            var lastDay = new Date(endDate);
+            lastDay.setDate(lastDay.getDate() + (6 - lastDay.getDay())); // End on Saturday after Dec 31
             
-            while (currentWeek <= today) {
+            while (currentWeek <= lastDay) {
                 var week = [];
                 for (var i = 0; i < 7; i++) {
                     var date = new Date(currentWeek);
@@ -1446,7 +1844,6 @@ table{overflow:visible!important}
             // Day labels column
             html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
             var days = ['Mon', 'Wed', 'Fri'];
-            var dayIndices = [1, 3, 5];
             for (var d = 0; d < 3; d++) {
                 html += '<div class="h-3 leading-3">' + days[d] + '</div>';
             }
@@ -1463,7 +1860,7 @@ table{overflow:visible!important}
             
             for (var w = 0; w < weeks.length; w++) {
                 var weekMonth = weeks[w][0].getMonth();
-                if (weekMonth !== lastMonth && w > 0) {
+                if (weekMonth !== lastMonth) {
                     monthPositions.push({ week: w, month: weekMonth });
                     lastMonth = weekMonth;
                 }
@@ -1479,7 +1876,7 @@ table{overflow:visible!important}
             }
             html += '</div>';
             
-            // Grid rows (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+            // Grid rows (Sun through Sat)
             for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
                 html += '<div class="flex gap-1 mb-1">';
                 
@@ -1491,18 +1888,22 @@ table{overflow:visible!important}
                     
                     var isToday = date.toDateString() === today.toDateString();
                     var isFuture = date > today;
+                    var isInRange = date >= startDate && date <= endDate;
                     
                     var title = dateStr;
-                    if (!isFuture) {
+                    if (!isFuture && isInRange) {
                         title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
                     } else {
                         title += ': No data';
                     }
                     
                     var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
-                    var opacity = isFuture ? 'opacity-30' : '';
+                    var opacity = (!isInRange || isFuture) ? 'opacity-30' : '';
+                    var clickable = (level > 0 && !isFuture && isInRange) ? 'cursor-pointer' : 'cursor-default';
+                    var onclick = (level > 0 && !isFuture && isInRange) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '';
                     
-                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 cursor-pointer ' + borderClass + ' ' + opacity + '" ' +
+                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:scale-110 ' + borderClass + ' ' + opacity + ' ' + clickable + '" ' +
+                            onclick + ' ' +
                             'style="background-color: ' + color + ';" ' +
                             'title="' + title + '"></div>';
                 }
@@ -1513,7 +1914,138 @@ table{overflow:visible!important}
             html += '</div></div></div>';
             container.innerHTML = html;
         }
-        
+
+        // Change calendar year
+        function changeCalendarYear(delta) {
+            var newYear = currentCalendarYear + delta;
+            var currentYear = new Date().getFullYear();
+            
+            // Don't allow future years
+            if (newYear > currentYear) {
+                return;
+            }
+            
+            currentCalendarYear = newYear;
+            generateActivityCalendar();
+        }
+
+        // Show activity details for a specific date
+        function showActivityDetails(dateStr) {
+            var modal = document.getElementById('activity_details_modal');
+            var dateHeader = document.getElementById('activity-date-header');
+            var content = document.getElementById('activity-details-content');
+            var loading = document.getElementById('activity-loading');
+            var noData = document.getElementById('activity-no-data');
+            
+            if (!modal || !dateHeader || !content || !loading || !noData) return;
+            
+            // Format date for display
+            var date = new Date(dateStr + 'T00:00:00');
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateHeader.textContent = date.toLocaleDateString('en-US', options);
+            
+            // Reset states
+            content.innerHTML = '';
+            content.classList.add('hidden');
+            loading.classList.remove('hidden');
+            noData.classList.add('hidden');
+            
+            // Open modal
+            modal.showModal();
+            
+            // Fetch activity details
+            fetch(`${BASE_PATH}/admin/api/activity-details?date=` + dateStr, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                loading.classList.add('hidden');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    content.classList.remove('hidden');
+                    var html = '';
+                    
+                    result.data.forEach(function(activity) {
+                        var time = new Date(activity.created_at);
+                        var timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                        var timeStr = time.toLocaleTimeString('en-US', timeOptions);
+                        
+                        // Badge with proper colors (verified = blue, rejected = red)
+                        var actionBadge = '';
+                        var actionText = '';
+                        if (activity.action === 'verified' || activity.action === 'verified_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-info text-white">Verified</span>';
+                            actionText = 'Verified';
+                        } else if (activity.action === 'rejected' || activity.action === 'rejected_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-error text-white">Rejected</span>';
+                            actionText = 'Rejected';
+                        }
+                        
+                        html += '<div class="bg-base-100 rounded-lg p-4 border border-base-300 hover:shadow-md transition-shadow">';
+                        html += '<div class="flex items-center justify-between mb-2">';
+                        html += '<span class="text-xs font-medium text-text-muted">' + timeStr + '</span>';
+                        html += '<div class="flex flex-col items-end gap-1">';
+                        html += actionBadge;
+                        if (activity.admin_name) {
+                            html += '<span class="text-xs text-text-muted">' + actionText + ' by Admin ' + activity.admin_name + '</span>';
+                        }
+                        html += '</div>';
+                        html += '</div>';
+                        
+                        html += '<p class="text-sm font-semibold text-text-header mb-2">' + (activity.description || 'Activity recorded') + '</p>';
+                        
+                        if (activity.student_id || activity.student_name) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />';
+                            html += '</svg>';
+                            html += '<span>';
+                            if (activity.student_id) {
+                                html += '<span class="font-medium">' + activity.student_id + '</span>';
+                            }
+                            if (activity.student_name) {
+                                html += (activity.student_id ? ' - ' : '') + activity.student_name;
+                            }
+                            html += '</span>';
+                            html += '</div>';
+                        }
+                        
+                        if (activity.venue) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted mt-1">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />';
+                            html += '</svg>';
+                            html += '<span>' + activity.venue + '</span>';
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    content.innerHTML = html;
+                } else {
+                    noData.classList.remove('hidden');
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to load activity details:', error);
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            });
+        }
+
         // Generate sample activity data (will be replaced with API call)
         function generateSampleActivityData(startDate, endDate) {
             var data = {};
@@ -1588,140 +2120,6 @@ table{overflow:visible!important}
         // Update chart with new data
         function updatePendingRequestsChart(pendingCount) {
             initPendingRequestsChart(pendingCount);
-        }
-
-        // Load Activity Calendar Data from API
-        function loadActivityData() {
-            fetch('/admin/api/activity-calendar', {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch activity data');
-                }
-                return response.json();
-            })
-            .then(result => {
-                if (result.success && result.data) {
-                    // API returns data in format: { "2024-10-22": 3, "2024-10-23": 1, ... }
-                    generateActivityCalendarWithData(result.data);
-                } else {
-                    console.warn('Invalid activity data format, using fallback');
-                    generateActivityCalendar();
-                }
-            })
-            .catch(error => {
-                console.error('Failed to load activity data:', error);
-                // Fall back to sample data
-                generateActivityCalendar();
-            });
-        }
-        
-        // Generate calendar with provided activity data
-        function generateActivityCalendarWithData(activityData) {
-            var container = document.getElementById('activity-calendar');
-            if (!container) return;
-            
-            var today = new Date();
-            var yearAgo = new Date(today);
-            yearAgo.setFullYear(today.getFullYear() - 1);
-            
-            // Use the same rendering logic but with provided data
-            // Get color based on activity level
-            function getColor(level) {
-                var colors = ['#E5E7EB', '#E5D4FF', '#C9A9FF', '#A475FF', '#6D28D9'];
-                return colors[Math.min(level, 4)] || colors[0];
-            }
-            
-            // Calculate weeks to display
-            var startDate = new Date(yearAgo);
-            startDate.setDate(startDate.getDate() - startDate.getDay());
-            
-            var weeks = [];
-            var currentWeek = new Date(startDate);
-            
-            while (currentWeek <= today) {
-                var week = [];
-                for (var i = 0; i < 7; i++) {
-                    var date = new Date(currentWeek);
-                    date.setDate(date.getDate() + i);
-                    week.push(date);
-                }
-                weeks.push(week);
-                currentWeek.setDate(currentWeek.getDate() + 7);
-            }
-            
-            // Build HTML (same as generateActivityCalendar but uses activityData parameter)
-            var html = '<div class="flex gap-2">';
-            
-            html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
-            var days = ['Mon', 'Wed', 'Fri'];
-            for (var d = 0; d < 3; d++) {
-                html += '<div class="h-3 leading-3">' + days[d] + '</div>';
-            }
-            html += '</div>';
-            
-            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
-            
-            html += '<div class="flex gap-1 mb-2">';
-            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            var lastMonth = -1;
-            var monthPositions = [];
-            
-            for (var w = 0; w < weeks.length; w++) {
-                var weekMonth = weeks[w][0].getMonth();
-                if (weekMonth !== lastMonth && w > 0) {
-                    monthPositions.push({ week: w, month: weekMonth });
-                    lastMonth = weekMonth;
-                }
-            }
-            
-            for (var w = 0; w < weeks.length; w++) {
-                var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
-                if (showMonth) {
-                    html += '<div class="text-xs text-text-muted" style="min-width: 13px;">' + months[showMonth.month] + '</div>';
-                } else {
-                    html += '<div style="min-width: 13px;"></div>';
-                }
-            }
-            html += '</div>';
-            
-            for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
-                html += '<div class="flex gap-1 mb-1">';
-                
-                for (var w = 0; w < weeks.length; w++) {
-                    var date = weeks[w][dayIndex];
-                    var dateStr = date.toISOString().split('T')[0];
-                    var level = activityData[dateStr] || 0;
-                    var color = getColor(level);
-                    
-                    var isToday = date.toDateString() === today.toDateString();
-                    var isFuture = date > today;
-                    
-                    var title = dateStr;
-                    if (!isFuture) {
-                        title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
-                    } else {
-                        title += ': No data';
-                    }
-                    
-                    var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
-                    var opacity = isFuture ? 'opacity-30' : '';
-                    
-                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 cursor-pointer ' + borderClass + ' ' + opacity + '" ' +
-                            'style="background-color: ' + color + ';" ' +
-                            'title="' + title + '"></div>';
-                }
-                
-                html += '</div>';
-            }
-            
-            html += '</div></div></div>';
-            container.innerHTML = html;
         }
     </script>
 </body>

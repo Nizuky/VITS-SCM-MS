@@ -483,14 +483,23 @@ class SuperAdminDashboardController extends Controller
     }
 
     /**
-     * Get activity calendar data (last 365 days)
+     * Get activity calendar data for a specific year
      */
-    public function getActivityCalendar()
+    public function getActivityCalendar(Request $request)
     {
         try {
             $superAdminId = Auth::guard('superadmin')->id();
-            $startDate = Carbon::now()->subYear();
-            $endDate = Carbon::now();
+            $year = $request->input('year', Carbon::now()->year);
+            
+            // Validate year
+            $year = (int)$year;
+            $currentYear = Carbon::now()->year;
+            if ($year > $currentYear) {
+                $year = $currentYear;
+            }
+            
+            $startDate = Carbon::create($year, 1, 1)->startOfDay();
+            $endDate = Carbon::create($year, 12, 31)->endOfDay();
             
             // Get all activity logs grouped by date
             $activities = SuperAdminActivityLog::where('super_admin_id', $superAdminId)
@@ -503,7 +512,8 @@ class SuperAdminDashboardController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => $activities
+                'data' => $activities,
+                'year' => $year
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get activity calendar', ['error' => $e->getMessage()]);
@@ -511,6 +521,95 @@ class SuperAdminDashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load activity calendar'
+            ], 500);
+        }
+    }
+    
+    /**
+     * Get activity details for a specific date
+     */
+    public function getActivityDetails(Request $request)
+    {
+        try {
+            $superAdminId = Auth::guard('superadmin')->id();
+            $superAdminName = Auth::guard('superadmin')->user()->name;
+            $date = $request->input('date');
+            
+            if (!$date) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Date parameter is required'
+                ], 400);
+            }
+            
+            $startOfDay = Carbon::parse($date)->startOfDay();
+            $endOfDay = Carbon::parse($date)->endOfDay();
+            
+            // Get all activities for this date with related record information
+            $activities = SuperAdminActivityLog::where('super_admin_id', $superAdminId)
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function($log) use ($superAdminName) {
+                    $data = [
+                        'id' => $log->id,
+                        'action' => $log->action,
+                        'description' => $log->description,
+                        'created_at' => $log->created_at->toIso8601String(),
+                        'student_id' => null,
+                        'student_name' => null,
+                        'venue' => null,
+                        'admin_name' => $superAdminName
+                    ];
+                    
+                    // Extract record_id from metadata JSON
+                    $recordId = null;
+                    if ($log->metadata) {
+                        $metadata = json_decode($log->metadata, true);
+                        $recordId = $metadata['record_id'] ?? null;
+                    }
+                    
+                    // Try to get related record information
+                    if ($recordId) {
+                        $record = \App\Models\SocialContractRecord::with('socialContract.student')->find($recordId);
+                        if ($record) {
+                            \Log::info('Found record', [
+                                'record_id' => $record->id,
+                                'has_social_contract' => $record->socialContract !== null,
+                                'has_student' => $record->socialContract && $record->socialContract->student !== null
+                            ]);
+                            
+                            if ($record->socialContract && $record->socialContract->student) {
+                                $data['student_id'] = $record->socialContract->student->student_id ?? null;
+                                $data['student_name'] = $record->socialContract->student->name ?? null;
+                            }
+                            $data['venue'] = $record->venue ?? null;
+                        } else {
+                            \Log::warning('Record not found', ['record_id' => $recordId]);
+                        }
+                    }
+                    
+                    \Log::info('Activity data', $data);
+                    
+                    return $data;
+                });
+            
+            \Log::info('Returning activities', ['count' => $activities->count()]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $activities,
+                'date' => $date
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to get activity details', [
+                'error' => $e->getMessage(),
+                'date' => $request->input('date')
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load activity details'
             ], 500);
         }
     }

@@ -135,14 +135,28 @@ body{font-family:'Inter',sans-serif}
 @php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
     $fullName = trim(auth('superadmin')->user()->name ?? 'Super Admin');
-    $nameWords = $fullName !== '' ? preg_split('/\s+/', $fullName) : [];
+    
+    // Check if name starts with "admin" (case-insensitive)
     $initials = '';
-    if (!empty($nameWords)) {
-        $initials = mb_strtoupper(mb_substr($nameWords[0], 0, 1));
-        if (isset($nameWords[1]) && mb_strlen($nameWords[1]) > 0) {
-            $initials .= mb_strtoupper(mb_substr($nameWords[1], 0, 1));
+    if (preg_match('/^admin(.+)/i', $fullName, $matches)) {
+        // Extract the part after "admin"
+        $afterAdmin = trim($matches[1]);
+        if (!empty($afterAdmin)) {
+            $initials = mb_strtoupper(mb_substr($afterAdmin, 0, 1));
         }
     }
+    
+    // Fallback: use standard first letter logic if no "admin" prefix
+    if (!$initials) {
+        $nameWords = $fullName !== '' ? preg_split('/\s+/', $fullName) : [];
+        if (!empty($nameWords)) {
+            $initials = mb_strtoupper(mb_substr($nameWords[0], 0, 1));
+            if (isset($nameWords[1]) && mb_strlen($nameWords[1]) > 0) {
+                $initials .= mb_strtoupper(mb_substr($nameWords[1], 0, 1));
+            }
+        }
+    }
+    
     if (!$initials)
         $initials = 'SA';
 @endphp
@@ -281,7 +295,7 @@ body{font-family:'Inter',sans-serif}
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Pending Requests -->
-                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -295,7 +309,7 @@ body{font-family:'Inter',sans-serif}
                         </div>
                         
                         <!-- Accepted Requests -->
-                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Approved')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -309,7 +323,7 @@ body{font-family:'Inter',sans-serif}
                         </div>
                         
                         <!-- Rejected Requests -->
-                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Rejected')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -331,16 +345,32 @@ body{font-family:'Inter',sans-serif}
                             <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
                             <p class="text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
                         </div>
-                        <div class="flex items-center gap-3 text-xs">
-                            <span class="text-text-muted">Less</span>
-                            <div class="flex gap-1">
-                                <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
-                                <div class="w-3 h-3 rounded-sm bg-[#6D28D9]" title="7+ updates"></div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="text-text-muted">Less</span>
+                                <div class="flex gap-1">
+                                    <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm bg-[#6D28D9]" title="7+ updates"></div>
+                                </div>
+                                <span class="text-text-muted">More</span>
                             </div>
-                            <span class="text-text-muted">More</span>
+                            <!-- Year Navigation -->
+                            <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                                <button id="prev-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(-1)" title="Previous year">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <span id="calendar-year" class="text-sm font-bold text-text-header min-w-[60px] text-center">2025</span>
+                                <button id="next-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(1)" title="Next year">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div id="activity-calendar" class="overflow-x-auto pb-2">
@@ -712,6 +742,36 @@ body{font-family:'Inter',sans-serif}
         </div>
     </dialog>
 
+    <!-- Activity Details Modal -->
+    <dialog id="activity_details_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date"></span></h3>
+            
+            <div id="activity-details-content" class="space-y-3">
+                <!-- Activity details will be loaded here -->
+            </div>
+            
+            <div id="activity-loading" class="text-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary-purple"></span>
+                <p class="mt-2 text-text-muted">Loading activities...</p>
+            </div>
+            
+            <div id="activity-no-data" class="text-center py-8 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="mt-4 text-text-muted">No activity recorded on this date</p>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- Logout Modal -->
     <dialog id="logout_modal" class="modal">
         <div class="modal-box">
@@ -783,9 +843,73 @@ body{font-family:'Inter',sans-serif}
         </div>
     </dialog>
 
+    <!-- Status Records Modal -->
+    <dialog id="status_records_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-5xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div id="status-modal-icon" class="bg-white p-3 rounded-full">
+                    <!-- Icon will be injected here -->
+                </div>
+                <div>
+                    <h3 class="font-bold text-2xl text-text-header" id="status-modal-title">Records</h3>
+                    <p class="text-sm text-text-muted" id="status-modal-subtitle">Showing all records with this status this week</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <!-- Records Table -->
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-200">
+                            <th class="text-center">Student ID</th>
+                            <th class="text-center">Student Name</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Event Name</th>
+                            <th class="text-center">Venue</th>
+                            <th class="text-center">Hours</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="status-modal-table-body">
+                        <!-- Records will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="status-modal-empty" class="hidden text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="text-gray-500 text-lg font-semibold">No records found</p>
+                <p class="text-gray-400 text-sm mt-2">There are no records with this status this week.</p>
+            </div>
+            
+            <!-- Summary Footer -->
+            <div class="bg-base-200 rounded-lg p-4 mt-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-text-muted">Total Records</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-total">0</p>
+                </div>
+                <div>
+                    <p class="text-sm text-text-muted">Total Hours</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-hours">0 hours</p>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
-
 
     <!-- Scripts -->
     <script>
@@ -1207,6 +1331,112 @@ body{font-family:'Inter',sans-serif}
             updatePendingRequestsChart(pending);
         }
 
+        // Show status modal with filtered records
+        window.showStatusModal = function(status) {
+            var modal = document.getElementById('status_records_modal');
+            var modalTitle = document.getElementById('status-modal-title');
+            var modalSubtitle = document.getElementById('status-modal-subtitle');
+            var modalIcon = document.getElementById('status-modal-icon');
+            var tableBody = document.getElementById('status-modal-table-body');
+            var emptyState = document.getElementById('status-modal-empty');
+            var totalCount = document.getElementById('status-modal-total');
+            var totalHours = document.getElementById('status-modal-hours');
+            
+            // Filter records by status (this week only)
+            var now = new Date();
+            var weekAgo = new Date(now);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            var filteredRecords = allSubmissions.filter(function(r) {
+                var recordDate = new Date(r.updated_at || r.created_at);
+                var isThisWeek = recordDate >= weekAgo && recordDate <= now;
+                
+                if (status === 'Verified') {
+                    return r.status === 'Verified';
+                } else if (status === 'Approved') {
+                    return r.status === 'Approved' && isThisWeek;
+                } else if (status === 'Rejected') {
+                    return r.status === 'Rejected' && isThisWeek;
+                }
+                return false;
+            });
+            
+            // Update modal header based on status
+            var iconSvg = '';
+            var bgColorClass = '';
+            
+            if (status === 'Verified') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                bgColorClass = 'bg-gradient-pending';
+                modalTitle.textContent = filteredRecords.length + ' Verified Requests';
+                modalSubtitle.textContent = 'All verified requests awaiting super admin approval';
+            } else if (status === 'Approved') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+                bgColorClass = 'bg-gradient-accepted';
+                modalTitle.textContent = filteredRecords.length + ' Approved Requests';
+                modalSubtitle.textContent = 'All approved requests this week';
+            } else if (status === 'Rejected') {
+                iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
+                bgColorClass = 'bg-gradient-rejected';
+                modalTitle.textContent = filteredRecords.length + ' Rejected Requests';
+                modalSubtitle.textContent = 'All rejected requests this week';
+            }
+            
+            modalIcon.innerHTML = iconSvg;
+            modalIcon.className = bgColorClass + ' p-3 rounded-full flex items-center justify-center';
+            
+            // Clear table body
+            tableBody.innerHTML = '';
+            
+            // Calculate total hours
+            var hours = filteredRecords.reduce(function(sum, r) {
+                return sum + (parseInt(r.hours_rendered) || 0);
+            }, 0);
+            
+            if (filteredRecords.length === 0) {
+                // Show empty state
+                emptyState.classList.remove('hidden');
+                tableBody.closest('.overflow-x-auto').classList.add('hidden');
+            } else {
+                // Hide empty state and show table
+                emptyState.classList.add('hidden');
+                tableBody.closest('.overflow-x-auto').classList.remove('hidden');
+                
+                // Populate table
+                filteredRecords.forEach(function(rec) {
+                    var row = document.createElement('tr');
+                    var statusBadge = '';
+                    
+                    if (rec.status === 'Verified') {
+                        statusBadge = '<span class="badge badge-info text-white">Verified</span>';
+                    } else if (rec.status === 'Approved') {
+                        statusBadge = '<span class="badge badge-success text-white">Approved</span>';
+                    } else if (rec.status === 'Rejected') {
+                        statusBadge = '<span class="badge badge-error text-white">Rejected</span>';
+                    } else if (rec.status === 'Pending') {
+                        statusBadge = '<span class="badge badge-warning text-white">Pending</span>';
+                    }
+                    
+                    row.innerHTML = 
+                        '<td class="text-center">' + (rec.student_id || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.student_name || '-') + '</td>' +
+                        '<td class="text-center">' + formatDate(rec.date) + '</td>' +
+                        '<td class="text-center">' + (rec.event_name || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.venue || '-') + '</td>' +
+                        '<td class="text-center">' + (rec.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="text-center">' + statusBadge + '</td>';
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Update summary
+            totalCount.textContent = filteredRecords.length;
+            totalHours.textContent = hours + ' hours';
+            
+            // Show modal
+            modal.showModal();
+        };
+
         // Open verify modal
         function openVerifyModal(b, e) {
             e.stopPropagation();
@@ -1375,30 +1605,98 @@ body{font-family:'Inter',sans-serif}
             initPendingRequestsChart(pendingCount);
         }
 
-        // Generate Activity Calendar
+        // Activity Calendar Variables
+        var currentCalendarYear = new Date().getFullYear();
+        var activityDataCache = {};
+
+        // Generate Activity Calendar (January to December for selected year)
         function generateActivityCalendar() {
             var container = document.getElementById('activity-calendar');
             if (!container) return;
             
-            var today = new Date();
-            var yearAgo = new Date(today);
-            yearAgo.setFullYear(today.getFullYear() - 1);
+            // Update year display
+            document.getElementById('calendar-year').textContent = currentCalendarYear;
             
-            // Sample activity data
-            var activityData = generateSampleActivityData(yearAgo, today);
-            
-            function getColor(level) {
-                var colors = ['#E5E7EB', '#E5D4FF', '#C9A9FF', '#A475FF', '#6D28D9'];
-                return colors[Math.min(level, 4)] || colors[0];
+            // Disable next button if viewing current year
+            var nextBtn = document.getElementById('next-year-btn');
+            var currentYear = new Date().getFullYear();
+            if (nextBtn) {
+                nextBtn.disabled = currentCalendarYear >= currentYear;
+                if (currentCalendarYear >= currentYear) {
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
             }
             
-            var startDate = new Date(yearAgo);
-            startDate.setDate(startDate.getDate() - startDate.getDay());
+            // Create date range for the selected year (January 1 to December 31)
+            var startDate = new Date(currentCalendarYear, 0, 1); // January 1
+            var endDate = new Date(currentCalendarYear, 11, 31); // December 31
+            var today = new Date();
             
+            // Load activity data from API
+            loadActivityDataForYear(currentCalendarYear, function(activityData) {
+                renderCalendar(startDate, endDate, today, activityData);
+            });
+        }
+        
+        // Load activity data from API for a specific year
+        function loadActivityDataForYear(year, callback) {
+            // Check cache first
+            if (activityDataCache[year]) {
+                callback(activityDataCache[year]);
+                return;
+            }
+            
+            fetch(`${BASE_PATH}/super-admin/api/activity-calendar?year=` + year, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch activity data');
+                return response.json();
+            })
+            .then(result => {
+                if (result.success && result.data) {
+                    activityDataCache[year] = result.data;
+                    callback(result.data);
+                } else {
+                    console.warn('Invalid activity data format');
+                    callback({});
+                }
+            })
+            .catch(error => {
+                console.error('Failed to load activity data:', error);
+                callback({});
+            });
+        }
+        
+        // Render the calendar
+        function renderCalendar(startDate, endDate, today, activityData) {
+            var container = document.getElementById('activity-calendar');
+            if (!container) return;
+            
+            function getColor(level) {
+                if (level === 0) return '#E5E7EB';
+                if (level <= 2) return '#E5D4FF';
+                if (level <= 4) return '#C9A9FF';
+                if (level <= 6) return '#A475FF';
+                return '#6D28D9';
+            }
+            
+            // Adjust start date to Sunday
+            var calendarStart = new Date(startDate);
+            calendarStart.setDate(calendarStart.getDate() - calendarStart.getDay());
+            
+            // Build weeks
             var weeks = [];
-            var currentWeek = new Date(startDate);
+            var currentWeek = new Date(calendarStart);
             
-            while (currentWeek <= today) {
+            while (currentWeek <= endDate) {
                 var week = [];
                 for (var i = 0; i < 7; i++) {
                     var date = new Date(currentWeek);
@@ -1411,6 +1709,7 @@ body{font-family:'Inter',sans-serif}
             
             var html = '<div class="flex gap-2">';
             
+            // Day labels column
             html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
             var days = ['Mon', 'Wed', 'Fri'];
             for (var d = 0; d < 3; d++) {
@@ -1418,8 +1717,10 @@ body{font-family:'Inter',sans-serif}
             }
             html += '</div>';
             
+            // Calendar grid
             html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
             
+            // Month labels row
             html += '<div class="flex gap-1 mb-2">';
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             var lastMonth = -1;
@@ -1427,7 +1728,7 @@ body{font-family:'Inter',sans-serif}
             
             for (var w = 0; w < weeks.length; w++) {
                 var weekMonth = weeks[w][0].getMonth();
-                if (weekMonth !== lastMonth && w > 0) {
+                if (weekMonth !== lastMonth) {
                     monthPositions.push({ week: w, month: weekMonth });
                     lastMonth = weekMonth;
                 }
@@ -1443,6 +1744,7 @@ body{font-family:'Inter',sans-serif}
             }
             html += '</div>';
             
+            // Grid rows
             for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
                 html += '<div class="flex gap-1 mb-1">';
                 
@@ -1454,20 +1756,22 @@ body{font-family:'Inter',sans-serif}
                     
                     var isToday = date.toDateString() === today.toDateString();
                     var isFuture = date > today;
+                    var isInYear = date.getFullYear() === currentCalendarYear;
                     
-                    var title = dateStr;
-                    if (!isFuture) {
-                        title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
-                    } else {
-                        title += ': No data';
-                    }
+                    var title = dateStr + ': ' + level + ' update' + (level !== 1 ? 's' : '');
                     
                     var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
-                    var opacity = isFuture ? 'opacity-30' : '';
+                    var opacity = (isFuture || !isInYear) ? 'opacity-30' : '';
+                    var cursor = (!isFuture && isInYear && level > 0) ? 'cursor-pointer' : 'cursor-default';
                     
-                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 cursor-pointer ' + borderClass + ' ' + opacity + '" ' +
+                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 ' + 
+                            cursor + ' ' + borderClass + ' ' + opacity + '" ' +
                             'style="background-color: ' + color + ';" ' +
-                            'title="' + title + '"></div>';
+                            'title="' + title + '" ' +
+                            'data-date="' + dateStr + '" ' +
+                            'data-count="' + level + '" ' +
+                            ((!isFuture && isInYear && level > 0) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '') +
+                            '></div>';
                 }
                 
                 html += '</div>';
@@ -1477,30 +1781,150 @@ body{font-family:'Inter',sans-serif}
             container.innerHTML = html;
         }
         
-        // Generate sample activity data
-        function generateSampleActivityData(startDate, endDate) {
-            var data = {};
-            var current = new Date(startDate);
+        // Change calendar year
+        function changeCalendarYear(delta) {
+            var currentYear = new Date().getFullYear();
+            var newYear = currentCalendarYear + delta;
             
-            while (current <= endDate) {
-                var dateStr = current.toISOString().split('T')[0];
-                var random = Math.random();
-                if (random < 0.3) {
-                    data[dateStr] = 0;
-                } else if (random < 0.6) {
-                    data[dateStr] = 1;
-                } else if (random < 0.8) {
-                    data[dateStr] = 2;
-                } else if (random < 0.95) {
-                    data[dateStr] = 3;
-                } else {
-                    data[dateStr] = 4;
-                }
-                current.setDate(current.getDate() + 1);
-            }
+            // Don't allow future years
+            if (newYear > currentYear) return;
             
-            return data;
+            currentCalendarYear = newYear;
+            generateActivityCalendar();
         }
+        
+        // Make function globally accessible
+        window.changeCalendarYear = changeCalendarYear;
+        
+        // Show activity details for a specific date
+        function showActivityDetails(dateStr) {
+            var modal = document.getElementById('activity_details_modal');
+            var dateDisplay = document.getElementById('activity-date');
+            var content = document.getElementById('activity-details-content');
+            var loading = document.getElementById('activity-loading');
+            var noData = document.getElementById('activity-no-data');
+            
+            if (!modal || !dateDisplay || !content) return;
+            
+            // Format date for display
+            var date = new Date(dateStr + 'T00:00:00');
+            dateDisplay.textContent = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Show modal and loading state
+            modal.showModal();
+            content.innerHTML = '';
+            content.classList.add('hidden');
+            loading.classList.remove('hidden');
+            noData.classList.add('hidden');
+            
+            // Fetch activity details for this date
+            fetch(`${BASE_PATH}/super-admin/api/activity-details?date=` + dateStr, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch activity details');
+                return response.json();
+            })
+            .then(result => {
+                loading.classList.add('hidden');
+                
+                console.log('Activity details result:', result);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    content.classList.remove('hidden');
+                    var html = '';
+                    
+                    result.data.forEach(function(activity) {
+                        console.log('Processing activity:', activity);
+                        
+                        var time = new Date(activity.created_at).toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        });
+                        
+                        var actionBadge = '';
+                        var actionText = '';
+                        if (activity.action === 'verified' || activity.action === 'verified_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-info text-white">Verified</span>';
+                            actionText = 'Verified';
+                        } else if (activity.action === 'approved' || activity.action === 'approved_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-success text-white">Approved</span>';
+                            actionText = 'Approved';
+                        } else if (activity.action === 'rejected' || activity.action === 'rejected_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-error text-white">Rejected</span>';
+                            actionText = 'Rejected';
+                        }
+                        
+                        html += '<div class="bg-base-100 rounded-lg p-4 border border-base-300 hover:shadow-md transition-shadow">';
+                        html += '<div class="flex items-center justify-between mb-2">';
+                        html += '<span class="text-xs font-medium text-text-muted">' + time + '</span>';
+                        html += '<div class="flex flex-col items-end gap-1">';
+                        html += actionBadge;
+                        if (activity.admin_name) {
+                            html += '<span class="text-xs text-text-muted">' + actionText + ' by Admin ' + activity.admin_name + '</span>';
+                        }
+                        html += '</div>';
+                        html += '</div>';
+                        
+                        html += '<p class="text-sm font-semibold text-text-header mb-2">' + (activity.description || 'Activity recorded') + '</p>';
+                        
+                        if (activity.student_id || activity.student_name) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />';
+                            html += '</svg>';
+                            html += '<span>';
+                            if (activity.student_id) {
+                                html += '<span class="font-medium">' + activity.student_id + '</span>';
+                            }
+                            if (activity.student_name) {
+                                html += (activity.student_id ? ' - ' : '') + activity.student_name;
+                            }
+                            html += '</span>';
+                            html += '</div>';
+                        }
+                        
+                        if (activity.venue) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted mt-1">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />';
+                            html += '</svg>';
+                            html += '<span>' + activity.venue + '</span>';
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    console.log('Generated HTML:', html);
+                    content.innerHTML = html;
+                } else {
+                    noData.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to load activity details:', error);
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            });
+        }
+        
+        // Make function globally accessible
+        window.showActivityDetails = showActivityDetails;
+        
+        // Remove old sample data function
+        // function generateSampleActivityData() - REMOVED
 
         // DOM ready
         document.addEventListener('DOMContentLoaded', function() {

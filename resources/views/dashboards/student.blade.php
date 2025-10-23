@@ -121,6 +121,7 @@
         .bg-gradient-primary-purple { background-image: linear-gradient(to bottom, #bbacffff, #6D28D9); }
         /* Gradients for summary cards */
         .bg-gradient-approved { background-image: linear-gradient(to bottom, #DCFCE7, #81FFAC); }
+        .bg-gradient-verified { background-image: linear-gradient(to bottom, #D1FAE5, #5EEAD4); }
         .bg-gradient-pending { background-image: linear-gradient(to bottom, #FFF4DE, #FFE0A2); }
         .bg-gradient-rejected { background-image: linear-gradient(to bottom, #FFE2E5, #FFB7BE); }
         /* Notification bell dot: force consistent color and visibility */
@@ -186,6 +187,145 @@
         [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
         [data-theme="dark"] .btn.bg-success-green:focus,
         [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
+    </style>
+    <style>
+        /* Custom Progress Stepper Styles - Horizontal inline */
+        .record-details-row {
+            background-color: #f9fafb;
+            border-top: 2px solid #e5e7eb;
+        }
+        [data-theme="dark"] .record-details-row {
+            background-color: #1f2937;
+            border-top: 2px solid #374151;
+        }
+        
+        .steps-horizontal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+        
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .step-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .step-circle.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        .step-circle.completed {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .step-circle.rejected {
+            background-color: #EF4444;
+            color: white;
+        }
+        
+        .step-circle.pending {
+            background-color: #F59E0B;
+            color: white;
+        }
+        
+        .step-label {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        
+        .step-sublabel {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 0.25rem;
+        }
+        
+        .step-connector {
+            position: absolute;
+            top: 1.5rem;
+            left: 50%;
+            right: -50%;
+            height: 3px;
+            background-color: #e5e7eb;
+            z-index: 1;
+        }
+        
+        .step-item:last-child .step-connector {
+            display: none;
+        }
+        
+        .step-connector.active {
+            background-color: #3B82F6;
+        }
+        
+        .step-connector.completed {
+            background-color: #4CAF50;
+        }
+        
+        [data-theme="dark"] .step-circle {
+            background-color: #374151;
+            color: #9ca3af;
+        }
+        
+        [data-theme="dark"] .step-sublabel {
+            color: #9ca3af;
+        }
+        
+        [data-theme="dark"] .step-connector {
+            background-color: #374151;
+        }
+        
+        /* Status Modal Animations */
+        #status_records_modal[open] {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Enhanced table styling for modal */
+        #status_records_modal .table tbody tr:hover {
+            background-color: rgba(109, 40, 217, 0.05);
+        }
+        
+        [data-theme="dark"] #status_records_modal .table tbody tr:hover {
+            background-color: rgba(109, 40, 217, 0.15);
+        }
+    </style>
+    <style>
                 /* Dark theme: card/background overrides */
         [data-theme="dark"] .bg-custom {
             background-color: #0b0f19; /* deeper fallback */
@@ -203,6 +343,7 @@
         [data-theme="dark"] .bg-base-100 { background-color: #111827 !important; } /* gray-900 for DaisyUI surfaces */
         /* Replace pastel gradients with solid dark gray in dark mode */
         [data-theme="dark"] .bg-gradient-approved { background-image: linear-gradient(to top, #6D28D9, #81FFAC); }
+        [data-theme="dark"] .bg-gradient-verified { background-image: linear-gradient(to top, #6D28D9, #5EEAD4); }
         [data-theme="dark"] .bg-gradient-pending { background-image: linear-gradient(to top, #6D28D9, #FFE0A2); }
         [data-theme="dark"] .bg-gradient-rejected { background-image: linear-gradient(to top, #6D28D9, #FFB7BE); }
         /* Checkboxes: purple accent in light; custom dark styling */
@@ -443,7 +584,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
-                            <p class="text-sm text-text-muted">Contract Status Overview (Approved, Pending, Rejected)</p>
+                            <p class="text-sm text-text-muted">Contract Status Overview (Approved, Verified, Pending, Rejected)</p>
                         </div>
                         <button onclick="loadRecords();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -452,9 +593,9 @@
                             <span class="hidden md:inline">Refresh</span>
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <!-- Approved Records -->
-                        <div class="bg-gradient-approved p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-approved p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Approved')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                             </div>
@@ -464,8 +605,19 @@
                                 <p class="text-xs text-text-muted mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                             </div>
                         </div>
+                        <!-- Verified Records -->
+                        <div class="bg-gradient-verified p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
+                            <div class="bg-white p-2 rounded-full w-min">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-text-header"><span id="verified-count">0</span> Records</h3>
+                                <p class="text-teal-800 font-semibold">Verified</p>
+                                <p class="text-xs text-text-muted mt-1" id="summary-last-updated-verified-row">Last update: <span id="summary-last-updated-verified"></span></p>
+                            </div>
+                        </div>
                         <!-- Pending Records -->
-                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Pending')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
@@ -476,7 +628,7 @@
                             </div>
                         </div>
                         <!-- Rejected Records -->
-                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Rejected')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                             </div>
@@ -766,7 +918,7 @@
                             6. Can I edit my form after submission?
                         </div>
                         <div class="collapse-content">
-                            <p class="text-text-muted">No. Once submitted, you can't edit it. Wait for feedback from your adviser if revisions are needed.</p>
+                            <p class="text-text-muted">No. Once submitted, you can't edit it. Wait for feedback from your adviser if revisions are needed. Only pending contracts can be deleted.</p>
                         </div>
                     </div>
                     
@@ -909,6 +1061,72 @@
             </div>
         </div>
     </dialog>
+
+    <!-- Status Records Modal -->
+    <dialog id="status_records_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-5xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div id="status-modal-icon" class="bg-white p-3 rounded-full">
+                    <!-- Icon will be injected here -->
+                </div>
+                <div>
+                    <h3 class="font-bold text-2xl text-text-header" id="status-modal-title">Records</h3>
+                    <p class="text-sm text-text-muted" id="status-modal-subtitle">Showing all records with this status</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <!-- Records Table -->
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-200">
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Event Name</th>
+                            <th class="text-center">Venue</th>
+                            <th class="text-center">Organization</th>
+                            <th class="text-center">Hours</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="status-modal-table-body">
+                        <!-- Records will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="status-modal-empty" class="hidden text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="text-gray-500 text-lg font-semibold">No records found</p>
+                <p class="text-gray-400 text-sm mt-2">There are no records with this status yet.</p>
+            </div>
+            
+            <!-- Summary Footer -->
+            <div class="bg-base-200 rounded-lg p-4 mt-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-text-muted">Total Records</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-total">0</p>
+                </div>
+                <div>
+                    <p class="text-sm text-text-muted">Total Hours</p>
+                    <p class="text-xl font-bold text-text-header" id="status-modal-hours">0 hours</p>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+
 
     <!-- DaisyUI toast root (bottom-right) -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
@@ -1206,6 +1424,185 @@
             
             // Make loadRecords globally accessible for onclick handlers
             window.loadRecords = loadRecords;
+            
+            let currentExpandedRecordId = null;
+            
+            // Toggle record details inline with horizontal stepper
+            function toggleRecordDetails(record, rowElement) {
+                const recordId = record.id;
+                
+                // If clicking the same row, collapse it
+                if (currentExpandedRecordId === recordId) {
+                    const existingDetailsRow = document.querySelector(`tr[data-details-for="${recordId}"]`);
+                    if (existingDetailsRow) {
+                        existingDetailsRow.remove();
+                    }
+                    currentExpandedRecordId = null;
+                    return;
+                }
+                
+                // Remove any existing details row
+                const existingDetailsRow = document.querySelector('tr.record-details-row');
+                if (existingDetailsRow) {
+                    existingDetailsRow.remove();
+                }
+                
+                // Create new details row
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'record-details-row';
+                detailsRow.dataset.detailsFor = recordId;
+                
+                // Determine step states based on status
+                let step1Class = 'completed';
+                let step1Icon = '1';
+                let step2Class = '';
+                let step2Icon = '2';
+                let step2Label = 'Pending';
+                let step3Class = '';
+                let step3Icon = '3';
+                let step3Label = 'Pending';
+                let connector1Class = 'completed';
+                let connector2Class = '';
+                
+                if (record.status === 'Pending') {
+                    step2Class = 'pending';
+                    step2Label = 'Awaiting verification';
+                } else if (record.status === 'Verified') {
+                    step2Class = 'completed';
+                    step2Icon = '2';
+                    step2Label = 'Verified';
+                    connector1Class = 'completed';
+                    connector2Class = 'active';
+                    step3Class = 'active';
+                    step3Label = 'Awaiting approval';
+                } else if (record.status === 'Approved') {
+                    step2Class = 'completed';
+                    step2Icon = '2';
+                    step2Label = 'Verified';
+                    step3Class = 'completed';
+                    step3Icon = '3';
+                    step3Label = 'Approved';
+                    connector1Class = 'completed';
+                    connector2Class = 'completed';
+                } else if (record.status === 'Rejected') {
+                    // Determine if rejected at step 2 or 3
+                    // For now, assume rejection at step 2
+                    step2Class = 'rejected';
+                    step2Icon = '2';
+                    step2Label = 'Rejected';
+                    connector1Class = 'completed';
+                }
+                
+                detailsRow.innerHTML = `
+                    <td colspan="7">
+                        <div class="steps-horizontal">
+                            <div class="step-item">
+                                <div class="step-circle ${step1Class}">${step1Icon}</div>
+                                <div class="step-connector ${connector1Class}"></div>
+                                <div class="step-label">Submitted</div>
+                                <div class="step-sublabel">${normalizeDateString(record.date)}</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-circle ${step2Class}">${step2Icon}</div>
+                                <div class="step-connector ${connector2Class}"></div>
+                                <div class="step-label">Admin Review</div>
+                                <div class="step-sublabel">${step2Label}</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-circle ${step3Class}">${step3Icon}</div>
+                                <div class="step-label">Super Admin Review</div>
+                                <div class="step-sublabel">${step3Label}</div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                // Insert after the clicked row
+                rowElement.insertAdjacentElement('afterend', detailsRow);
+                currentExpandedRecordId = recordId;
+            }
+            
+            // Show status modal with filtered records
+            function showStatusModal(status) {
+                const modal = document.getElementById('status_records_modal');
+                const modalTitle = document.getElementById('status-modal-title');
+                const modalSubtitle = document.getElementById('status-modal-subtitle');
+                const modalIcon = document.getElementById('status-modal-icon');
+                const tableBody = document.getElementById('status-modal-table-body');
+                const emptyState = document.getElementById('status-modal-empty');
+                const totalCount = document.getElementById('status-modal-total');
+                const totalHours = document.getElementById('status-modal-hours');
+                
+                // Filter records by status
+                const filteredRecords = allRecords.filter(r => r.status === status);
+                
+                // Update modal header based on status
+                let iconSvg = '';
+                let bgColorClass = '';
+                
+                if (status === 'Approved') {
+                    iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+                    bgColorClass = 'bg-gradient-approved';
+                    modalTitle.textContent = `${filteredRecords.length} Approved Records`;
+                } else if (status === 'Verified') {
+                    iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+                    bgColorClass = 'bg-gradient-verified';
+                    modalTitle.textContent = `${filteredRecords.length} Verified Records`;
+                } else if (status === 'Pending') {
+                    iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                    bgColorClass = 'bg-gradient-pending';
+                    modalTitle.textContent = `${filteredRecords.length} Pending Records`;
+                } else if (status === 'Rejected') {
+                    iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
+                    bgColorClass = 'bg-gradient-rejected';
+                    modalTitle.textContent = `${filteredRecords.length} Rejected Records`;
+                }
+                
+                modalIcon.innerHTML = iconSvg;
+                modalIcon.className = `${bgColorClass} p-3 rounded-full flex items-center justify-center`;
+                modalSubtitle.textContent = `All ${status.toLowerCase()} social contract records`;
+                
+                // Clear table body
+                tableBody.innerHTML = '';
+                
+                // Calculate total hours
+                const hours = filteredRecords.reduce((sum, r) => sum + (parseInt(r.hours_rendered) || 0), 0);
+                
+                if (filteredRecords.length === 0) {
+                    // Show empty state
+                    emptyState.classList.remove('hidden');
+                    tableBody.closest('.overflow-x-auto').classList.add('hidden');
+                } else {
+                    // Hide empty state and show table
+                    emptyState.classList.add('hidden');
+                    tableBody.closest('.overflow-x-auto').classList.remove('hidden');
+                    
+                    // Populate table
+                    filteredRecords.forEach(rec => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="text-center">${normalizeDateString(rec.date)}</td>
+                            <td class="text-center">${rec.event_name || '-'}</td>
+                            <td class="text-center">${rec.venue || '-'}</td>
+                            <td class="text-center">${rec.organization || '-'}</td>
+                            <td class="text-center">${rec.hours_rendered} hours</td>
+                            <td class="text-center">${renderStatusBadge(rec.status)}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                // Update summary
+                totalCount.textContent = filteredRecords.length;
+                totalHours.textContent = `${hours} hours`;
+                
+                // Show modal
+                modal.showModal();
+            }
+            
+            // Make showStatusModal globally accessible
+            window.showStatusModal = showStatusModal;
+            
             function renderTable() {
                 tableBody.innerHTML = '';
                 const query = (searchInput.value || '').toLowerCase().trim();
@@ -1239,6 +1636,12 @@
                     const row = document.createElement('tr');
                     row.dataset.recordId = rec.id;
                     row.dataset.status = rec.status;
+                    row.style.cursor = 'pointer';
+                    row.onclick = function(e) { 
+                        // Don't toggle if clicking on checkbox
+                        if (e.target.classList.contains('record-checkbox')) return;
+                        toggleRecordDetails(rec, row); 
+                    };
                     row.innerHTML = `
                         <td class="text-center"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
                         <td class="text-center">${formattedDate}</td>
@@ -1397,12 +1800,40 @@
             }
             document.getElementById('delete-selected').addEventListener('click', () => {
                 const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const ids = Array.from(document.querySelectorAll('#record-table-body tr'))
-                    .filter(tr => tr.querySelector('.record-checkbox')?.checked)
+                
+                // Get all checked rows
+                const checkedRows = Array.from(document.querySelectorAll('#record-table-body tr'))
+                    .filter(tr => tr.querySelector('.record-checkbox')?.checked);
+                
+                // Filter to only pending records
+                const pendingIds = checkedRows
+                    .filter(tr => tr.dataset.status === 'Pending')
                     .map(tr => parseInt(tr.dataset.recordId, 10))
                     .filter(Boolean);
-                if (!ids.length) return;
-                Promise.all(ids.map(id => fetch(`${BASE_PATH}/api/social-contract/records/${id}`, {
+                
+                // Check if there are non-pending records selected
+                const nonPendingSelected = checkedRows.length > pendingIds.length;
+                
+                if (!checkedRows.length) {
+                    showToast('Please select records to delete', 'warning');
+                    return;
+                }
+                
+                if (nonPendingSelected) {
+                    showToast('Only pending records can be deleted. Non-pending records have been excluded.', 'warning');
+                }
+                
+                if (!pendingIds.length) {
+                    showToast('No pending records selected. Only pending records can be deleted.', 'error');
+                    return;
+                }
+                
+                // Confirm deletion
+                if (!confirm(`Are you sure you want to delete ${pendingIds.length} pending record(s)?`)) {
+                    return;
+                }
+                
+                Promise.all(pendingIds.map(id => fetch(`${BASE_PATH}/api/social-contract/records/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
@@ -1421,11 +1852,15 @@
                     return r.json();
                 })))
                 .then(() => {
-                    allRecords = allRecords.filter(r => !ids.includes(r.id));
+                    allRecords = allRecords.filter(r => !pendingIds.includes(r.id));
                     renderTable();
                     updateDashboardFromRecords(allRecords);
+                    showToast(`Successfully deleted ${pendingIds.length} record(s)`, 'success');
                 })
-                .catch((err) => { console.error('Failed to delete selected records', err); });
+                .catch((err) => { 
+                    console.error('Failed to delete selected records', err);
+                    showToast('Failed to delete records', 'error');
+                });
             });
         }
         // Floating portal for the status filter menu (avoid overflow clipping)
@@ -1683,6 +2118,7 @@
         function updateDashboardFromRecords(records) {
             try {
                 const elApproved = document.getElementById('approved-count');
+                const elVerified = document.getElementById('verified-count');
                 const elPending = document.getElementById('pending-count');
                 const elRejected = document.getElementById('rejected-count');
                 const elHoursLabel = document.getElementById('hours-completion-label');
@@ -1694,10 +2130,12 @@
 
                 const counts = { Approved: 0, Verified: 0, Pending: 0, Rejected: 0 };
                 let totalHours = 0; // all hours, informational only
-                let approvedHours = 0; // Approved + Verified
+                let approvedHours = 0; // Approved only (final approval)
+                let verifiedHours = 0; // Verified only (admin verified, awaiting super admin approval)
                 let pendingHours = 0;  // Pending only
                 // Track last update per status
-                let lastApproved = null; // includes Verified/Approved
+                let lastApproved = null;
+                let lastVerified = null;
                 let lastPending = null;
                 let lastRejected = null;
                 const yearMap = new Map(); // year -> approved count
@@ -1707,8 +2145,7 @@
                     // prefer explicit timestamps when available; fallback to record date
                     const createdAt = safeDate(r.created_at || r.createdAt || r.date);
                     const updatedAt = safeDate(r.updated_at || r.updatedAt || r.date);
-                    if (status === 'Verified' || status === 'Approved') {
-                        // Count both Verified and Approved as "Approved" for display
+                    if (status === 'Approved') {
                         counts.Approved++;
                         // aggregate yearly approved
                         const y = safeYear(r.date);
@@ -1717,6 +2154,10 @@
                         }
                         const basis = updatedAt || createdAt;
                         if (basis && (!lastApproved || basis > lastApproved)) lastApproved = basis;
+                    } else if (status === 'Verified') {
+                        counts.Verified++;
+                        const basis = updatedAt || createdAt;
+                        if (basis && (!lastVerified || basis > lastVerified)) lastVerified = basis;
                     } else if (status === 'Pending') {
                         counts.Pending++;
                         if (createdAt && (!lastPending || createdAt > lastPending)) lastPending = createdAt;
@@ -1729,32 +2170,37 @@
                     const h = Number(r.hours_rendered || 0);
                     if (!Number.isNaN(h)) {
                         totalHours += h;
-                        if (status === 'Verified' || status === 'Approved') approvedHours += h;
+                        if (status === 'Approved') approvedHours += h;
+                        else if (status === 'Verified') verifiedHours += h;
                         else if (status === 'Pending') pendingHours += h;
                     }
                 }
 
-                // Update cards (show combined Verified + Approved as "Approved")
+                // Update cards
                 if (elApproved) elApproved.textContent = String(counts.Approved);
+                if (elVerified) elVerified.textContent = String(counts.Verified);
                 if (elPending) elPending.textContent = String(counts.Pending);
                 if (elRejected) elRejected.textContent = String(counts.Rejected);
                 // Per-status last update text & row visibility
                 const fmt = (d) => d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : '';
                 const approvedText = fmt(lastApproved);
+                const verifiedText = fmt(lastVerified);
                 const pendingText = fmt(lastPending);
                 const rejectedText = fmt(lastRejected);
                 setTextIf('#summary-last-updated', approvedText);
+                setTextIf('#summary-last-updated-verified', verifiedText);
                 setTextIf('#summary-last-updated-2', pendingText);
                 setTextIf('#summary-last-updated-3', rejectedText);
                 // Leave labels visible; if no data, the value spans are empty (blank)
 
-                // Hours: explicit 120-hour target for both approved (completion) and pending
+                // Hours: explicit 160-hour target for approved (completion - includes both Approved and Verified)
                 const targetHours = 160;
-                const approvedPct = Math.max(0, Math.min(100, Math.round(((approvedHours || 0) / targetHours) * 100)));
+                const combinedApprovedHours = approvedHours + verifiedHours; // Approved + Verified count towards completion
+                const approvedPct = Math.max(0, Math.min(100, Math.round(((combinedApprovedHours || 0) / targetHours) * 100)));
                 const pendingPct = Math.max(0, Math.min(100, Math.round(((pendingHours || 0) / targetHours) * 100)));
                 // Update labels
                 if (elHoursLabel) elHoursLabel.textContent = approvedPct + '%';
-                if (elHoursAmount) elHoursAmount.textContent = `${approvedHours || 0}h of ${targetHours}h`;
+                if (elHoursAmount) elHoursAmount.textContent = `${combinedApprovedHours || 0}h of ${targetHours}h`;
                 if (elPendingLabel) elPendingLabel.textContent = pendingPct + '%';
                 if (elPendingAmount) elPendingAmount.textContent = `${pendingHours || 0}h of ${targetHours}h`;
                 // Values for charts

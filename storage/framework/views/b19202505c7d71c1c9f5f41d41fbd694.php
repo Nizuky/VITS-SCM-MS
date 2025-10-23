@@ -7,9 +7,9 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Super Admin - Student Contract Management</title>
+<title>Admin - Student Contract Management</title>
 <script>
-(function(){try{var s=localStorage.getItem('scms_superadmin_theme');if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}}catch(_){}})();
+(function(){try{var s=localStorage.getItem('scms_admin_theme');if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}}catch(_){}})();
 </script>
 <script>
 tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{colors:{'background-light':'#EDF1FA','primary-purple':'#6D28D9','primary-purple-hover':'#5B21B6','text-header':'#2B3674','text-muted':'#707EAE','badge-pending-text':'#E29C44','badge-pending-bg':'#FAEAD0','badge-verified-text':'#399552','badge-verified-bg':'#CCEED6','badge-rejected-text':'#CC525D','badge-rejected-bg':'#FFD7DB','success-green':'#4CAF50','success-green-hover':'#45a049','danger-red':'#CC525D','danger-red-hover':'#b33e46'},fontFamily:{sans:['Inter','sans-serif']}}}};
@@ -48,8 +48,7 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
+<style>
 body{font-family:'Inter',sans-serif}
 .active-nav{background-color:#6D28D9;color:#fff;border-radius:0.5rem}
 .flex-1-dynamic{flex:1 1 auto;min-height:0}
@@ -70,13 +69,11 @@ body{font-family:'Inter',sans-serif}
 .btn-action{font-weight:600;border-width:1.5px;border-radius:6px;padding:4px 12px;font-size:0.75rem;height:auto;min-height:auto;background-color:transparent;transition:all 0.2s ease-in-out}
 .btn-action-verify{border-color:#13AAAA;color:#13AAAA}
 .btn-action-verify:hover{background-color:#13AAAA;color:white}
-.btn-action-approve{border-color:#4CAF50;color:#4CAF50}
-.btn-action-approve:hover{background-color:#4CAF50;color:white}
 .btn-action-reject{border-color:#CC525D;color:#CC525D}
 .btn-action-reject:hover{background-color:#CC525D;color:white}
 .bg-gradient-primary-purple{background-image:linear-gradient(to bottom,#bbacffff,#6D28D9)}
 .bg-gradient-pending{background-image:linear-gradient(to bottom,#FFF4DE,#FFE0A2)}
-.bg-gradient-accepted{background-image:linear-gradient(to bottom,#DCFCE7,#81FFAC)}
+.bg-gradient-accepted{background-image:linear-gradient(to bottom,#e1fff8ff,#2ce0e0ff)}
 .bg-gradient-rejected{background-image:linear-gradient(to bottom,#FFE2E5,#FFB7BE)}
 .custom-tab-wrapper{background-color:white;border-radius:0.5rem;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);padding:0.5rem}
 .custom-tab{font-weight:600;color:#707EAE;padding:0.5rem 1.25rem;border-bottom:3px solid transparent;transition:all 0.2s ease-in-out;cursor:pointer}
@@ -86,15 +83,12 @@ body{font-family:'Inter',sans-serif}
 .details-label{font-weight:600;color:#374151;margin-bottom:0.5rem;display:block}
 .status-badge{display:inline-flex;align-items:center;padding:0.5rem 1.25rem;border-radius:0.5rem;font-weight:600;font-size:0.875rem}
 .status-badge.verified{background-color:#D1FAE5;color:#065F46}
-.status-badge.approved{background-color:#D1FAE5;color:#065F46}
 .status-badge.rejected{background-color:#FFD1D3;color:#CC525D}
-.status-badge.for-approval{background-color:#FFF4DE;color:#E29C44}
 .scms-badge{display:inline-flex;align-items:center;justify-content:center;font-weight:600;border-radius:9999px;padding:0.25rem 0.5rem;font-size:0.75rem;line-height:1;border:0!important}
 .scms-badge--pending{background-color:#FAEAD0!important;color:#E29C44!important}
 .scms-badge--verified{background-color:#B2F5EA!important;color:#0D9488!important}
 .scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
 .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
-.scms-badge--for-approval{background-color:#FFF4DE!important;color:#E29C44!important}
 .bg-custom{background-color:#EDF1FA;background-image:url('<?php echo e(asset("vits_bg_white.png")); ?>');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
 #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
 #toast-root .alert{pointer-events:auto}
@@ -113,9 +107,8 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
 [data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
 [data-theme="dark"] .scms-badge--rejected{background-color:#b8000fff!important;color:#ffffffff!important}
-[data-theme="dark"] .scms-badge--for-approval{background-color:#ff9d26ff!important;color:#ffffffff!important}
 [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
-[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
+[data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
 [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
 [data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('<?php echo e(asset("storage/vits_bg_black.png")); ?>')}
 [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
@@ -127,14 +120,31 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
 [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
 [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+#status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
+#status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.1)}
+#status-filter-dropdown svg{fill:#707EAE}
+#status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+#status-filter-dropdown{position:relative!important}
+#status-filter-dropdown .dropdown-content{position:fixed!important;box-shadow:0 10px 25px rgba(0,0,0,0.15)!important;z-index:9999!important}
+.dropdown-content li a{font-size:0.875rem;padding:0.5rem 1rem}
+.dropdown-content li a:hover{background-color:#6D28D9;color:#fff}
+[data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+[data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+[data-theme="dark"] #status-filter-dropdown .btn{color:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.2)}
+[data-theme="dark"] #status-filter-dropdown svg{fill:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+thead{overflow:visible!important}
+table{overflow:visible!important}
+#submission-page .overflow-x-auto{overflow:visible!important}
+#action-status-header{overflow:visible!important;position:relative}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
-
 <body class="min-h-screen bg-custom">
 <?php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
-    $fullName = trim(auth('superadmin')->user()->name ?? 'Super Admin');
+    $fullName = trim(auth('admin')->user()->name ?? 'Admin');
     
     // Check if name starts with "admin" (case-insensitive)
     $initials = '';
@@ -158,7 +168,7 @@ body{font-family:'Inter',sans-serif}
     }
     
     if (!$initials)
-        $initials = 'SA';
+        $initials = 'AD';
 ?>
 
     <div class="flex p-4 gap-4 min-h-screen">
@@ -174,7 +184,7 @@ body{font-family:'Inter',sans-serif}
                     </div>
                 </div>
                 <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
-                <p class="text-sm text-gray-500">Super Administrator</p>
+                <p class="text-sm text-gray-500">Administrator</p>
             </div>
 
             <!-- Main Navigation -->
@@ -211,35 +221,31 @@ body{font-family:'Inter',sans-serif}
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" onclick="document.getElementById('logout_modal').showModal()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        Log Out
-                    </a>
+                    <form id="logout-form-visible" 
+                          action="<?php echo e(route('admin.logout')); ?>" 
+                          method="POST" 
+                          class="m-0 p-0 pl-2 pr-0" 
+                          novalidate>
+                        <?php echo csrf_field(); ?>
+                        <button id="logout-button-visible" 
+                                type="button" 
+                                class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Log Out
+                        </button>
+                    </form>
                 </li>
             </ul>
         </aside>
 
+        <!-- Main Content -->
         <main class="flex-1 flex flex-col gap-6" id="page-container">
-            
-            <!-- Flash Messages -->
-            <?php if(session('success')): ?>
-                <div class="alert alert-success shadow-lg mx-4" id="flash-message">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span><?php echo e(session('success')); ?></span>
-                </div>
-            <?php endif; ?>
-            <?php if(session('error')): ?>
-                <div class="alert alert-error shadow-lg mx-4" id="flash-message">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span><?php echo e(session('error')); ?></span>
-                </div>
-            <?php endif; ?>
             
             <!-- Dashboard Overview Page -->
             <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
-                <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Super Admin Dashboard</h1>
+                <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Admin Dashboard</h1>
                 
                 <!-- Welcome Greeting Card -->
                 <div class="relative rounded-2xl bg-transparent p-2 mb-6 h-[190px]">
@@ -252,17 +258,17 @@ body{font-family:'Inter',sans-serif}
                             <h2 class="text-3xl font-semibold text-white">
                                 Welcome, 
                                 <span class="text-white font-bold">
-                                    <?php echo e(Str::of(auth('superadmin')->user()->name)->explode(' ')->first()); ?>
+                                    <?php echo e(Str::of(auth('admin')->user()->name)->explode(' ')->first()); ?>
 
                                 </span>
                             </h2>
                             <br>
                             <p class="text-white text-base mt-1">
-                                Manage admin submissions and <br>
-                                oversee social contract compliance.
+                                Manage student submissions and <br>
+                                monitor social contract compliance.
                             </p>
                             <p class="text-white font-bold text-base mt-1">
-                                Empowering ka-VITS through efficient super administration!
+                                Empowering ka-VITS through efficient administration!
                             </p>
                         </div>
                         
@@ -296,7 +302,7 @@ body{font-family:'Inter',sans-serif}
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Pending Requests -->
-                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
+                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Pending')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -310,7 +316,7 @@ body{font-family:'Inter',sans-serif}
                         </div>
                         
                         <!-- Accepted Requests -->
-                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Approved')">
+                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
                             <div class="bg-white p-2 rounded-full w-min">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -318,7 +324,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-green-800 font-semibold">Approved This Week</p>
+                                <p class="text-[#0e4848ff] font-semibold">Verified This Week</p>
                                 <p class="text-xs text-text-muted mt-1">Successfully verified</p>
                             </div>
                         </div>
@@ -340,7 +346,7 @@ body{font-family:'Inter',sans-serif}
                 </div>
 
                 <!-- Activity Calendar -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <div class="bg-white dark:bg-base-200 rounded-2xl p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
@@ -349,8 +355,8 @@ body{font-family:'Inter',sans-serif}
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-3 text-xs">
                                 <span class="text-text-muted">Less</span>
-                                <div class="flex gap-1">
-                                    <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
+                                <div class="flex gap-1 activity-calendar-legend">
+                                     <div class="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" title="No activity"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
                                     <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
@@ -358,24 +364,20 @@ body{font-family:'Inter',sans-serif}
                                 </div>
                                 <span class="text-text-muted">More</span>
                             </div>
-                            <!-- Year Navigation -->
-                            <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                                <button id="prev-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(-1)" title="Previous year">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
+                            <div class="flex items-center gap-2">
+                                <button id="calendar-prev-year" onclick="changeCalendarYear(-1)" class="btn btn-sm btn-circle btn-ghost">
+                                    ←
                                 </button>
-                                <span id="calendar-year" class="text-sm font-bold text-text-header min-w-[60px] text-center">2025</span>
-                                <button id="next-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(1)" title="Next year">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
+                                <span id="calendar-year" class="text-sm font-semibold min-w-[3rem] text-center">2025</span>
+                                <button id="calendar-next-year" onclick="changeCalendarYear(1)" class="btn btn-sm btn-circle btn-ghost">
+                                    →
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div id="activity-calendar" class="overflow-x-auto pb-2">
                         <!-- Calendar will be dynamically generated by JavaScript -->
+                        <!-- Data source: loadActivityData() function calls API endpoint -->
                     </div>
                 </div>
             </div>
@@ -386,21 +388,9 @@ body{font-family:'Inter',sans-serif}
                 
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
                     <!-- Tabs -->
-                    <!-- 
-                        Workflow:
-                        1. Pending: Records submitted by students (not yet reviewed by anyone)
-                        2. For Approval: Records with "Verified" status (admin verified from their archived section) - awaiting super admin's final decision
-                        3. Archived: Records with super admin's final decision (Approved or Rejected)
-                        
-                        Status mapping: 
-                        - DB Status "Pending" → Shows in "Pending" tab
-                        - DB Status "Verified" → Shows in "For Approval" tab (these are admin's archived verified records)
-                        - DB Status "Approved"/"Rejected" → Shows in "Archived" tab (super admin's final decisions)
-                    -->
                     <div class="flex space-x-2 custom-tab-wrapper">
-                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('for-approval',this)">For Approval</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('archived',this)">Archived</a>
+                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('Pending',this)">Pending</a>
+                        <a role="tab" class="custom-tab" onclick="filterSubmissions('Archived',this)">Archived</a>
                     </div>
                     
                     <!-- Search -->
@@ -447,7 +437,27 @@ body{font-family:'Inter',sans-serif}
                                             <span id="date-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">Action</th>
+                                    <th class="w-[18%] text-center" id="action-status-header">
+                                        <span id="action-label">Action</span>
+                                        <div class="hidden" id="status-header-wrapper">
+                                            <div class="flex items-center justify-center gap-1">
+                                                <span>Status</span>
+                                                <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
+                                                    <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1.5A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
+                                                        <li><a onclick="filterTableByStatus('All', event)">All</a></li>
+                                                        <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
+                                                        <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
+                                                        <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body">
@@ -483,7 +493,7 @@ body{font-family:'Inter',sans-serif}
                                 <div class="label">
                                     <span class="label-text font-semibold">Full Name</span>
                                 </div>
-                                <input id="admin-name" type="text" value="<?php echo e(auth()->guard('superadmin')->user()->name); ?>" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
+                                <input id="admin-name" type="text" value="<?php echo e(auth()->guard('admin')->user()->name); ?>" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
                             </label>
                             
                             <div class="pt-4 flex justify-end">
@@ -497,7 +507,7 @@ body{font-family:'Inter',sans-serif}
                     <!-- Change Password Section -->
                     <div>
                         <h2 class="text-xl font-bold text-text-header mb-4">Change Password</h2>
-                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong><?php echo e(auth()->guard('superadmin')->user()->email); ?></strong> to confirm your password change.</p>
+                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong><?php echo e(auth()->guard('admin')->user()->email); ?></strong> to confirm your password change.</p>
                         
                         <form id="password-change-form" class="space-y-4 max-w-md">
                         <!-- Current Password -->
@@ -557,192 +567,11 @@ body{font-family:'Inter',sans-serif}
                     </div>
                 </div>
             </div>
-
-            <!-- FAQs Page -->
-            <div id="faqs-page" class="page-content hidden">
-                <div class="p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Frequently Asked Questions</h4>
-                </div>
-                
-                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto space-y-4">
-                    <!-- FAQ 1 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            1. What is the Social Contract Management System?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">The Social Contract Management System is a digital platform that helps manage and monitor students' social service hours required by the Pamantasan ng Lungsod ng Valenzuela. It allows students, staff, and advisers to record, verify, and approve social contract activities more efficiently.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 2 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            2. Why was the system developed?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">It was developed to replace the manual, paper-based process of recording social contract hours. The old process often led to misplaced files, inaccurate records, and difficulty in tracking student progress.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 3 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            3. Who can access the system?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">The system can be accessed by students, department staff, advisers, and the head office reviewer. Each has different access levels and responsibilities.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 4 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            4. How does the approval process work?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">The process starts when a student submits their accomplished form. The Department Staff or Adviser first checks and verifies the details. Once verified, the Chairperson gives the final approval or rejection. Approved records are then officially counted toward the student's required hours.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 5 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            5. How do I create an account?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">Click "Sign Up," fill in your student details, and verify your PLV email to activate your account.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 6 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            6. Can I edit my form after submission?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">No. Once submitted, you can't edit it. Wait for feedback from your adviser if revisions are needed.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 7 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            7. What happens after I submit my form?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">Your form will first be reviewed by your Department Staff or Adviser, then forwarded to the Head Office Reviewer for final approval.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 8 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            8. How long does the review process take?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">It may take a few working days, depending on the availability of your adviser and the head office reviewer.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 9 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            9. How will I know if my form is approved or rejected?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">You'll receive a status update and notification on your dashboard once your form is verified or approved.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 10 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            10. What should I do if my form is rejected?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">Check the reason for rejection on your dashboard, correct the issue, and resubmit your form.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 11 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            11. Can I submit multiple forms?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">No. Only one valid Social Contract Form is allowed per academic year.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 12 -->
-                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
-                        <div class="collapse-title text-lg font-semibold text-text-header">
-                            12. Do I need to print my Social Contract Form?
-                        </div>
-                        <div class="collapse-content">
-                            <p class="text-text-muted">Yes. Once your form is approved by the head office reviewer, export and print it at the end of every academic year, then submit it to the Registrar's Office as proof of your completed service hours.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
     <!-- Modals -->
-    <!-- Verify Modal -->
-    <dialog id="verify_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Verify Submission</h3>
-            <p class="py-4">Are you sure you want to verify this submission? This will move it to "For Approval" status.</p>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-verify-btn" class="btn btn-action-verify text-white" style="background-color: #13AAAA;">
-                        Yes, verify
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Approve Modal -->
-    <dialog id="approve_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Approve Submission</h3>
-            <p class="py-4">Are you sure you want to approve this submission?</p>
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg mb-4" role="alert">
-                <p class="font-bold">Important Notice</p>
-                <p>Once approved, this record will now appear on the Students page and this action cannot be undone.</p>
-            </div>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-approve-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Yes, approve
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Reject Modal with Reason -->
-    <dialog id="reject_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Reject Submission</h3>
-            <p class="py-4">Please provide a reason for rejecting this submission. The student will be notified.</p>
-            <textarea id="rejection-reason" class="textarea textarea-bordered w-full" placeholder="Reason for rejection..." rows="4"></textarea>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
-                        Yes, reject
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
+    <!-- Activity Details Modal -->
     <!-- Activity Details Modal -->
     <dialog id="activity_details_modal" class="modal">
         <div class="modal-box w-11/12 max-w-2xl">
@@ -750,7 +579,7 @@ body{font-family:'Inter',sans-serif}
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
             </form>
             
-            <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date"></span></h3>
+            <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date-header"></span></h3>
             
             <div id="activity-details-content" class="space-y-3">
                 <!-- Activity details will be loaded here -->
@@ -772,17 +601,33 @@ body{font-family:'Inter',sans-serif}
             <button>close</button>
         </form>
     </dialog>
-
-    <!-- Logout Modal -->
-    <dialog id="logout_modal" class="modal">
+    
+    <!-- Verify Modal -->
+    <dialog id="verify_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg">Log Out?</h3>
-            <p class="py-4">Are you sure you want to log out?</p>
+            <h3 class="font-bold text-lg">Verify Submission</h3>
+            <p class="py-4">Are you sure you want to verify this submission?</p>
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
                     <button class="btn">Cancel</button>
-                    <button id="confirm-logout-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
-                        Yes, log out
+                    <button id="confirm-verify-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
+                        Yes, verify
+                    </button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Reject Modal -->
+    <dialog id="reject_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Reject Submission</h3>
+            <p class="py-4">Are you sure you want to reject this submission?</p>
+            <div class="modal-action">
+                <form method="dialog" class="flex gap-2">
+                    <button class="btn">Cancel</button>
+                    <button id="confirm-reject-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                        Yes, reject
                     </button>
                 </form>
             </div>
@@ -917,197 +762,15 @@ body{font-family:'Inter',sans-serif}
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
-        var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
         var currentSortBy = null; // 'hours', 'studentid', or 'date'
 
-        // Toast notification function
-        function showToast(m, t) {
-            t = t || 'success';
-            try {
-                var r = document.getElementById('toast-root');
-                if (!r) return alert(m);
-                
-                var e = document.createElement('div');
-                e.className = 'scms-toast scms-toast--' + t;
-                e.setAttribute('role', 'status');
-                e.setAttribute('aria-live', 'polite');
-                e.style.pointerEvents = 'auto';
-                e.innerHTML = '<span class="scms-toast__msg">' + ((m || '').replace(/</g, '&lt;')) + '</span>' +
-                    '<button class="scms-toast__close" aria-label="Close">' +
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                    '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>' +
-                    '</svg></button>' +
-                    '<div class="scms-toast__progress"></div>';
-                
-                var c = e.querySelector('.scms-toast__close');
-                var p = e.querySelector('.scms-toast__progress');
-                
-                if (p) p.style.animation = 'scms-toast-progress 3500ms linear forwards';
-                
-                var rm = null;
-                var remove = function() {
-                    try { clearTimeout(rm); } catch(_) {}
-                    e.style.opacity = '0';
-                    e.style.transform = 'translateY(6px)';
-                    setTimeout(function() { e.remove(); }, 180);
-                };
-                
-                c.addEventListener('click', remove, {passive: true});
-                r.appendChild(e);
-                e.style.opacity = '0';
-                e.style.transform = 'translateY(6px)';
-                
-                requestAnimationFrame(function() {
-                    e.style.transition = 'opacity .18s ease, transform .18s ease';
-                    e.style.opacity = '1';
-                    e.style.transform = 'translateY(0)';
-                });
-                
-                rm = setTimeout(remove, 3500);
-            } catch(_) {
-                try { alert(m); } catch {}
-            }
-        }
-
-        // Ensure CSRF cookie exists
-        async function ensureCsrfCookie() {
-            try {
-                await fetch(`${BASE_PATH}/sanctum/csrf-cookie`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-            } catch (e) {
-                console.warn('Could not fetch CSRF cookie:', e);
-            }
-        }
-
-        // Toggle password visibility
-        function togglePasswordVisibility(i) {
-            var inp = document.getElementById(i);
-            if (inp) inp.type = inp.type === "password" ? "text" : "password";
-        }
-
-        // Show/hide pages
-        function showPage(p) {
-            document.querySelectorAll('aside a').forEach(function(a) {
-                a.classList.remove('active-nav');
-            });
-            document.querySelectorAll('.page-content').forEach(function(pg) {
-                pg.classList.add('hidden');
-            });
-            
-            var np = document.getElementById(p + '-page');
-            if (np) np.classList.remove('hidden');
-            
-            var nl = document.getElementById('nav-' + p);
-            if (nl) nl.classList.add('active-nav');
-            
-            // Save current page to localStorage for super admin
-            try {
-                localStorage.setItem('scms_superadmin_current_page', p);
-            } catch(_) {}
-            
-            // Load submissions when showing submission page
-            if (p === 'submission') {
-                loadSubmissions();
-                
-                // Restore saved tab or default to pending
-                setTimeout(function() {
-                    var savedTab = 'pending';
-                    try {
-                        savedTab = localStorage.getItem('scms_superadmin_current_tab') || 'pending';
-                    } catch(_) {}
-                    
-                    // Find the tab element based on saved tab
-                    var tabs = document.querySelectorAll('.custom-tab');
-                    var targetTab = null;
-                    
-                    tabs.forEach(function(tab) {
-                        var tabText = tab.textContent.trim().toLowerCase();
-                        if (tabText === savedTab || tabText === savedTab.replace('-', ' ')) {
-                            targetTab = tab;
-                        }
-                    });
-                    
-                    // If no matching tab found, use first tab
-                    if (!targetTab) {
-                        targetTab = tabs[0];
-                    }
-                    
-                    if (targetTab) {
-                        targetTab.classList.add('custom-tab-active');
-                        filterSubmissions(savedTab, targetTab);
-                    }
-                }, 100);
-            }
-        }
-
-        // Filter submissions by status
-        function filterSubmissions(s, t) {
-            document.querySelectorAll('.custom-tab').forEach(function(tb) {
-                tb.classList.remove('custom-tab-active');
-            });
-            t.classList.add('custom-tab-active');
-            
-            // Save current tab for super admin
-            try {
-                localStorage.setItem('scms_superadmin_current_tab', s);
-            } catch(_) {}
-            
-            var st = document.getElementById('search-input').value.toLowerCase();
-            var rs = document.querySelectorAll('#submission-table-body tr');
-            
-            // Normalize the status string for comparison
-            var normalizedStatus = s.toLowerCase().trim();
-            var statusMap = {
-                'pending': 'pending',
-                'for approval': 'for approval',
-                'for-approval': 'for approval',
-                'forapproval': 'for approval',
-                'verified': 'for approval', // Admin verified records appear in "For Approval" tab
-                'archived': 'archived'
-            };
-            var filterStatus = statusMap[normalizedStatus] || normalizedStatus;
-            
-            rs.forEach(function(r) {
-                // Skip if it's the loading row or header row
-                if (!r.dataset.status) {
-                    return;
-                }
-                
-                var dataStatus = (r.dataset.status || '').toLowerCase().trim();
-                
-                // Check if status matches
-                var statusMatch = (dataStatus === filterStatus);
-                
-                // For search term matching
-                var ms = true;
-                if (st) {
-                    var id = r.cells[0].textContent.toLowerCase();
-                    var sn = r.cells[1].textContent.toLowerCase();
-                    var en = r.cells[2].textContent.toLowerCase();
-                    var sb = r.cells[3].textContent.toLowerCase();
-                    var hr = r.cells[4].textContent.toLowerCase();
-                    var dt = r.cells[5].textContent.toLowerCase();
-                    ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
-                         sb.includes(st) || hr.includes(st) || dt.includes(st);
-                }
-                
-                if (statusMatch && ms) {
-                    r.classList.remove('hidden');
-                } else {
-                    r.classList.add('hidden');
-                }
-            });
-        }
-
         // Load dashboard statistics
         function loadDashboardStats() {
-            fetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
+            fetch('/admin/api/dashboard-stats', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1126,8 +789,11 @@ body{font-family:'Inter',sans-serif}
                 if (result.success && result.data) {
                     // Update the counts in the dashboard
                     document.getElementById('pending-requests-count').textContent = result.data.pending;
-                    document.getElementById('accepted-requests-count').textContent = result.data.approved_this_week;
+                    document.getElementById('accepted-requests-count').textContent = result.data.verified_this_week;
                     document.getElementById('rejected-requests-count').textContent = result.data.rejected_this_week;
+                    
+                    // Update the donut chart
+                    updatePendingRequestsChart(result.data.pending);
                 } else {
                     console.warn('Invalid dashboard stats format');
                 }
@@ -1151,7 +817,7 @@ body{font-family:'Inter',sans-serif}
             }
             
             // Fetch submissions from API
-            fetch(`${BASE_PATH}/super-admin/api/submissions`, {
+            fetch('/admin/api/submissions', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1175,7 +841,7 @@ body{font-family:'Inter',sans-serif}
                         lastSubmissionsData = result.data;
                         allSubmissions = result.data;
                         renderSubmissions(result.data);
-                        updateDashboardStats(result.data);
+                        updateWeeklySummaryFromData(result.data);
                     }
                 } else {
                     throw new Error('Invalid response format');
@@ -1226,13 +892,12 @@ body{font-family:'Inter',sans-serif}
             sortedSubmissions.forEach(function(record) {
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
-                var isVerified = status === 'Verified'; // Admin verified - shown in "For Approval" tab
+                var isVerified = status === 'Verified';
                 var isApproved = status === 'Approved';
                 var isRejected = status === 'Rejected';
                 
-                // Map status to tab: Pending → Pending tab, Verified → For Approval tab, Approved/Rejected → Archived tab
-                var dataStatus = isPending ? 'Pending' : (isVerified ? 'For Approval' : 'Archived');
-                var dataArchiveStatus = (isApproved || isRejected) ? status : '';
+                var dataStatus = isPending ? 'Pending' : 'Archived';
+                var dataArchiveStatus = isPending ? '' : status;
                 
                 var dateStr = record.date ? formatDate(record.date) : '—';
                 
@@ -1241,7 +906,6 @@ body{font-family:'Inter',sans-serif}
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
-                        'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
@@ -1256,14 +920,10 @@ body{font-family:'Inter',sans-serif}
                             '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
                             '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
                             '</div>';
-                } else if (isVerified) {
-                    // Admin verified records - awaiting super admin approval/rejection
-                    html += '<div class="space-x-2">' +
-                            '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
-                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                            '</div>';
                 } else if (isApproved) {
                     html += '<span class="scms-badge scms-badge--approved">Approved</span>';
+                } else if (isVerified) {
+                    html += '<span class="scms-badge scms-badge--verified">Verified</span>';
                 } else if (isRejected) {
                     html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
                 }
@@ -1273,17 +933,10 @@ body{font-family:'Inter',sans-serif}
             
             tbody.innerHTML = html;
             
-            // Apply current filter or default to pending
+            // Apply current filter
             var activeTab = document.querySelector('.custom-tab-active');
             if (activeTab) {
-                filterSubmissions(activeTab.textContent.trim().toLowerCase(), activeTab);
-            } else {
-                // If no active tab, activate the first tab (Pending)
-                var firstTab = document.querySelector('.custom-tab');
-                if (firstTab) {
-                    firstTab.classList.add('custom-tab-active');
-                    filterSubmissions('pending', firstTab);
-                }
+                filterSubmissions(activeTab.textContent.trim(), activeTab);
             }
         }
         
@@ -1300,36 +953,38 @@ body{font-family:'Inter',sans-serif}
             }
         }
         
-        // Update dashboard statistics
-        function updateDashboardStats(submissions) {
+        // Update weekly summary from loaded data
+        function updateWeeklySummaryFromData(submissions) {
             var now = new Date();
             var weekAgo = new Date(now);
             weekAgo.setDate(weekAgo.getDate() - 7);
             
-            var pending = 0, approved = 0, rejected = 0;
+            var pending = 0, accepted = 0, rejected = 0;
             
             submissions.forEach(function(record) {
-                var recordDate = new Date(record.updated_at || record.created_at || record.date);
+                var recordDate = new Date(record.updated_at || record.created_at);
                 var isThisWeek = recordDate >= weekAgo && recordDate <= now;
                 
-                // Count Pending and Verified (admin verified, awaiting super admin decision) as pending
-                if (record.status === 'Pending' || record.status === 'Verified') {
+                if (record.status === 'Pending') {
                     pending++;
-                }
-                if (record.status === 'Approved' && isThisWeek) {
-                    approved++;
-                }
-                if (record.status === 'Rejected' && isThisWeek) {
+                } else if (record.status === 'Verified' && isThisWeek) {
+                    accepted++;
+                } else if (record.status === 'Rejected' && isThisWeek) {
                     rejected++;
                 }
             });
             
             document.getElementById('pending-requests-count').textContent = pending;
-            document.getElementById('accepted-requests-count').textContent = approved;
+            document.getElementById('accepted-requests-count').textContent = accepted;
             document.getElementById('rejected-requests-count').textContent = rejected;
             
             // Update the donut chart
-            updatePendingRequestsChart(pending);
+            if (pendingRequestsChartInstance) {
+                var totalCapacity = 50;
+                pendingRequestsChartInstance.data.datasets[0].data = [pending, Math.max(0, totalCapacity - pending)];
+                pendingRequestsChartInstance.update();
+                document.getElementById('pending-requests-label').textContent = pending;
+            }
         }
 
         // Show status modal with filtered records
@@ -1352,10 +1007,10 @@ body{font-family:'Inter',sans-serif}
                 var recordDate = new Date(r.updated_at || r.created_at);
                 var isThisWeek = recordDate >= weekAgo && recordDate <= now;
                 
-                if (status === 'Verified') {
-                    return r.status === 'Verified';
-                } else if (status === 'Approved') {
-                    return r.status === 'Approved' && isThisWeek;
+                if (status === 'Pending') {
+                    return r.status === 'Pending';
+                } else if (status === 'Verified') {
+                    return r.status === 'Verified' && isThisWeek;
                 } else if (status === 'Rejected') {
                     return r.status === 'Rejected' && isThisWeek;
                 }
@@ -1366,16 +1021,16 @@ body{font-family:'Inter',sans-serif}
             var iconSvg = '';
             var bgColorClass = '';
             
-            if (status === 'Verified') {
+            if (status === 'Pending') {
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
                 bgColorClass = 'bg-gradient-pending';
-                modalTitle.textContent = filteredRecords.length + ' Verified Requests';
-                modalSubtitle.textContent = 'All verified requests awaiting super admin approval';
-            } else if (status === 'Approved') {
+                modalTitle.textContent = filteredRecords.length + ' Pending Requests';
+                modalSubtitle.textContent = 'All pending social contract requests awaiting review';
+            } else if (status === 'Verified') {
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
                 bgColorClass = 'bg-gradient-accepted';
-                modalTitle.textContent = filteredRecords.length + ' Approved Requests';
-                modalSubtitle.textContent = 'All approved requests this week';
+                modalTitle.textContent = filteredRecords.length + ' Verified Requests';
+                modalSubtitle.textContent = 'All verified requests this week';
             } else if (status === 'Rejected') {
                 iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
                 bgColorClass = 'bg-gradient-rejected';
@@ -1408,14 +1063,14 @@ body{font-family:'Inter',sans-serif}
                     var row = document.createElement('tr');
                     var statusBadge = '';
                     
-                    if (rec.status === 'Verified') {
+                    if (rec.status === 'Pending') {
+                        statusBadge = '<span class="badge badge-warning text-white">Pending</span>';
+                    } else if (rec.status === 'Verified') {
                         statusBadge = '<span class="badge badge-info text-white">Verified</span>';
-                    } else if (rec.status === 'Approved') {
-                        statusBadge = '<span class="badge badge-success text-white">Approved</span>';
                     } else if (rec.status === 'Rejected') {
                         statusBadge = '<span class="badge badge-error text-white">Rejected</span>';
-                    } else if (rec.status === 'Pending') {
-                        statusBadge = '<span class="badge badge-warning text-white">Pending</span>';
+                    } else if (rec.status === 'Approved') {
+                        statusBadge = '<span class="badge badge-success text-white">Approved</span>';
                     }
                     
                     row.innerHTML = 
@@ -1438,18 +1093,211 @@ body{font-family:'Inter',sans-serif}
             modal.showModal();
         };
 
+        // Toast notification function
+        function showToast(m, t) {
+            t = t || 'success';
+            try {
+                var r = document.getElementById('toast-root');
+                if (!r) return alert(m);
+                
+                var e = document.createElement('div');
+                e.className = 'scms-toast scms-toast--' + t;
+                e.setAttribute('role', 'status');
+                e.setAttribute('aria-live', 'polite');
+                e.style.pointerEvents = 'auto';
+                e.innerHTML = '<span class="scms-toast__msg">' + ((m || '').replace(/</g, '&lt;')) + '</span>' +
+                    '<button class="scms-toast__close" aria-label="Close">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>' +
+                    '</svg></button>' +
+                    '<div class="scms-toast__progress"></div>';
+                
+                var c = e.querySelector('.scms-toast__close');
+                var p = e.querySelector('.scms-toast__progress');
+                
+                if (p) p.style.animation = 'scms-toast-progress 3500ms linear forwards';
+                
+                var rm = null;
+                var remove = function() {
+                    try { clearTimeout(rm); } catch(_) {}
+                    e.style.opacity = '0';
+                    e.style.transform = 'translateY(6px)';
+                    setTimeout(function() { e.remove(); }, 180);
+                };
+                
+                c.addEventListener('click', remove, {passive: true});
+                r.appendChild(e);
+                e.style.opacity = '0';
+                e.style.transform = 'translateY(6px)';
+                
+                requestAnimationFrame(function() {
+                    e.style.transition = 'opacity .18s ease, transform .18s ease';
+                    e.style.opacity = '1';
+                    e.style.transform = 'translateY(0)';
+                });
+                
+                rm = setTimeout(remove, 3500);
+            } catch(_) {
+                try { alert(m); } catch {}
+            }
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(i) {
+            var inp = document.getElementById(i);
+            if (inp) inp.type = inp.type === "password" ? "text" : "password";
+        }
+
+        // Show/hide pages
+        function showPage(p) {
+            document.querySelectorAll('aside a').forEach(function(a) {
+                a.classList.remove('active-nav');
+            });
+            document.querySelectorAll('.page-content').forEach(function(pg) {
+                pg.classList.add('hidden');
+            });
+            
+            var np = document.getElementById(p + '-page');
+            if (np) np.classList.remove('hidden');
+            
+            var nl = document.getElementById('nav-' + p);
+            if (nl) nl.classList.add('active-nav');
+            
+            // Save current page to localStorage for admin
+            try {
+                localStorage.setItem('scms_admin_current_page', p);
+            } catch(_) {}
+            
+            // Load submissions when showing submission page
+            if (p === 'submission') {
+                loadSubmissions();
+                
+                // Restore saved tab or default to pending
+                setTimeout(function() {
+                    var savedTab = 'pending';
+                    try {
+                        savedTab = localStorage.getItem('scms_admin_current_tab') || 'pending';
+                    } catch(_) {}
+                    
+                    // Find the tab element based on saved tab
+                    var tabs = document.querySelectorAll('.custom-tab');
+                    var targetTab = null;
+                    
+                    tabs.forEach(function(tab) {
+                        var tabText = tab.textContent.trim().toLowerCase();
+                        if (tabText === savedTab || tabText === savedTab.replace('-', ' ')) {
+                            targetTab = tab;
+                        }
+                    });
+                    
+                    // If no matching tab found, use first tab
+                    if (!targetTab && tabs.length > 0) {
+                        targetTab = tabs[0];
+                    }
+                    
+                    if (targetTab) {
+                        targetTab.classList.add('custom-tab-active');
+                        filterSubmissions(savedTab, targetTab);
+                    }
+                }, 100);
+            }
+        }
+
+        // Global variable to track current status filter
+        var currentStatusFilter = 'All';
+
+        // Filter submissions by status
+        function filterSubmissions(s, t) {
+            document.querySelectorAll('.custom-tab').forEach(function(tb) {
+                tb.classList.remove('custom-tab-active');
+            });
+            t.classList.add('custom-tab-active');
+            
+            // Save current tab for admin
+            try {
+                localStorage.setItem('scms_admin_current_tab', s);
+            } catch(_) {}
+            
+            // Update header based on tab
+            var actionLabel = document.getElementById('action-label');
+            var statusWrapper = document.getElementById('status-header-wrapper');
+            
+            if (s === 'Archived') {
+                actionLabel.classList.add('hidden');
+                statusWrapper.classList.remove('hidden');
+            } else {
+                actionLabel.classList.remove('hidden');
+                statusWrapper.classList.add('hidden');
+            }
+            
+            // Reset status filter when switching tabs
+            currentStatusFilter = 'All';
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rs = r.dataset.status;
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                if (rs === s && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
+        }
+
+        // Filter table by status (for Archived tab)
+        function filterTableByStatus(status, event) {
+            if (event) event.preventDefault();
+            
+            currentStatusFilter = status;
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rowStatus = r.dataset.status;
+                var archiveStatus = r.dataset.archiveStatus;
+                
+                // Only filter rows that are in the Archived tab
+                if (rowStatus !== 'Archived') {
+                    return;
+                }
+                
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                // Apply both status filter and search filter
+                var statusMatch = status === 'All' || archiveStatus === status;
+                
+                if (statusMatch && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
+        }
+
         // Open verify modal
         function openVerifyModal(b, e) {
             e.stopPropagation();
             activeRow = b.closest('tr');
             document.getElementById('verify_modal').showModal();
-        }
-
-        // Open approve modal
-        function openApproveModal(b, e) {
-            e.stopPropagation();
-            activeRow = b.closest('tr');
-            document.getElementById('approve_modal').showModal();
         }
 
         // Open reject modal
@@ -1465,16 +1313,17 @@ body{font-family:'Inter',sans-serif}
             var s = r.dataset.status;
             var v = r.dataset.venue;
             var en = r.cells[2].textContent;
-            var org = r.cells[3].textContent;
+            var sn = r.cells[3].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
+            var oc = r.cells[2].textContent;
             
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = org;
+            document.getElementById('details-supervisor-name').value = sn;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
-            document.getElementById('details-organizing-committee').value = org;
+            document.getElementById('details-organizing-committee').value = oc;
             
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
@@ -1488,20 +1337,13 @@ body{font-family:'Inter',sans-serif}
                 ab.classList.remove('hidden');
                 ab.innerHTML = '<button class="btn btn-action btn-action-verify flex-1" onclick="handleDetailsVerify()">Verify</button>' +
                                '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
-            } else if (s === 'For Approval') {
-                // Records verified by admin - awaiting super admin approval/rejection
-                ss.classList.add('hidden');
-                ab.classList.remove('hidden');
-                ab.innerHTML = '<button class="btn btn-action btn-action-approve flex-1" onclick="handleDetailsApprove()">Approve</button>' +
-                               '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
             } else {
-                // Archived records - show final status (Approved or Rejected by super admin)
                 ss.classList.remove('hidden');
                 ab.classList.add('hidden');
                 var as = r.dataset.archiveStatus;
                 sb.textContent = as;
-                if (as === 'Approved') {
-                    sb.className = 'status-badge approved';
+                if (as === 'Verified') {
+                    sb.className = 'status-badge verified';
                 } else if (as === 'Rejected') {
                     sb.className = 'status-badge rejected';
                 }
@@ -1514,12 +1356,6 @@ body{font-family:'Inter',sans-serif}
         function handleDetailsVerify() {
             document.getElementById('submission_details_modal').close();
             document.getElementById('verify_modal').showModal();
-        }
-
-        // Handle approve from details modal
-        function handleDetailsApprove() {
-            document.getElementById('submission_details_modal').close();
-            document.getElementById('approve_modal').showModal();
         }
 
         // Handle reject from details modal
@@ -1536,7 +1372,7 @@ body{font-family:'Inter',sans-serif}
                 var ap = function(m) {
                     document.documentElement.setAttribute('data-theme', m);
                     try {
-                        localStorage.setItem('scms_superadmin_theme', m);
+                        localStorage.setItem('scms_admin_theme', m);
                     } catch(_) {}
                     if (lb) lb.textContent = (m === 'dark') ? 'Dark theme' : 'Light theme';
                     if (tg) tg.checked = (m === 'dark');
@@ -1544,7 +1380,7 @@ body{font-family:'Inter',sans-serif}
                 
                 var sv = 'light';
                 try {
-                    sv = (localStorage.getItem('scms_superadmin_theme') === 'dark') ? 'dark' : 'light';
+                    sv = (localStorage.getItem('scms_admin_theme') === 'dark') ? 'dark' : 'light';
                 } catch(_) {}
                 
                 ap(sv);
@@ -1557,389 +1393,67 @@ body{font-family:'Inter',sans-serif}
             } catch(_) {}
         }
 
-        // Initialize Pending Requests Donut Chart
-        var pendingRequestsChartInstance = null;
-        function initPendingRequestsChart(pendingCount) {
-            var canvas = document.getElementById('pendingRequestsChart');
-            if (!canvas) return;
-            
-            var ctx = canvas.getContext('2d');
-            
-            // Destroy existing chart if any
-            if (pendingRequestsChartInstance) {
-                pendingRequestsChartInstance.destroy();
-            }
-            
-            // Default to 0 if not provided
-            if (typeof pendingCount === 'undefined') {
-                pendingCount = 0;
-            }
-            
-            var totalCapacity = 50; // Example total capacity
-            
-            pendingRequestsChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [pendingCount, Math.max(0, totalCapacity - pendingCount)],
-                        backgroundColor: ['#FFFFFF', 'rgba(255, 255, 255, 0.2)'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '75%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                }
-            });
-            
-            // Update label
-            document.getElementById('pending-requests-label').textContent = pendingCount;
-        }
-
-        // Update chart with new data
-        function updatePendingRequestsChart(pendingCount) {
-            initPendingRequestsChart(pendingCount);
-        }
-
-        // Activity Calendar Variables
-        var currentCalendarYear = new Date().getFullYear();
-        var activityDataCache = {};
-
-        // Generate Activity Calendar (January to December for selected year)
-        function generateActivityCalendar() {
-            var container = document.getElementById('activity-calendar');
-            if (!container) return;
-            
-            // Update year display
-            document.getElementById('calendar-year').textContent = currentCalendarYear;
-            
-            // Disable next button if viewing current year
-            var nextBtn = document.getElementById('next-year-btn');
-            var currentYear = new Date().getFullYear();
-            if (nextBtn) {
-                nextBtn.disabled = currentCalendarYear >= currentYear;
-                if (currentCalendarYear >= currentYear) {
-                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            }
-            
-            // Create date range for the selected year (January 1 to December 31)
-            var startDate = new Date(currentCalendarYear, 0, 1); // January 1
-            var endDate = new Date(currentCalendarYear, 11, 31); // December 31
-            var today = new Date();
-            
-            // Load activity data from API
-            loadActivityDataForYear(currentCalendarYear, function(activityData) {
-                renderCalendar(startDate, endDate, today, activityData);
-            });
-        }
-        
-        // Load activity data from API for a specific year
-        function loadActivityDataForYear(year, callback) {
-            // Check cache first
-            if (activityDataCache[year]) {
-                callback(activityDataCache[year]);
-                return;
-            }
-            
-            fetch(`${BASE_PATH}/super-admin/api/activity-calendar?year=` + year, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to fetch activity data');
-                return response.json();
-            })
-            .then(result => {
-                if (result.success && result.data) {
-                    activityDataCache[year] = result.data;
-                    callback(result.data);
-                } else {
-                    console.warn('Invalid activity data format');
-                    callback({});
-                }
-            })
-            .catch(error => {
-                console.error('Failed to load activity data:', error);
-                callback({});
-            });
-        }
-        
-        // Render the calendar
-        function renderCalendar(startDate, endDate, today, activityData) {
-            var container = document.getElementById('activity-calendar');
-            if (!container) return;
-            
-            function getColor(level) {
-                if (level === 0) return '#E5E7EB';
-                if (level <= 2) return '#E5D4FF';
-                if (level <= 4) return '#C9A9FF';
-                if (level <= 6) return '#A475FF';
-                return '#6D28D9';
-            }
-            
-            // Adjust start date to Sunday
-            var calendarStart = new Date(startDate);
-            calendarStart.setDate(calendarStart.getDate() - calendarStart.getDay());
-            
-            // Build weeks
-            var weeks = [];
-            var currentWeek = new Date(calendarStart);
-            
-            while (currentWeek <= endDate) {
-                var week = [];
-                for (var i = 0; i < 7; i++) {
-                    var date = new Date(currentWeek);
-                    date.setDate(date.getDate() + i);
-                    week.push(date);
-                }
-                weeks.push(week);
-                currentWeek.setDate(currentWeek.getDate() + 7);
-            }
-            
-            var html = '<div class="flex gap-2">';
-            
-            // Day labels column
-            html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
-            var days = ['Mon', 'Wed', 'Fri'];
-            for (var d = 0; d < 3; d++) {
-                html += '<div class="h-3 leading-3">' + days[d] + '</div>';
-            }
-            html += '</div>';
-            
-            // Calendar grid
-            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
-            
-            // Month labels row
-            html += '<div class="flex gap-1 mb-2">';
-            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            var lastMonth = -1;
-            var monthPositions = [];
-            
-            for (var w = 0; w < weeks.length; w++) {
-                var weekMonth = weeks[w][0].getMonth();
-                if (weekMonth !== lastMonth) {
-                    monthPositions.push({ week: w, month: weekMonth });
-                    lastMonth = weekMonth;
-                }
-            }
-            
-            for (var w = 0; w < weeks.length; w++) {
-                var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
-                if (showMonth) {
-                    html += '<div class="text-xs text-text-muted" style="min-width: 13px;">' + months[showMonth.month] + '</div>';
-                } else {
-                    html += '<div style="min-width: 13px;"></div>';
-                }
-            }
-            html += '</div>';
-            
-            // Grid rows
-            for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
-                html += '<div class="flex gap-1 mb-1">';
+        // Attach logout handler
+        function attachLogoutHandler() {
+            try {
+                var f = document.getElementById('logout-form-visible');
+                var b = document.getElementById('logout-button-visible');
+                if (!f || !b) return;
                 
-                for (var w = 0; w < weeks.length; w++) {
-                    var date = weeks[w][dayIndex];
-                    var dateStr = date.toISOString().split('T')[0];
-                    var level = activityData[dateStr] || 0;
-                    var color = getColor(level);
-                    
-                    var isToday = date.toDateString() === today.toDateString();
-                    var isFuture = date > today;
-                    var isInYear = date.getFullYear() === currentCalendarYear;
-                    
-                    var title = dateStr + ': ' + level + ' update' + (level !== 1 ? 's' : '');
-                    
-                    var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
-                    var opacity = (isFuture || !isInYear) ? 'opacity-30' : '';
-                    var cursor = (!isFuture && isInYear && level > 0) ? 'cursor-pointer' : 'cursor-default';
-                    
-                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 ' + 
-                            cursor + ' ' + borderClass + ' ' + opacity + '" ' +
-                            'style="background-color: ' + color + ';" ' +
-                            'title="' + title + '" ' +
-                            'data-date="' + dateStr + '" ' +
-                            'data-count="' + level + '" ' +
-                            ((!isFuture && isInYear && level > 0) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '') +
-                            '></div>';
-                }
+                var cm = document.querySelector('meta[name="csrf-token"]');
+                var cs = cm ? cm.getAttribute('content') : '';
                 
-                html += '</div>';
-            }
-            
-            html += '</div></div></div>';
-            container.innerHTML = html;
-        }
-        
-        // Change calendar year
-        function changeCalendarYear(delta) {
-            var currentYear = new Date().getFullYear();
-            var newYear = currentCalendarYear + delta;
-            
-            // Don't allow future years
-            if (newYear > currentYear) return;
-            
-            currentCalendarYear = newYear;
-            generateActivityCalendar();
-        }
-        
-        // Make function globally accessible
-        window.changeCalendarYear = changeCalendarYear;
-        
-        // Show activity details for a specific date
-        function showActivityDetails(dateStr) {
-            var modal = document.getElementById('activity_details_modal');
-            var dateDisplay = document.getElementById('activity-date');
-            var content = document.getElementById('activity-details-content');
-            var loading = document.getElementById('activity-loading');
-            var noData = document.getElementById('activity-no-data');
-            
-            if (!modal || !dateDisplay || !content) return;
-            
-            // Format date for display
-            var date = new Date(dateStr + 'T00:00:00');
-            dateDisplay.textContent = date.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            // Show modal and loading state
-            modal.showModal();
-            content.innerHTML = '';
-            content.classList.add('hidden');
-            loading.classList.remove('hidden');
-            noData.classList.add('hidden');
-            
-            // Fetch activity details for this date
-            fetch(`${BASE_PATH}/super-admin/api/activity-details?date=` + dateStr, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to fetch activity details');
-                return response.json();
-            })
-            .then(result => {
-                loading.classList.add('hidden');
+                b.replaceWith(b.cloneNode(true));
+                var fb = document.getElementById('logout-button-visible');
+                if (!fb) return;
                 
-                console.log('Activity details result:', result);
-                
-                if (result.success && result.data && result.data.length > 0) {
-                    content.classList.remove('hidden');
-                    var html = '';
-                    
-                    result.data.forEach(function(activity) {
-                        console.log('Processing activity:', activity);
-                        
-                        var time = new Date(activity.created_at).toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                fb.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    try {
+                        fetch(f.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': cs,
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin',
+                            body: new URLSearchParams({'_token': cs}).toString(),
+                            keepalive: true
+                        }).finally(function() {
+                            try {
+                                window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
+                            } catch(_) {
+                                window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
+                            }
                         });
-                        
-                        var actionBadge = '';
-                        var actionText = '';
-                        if (activity.action === 'verified' || activity.action === 'verified_submission') {
-                            actionBadge = '<span class="badge badge-sm badge-info text-white">Verified</span>';
-                            actionText = 'Verified';
-                        } else if (activity.action === 'approved' || activity.action === 'approved_submission') {
-                            actionBadge = '<span class="badge badge-sm badge-success text-white">Approved</span>';
-                            actionText = 'Approved';
-                        } else if (activity.action === 'rejected' || activity.action === 'rejected_submission') {
-                            actionBadge = '<span class="badge badge-sm badge-error text-white">Rejected</span>';
-                            actionText = 'Rejected';
+                    } catch(err) {
+                        try {
+                            window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
+                        } catch(_) {
+                            window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
                         }
-                        
-                        html += '<div class="bg-base-100 rounded-lg p-4 border border-base-300 hover:shadow-md transition-shadow">';
-                        html += '<div class="flex items-center justify-between mb-2">';
-                        html += '<span class="text-xs font-medium text-text-muted">' + time + '</span>';
-                        html += '<div class="flex flex-col items-end gap-1">';
-                        html += actionBadge;
-                        if (activity.admin_name) {
-                            html += '<span class="text-xs text-text-muted">' + actionText + ' by Admin ' + activity.admin_name + '</span>';
-                        }
-                        html += '</div>';
-                        html += '</div>';
-                        
-                        html += '<p class="text-sm font-semibold text-text-header mb-2">' + (activity.description || 'Activity recorded') + '</p>';
-                        
-                        if (activity.student_id || activity.student_name) {
-                            html += '<div class="flex items-center gap-2 text-sm text-text-muted">';
-                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
-                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />';
-                            html += '</svg>';
-                            html += '<span>';
-                            if (activity.student_id) {
-                                html += '<span class="font-medium">' + activity.student_id + '</span>';
-                            }
-                            if (activity.student_name) {
-                                html += (activity.student_id ? ' - ' : '') + activity.student_name;
-                            }
-                            html += '</span>';
-                            html += '</div>';
-                        }
-                        
-                        if (activity.venue) {
-                            html += '<div class="flex items-center gap-2 text-sm text-text-muted mt-1">';
-                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
-                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />';
-                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />';
-                            html += '</svg>';
-                            html += '<span>' + activity.venue + '</span>';
-                            html += '</div>';
-                        }
-                        
-                        html += '</div>';
-                    });
-                    
-                    console.log('Generated HTML:', html);
-                    content.innerHTML = html;
-                } else {
-                    noData.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('Failed to load activity details:', error);
-                loading.classList.add('hidden');
-                noData.classList.remove('hidden');
-            });
+                    }
+                }, {passive: true});
+            } catch(_) {}
         }
-        
-        // Make function globally accessible
-        window.showActivityDetails = showActivityDetails;
-        
-        // Remove old sample data function
-        // function generateSampleActivityData() - REMOVED
 
         // DOM ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Restore saved page for super admin, default to dashboard
+            // Restore saved page for admin, default to dashboard
             var savedPage = 'dashboard';
             try {
-                savedPage = localStorage.getItem('scms_superadmin_current_page') || 'dashboard';
+                savedPage = localStorage.getItem('scms_admin_current_page') || 'dashboard';
             } catch(_) {}
             
             showPage(savedPage);
             initThemeToggle();
-            loadSubmissions();
+            attachLogoutHandler();
+            loadDashboardStats(); // Load dashboard statistics
+            generateActivityCalendar(); // Load activity calendar with API data
+            loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
-            generateActivityCalendar();
             
             // Hours sort toggle event listener
             var hoursSortToggle = document.getElementById('hours-sort-toggle');
@@ -1989,6 +1503,24 @@ body{font-family:'Inter',sans-serif}
                 });
             }
             
+            // Auto-refresh removed - use manual refresh buttons instead
+            
+            // Fix dropdown positioning
+            var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                        if (dropdown) {
+                            var btnRect = dropdownBtn.getBoundingClientRect();
+                            dropdown.style.position = 'fixed';
+                            dropdown.style.left = (btnRect.left - 100) + 'px';
+                            dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                        }
+                    }, 10);
+                });
+            }
+            
             // Confirm verify button handler
             document.getElementById('confirm-verify-btn').addEventListener('click', async function() {
                 if (activeRow) {
@@ -1996,7 +1528,7 @@ body{font-family:'Inter',sans-serif}
                     
                     try {
                         // Make API call to verify the submission
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/verify`, {
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/verify`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -2016,7 +1548,8 @@ body{font-family:'Inter',sans-serif}
                             
                             // Reload submissions to get fresh data from database
                             loadSubmissions();
-                            loadDashboardStats();
+                            generateActivityCalendar(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
                         } else {
                             showToast(data.message || 'Failed to verify submission.', 'error');
                         }
@@ -2027,88 +1560,36 @@ body{font-family:'Inter',sans-serif}
                 }
             });
             
-            // Confirm approve button handler
-            document.getElementById('confirm-approve-btn').addEventListener('click', async function() {
-                if (activeRow) {
-                    var recordId = activeRow.dataset.recordId;
-                    console.log('Approving submission with ID:', recordId);
-                    
-                    try {
-                        await ensureCsrfCookie();
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/approve`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            credentials: 'same-origin'
-                        });
-                        
-                        console.log('Response status:', response.status);
-                        const data = await response.json();
-                        console.log('Response data:', data);
-                        
-                        if (data.success) {
-                            showToast('Submission has been approved.', 'success');
-                            document.getElementById('approve_modal').close();
-                            activeRow = null;
-                            
-                            // Reload to update stats and table
-                            loadSubmissions();
-                        } else {
-                            console.error('Approval failed:', data);
-                            showToast(data.message || 'Failed to approve submission.', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error approving submission:', error);
-                        showToast('Failed to approve submission. Please try again.', 'error');
-                    }
-                }
-            });
-            
             // Confirm reject button handler
             document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
-                    var reason = document.getElementById('rejection-reason').value;
-                    
-                    if (!reason.trim()) {
-                        showToast('Please provide a reason for rejection.', 'error');
-                        return;
-                    }
-                    
-                    console.log('Rejecting submission with ID:', recordId, 'Reason:', reason);
                     
                     try {
-                        await ensureCsrfCookie();
-                        const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordId}/reject`, {
+                        // Make API call to reject the submission
+                        const response = await fetch(`${BASE_PATH}/admin/api/submissions/${recordId}/reject`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
-                            credentials: 'same-origin',
-                            body: JSON.stringify({
-                                reason: reason
-                            })
+                            credentials: 'same-origin'
                         });
                         
-                        console.log('Response status:', response.status);
                         const data = await response.json();
-                        console.log('Response data:', data);
                         
                         if (data.success) {
                             showToast('Submission has been rejected.', 'success');
-                            document.getElementById('rejection-reason').value = '';
                             document.getElementById('reject_modal').close();
                             activeRow = null;
                             
-                            // Reload to update stats and table
+                            // Reload submissions to get fresh data from database
                             loadSubmissions();
+                            generateActivityCalendar(); // Refresh calendar to show new activity
+                            loadDashboardStats(); // Refresh dashboard statistics
                         } else {
-                            console.error('Rejection failed:', data);
                             showToast(data.message || 'Failed to reject submission.', 'error');
                         }
                     } catch (error) {
@@ -2121,8 +1602,12 @@ body{font-family:'Inter',sans-serif}
             // Search input handler
             document.getElementById('search-input').addEventListener('keyup', function() {
                 var at = document.querySelector('.custom-tab-active');
-                if (at) {
-                    var as = at.textContent.trim().toLowerCase();
+                var as = at.textContent.trim();
+                
+                // If on Archived tab and there's a status filter active, use filterTableByStatus
+                if (as === 'Archived' && currentStatusFilter !== 'All') {
+                    filterTableByStatus(currentStatusFilter, null);
+                } else {
                     filterSubmissions(as, at);
                 }
             });
@@ -2143,7 +1628,7 @@ body{font-family:'Inter',sans-serif}
                     snb.disabled = true;
                     snb.textContent = 'Updating...';
                     
-                    var response = await fetch(`${BASE_PATH}/super-admin/api/settings/update-name`, {
+                    var response = await fetch(`${BASE_PATH}/admin/api/settings/update-name`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2202,7 +1687,7 @@ body{font-family:'Inter',sans-serif}
                     spb.disabled = true;
                     spb.textContent = 'Sending...';
                     
-                    var response = await fetch(`${BASE_PATH}/super-admin/api/settings/request-password-change`, {
+                    var response = await fetch(`${BASE_PATH}/admin/api/settings/request-password-change`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2233,43 +1718,425 @@ body{font-family:'Inter',sans-serif}
                     spb.textContent = 'Request Password Change';
                 }
             });
-
-            // Logout handler
-            document.getElementById('confirm-logout-btn').addEventListener('click', function() {
-                // Call the logout API endpoint
-                fetch(`${BASE_PATH}/super-admin/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(function() {
-                    // Redirect to super admin login page after successful logout
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                })
-                .catch(function(error) {
-                    console.error('Logout error:', error);
-                    // Still redirect even if there's an error
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                });
-            });
             
             // Auto-refresh removed - use manual refresh buttons instead
-            
-            // Auto-hide flash messages after 5 seconds
-            var flashMessage = document.getElementById('flash-message');
-            if (flashMessage) {
-                setTimeout(function() {
-                    flashMessage.style.transition = 'opacity 0.5s';
-                    flashMessage.style.opacity = '0';
-                    setTimeout(function() {
-                        flashMessage.remove();
-                    }, 500);
-                }, 5000);
-            }
         });
+
+        // Calendar year management
+        var currentCalendarYear = new Date().getFullYear();
+        var activityDataCache = {}; // Cache for activity data by year
+
+        // Generate Activity Calendar (GitHub-style) - Year-based (Jan-Dec)
+        function generateActivityCalendar() {
+            var container = document.getElementById('activity-calendar');
+            if (!container) return;
+            
+            // Update year display
+            document.getElementById('calendar-year').textContent = currentCalendarYear;
+            
+            // Disable next button if viewing current year
+            var nextBtn = document.getElementById('calendar-next-year');
+            var currentYear = new Date().getFullYear();
+            if (nextBtn) {
+                nextBtn.disabled = (currentCalendarYear >= currentYear);
+                if (nextBtn.disabled) {
+                    nextBtn.classList.add('btn-disabled');
+                } else {
+                    nextBtn.classList.remove('btn-disabled');
+                }
+            }
+            
+            // Load activity data for the year
+            loadActivityDataForYear(currentCalendarYear, function(activityData) {
+                var startDate = new Date(currentCalendarYear, 0, 1); // Jan 1
+                var endDate = new Date(currentCalendarYear, 11, 31); // Dec 31
+                var today = new Date();
+                
+                renderCalendar(startDate, endDate, today, activityData);
+            });
+        }
+
+        // Load activity data from API for a specific year
+        function loadActivityDataForYear(year, callback) {
+            // Check cache first
+            if (activityDataCache[year]) {
+                callback(activityDataCache[year]);
+                return;
+            }
+            
+            // Show loading state
+            var container = document.getElementById('activity-calendar');
+            if (container) {
+                container.innerHTML = '<div class="text-center text-text-muted py-8">Loading calendar...</div>';
+            }
+            
+            // Fetch from API
+            fetch(`${BASE_PATH}/admin/api/activity-calendar?year=` + year, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                console.log('Activity calendar response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status + ' ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                console.log('Activity calendar result:', result);
+                if (result.success) {
+                    var activityData = result.data || {};
+                    activityDataCache[year] = activityData; // Cache the data
+                    callback(activityData);
+                } else {
+                    throw new Error(result.message || 'Failed to load activity data');
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to load activity calendar:', error);
+                if (container) {
+                    container.innerHTML = '<div class="text-center text-error py-8">Failed to load calendar: ' + error.message + '</div>';
+                }
+            });
+        }
+
+        // Render the calendar grid
+        function renderCalendar(startDate, endDate, today, activityData) {
+            var container = document.getElementById('activity-calendar');
+            if (!container) return;
+            
+            var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Get color based on activity level (purple palette)
+            function getColor(level, isDarkMode) {
+                if (level === 0) {
+                    return isDarkMode ? '#374151' : '#e5e7eb'; // No activity (gray-700 dark, gray-200 light)
+                }
+                if (level <= 2) return '#E5D4FF'; // Low (light purple)
+                if (level <= 4) return '#C9A9FF'; // Medium-low (medium purple)
+                if (level <= 6) return '#A475FF'; // Medium-high (darker purple)
+                return '#6D28D9'; // High (darkest purple - 7+)
+            }
+            
+            // Check if dark mode is active
+            function isDarkMode() {
+                return document.documentElement.getAttribute('data-theme') === 'dark';
+            }
+            
+            // Calculate weeks to display (always start from Jan 1, end at Dec 31)
+            var firstDay = new Date(startDate);
+            firstDay.setDate(firstDay.getDate() - firstDay.getDay()); // Start from Sunday before Jan 1
+            
+            var weeks = [];
+            var currentWeek = new Date(firstDay);
+            var lastDay = new Date(endDate);
+            lastDay.setDate(lastDay.getDate() + (6 - lastDay.getDay())); // End on Saturday after Dec 31
+            
+            while (currentWeek <= lastDay) {
+                var week = [];
+                for (var i = 0; i < 7; i++) {
+                    var date = new Date(currentWeek);
+                    date.setDate(date.getDate() + i);
+                    week.push(date);
+                }
+                weeks.push(week);
+                currentWeek.setDate(currentWeek.getDate() + 7);
+            }
+            
+            // Build HTML
+            var html = '<div class="flex gap-2">';
+            
+            // Day labels column
+            html += '<div class="flex flex-col justify-start text-xs activity-calendar-days" style="padding-top: 28px; height: fit-content;">';
+            var days = ['Mon', 'Wed', 'Fri'];
+            var dayIndices = [1, 3, 5]; // Monday, Wednesday, Friday indices
+            for (var d = 0; d < 3; d++) {
+                var topOffset = dayIndices[d] * 16 + (dayIndices[d] * 4); // 16px height + 4px gap
+                html += '<div class="activity-calendar-day-label" style="height: 12px; line-height: 12px; margin-bottom: ' + (d < 2 ? '24px' : '0') + ';">' + days[d] + '</div>';
+            }
+            html += '</div>';
+            
+            // Calendar grid with month labels
+            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col gap-0">';
+            
+            // Month labels row
+            html += '<div class="flex gap-1 mb-2" style="height: 16px;">';
+            var lastMonth = -1;
+            var monthPositions = [];
+            
+            for (var w = 0; w < weeks.length; w++) {
+                var weekMonth = weeks[w][0].getMonth();
+                if (weekMonth !== lastMonth) {
+                    monthPositions.push({ week: w, month: weekMonth });
+                    lastMonth = weekMonth;
+                }
+            }
+            
+            for (var w = 0; w < weeks.length; w++) {
+                var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
+                if (showMonth) {
+                    html += '<div class="text-xs activity-calendar-month-label" style="width: 12px; height: 16px; line-height: 16px;">' + monthShort[showMonth.month] + '</div>';
+                } else {
+                    html += '<div style="width: 12px; height: 16px;"></div>';
+                }
+            }
+            html += '</div>';
+            
+            // Grid rows (Sun through Sat)
+            for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
+                html += '<div class="flex gap-1" style="height: 12px; margin-bottom: ' + (dayIndex < 6 ? '4px' : '0') + ';">';
+                
+                for (var w = 0; w < weeks.length; w++) {
+                    var date = weeks[w][dayIndex];
+                    var dateStr = date.toISOString().split('T')[0];
+                    var level = activityData[dateStr] || 0;
+                    var darkMode = isDarkMode();
+                    var color = getColor(level, darkMode);
+                    
+                    var isToday = date.toDateString() === today.toDateString();
+                    var isFuture = date > today;
+                    var isInRange = date >= startDate && date <= endDate;
+                    
+                    // Format: "Month DD, YYYY: X updates"
+                    var title = monthNames[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+                    if (!isFuture && isInRange) {
+                        title += ': ' + level + ' update' + (level !== 1 ? 's' : '');
+                    } else if (isFuture) {
+                        title += ': Future date';
+                    } else {
+                        title += ': No data';
+                    }
+                    
+                    var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
+                    var opacity = (!isInRange || isFuture) ? 'opacity-30' : '';
+                    var clickable = (level > 0 && !isFuture && isInRange) ? 'cursor-pointer' : 'cursor-default';
+                    var onclick = (level > 0 && !isFuture && isInRange) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '';
+                    
+                    html += '<div class="activity-calendar-cell w-3 h-3 rounded-sm transition-all hover:scale-110 ' + borderClass + ' ' + opacity + ' ' + clickable + '" ' +
+                            onclick + ' ' +
+                            'style="background-color: ' + color + ';" ' +
+                            'title="' + title + '"></div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            html += '</div></div></div>';
+            container.innerHTML = html;
+        }
+
+        // Change calendar year
+        function changeCalendarYear(delta) {
+            var newYear = currentCalendarYear + delta;
+            var currentYear = new Date().getFullYear();
+            
+            // Don't allow future years
+            if (newYear > currentYear) {
+                return;
+            }
+            
+            currentCalendarYear = newYear;
+            generateActivityCalendar();
+        }
+
+        // Show activity details for a specific date
+        function showActivityDetails(dateStr) {
+            var modal = document.getElementById('activity_details_modal');
+            var dateHeader = document.getElementById('activity-date-header');
+            var content = document.getElementById('activity-details-content');
+            var loading = document.getElementById('activity-loading');
+            var noData = document.getElementById('activity-no-data');
+            
+            if (!modal || !dateHeader || !content || !loading || !noData) return;
+            
+            // Format date for display
+            var date = new Date(dateStr + 'T00:00:00');
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateHeader.textContent = date.toLocaleDateString('en-US', options);
+            
+            // Reset states
+            content.innerHTML = '';
+            content.classList.add('hidden');
+            loading.classList.remove('hidden');
+            noData.classList.add('hidden');
+            
+            // Open modal
+            modal.showModal();
+            
+            // Fetch activity details
+            fetch(`${BASE_PATH}/admin/api/activity-details?date=` + dateStr, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                loading.classList.add('hidden');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    content.classList.remove('hidden');
+                    var html = '';
+                    
+                    result.data.forEach(function(activity) {
+                        var time = new Date(activity.created_at);
+                        var timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                        var timeStr = time.toLocaleTimeString('en-US', timeOptions);
+                        
+                        // Badge with proper colors (verified = blue, rejected = red)
+                        var actionBadge = '';
+                        var actionText = '';
+                        if (activity.action === 'verified' || activity.action === 'verified_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-info text-white">Verified</span>';
+                            actionText = 'Verified';
+                        } else if (activity.action === 'rejected' || activity.action === 'rejected_submission') {
+                            actionBadge = '<span class="badge badge-sm badge-error text-white">Rejected</span>';
+                            actionText = 'Rejected';
+                        }
+                        
+                        html += '<div class="bg-base-100 rounded-lg p-4 border border-base-300 hover:shadow-md transition-shadow">';
+                        html += '<div class="flex items-center justify-between mb-2">';
+                        html += '<span class="text-xs font-medium text-text-muted">' + timeStr + '</span>';
+                        html += '<div class="flex flex-col items-end gap-1">';
+                        html += actionBadge;
+                        if (activity.admin_name) {
+                            html += '<span class="text-xs text-text-muted">' + actionText + ' by Admin ' + activity.admin_name + '</span>';
+                        }
+                        html += '</div>';
+                        html += '</div>';
+                        
+                        html += '<p class="text-sm font-semibold text-text-header mb-2">' + (activity.description || 'Activity recorded') + '</p>';
+                        
+                        if (activity.student_id || activity.student_name) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />';
+                            html += '</svg>';
+                            html += '<span>';
+                            if (activity.student_id) {
+                                html += '<span class="font-medium">' + activity.student_id + '</span>';
+                            }
+                            if (activity.student_name) {
+                                html += (activity.student_id ? ' - ' : '') + activity.student_name;
+                            }
+                            html += '</span>';
+                            html += '</div>';
+                        }
+                        
+                        if (activity.venue) {
+                            html += '<div class="flex items-center gap-2 text-sm text-text-muted mt-1">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />';
+                            html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />';
+                            html += '</svg>';
+                            html += '<span>' + activity.venue + '</span>';
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    content.innerHTML = html;
+                } else {
+                    noData.classList.remove('hidden');
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to load activity details:', error);
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            });
+        }
+
+        // Generate sample activity data (will be replaced with API call)
+        function generateSampleActivityData(startDate, endDate) {
+            var data = {};
+            var current = new Date(startDate);
+            
+            while (current <= endDate) {
+                var dateStr = current.toISOString().split('T')[0];
+                // Random activity level (0-4), with higher probability for lower values
+                var random = Math.random();
+                if (random < 0.3) {
+                    data[dateStr] = 0;
+                } else if (random < 0.6) {
+                    data[dateStr] = 1;
+                } else if (random < 0.8) {
+                    data[dateStr] = 2;
+                } else if (random < 0.95) {
+                    data[dateStr] = 3;
+                } else {
+                    data[dateStr] = 4;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return data;
+        }
+
+        // Initialize Pending Requests Donut Chart
+        var pendingRequestsChartInstance = null;
+        function initPendingRequestsChart(pendingCount) {
+            var canvas = document.getElementById('pendingRequestsChart');
+            if (!canvas) return;
+            
+            var ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if any
+            if (pendingRequestsChartInstance) {
+                pendingRequestsChartInstance.destroy();
+            }
+            
+            // Default to 0 if not provided
+            if (typeof pendingCount === 'undefined') {
+                pendingCount = 0;
+            }
+            
+            var totalCapacity = 50; // Example total capacity
+            var percentage = Math.round((pendingCount / totalCapacity) * 100);
+            
+            pendingRequestsChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [pendingCount, Math.max(0, totalCapacity - pendingCount)],
+                        backgroundColor: ['#FFFFFF', 'rgba(255, 255, 255, 0.2)'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+            
+            // Update label
+            document.getElementById('pending-requests-label').textContent = pendingCount;
+        }
+
+        // Update chart with new data
+        function updatePendingRequestsChart(pendingCount) {
+            initPendingRequestsChart(pendingCount);
+        }
     </script>
 </body>
-</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/super_admin.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>

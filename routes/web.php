@@ -75,7 +75,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [App\Http\Controllers\Admin\Auth\LoginController::class, 'logout'])->name('logout');
 
         Route::get('dashboard', function () {
-            return view('dashboards.admin');
+            $BASE_PATH = '';
+            return view('dashboards.admin', compact('BASE_PATH'));
         })->name('dashboard');
 
         // Admin API routes for managing student submissions
@@ -85,6 +86,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('submissions/{id}/verify', [App\Http\Controllers\AdminDashboardController::class, 'verifySubmission'])->name('submissions.verify');
             Route::post('submissions/{id}/reject', [App\Http\Controllers\AdminDashboardController::class, 'rejectSubmission'])->name('submissions.reject');
             Route::get('activity-calendar', [App\Http\Controllers\AdminDashboardController::class, 'getActivityCalendar'])->name('activity-calendar');
+            Route::get('activity-details', [App\Http\Controllers\AdminDashboardController::class, 'getActivityDetails'])->name('activity-details');
+            
+            // Admin Settings API endpoints
+            Route::post('settings/update-name', [App\Http\Controllers\Admin\SettingsController::class, 'updateName'])->name('settings.updateName');
+            Route::post('settings/request-password-change', [App\Http\Controllers\Admin\SettingsController::class, 'requestPasswordChange'])->name('settings.requestPasswordChange');
         });
     });
 });
