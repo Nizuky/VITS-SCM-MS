@@ -177,13 +177,30 @@ class SuperAdminDashboardController extends Controller
                 });
 
             // Merge all records
-            $allSubmissions = $pendingRecords
+            $allSubmissions = collect()
+                ->concat($pendingRecords)
                 ->concat($forApprovalRecords)
                 ->concat($archivedRecords);
             
+            // Remove duplicates by tracking the underlying social_contract_record_id
+            // Approvals take precedence over pending records
+            $seen = [];
+            $uniqueSubmissions = $allSubmissions->filter(function ($record) use (&$seen) {
+                // For approval records, use the social_contract_record_id
+                // For pending records, use their own id
+                $recordId = isset($record['record_id']) ? $record['record_id'] : $record['id'];
+                
+                if (in_array($recordId, $seen)) {
+                    return false; // Skip duplicate
+                }
+                
+                $seen[] = $recordId;
+                return true;
+            });
+            
             return response()->json([
                 'success' => true,
-                'data' => $allSubmissions
+                'data' => $uniqueSubmissions->values() // Re-index after filtering
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get submissions', ['error' => $e->getMessage()]);

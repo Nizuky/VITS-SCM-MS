@@ -622,19 +622,41 @@ table{overflow:visible!important}
     <dialog id="reject_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg text-text-header">Reject Submission</h3>
-            <p class="py-4 text-text-body">Please provide a reason for rejecting this submission. The student will be notified.</p>
+            <p class="py-4 text-text-body">Please select or provide a reason for rejecting this submission. The student will be notified.</p>
             
-            <div class="form-control">
+            <label class="form-control w-full mb-4">
+                <div class="label">
+                    <span class="label-text font-semibold">Rejection Reason</span>
+                </div>
+                <select id="rejection-reason-select" class="select select-bordered w-full">
+                    <option disabled selected value="">Select a reason</option>
+                    <option value="Incorrect or Invalid Information&#10;The provided details do not match official PLV records or contain false information.">
+                        Incorrect or Invalid Information
+                    </option>
+                    <option value="Duplicate Submission&#10;The same form or request has already been submitted and is recorded in the system.">
+                        Duplicate Submission
+                    </option>
+                    <option value="Late Submission&#10;The form was filed beyond the official deadline or submission period.">
+                        Late Submission
+                    </option>
+                    <option value="Others">Others</option>
+                </select>
+            </label>
+            
+            <label id="other-reason-label" class="form-control w-full hidden">
+                <div class="label">
+                    <span class="label-text font-semibold">Specify Reason</span>
+                </div>
                 <textarea 
                     id="reject-reason-textarea" 
-                    class="textarea textarea-bordered h-32 resize-none focus:outline-none focus:border-primary-purple" 
-                    placeholder="Reason for rejection..."
-                    required></textarea>
-            </div>
+                    class="textarea textarea-bordered h-24 resize-none focus:outline-none focus:border-primary-purple" 
+                    placeholder="Please specify the reason for rejection..."
+                ></textarea>
+            </label>
             
-            <div class="modal-action">
+            <div class="modal-action mt-6">
                 <form method="dialog" class="flex gap-2">
-                    <button class="btn btn-ghost">Cancel</button>
+                    <button class="btn btn-ghost" onclick="resetRejectModal()">Cancel</button>
                     <button id="confirm-reject-btn" type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                         Yes, reject
                     </button>
@@ -1576,18 +1598,68 @@ table{overflow:visible!important}
                 }
             });
             
+            // Reset reject modal function
+            function resetRejectModal() {
+                var rejectionReasonSelect = document.getElementById('rejection-reason-select');
+                var otherReasonLabel = document.getElementById('other-reason-label');
+                var rejectionReasonTextarea = document.getElementById('reject-reason-textarea');
+                
+                rejectionReasonSelect.value = "";
+                otherReasonLabel.classList.add('hidden');
+                rejectionReasonTextarea.value = '';
+                rejectionReasonSelect.classList.remove('border-red-500');
+                rejectionReasonTextarea.classList.remove('border-red-500');
+            }
+            
+            // Make resetRejectModal globally accessible
+            window.resetRejectModal = resetRejectModal;
+            
+            // Rejection reason dropdown change handler
+            var rejectionReasonSelect = document.getElementById('rejection-reason-select');
+            var otherReasonLabel = document.getElementById('other-reason-label');
+            var rejectionReasonTextarea = document.getElementById('reject-reason-textarea');
+            
+            if (rejectionReasonSelect) {
+                rejectionReasonSelect.addEventListener('change', function() {
+                    if (this.value === 'Others') {
+                        otherReasonLabel.classList.remove('hidden');
+                    } else {
+                        otherReasonLabel.classList.add('hidden');
+                        rejectionReasonTextarea.value = '';
+                    }
+                });
+            }
+            
             // Confirm reject button handler
             document.getElementById('confirm-reject-btn').addEventListener('click', async function() {
                 if (activeRow) {
                     var recordId = activeRow.dataset.recordId;
-                    var reasonTextarea = document.getElementById('reject-reason-textarea');
-                    var reason = reasonTextarea.value.trim();
+                    var rejectionReasonSelect = document.getElementById('rejection-reason-select');
+                    var rejectionReasonTextarea = document.getElementById('reject-reason-textarea');
+                    var selectedReason = rejectionReasonSelect.value;
+                    var reason = '';
                     
-                    // Validate that a reason is provided
-                    if (!reason) {
-                        showToast('Please provide a reason for rejection.', 'error');
-                        reasonTextarea.focus();
+                    // Validate that a reason is selected
+                    if (!selectedReason) {
+                        showToast('Please select a rejection reason.', 'error');
+                        rejectionReasonSelect.classList.add('border-red-500');
+                        rejectionReasonSelect.focus();
                         return;
+                    }
+                    
+                    // If "Others" is selected, validate the textarea
+                    if (selectedReason === 'Others') {
+                        var otherReason = rejectionReasonTextarea.value.trim();
+                        if (!otherReason) {
+                            showToast('Please specify the reason for rejection.', 'error');
+                            rejectionReasonTextarea.classList.add('border-red-500');
+                            rejectionReasonTextarea.focus();
+                            return;
+                        }
+                        reason = otherReason;
+                    } else {
+                        // Use the predefined reason
+                        reason = selectedReason;
                     }
                     
                     try {
@@ -1613,7 +1685,7 @@ table{overflow:visible!important}
                         if (data.success) {
                             showToast('Submission has been rejected.', 'success');
                             document.getElementById('reject_modal').close();
-                            reasonTextarea.value = ''; // Clear the textarea
+                            resetRejectModal(); // Clear the form
                             activeRow = null;
                             
                             // Reload submissions to get fresh data from database

@@ -2678,7 +2678,7 @@
             const tableBody = document.getElementById('record-table-body');
             const rows = tableBody.querySelectorAll('tr');
             rows.forEach(row => {
-                const rowStatus = row.children[6].textContent.trim();
+                const rowStatus = row.dataset.status || '';
                 row.style.display = (status === 'All' || rowStatus === status) ? '' : 'none';
             });
             // Close the floating menu if open

@@ -127,6 +127,23 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
 [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
 [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+#status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
+#status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.1)}
+#status-filter-dropdown svg{fill:#707EAE}
+#status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+#status-filter-dropdown{position:relative!important}
+#status-filter-dropdown .dropdown-content{position:fixed!important;box-shadow:0 10px 25px rgba(0,0,0,0.15)!important;z-index:9999!important}
+.dropdown-content li a{font-size:0.875rem;padding:0.5rem 1rem}
+.dropdown-content li a:hover{background-color:#6D28D9;color:#fff}
+[data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+[data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+[data-theme="dark"] #status-filter-dropdown .btn{color:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover{color:#6D28D9;background-color:rgba(109,40,217,0.2)}
+[data-theme="dark"] #status-filter-dropdown svg{fill:#fff}
+[data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
+thead{overflow:visible!important}
+table{overflow:visible!important}
+#submission-page .overflow-x-auto{overflow:visible!important}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -421,10 +438,10 @@ body{font-family:'Inter',sans-serif}
 
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
-                    <div class="overflow-x-auto">
-                        <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600">
-                                <tr>
+                    <div class="overflow-x-auto" style="overflow: visible;">
+                        <table class="table table-fixed w-full" style="overflow: visible;">
+                            <thead class="bg-gray-50 text-gray-600" style="overflow: visible;">
+                                <tr id="table-header-row">
                                     <th class="w-[10%] text-center">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                                             Student ID
@@ -872,6 +889,11 @@ body{font-family:'Inter',sans-serif}
                 <div id="details-status-badge" class="status-badge"></div>
             </div>
             
+            <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
+                <label class="details-label">Reason for Rejection</label>
+                <p class="font-medium text-badge-rejected-text whitespace-pre-line bg-gray-50 p-3 rounded-lg" id="details-reason-text"></p>
+            </div>
+            
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
         </div>
     </dialog>
@@ -955,6 +977,7 @@ body{font-family:'Inter',sans-serif}
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
         var currentSortBy = null; // 'hours', 'studentid', or 'date'
+        var currentStatusFilter = 'All'; // Track current status filter for archived tab
 
         // Toast notification function
         function showToast(m, t) {
@@ -1078,12 +1101,173 @@ body{font-family:'Inter',sans-serif}
             }
         }
 
+        // Attach sort event listeners to table headers
+        function attachSortEventListeners() {
+            var hoursSortToggle = document.getElementById('hours-sort-toggle');
+            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
+            if (hoursSortToggle && hoursSortIndicator) {
+                hoursSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'hours';
+                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    var siIndicator = document.getElementById('studentid-sort-indicator');
+                    var dIndicator = document.getElementById('date-sort-indicator');
+                    if (siIndicator) siIndicator.textContent = '▼';
+                    if (dIndicator) dIndicator.textContent = '▼';
+                    renderSubmissions(allSubmissions, 'hours');
+                };
+            }
+            
+            var studentIdSortToggle = document.getElementById('studentid-sort-toggle');
+            var studentIdSortIndicator = document.getElementById('studentid-sort-indicator');
+            if (studentIdSortToggle && studentIdSortIndicator) {
+                studentIdSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentid';
+                    studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    var hIndicator = document.getElementById('hours-sort-indicator');
+                    var dIndicator = document.getElementById('date-sort-indicator');
+                    if (hIndicator) hIndicator.textContent = '▼';
+                    if (dIndicator) dIndicator.textContent = '▼';
+                    renderSubmissions(allSubmissions, 'studentid');
+                };
+            }
+            
+            var dateSortToggle = document.getElementById('date-sort-toggle');
+            var dateSortIndicator = document.getElementById('date-sort-indicator');
+            if (dateSortToggle && dateSortIndicator) {
+                dateSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'date';
+                    dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    // Reset other indicators
+                    var hIndicator = document.getElementById('hours-sort-indicator');
+                    var siIndicator = document.getElementById('studentid-sort-indicator');
+                    if (hIndicator) hIndicator.textContent = '▼';
+                    if (siIndicator) siIndicator.textContent = '▼';
+                    renderSubmissions(allSubmissions, 'date');
+                };
+            }
+        }
+
+        // Update table headers based on active tab
+        function updateTableHeaders(tabName) {
+            var headerRow = document.getElementById('table-header-row');
+            if (!headerRow) return;
+            
+            var normalizedTab = tabName.toLowerCase().trim();
+            
+            if (normalizedTab === 'archived') {
+                // Archived tab: show Status with filter and Rejection Reason columns
+                headerRow.innerHTML = `
+                    <th class="w-[10%] text-center">
+                        <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
+                            Student ID
+                            <span id="studentid-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[15%] text-center">Student Name</th>
+                    <th class="w-[15%] text-center">Event Name</th>
+                    <th class="w-[15%] text-center">Organization</th>
+                    <th class="w-[10%] text-center">
+                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
+                            Hours Rendered
+                            <span id="hours-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[10%] text-center">
+                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
+                            Date
+                            <span id="date-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[15%] text-center">Rejection Reason</th>
+                    <th class="w-[10%] text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <span>Status</span>
+                            <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
+                                <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1.5A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                    </svg>
+                                </div>
+                                <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
+                                    <li><a onclick="filterTableByStatus('All', event)">All</a></li>
+                                    <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
+                                    <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
+                `;
+            } else {
+                // Pending and For Approval tabs: show Action column with status filter
+                headerRow.innerHTML = `
+                    <th class="w-[10%] text-center">
+                        <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
+                            Student ID
+                            <span id="studentid-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[15%] text-center">Student Name</th>
+                    <th class="w-[20%] text-center">Event Name</th>
+                    <th class="w-[15%] text-center">Organization</th>
+                    <th class="w-[12%] text-center">
+                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
+                            Hours Rendered
+                            <span id="hours-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[10%] text-center">
+                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
+                            Date
+                            <span id="date-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[18%] text-center">Action</th>
+                `;
+            }
+            
+            // Reattach sort event listeners after updating headers
+            attachSortEventListeners();
+            
+            // Reattach dropdown positioning fix after header update
+            setTimeout(function() {
+                var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+                if (dropdownBtn) {
+                    dropdownBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        setTimeout(function() {
+                            var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                            if (dropdown) {
+                                var btnRect = dropdownBtn.getBoundingClientRect();
+                                dropdown.style.position = 'fixed';
+                                dropdown.style.left = (btnRect.left - 100) + 'px';
+                                dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                            }
+                        }, 10);
+                    });
+                }
+            }, 100);
+        }
+
         // Filter submissions by status
         function filterSubmissions(s, t) {
             document.querySelectorAll('.custom-tab').forEach(function(tb) {
                 tb.classList.remove('custom-tab-active');
             });
             t.classList.add('custom-tab-active');
+            
+            // Update table headers based on tab
+            updateTableHeaders(s);
+            
+            // Reset status filter when switching tabs
+            currentStatusFilter = 'All';
             
             // Save current tab for super admin
             try {
@@ -1128,6 +1312,44 @@ body{font-family:'Inter',sans-serif}
                     ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
                          sb.includes(st) || hr.includes(st) || dt.includes(st);
                 }
+                
+                if (statusMatch && ms) {
+                    r.classList.remove('hidden');
+                } else {
+                    r.classList.add('hidden');
+                }
+            });
+        }
+
+        // Filter table by status (for Archived tab)
+        function filterTableByStatus(status, event) {
+            if (event) event.preventDefault();
+            
+            currentStatusFilter = status;
+            
+            var st = document.getElementById('search-input').value.toLowerCase();
+            var rs = document.querySelectorAll('#submission-table-body tr');
+            
+            rs.forEach(function(r) {
+                var rowStatus = (r.dataset.status || '').toLowerCase();
+                var archiveStatus = r.dataset.archiveStatus;
+                
+                // Only filter rows that are in the Archived tab
+                if (rowStatus !== 'archived') {
+                    return;
+                }
+                
+                var id = r.cells[0].textContent.toLowerCase();
+                var sn = r.cells[1].textContent.toLowerCase();
+                var en = r.cells[2].textContent.toLowerCase();
+                var sb = r.cells[3].textContent.toLowerCase();
+                var hr = r.cells[4].textContent.toLowerCase();
+                var dt = r.cells[5].textContent.toLowerCase();
+                var ms = id.includes(st) || sn.includes(st) || en.includes(st) || 
+                         sb.includes(st) || hr.includes(st) || dt.includes(st);
+                
+                // Apply both status filter and search filter
+                var statusMatch = status === 'All' || archiveStatus === status;
                 
                 if (statusMatch && ms) {
                     r.classList.remove('hidden');
@@ -1261,6 +1483,7 @@ body{font-family:'Inter',sans-serif}
                 var isVerified = status === 'Verified'; // Admin verified - shown in "For Approval" tab
                 var isApproved = status === 'Approved';
                 var isRejected = status === 'Rejected';
+                var isArchived = isApproved || isRejected;
                 
                 // Map status to tab: Pending → Pending tab, Verified → For Approval tab, Approved/Rejected → Archived tab
                 var dataStatus = isPending ? 'Pending' : (isVerified ? 'For Approval' : 'Archived');
@@ -1268,39 +1491,60 @@ body{font-family:'Inter',sans-serif}
                 
                 var dateStr = record.date ? formatDate(record.date) : '—';
                 
+                // Escape rejection reason for HTML attribute
+                var rejectionReason = (record.rejection_reason || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                
                 html += '<tr data-status="' + dataStatus + '" ' +
                         (dataArchiveStatus ? 'data-archive-status="' + dataArchiveStatus + '" ' : '') +
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
-                        'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
+                        'data-rejection-reason="' + rejectionReason + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.event_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.organization || '—') + '</td>' +
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
-                        '<td class="text-center">' + dateStr + '</td>' +
-                        '<td class="text-center">';
+                        '<td class="text-center">' + dateStr + '</td>';
                 
-                if (isPending) {
-                    html += '<div class="space-x-2">' +
-                            '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
-                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                            '</div>';
-                } else if (isVerified) {
-                    // Admin verified records - awaiting super admin approval/rejection
-                    html += '<div class="space-x-2">' +
-                            '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
-                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                            '</div>';
-                } else if (isApproved) {
-                    html += '<span class="scms-badge scms-badge--approved">Approved</span>';
-                } else if (isRejected) {
-                    html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
+                // For archived records, show rejection reason and status columns
+                if (isArchived) {
+                    // Rejection Reason column (show only first line, truncated)
+                    var shortReason = '-';
+                    if (isRejected && record.rejection_reason) {
+                        var firstLine = record.rejection_reason.split('\n')[0];
+                        shortReason = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+                    }
+                    html += '<td class="text-center" title="' + (record.rejection_reason || '') + '">' + shortReason + '</td>';
+                    
+                    // Status column
+                    html += '<td class="text-center">';
+                    if (isApproved) {
+                        html += '<span class="scms-badge scms-badge--approved">Approved</span>';
+                    } else if (isRejected) {
+                        html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
+                    }
+                    html += '</td>';
+                } else {
+                    // For pending and verified records, show action buttons
+                    html += '<td class="text-center">';
+                    if (isPending) {
+                        html += '<div class="space-x-2">' +
+                                '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
+                                '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
+                                '</div>';
+                    } else if (isVerified) {
+                        // Admin verified records - awaiting super admin approval/rejection
+                        html += '<div class="space-x-2">' +
+                                '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
+                                '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
+                                '</div>';
+                    }
+                    html += '</td>';
                 }
                 
-                html += '</td></tr>';
+                html += '</tr>';
             });
             
             tbody.innerHTML = html;
@@ -1507,6 +1751,7 @@ body{font-family:'Inter',sans-serif}
             var org = r.cells[3].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
+            var rejectionReason = r.dataset.rejectionReason || '';
             
             document.getElementById('details-event-name').value = en;
             document.getElementById('details-supervisor-name').value = org;
@@ -1518,9 +1763,12 @@ body{font-family:'Inter',sans-serif}
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
             var sb = document.getElementById('details-status-badge');
+            var reasonContainer = document.getElementById('details-reason-container');
+            var reasonText = document.getElementById('details-reason-text');
             
             sb.innerHTML = '';
             ab.innerHTML = '';
+            reasonContainer.classList.add('hidden'); // Hide reason by default
             
             if (s === 'Pending') {
                 ss.classList.add('hidden');
@@ -1543,6 +1791,20 @@ body{font-family:'Inter',sans-serif}
                     sb.className = 'status-badge approved';
                 } else if (as === 'Rejected') {
                     sb.className = 'status-badge rejected';
+                    
+                    // Show rejection reason if it exists
+                    if (rejectionReason) {
+                        // Decode HTML entities
+                        var decodedReason = rejectionReason
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .replace(/&amp;/g, '&')
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>');
+                        
+                        reasonText.textContent = decodedReason;
+                        reasonContainer.classList.remove('hidden');
+                    }
                 }
             }
             
@@ -1979,6 +2241,25 @@ body{font-family:'Inter',sans-serif}
             loadSubmissions();
             initPendingRequestsChart();
             generateActivityCalendar();
+            
+            // Fix dropdown positioning for status filter
+            setTimeout(function() {
+                var dropdownBtn = document.querySelector('#status-filter-dropdown [role="button"]');
+                if (dropdownBtn) {
+                    dropdownBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        setTimeout(function() {
+                            var dropdown = document.querySelector('#status-filter-dropdown .dropdown-content');
+                            if (dropdown) {
+                                var btnRect = dropdownBtn.getBoundingClientRect();
+                                dropdown.style.position = 'fixed';
+                                dropdown.style.left = (btnRect.left - 100) + 'px';
+                                dropdown.style.top = (btnRect.bottom + 5) + 'px';
+                            }
+                        }, 10);
+                    });
+                }
+            }, 500);
             
             // Hours sort toggle event listener
             var hoursSortToggle = document.getElementById('hours-sort-toggle');
