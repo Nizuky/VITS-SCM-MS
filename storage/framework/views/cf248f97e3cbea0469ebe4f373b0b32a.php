@@ -2772,16 +2772,16 @@
                 setTextIf('#summary-last-updated-3', rejectedText);
                 // Leave labels visible; if no data, the value spans are empty (blank)
 
-                // Hours: explicit 160-hour target for approved (completion - includes both Approved and Verified)
+                // Hours: explicit 160-hour target for approved (completion - only Approved, not Verified)
                 const targetHours = 160;
-                const combinedApprovedHours = approvedHours + verifiedHours; // Approved + Verified count towards completion
-                const approvedPct = Math.max(0, Math.min(100, Math.round(((combinedApprovedHours || 0) / targetHours) * 100)));
-                const pendingPct = Math.max(0, Math.min(100, Math.round(((pendingHours || 0) / targetHours) * 100)));
+                const combinedPendingHours = pendingHours + verifiedHours; // Pending + Verified hours
+                const approvedPct = Math.max(0, Math.min(100, Math.round(((approvedHours || 0) / targetHours) * 100)));
+                const pendingPct = Math.max(0, Math.min(100, Math.round(((combinedPendingHours || 0) / targetHours) * 100)));
                 // Update labels
                 if (elHoursLabel) elHoursLabel.textContent = approvedPct + '%';
-                if (elHoursAmount) elHoursAmount.textContent = `${combinedApprovedHours || 0}h of ${targetHours}h`;
+                if (elHoursAmount) elHoursAmount.textContent = `${approvedHours || 0}h of ${targetHours}h`;
                 if (elPendingLabel) elPendingLabel.textContent = pendingPct + '%';
-                if (elPendingAmount) elPendingAmount.textContent = `${pendingHours || 0}h of ${targetHours}h`;
+                if (elPendingAmount) elPendingAmount.textContent = `${combinedPendingHours || 0}h of ${targetHours}h`;
                 // Values for charts
                 window.__scms_hoursPercent = approvedPct;
                 window.__scms_pendingPercent = pendingPct;
