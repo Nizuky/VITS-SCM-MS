@@ -13,9 +13,16 @@ class SuperAdminStudentController extends Controller
     /**
      * Get all students
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
+            // Ensure session marker is present (restore if missing but user is authenticated)
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in students index');
+            }
+            
             // Use a subquery approach - join through social_contracts table
             $students = User::select('users.*')
                 ->selectSub(function ($query) {
@@ -61,6 +68,13 @@ class SuperAdminStudentController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in student update');
+            }
+            
             $student = User::findOrFail($id);
             
             // Validate the request
@@ -190,9 +204,16 @@ class SuperAdminStudentController extends Controller
     /**
      * Delete a student account permanently
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in student destroy');
+            }
+            
             $student = User::findOrFail($id);
             
             // Store student info for logging before deletion

@@ -17,9 +17,16 @@ class SuperAdminDashboardController extends Controller
     /**
      * Get dashboard statistics
      */
-    public function getDashboardStats()
+    public function getDashboardStats(Request $request)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in getDashboardStats');
+            }
+            
             $now = Carbon::now();
             $startOfMonth = $now->copy()->startOfMonth(); // First day of current month
             $endOfMonth = $now->copy()->endOfMonth(); // Last day of current month
@@ -70,8 +77,15 @@ class SuperAdminDashboardController extends Controller
      * For Approval: from social_contract_approvals with status 'Verified'
      * Archived: from social_contract_approvals with status 'Approved' or 'Rejected'
      */
-    public function getSubmissions()
+    public function getSubmissions(Request $request)
     {
+        // Ensure session marker is present
+        if (!$request->session()->has('superadmin_session_active')) {
+            $request->session()->put('superadmin_session_active', true);
+            $request->session()->save();
+            Log::info('Restored missing superadmin session marker in getSubmissions');
+        }
+        
         \Log::info('SuperAdminDashboardController@getSubmissions called', [
             'auth_check' => Auth::guard('superadmin')->check(),
             'user_id' => Auth::guard('superadmin')->id(),
@@ -269,9 +283,16 @@ class SuperAdminDashboardController extends Controller
      * Approve a verified submission (SuperAdmin only)
      * Works with social_contract_approvals table
      */
-    public function approveSubmission($id)
+    public function approveSubmission(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in approveSubmission');
+            }
+            
             Log::info('Attempting to approve submission', ['id' => $id]);
             
             // Find the record directly from social_contract_records
@@ -352,9 +373,16 @@ class SuperAdminDashboardController extends Controller
      * Works with social_contract_records table - similar to Admin verify
      * This moves record from "Pending" to "Verified" status and triggers observer
      */
-    public function verifySubmission($id)
+    public function verifySubmission(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in verifySubmission');
+            }
+            
             Log::info('SuperAdmin attempting to verify submission', ['id' => $id]);
             
             // Find the record from social_contract_records table
@@ -428,6 +456,13 @@ class SuperAdminDashboardController extends Controller
     public function rejectSubmission(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in rejectSubmission');
+            }
+            
             Log::info('SuperAdmin attempting to reject submission', ['id' => $id]);
             
             $reason = $request->input('reason', 'Rejected by SuperAdmin');

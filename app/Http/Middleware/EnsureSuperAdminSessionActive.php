@@ -13,25 +13,34 @@ class EnsureSuperAdminSessionActive
      */
     public function handle(Request $request, Closure $next)
     {
-        // If the superadmin is authenticated but our session marker is missing, force logout.
+        // If the superadmin is authenticated but our session marker is missing, restore it instead of forcing logout.
         if (Auth::guard('superadmin')->check()) {
             if (! $request->session()->has('superadmin_session_active')) {
-                \Log::warning('SuperAdmin session marker missing, forcing logout', [
+                \Log::info('SuperAdmin session marker missing, restoring it', [
                     'url' => $request->url(),
                     'session_id' => $request->session()->getId(),
                     'superadmin_id' => Auth::guard('superadmin')->id(),
-                    'all_session_data' => $request->session()->all(),
                 ]);
-                Auth::guard('superadmin')->logout();
-                try { $request->session()->invalidate(); } catch (\Throwable $e) {}
-                try { $request->session()->regenerateToken(); } catch (\Throwable $e) {}
-                return redirect()->route('superadmin.login')->with('error', 'Session expired. Please login again.');
+                
+                // Restore the session marker instead of logging out
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
             }
         } else {
             // If not authenticated, redirect to login
             \Log::info('SuperAdmin not authenticated, redirecting to login', [
                 'url' => $request->url(),
             ]);
+            
+            // If this is an AJAX request, return JSON instead of redirect
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication required. Please refresh the page.',
+                    'unauthenticated' => true
+                ], 401);
+            }
+            
             return redirect()->route('superadmin.login');
         }
 

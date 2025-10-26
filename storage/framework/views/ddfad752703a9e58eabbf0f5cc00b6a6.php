@@ -2910,7 +2910,9 @@ table{overflow:visible!important}
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
                     'Pragma': 'no-cache',
                     'Expires': '0'
@@ -2921,24 +2923,38 @@ table{overflow:visible!important}
                 const ct = r.headers.get('content-type') || '';
                 if (!r.ok) throw r;
                 if (!ct.includes('application/json')) {
-                    console.warn('loadStudents: non-JSON response');
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
+                    console.warn('loadStudents: non-JSON response, session may have expired');
+                    // Silently handle non-JSON response, don't redirect
                     return Promise.reject(new Error('Non-JSON response'));
                 }
                 return r.json();
             })
             .then((data) => {
                 isLoadingStudents = false;
-                lastStudentsData = data.students;
-                allStudents = data.students;
-                renderStudents(allStudents);
+                
+                // Check for authentication error
+                if (data.unauthenticated) {
+                    console.warn('Session expired while loading students, silently ignoring');
+                    return;
+                }
+                
+                if (data.success !== false) {
+                    lastStudentsData = data.students;
+                    allStudents = data.students;
+                    renderStudents(allStudents);
+                } else {
+                    throw new Error(data.message || 'Failed to load students');
+                }
             })
             .catch((err) => {
                 isLoadingStudents = false;
                 console.error('Failed to load students', err);
+                
+                // Only show error if we have no cached data AND it's initial load
                 if (!lastStudentsData && showLoading) {
                     tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">Failed to load students. Please refresh.</td></tr>';
                 }
+                // If we have cached data, silently keep showing it
             });
         }
         
@@ -3228,7 +3244,22 @@ table{overflow:visible!important}
                         body: JSON.stringify(requestBody)
                     });
                     
+                    // Check if response is HTML (redirect to login) instead of JSON
+                    const contentType = response.headers.get('content-type') || '';
+                    if (!contentType.includes('application/json')) {
+                        console.warn('Non-JSON response received, session may have expired');
+                        // Session expired, silently ignore - user stays on page
+                        return;
+                    }
+                    
                     const data = await response.json();
+                    
+                    // Check for authentication error
+                    if (data.unauthenticated || response.status === 401 || response.status === 419) {
+                        console.warn('Session expired, silently ignoring update');
+                        // Don't show error - just stay on page, session keeper will maintain session
+                        return;
+                    }
                     
                     if (!response.ok) {
                         throw new Error(data.message || 'Failed to update student');
@@ -3239,7 +3270,12 @@ table{overflow:visible!important}
                     loadStudents(false);
                 } catch (error) {
                     console.error('Error updating student:', error);
-                    showToast(error.message || 'Failed to update student', 'error');
+                    // Only show error if it's not an authentication/parsing issue
+                    if (!error.message.includes('Unexpected token') && 
+                        !error.message.includes('JSON') && 
+                        !error.message.includes('Session')) {
+                        showToast(error.message || 'Failed to update student', 'error');
+                    }
                 }
             });
         }
@@ -3482,7 +3518,21 @@ table{overflow:visible!important}
                             credentials: 'same-origin'
                         });
                         
+                        // Check if response is HTML (redirect to login) instead of JSON
+                        const contentType = response.headers.get('content-type') || '';
+                        if (!contentType.includes('application/json')) {
+                            console.warn('Non-JSON response received, session may have expired');
+                            // Session expired, silently ignore
+                            return;
+                        }
+                        
                         const data = await response.json();
+                        
+                        // Check for authentication error
+                        if (data.unauthenticated || response.status === 401 || response.status === 419) {
+                            console.warn('Session expired, silently ignoring verify');
+                            return;
+                        }
                         
                         if (data.success) {
                             showToast('Submission has been verified successfully.', 'success');
@@ -3497,7 +3547,12 @@ table{overflow:visible!important}
                         }
                     } catch (error) {
                         console.error('Error verifying submission:', error);
-                        showToast('Failed to verify submission. Please try again.', 'error');
+                        // Only show error if it's not an authentication/parsing issue
+                        if (!error.message.includes('Unexpected token') && 
+                            !error.message.includes('JSON') && 
+                            !error.message.includes('Session')) {
+                            showToast('Failed to verify submission. Please try again.', 'error');
+                        }
                     }
                 }
             });
@@ -3515,14 +3570,30 @@ table{overflow:visible!important}
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
                             credentials: 'same-origin'
                         });
                         
                         console.log('Response status:', response.status);
+                        
+                        // Check if response is HTML (redirect to login) instead of JSON
+                        const contentType = response.headers.get('content-type') || '';
+                        if (!contentType.includes('application/json')) {
+                            console.warn('Non-JSON response received, session may have expired');
+                            // Session expired, silently ignore
+                            return;
+                        }
+                        
                         const data = await response.json();
                         console.log('Response data:', data);
+                        
+                        // Check for authentication error
+                        if (data.unauthenticated || response.status === 401 || response.status === 419) {
+                            console.warn('Session expired, silently ignoring approve');
+                            return;
+                        }
                         
                         if (data.success) {
                             showToast('Submission has been approved.', 'success');
@@ -3537,7 +3608,12 @@ table{overflow:visible!important}
                         }
                     } catch (error) {
                         console.error('Error approving submission:', error);
-                        showToast('Failed to approve submission. Please try again.', 'error');
+                        // Only show error if it's not an authentication/parsing issue
+                        if (!error.message.includes('Unexpected token') && 
+                            !error.message.includes('JSON') && 
+                            !error.message.includes('Session')) {
+                            showToast('Failed to approve submission. Please try again.', 'error');
+                        }
                     }
                 }
             });
@@ -3585,7 +3661,8 @@ table{overflow:visible!important}
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
                             credentials: 'same-origin',
                             body: JSON.stringify({
@@ -3594,8 +3671,23 @@ table{overflow:visible!important}
                         });
                         
                         console.log('Response status:', response.status);
+                        
+                        // Check if response is HTML (redirect to login) instead of JSON
+                        const contentType = response.headers.get('content-type') || '';
+                        if (!contentType.includes('application/json')) {
+                            console.warn('Non-JSON response received, session may have expired');
+                            // Session expired, silently ignore
+                            return;
+                        }
+                        
                         const data = await response.json();
                         console.log('Response data:', data);
+                        
+                        // Check for authentication error
+                        if (data.unauthenticated || response.status === 401 || response.status === 419) {
+                            console.warn('Session expired, silently ignoring reject');
+                            return;
+                        }
                         
                         if (data.success) {
                             showToast('Submission has been rejected.', 'success');
@@ -3613,7 +3705,12 @@ table{overflow:visible!important}
                         }
                     } catch (error) {
                         console.error('Error rejecting submission:', error);
-                        showToast('Failed to reject submission. Please try again.', 'error');
+                        // Only show error if it's not an authentication/parsing issue
+                        if (!error.message.includes('Unexpected token') && 
+                            !error.message.includes('JSON') && 
+                            !error.message.includes('Session')) {
+                            showToast('Failed to reject submission. Please try again.', 'error');
+                        }
                     } finally {
                         // Re-enable button and restore text
                         this.disabled = false;

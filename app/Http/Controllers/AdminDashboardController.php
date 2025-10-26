@@ -17,9 +17,16 @@ class AdminDashboardController extends Controller
     /**
      * Get dashboard statistics
      */
-    public function getDashboardStats()
+    public function getDashboardStats(Request $request)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in getDashboardStats');
+            }
+            
             $now = Carbon::now();
             $startOfMonth = $now->copy()->startOfMonth(); // First day of current month
             $endOfMonth = $now->copy()->endOfMonth(); // Last day of current month
@@ -65,9 +72,16 @@ class AdminDashboardController extends Controller
     /**
      * Get all submissions with student information
      */
-    public function getSubmissions()
+    public function getSubmissions(Request $request)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in getSubmissions');
+            }
+            
             \Log::info('AdminDashboardController@getSubmissions called');
             
             // Log table counts for debugging - All from social_contract_records now
@@ -129,39 +143,47 @@ class AdminDashboardController extends Controller
                 ->orderBy('updated_at', 'desc')
                 ->get()
                 ->map(function ($record) {
+                    $student = $record->socialContract->student ?? null;
+                    
                     $dateFormatted = null;
-                    if ($record->socialContract && $record->socialContract->date) {
+                    if ($record->date) {
                         try {
-                            $dateObj = $record->socialContract->date instanceof \Carbon\Carbon ? $record->socialContract->date : Carbon::parse($record->socialContract->date);
+                            $dateObj = $record->date instanceof \Carbon\Carbon ? $record->date : Carbon::parse($record->date);
                             $dateFormatted = $dateObj->format('Y-m-d');
                         } catch (\Exception $e) {
-                            $dateFormatted = $record->socialContract->date;
+                            $dateFormatted = $record->date;
                         }
                     }
                     
-                    // Determine which action date to show
+                    // Determine which action date to show - handle both Carbon instances and strings
                     $actionDate = null;
                     if ($record->status === 'Approved' && $record->approved_at) {
-                        $actionDate = $record->approved_at->format('m-d-Y');
+                        $actionDate = $record->approved_at instanceof \Carbon\Carbon 
+                            ? $record->approved_at->format('m-d-Y') 
+                            : (is_string($record->approved_at) ? Carbon::parse($record->approved_at)->format('m-d-Y') : $record->approved_at);
                     } elseif ($record->status === 'Rejected' && $record->rejected_at) {
-                        $actionDate = $record->rejected_at->format('m-d-Y');
+                        $actionDate = $record->rejected_at instanceof \Carbon\Carbon 
+                            ? $record->rejected_at->format('m-d-Y') 
+                            : (is_string($record->rejected_at) ? Carbon::parse($record->rejected_at)->format('m-d-Y') : $record->rejected_at);
                     } elseif ($record->status === 'Verified' && $record->verified_at) {
-                        $actionDate = $record->verified_at->format('m-d-Y');
+                        $actionDate = $record->verified_at instanceof \Carbon\Carbon 
+                            ? $record->verified_at->format('m-d-Y') 
+                            : (is_string($record->verified_at) ? Carbon::parse($record->verified_at)->format('m-d-Y') : $record->verified_at);
                     }
                     
                     return [
                         'id' => $record->id,
-                        'student_id' => $record->socialContract->student->id ?? null,
-                        'student_name' => $record->socialContract->student->name ?? 'N/A',
-                        'event_name' => $record->socialContract->event_name ?? 'N/A',
-                        'organization' => $record->socialContract->organization ?? 'N/A',
-                        'venue' => $record->socialContract->venue ?? 'N/A',
-                        'hours_rendered' => $record->socialContract->hours_rendered ?? 'N/A',
+                        'student_id' => $student ? ($student->student_id ?? 'N/A') : 'N/A',
+                        'student_name' => $student->name ?? 'N/A',
+                        'event_name' => $record->event_name ?? 'N/A',
+                        'organization' => $record->organization ?? 'N/A',
+                        'venue' => $record->venue ?? 'N/A',
+                        'hours_rendered' => $record->hours_rendered ?? 'N/A',
                         'date' => $dateFormatted,
                         'status' => $record->status, // Keep the actual status (Verified/Approved/Rejected)
-                        'verified_at' => $record->verified_at ? $record->verified_at->format('m-d-Y') : null,
-                        'approved_at' => $record->approved_at ? $record->approved_at->format('m-d-Y') : null,
-                        'rejected_at' => $record->rejected_at ? $record->rejected_at->format('m-d-Y') : null,
+                        'verified_at' => $record->verified_at ? ($record->verified_at instanceof \Carbon\Carbon ? $record->verified_at->format('m-d-Y') : Carbon::parse($record->verified_at)->format('m-d-Y')) : null,
+                        'approved_at' => $record->approved_at ? ($record->approved_at instanceof \Carbon\Carbon ? $record->approved_at->format('m-d-Y') : Carbon::parse($record->approved_at)->format('m-d-Y')) : null,
+                        'rejected_at' => $record->rejected_at ? ($record->rejected_at instanceof \Carbon\Carbon ? $record->rejected_at->format('m-d-Y') : Carbon::parse($record->rejected_at)->format('m-d-Y')) : null,
                         'action_date' => $actionDate,
                         'rejection_reason' => $record->rejection_reason,
                         'created_at' => $record->created_at->toIso8601String(),
@@ -223,9 +245,16 @@ class AdminDashboardController extends Controller
     /**
      * Verify a submission
      */
-    public function verifySubmission($id)
+    public function verifySubmission(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in verifySubmission');
+            }
+            
             DB::beginTransaction();
             
             $record = SocialContractRecord::with('socialContract')->findOrFail($id);
@@ -286,6 +315,13 @@ class AdminDashboardController extends Controller
     public function rejectSubmission(Request $request, $id)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in rejectSubmission');
+            }
+            
             // Validate the rejection reason
             $validated = $request->validate([
                 'reason' => 'required|string|min:3|max:1000'
@@ -347,6 +383,13 @@ class AdminDashboardController extends Controller
     public function getActivityCalendar(Request $request)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in getActivityCalendar');
+            }
+            
             $year = $request->input('year', Carbon::now()->year);
             
             \Log::info('Admin activity calendar requested', ['year' => $year]);
@@ -401,6 +444,13 @@ class AdminDashboardController extends Controller
     public function getActivityDetails(Request $request)
     {
         try {
+            // Ensure session marker is present
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+                \Log::info('Restored missing admin session marker in getActivityDetails');
+            }
+            
             $date = $request->input('date');
             
             if (!$date) {

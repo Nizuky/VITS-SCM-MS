@@ -27,6 +27,8 @@ class SocialContractRecord extends Model
     protected $casts = [
         'date' => 'date',
         'hours_rendered' => 'integer',
+        'verified_at' => 'datetime',
+        'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
     ];
 

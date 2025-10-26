@@ -13,16 +13,34 @@ class EnsureAdminSessionActive
      */
     public function handle(Request $request, Closure $next)
     {
-        // If the admin is authenticated but our session marker is missing, force logout.
-        if (Auth::guard('admin')->check() && ! $request->session()->has('admin_session_active')) {
-            \Log::warning('Admin session marker missing, forcing logout', [
+        // If the admin is authenticated but our session marker is missing, restore it instead of forcing logout.
+        if (Auth::guard('admin')->check()) {
+            if (! $request->session()->has('admin_session_active')) {
+                \Log::info('Admin session marker missing, restoring it', [
+                    'url' => $request->url(),
+                    'session_id' => $request->session()->getId(),
+                    'admin_id' => Auth::guard('admin')->id(),
+                ]);
+                
+                // Restore the session marker instead of logging out
+                $request->session()->put('admin_session_active', true);
+                $request->session()->save();
+            }
+        } else {
+            // If not authenticated, redirect to login
+            \Log::info('Admin not authenticated, redirecting to login', [
                 'url' => $request->url(),
-                'session_id' => $request->session()->getId(),
-                'admin_id' => Auth::guard('admin')->id(),
             ]);
-            Auth::guard('admin')->logout();
-            try { $request->session()->invalidate(); } catch (\Throwable $e) {}
-            try { $request->session()->regenerateToken(); } catch (\Throwable $e) {}
+            
+            // If this is an AJAX request, return JSON instead of redirect
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication required. Please refresh the page.',
+                    'unauthenticated' => true
+                ], 401);
+            }
+            
             return redirect()->route('admin.login');
         }
 

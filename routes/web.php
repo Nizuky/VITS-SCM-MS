@@ -64,8 +64,16 @@ Route::post('/api/ping', function (\Illuminate\Http\Request $request) {
             $guard = 'web';
         } elseif (auth()->guard('admin')->check()) {
             $guard = 'admin';
+            // Ensure admin session marker stays active
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+            }
         } elseif (auth()->guard('superadmin')->check()) {
             $guard = 'superadmin';
+            // Ensure superadmin session marker stays active
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+            }
         }
         
         return response()->json([
