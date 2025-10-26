@@ -576,17 +576,31 @@ class SuperAdminDashboardController extends Controller
                 $year = $currentYear;
             }
             
-            $startDate = Carbon::create($year, 1, 1)->startOfDay();
-            $endDate = Carbon::create($year, 12, 31)->endOfDay();
+            $startDate = Carbon::create($year, 1, 1, 0, 0, 0, config('app.timezone'))->startOfDay();
+            $endDate = Carbon::create($year, 12, 31, 23, 59, 59, config('app.timezone'))->endOfDay();
             
-            // Get all activity logs grouped by date
+            Log::info('Admin activity calendar requested', [
+                'year' => $year,
+                'timezone' => config('app.timezone')
+            ]);
+            
+            // Get all activity logs grouped by date in the application's timezone
             $activities = SuperAdminActivityLog::where('super_admin_id', $superAdminId)
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                ->groupBy('date')
                 ->get()
-                ->pluck('count', 'date')
+                ->groupBy(function($item) {
+                    // Group by date in the application's timezone
+                    return Carbon::parse($item->created_at)->timezone(config('app.timezone'))->format('Y-m-d');
+                })
+                ->map(function($group) {
+                    return $group->count();
+                })
                 ->toArray();
+            
+            Log::info('Admin activity calendar data', [
+                'count' => count($activities),
+                'year' => $year
+            ]);
             
             return response()->json([
                 'success' => true,
@@ -620,8 +634,16 @@ class SuperAdminDashboardController extends Controller
                 ], 400);
             }
             
-            $startOfDay = Carbon::parse($date)->startOfDay();
-            $endOfDay = Carbon::parse($date)->endOfDay();
+            // Parse date in the application's timezone to avoid timezone conversion issues
+            $startOfDay = Carbon::parse($date, config('app.timezone'))->startOfDay();
+            $endOfDay = Carbon::parse($date, config('app.timezone'))->endOfDay();
+            
+            Log::info('Activity details date range', [
+                'date' => $date,
+                'startOfDay' => $startOfDay->toDateTimeString(),
+                'endOfDay' => $endOfDay->toDateTimeString(),
+                'timezone' => config('app.timezone')
+            ]);
             
             // Get all activities for this date with related record information
             $activities = SuperAdminActivityLog::where('super_admin_id', $superAdminId)

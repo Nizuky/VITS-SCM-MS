@@ -2956,6 +2956,12 @@ table{overflow:visible!important}
             var container = document.getElementById('activity-calendar');
             if (!container) return;
             
+            // Use Philippines timezone (UTC+8)
+            var philippinesOffset = 8 * 60; // 8 hours in minutes
+            var localOffset = today.getTimezoneOffset();
+            var offsetDiff = philippinesOffset + localOffset;
+            var philippinesToday = new Date(today.getTime() + (offsetDiff * 60 * 1000));
+            
             function getColor(level) {
                 if (level === 0) return '#E5E7EB';
                 if (level <= 2) return '#E5D4FF';
@@ -2964,96 +2970,120 @@ table{overflow:visible!important}
                 return '#6D28D9';
             }
             
-            // Adjust start date to Sunday
-            var calendarStart = new Date(startDate);
-            calendarStart.setDate(calendarStart.getDate() - calendarStart.getDay());
-            
-            // Build weeks
-            var weeks = [];
-            var currentWeek = new Date(calendarStart);
-            
-            while (currentWeek <= endDate) {
-                var week = [];
-                for (var i = 0; i < 7; i++) {
-                    var date = new Date(currentWeek);
-                    date.setDate(date.getDate() + i);
-                    week.push(date);
-                }
-                weeks.push(week);
-                currentWeek.setDate(currentWeek.getDate() + 7);
-            }
-            
             var html = '<div class="flex gap-2">';
             
-            // Day labels column
-            html += '<div class="flex flex-col justify-between text-xs text-text-muted pr-2" style="padding-top: 24px;">';
-            var days = ['Mon', 'Wed', 'Fri'];
-            for (var d = 0; d < 3; d++) {
-                html += '<div class="h-3 leading-3">' + days[d] + '</div>';
-            }
+            // Day labels column - use rem values to match Tailwind exactly
+            // h-3 = 0.75rem (12px), mb-1 = 0.25rem (4px)
+            html += '<div class="flex flex-col text-xs text-text-muted pr-2" style="padding-top: 18px;">';
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem;"></div>'; // Sunday - Row 0
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem; line-height: 0.75rem;">Mon</div>'; // Monday - Row 1
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem;"></div>'; // Tuesday - Row 2
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem; line-height: 0.75rem;">Wed</div>'; // Wednesday - Row 3
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem;"></div>'; // Thursday - Row 4
+            html += '<div style="height: 0.75rem; margin-bottom: 0.25rem; line-height: 0.75rem;">Fri</div>'; // Friday - Row 5
+            html += '<div style="height: 0.75rem;"></div>'; // Saturday - Row 6
             html += '</div>';
             
-            // Calendar grid
-            html += '<div class="flex-1 overflow-x-auto"><div class="inline-flex flex-col">';
+            // Calendar grid container
+            html += '<div class="flex-1 overflow-x-auto">';
+            html += '<div class="flex gap-4">'; // Gap between months
             
-            // Month labels row
-            html += '<div class="flex gap-1 mb-2">';
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            var lastMonth = -1;
-            var monthPositions = [];
             
-            for (var w = 0; w < weeks.length; w++) {
-                var weekMonth = weeks[w][0].getMonth();
-                if (weekMonth !== lastMonth) {
-                    monthPositions.push({ week: w, month: weekMonth });
-                    lastMonth = weekMonth;
-                }
-            }
-            
-            for (var w = 0; w < weeks.length; w++) {
-                var showMonth = monthPositions.find(function(mp) { return mp.week === w; });
-                if (showMonth) {
-                    html += '<div class="text-xs text-text-muted" style="min-width: 13px;">' + months[showMonth.month] + '</div>';
-                } else {
-                    html += '<div style="min-width: 13px;"></div>';
-                }
-            }
-            html += '</div>';
-            
-            // Grid rows
-            for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
-                html += '<div class="flex gap-1 mb-1">';
-                
-                for (var w = 0; w < weeks.length; w++) {
-                    var date = weeks[w][dayIndex];
-                    var dateStr = date.toISOString().split('T')[0];
-                    var level = activityData[dateStr] || 0;
-                    var color = getColor(level);
-                    
-                    var isToday = date.toDateString() === today.toDateString();
-                    var isFuture = date > today;
-                    var isInYear = date.getFullYear() === currentCalendarYear;
-                    
-                    var title = dateStr + ': ' + level + ' update' + (level !== 1 ? 's' : '');
-                    
-                    var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
-                    var opacity = (isFuture || !isInYear) ? 'opacity-30' : '';
-                    var cursor = (!isFuture && isInYear && level > 0) ? 'cursor-pointer' : 'cursor-default';
-                    
-                    html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 ' + 
-                            cursor + ' ' + borderClass + ' ' + opacity + '" ' +
-                            'style="background-color: ' + color + ';" ' +
-                            'title="' + title + '" ' +
-                            'data-date="' + dateStr + '" ' +
-                            'data-count="' + level + '" ' +
-                            ((!isFuture && isInYear && level > 0) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '') +
-                            '></div>';
+            // Loop through each month of the year
+            for (var monthIndex = 0; monthIndex < 12; monthIndex++) {
+                // Skip future months using Philippines time
+                var currentMonth = philippinesToday.getMonth();
+                if (monthIndex > currentMonth) {
+                    continue; // Skip this month
                 }
                 
-                html += '</div>';
+                // Build calendar dates
+                var monthStart = new Date(currentCalendarYear, monthIndex, 1);
+                var monthEnd = new Date(currentCalendarYear, monthIndex + 1, 0); // Last day of month
+                
+                // Find the Sunday before or on the first day of the month
+                var firstSunday = new Date(monthStart);
+                firstSunday.setDate(firstSunday.getDate() - firstSunday.getDay());
+                
+                // Build weeks for this month
+                var monthWeeks = [];
+                var currentWeekStart = new Date(firstSunday);
+                
+                // Continue until we've covered the entire month
+                while (currentWeekStart <= monthEnd) {
+                    var week = [];
+                    for (var dayOffset = 0; dayOffset < 7; dayOffset++) {
+                        var dayDate = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + dayOffset);
+                        week.push(dayDate);
+                    }
+                    monthWeeks.push(week);
+                    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                    
+                    // Stop if the week is entirely in the next month
+                    if (week[0].getMonth() > monthIndex && week[6].getMonth() > monthIndex) {
+                        break;
+                    }
+                }
+                
+                // Render this month
+                html += '<div class="inline-flex flex-col">';
+                
+                // Month label
+                html += '<div class="text-xs font-semibold text-text-muted text-center mb-2 h-4">' + months[monthIndex] + '</div>';
+                
+                // Grid rows for this month
+                for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
+                    // Remove mb-1 from last row (Saturday) to match day labels
+                    var rowClass = dayIndex === 6 ? 'flex gap-1' : 'flex gap-1 mb-1';
+                    html += '<div class="' + rowClass + '">';
+                    
+                    for (var w = 0; w < monthWeeks.length; w++) {
+                        var date = monthWeeks[w][dayIndex];
+                        
+                        // Create date string for data lookup
+                        var year = date.getFullYear();
+                        var month = String(date.getMonth() + 1).padStart(2, '0');
+                        var day = String(date.getDate()).padStart(2, '0');
+                        var dateStr = year + '-' + month + '-' + day;
+                        
+                        var level = activityData[dateStr] || 0;
+                        var color = getColor(level);
+                        
+                        // Check if this date is today in Philippines timezone
+                        var isToday = date.getFullYear() === philippinesToday.getFullYear() && 
+                                     date.getMonth() === philippinesToday.getMonth() && 
+                                     date.getDate() === philippinesToday.getDate();
+                        var isFuture = date > philippinesToday;
+                        var isInYear = date.getFullYear() === currentCalendarYear;
+                        var isInThisMonth = date.getMonth() === monthIndex;
+                        
+                        var title = dateStr + ': ' + level + ' update' + (level !== 1 ? 's' : '');
+                        
+                        var borderClass = isToday ? 'ring-2 ring-primary-purple ring-offset-1' : '';
+                        var opacity = (isFuture || !isInYear || !isInThisMonth) ? 'opacity-30' : '';
+                        var cursor = (!isFuture && isInYear && isInThisMonth && level > 0) ? 'cursor-pointer' : 'cursor-default';
+                        
+                        html += '<div class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-primary-purple hover:ring-offset-1 ' + 
+                                cursor + ' ' + borderClass + ' ' + opacity + '" ' +
+                                'style="background-color: ' + color + ';" ' +
+                                'title="' + title + '" ' +
+                                'data-date="' + dateStr + '" ' +
+                                'data-count="' + level + '" ' +
+                                ((!isFuture && isInYear && isInThisMonth && level > 0) ? 'onclick="showActivityDetails(\'' + dateStr + '\')"' : '') +
+                                '></div>';
+                    }
+                    
+                    html += '</div>';
+                }
+                
+                html += '</div>'; // End month column
             }
             
-            html += '</div></div></div>';
+            html += '</div>'; // End months flex container
+            html += '</div>'; // End overflow container
+            html += '</div>'; // End main flex container
+            
             container.innerHTML = html;
         }
         
@@ -3123,10 +3153,31 @@ table{overflow:visible!important}
                     result.data.forEach(function(activity) {
                         console.log('Processing activity:', activity);
                         
-                        var time = new Date(activity.created_at).toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        });
+                        // Parse the timestamp without timezone conversion
+                        var timestamp = activity.created_at;
+                        var time = '';
+                        
+                        // If timestamp includes timezone info, parse it carefully
+                        if (timestamp) {
+                            try {
+                                // Extract just the time portion (HH:MM:SS) from the timestamp
+                                var timeParts = timestamp.match(/(\d{2}):(\d{2}):(\d{2})/);
+                                if (timeParts) {
+                                    var hour = parseInt(timeParts[1]);
+                                    var minute = timeParts[2];
+                                    var ampm = hour >= 12 ? 'PM' : 'AM';
+                                    hour = hour % 12 || 12; // Convert to 12-hour format
+                                    time = hour + ':' + minute + ' ' + ampm;
+                                } else {
+                                    time = new Date(timestamp).toLocaleTimeString('en-US', { 
+                                        hour: '2-digit', 
+                                        minute: '2-digit' 
+                                    });
+                                }
+                            } catch (e) {
+                                time = '00:00 AM';
+                            }
+                        }
                         
                         var actionBadge = '';
                         var actionText = '';
