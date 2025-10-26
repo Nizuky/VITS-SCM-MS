@@ -35,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Fortify's auto-login from affecting admin/superadmin sessions
         $middleware->appendToGroup('web', App\Http\Middleware\IsolateWebGuardSession::class);
         
+        // Keep session alive - updates last activity timestamp on every request
+        $middleware->appendToGroup('web', App\Http\Middleware\KeepSessionAlive::class);
+        
         // Configure authentication redirect per guard (for guests trying to access protected routes)
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
             // Check which guard is being used for this request

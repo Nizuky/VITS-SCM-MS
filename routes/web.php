@@ -67,6 +67,22 @@ Route::get('/api/refresh-csrf', function (\Illuminate\Http\Request $request) {
     }
 });
 
+// Simple keep-alive endpoint (no CSRF required for GET)
+Route::get('/keep-alive', function (\Illuminate\Http\Request $request) {
+    if (auth()->guard('web')->check() || 
+        auth()->guard('admin')->check() || 
+        auth()->guard('superadmin')->check()) {
+        $request->session()->put('last_activity', time());
+        $request->session()->save();
+    }
+    return response()->noContent();
+});
+
+// Alias for backwards compatibility
+Route::get('/refresh-csrf', function (\Illuminate\Http\Request $request) {
+    return response()->json(['token' => csrf_token()]);
+});
+
 // API: Session keep-alive ping (for all authenticated users)
 Route::post('/api/ping', function (\Illuminate\Http\Request $request) {
     try {

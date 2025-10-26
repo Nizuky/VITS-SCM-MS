@@ -3905,5 +3905,32 @@ table{overflow:visible!important}
             });
         }
     </script>
+
+    <!-- Additional Keep-Alive Scripts (Fallback & Simplicity) -->
+    <script>
+        // Simple CSRF refresh every 30 minutes (fallback)
+        async function refreshCsrf() {
+            try {
+                const res = await fetch('/refresh-csrf', { credentials: 'same-origin' });
+                const data = await res.json();
+                document.querySelector('meta[name="csrf-token"]').content = data.token;
+                
+                if (window.axios) {
+                    axios.defaults.headers.common['X-CSRF-TOKEN'] = data.token;
+                }
+            } catch (e) {
+                console.warn('[Keep-Alive] CSRF refresh failed', e);
+            }
+        }
+
+        // Simple keep-alive ping every 20 minutes (fallback)
+        function keepAlive() {
+            fetch('/keep-alive', { credentials: 'same-origin' }).catch(() => {});
+        }
+
+        // Run both periodically (works alongside SessionKeeper)
+        setInterval(refreshCsrf, 30 * 60 * 1000); // 30 minutes
+        setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
+    </script>
 </body>
 </html>
