@@ -1492,7 +1492,6 @@ table{overflow:visible!important}
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': getCsrfToken(),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     credentials: 'include'

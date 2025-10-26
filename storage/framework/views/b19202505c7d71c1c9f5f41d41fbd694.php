@@ -817,6 +817,33 @@ table{overflow:visible!important}
         var allSubmissions = []; // Store all submissions data
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         
+        // ==================== CSRF TOKEN SETUP ====================
+        // Simple helper to get CSRF token from meta tag
+        function getCsrfToken() {
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            return metaTag ? metaTag.getAttribute('content') : '';
+        }
+        
+        // Auto-refresh CSRF token every 5 minutes to prevent expiration
+        setInterval(async () => {
+            try {
+                const response = await fetch(`${BASE_PATH}/api/refresh-csrf`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.token) {
+                    // Update meta tag with new token
+                    const metaTag = document.querySelector('meta[name="csrf-token"]');
+                    if (metaTag) {
+                        metaTag.setAttribute('content', data.token);
+                    }
+                }
+            } catch (e) {
+                console.warn('[CSRF] Failed to auto-refresh token');
+            }
+        }, 5 * 60 * 1000); // Every 5 minutes
+        
         // CSRF Cookie Helper Functions
         function getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -837,6 +864,9 @@ table{overflow:visible!important}
                         'Cache-Control': 'no-cache' 
                     }
                 });
+                
+                // Wait a moment for cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
                 // Update CSRF token in meta tag
                 if (response.ok) {

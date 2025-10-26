@@ -25,6 +25,25 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\VoltServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
+        // Exclude specific routes from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            // Student dashboard routes
+            '/api/social-contract/records',
+            '/api/social-contract/records/*',
+            '/api/support-tickets',
+            '/api/support-tickets/*',
+            '/api/notifications/*',
+            
+            // Admin dashboard routes
+            '/admin/api/submissions',
+            '/admin/api/submissions/*',
+            
+            // Super Admin dashboard routes
+            '/super-admin/api/submissions',
+            '/super-admin/api/submissions/*',
+            '/super-admin/api/support-tickets/*',
+        ]);
+        
         // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)
         $middleware->append(App\Http\Middleware\ForcePendingLogout::class);
         

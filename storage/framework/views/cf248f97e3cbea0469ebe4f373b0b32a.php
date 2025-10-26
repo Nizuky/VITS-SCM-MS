@@ -1724,40 +1724,18 @@
         const BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         
         // ==================== CSRF TOKEN SETUP ====================
-        // Get CSRF token from meta tag
+        // Simple helper to get CSRF token from meta tag
         function getCsrfToken() {
             const metaTag = document.querySelector('meta[name="csrf-token"]');
             return metaTag ? metaTag.getAttribute('content') : '';
         }
-        
-        // Set up default headers for fetch requests
-        const originalFetch = window.fetch;
-        window.fetch = function(url, options = {}) {
-            // Add CSRF token to POST, PUT, DELETE, PATCH requests
-            if (options.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase())) {
-                options.headers = options.headers || {};
-                const token = getCsrfToken();
-                if (token) {
-                    if (typeof options.headers.append === 'function') {
-                        options.headers.append('X-CSRF-TOKEN', token);
-                    } else {
-                        options.headers['X-CSRF-TOKEN'] = token;
-                    }
-                }
-                // Always include credentials for same-origin requests
-                if (!options.credentials) {
-                    options.credentials = 'same-origin';
-                }
-            }
-            return originalFetch.apply(this, [url, options]);
-        };
         
         // Auto-refresh CSRF token every 5 minutes to prevent expiration
         setInterval(async () => {
             try {
                 const response = await fetch(`${BASE_PATH}/api/refresh-csrf`, {
                     method: 'GET',
-                    credentials: 'same-origin'
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 if (data.token) {
@@ -1765,11 +1743,10 @@
                     const metaTag = document.querySelector('meta[name="csrf-token"]');
                     if (metaTag) {
                         metaTag.setAttribute('content', data.token);
-                        console.log('[CSRF] Token auto-refreshed successfully');
                     }
                 }
             } catch (e) {
-                console.warn('[CSRF] Failed to auto-refresh token:', e);
+                console.warn('[CSRF] Failed to auto-refresh token');
             }
         }, 5 * 60 * 1000); // Every 5 minutes
         
@@ -2934,7 +2911,7 @@
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    credentials: 'same-origin',
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 })
                 .then(async (r) => {
@@ -3376,7 +3353,7 @@
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'
                             },
-                            credentials: 'same-origin',
+                            credentials: 'include',
                             body: JSON.stringify(requestBody)
                         });
 
