@@ -21,7 +21,10 @@ class SocialContractRecordObserver
 {
     /**
      * Handle the SocialContractRecord "updated" event.
-     * When a record status changes to "Verified", copy it to approvals table
+     * 
+     * When status changes to "Verified" or "Rejected":
+     * - Creates a record in social_contract_approvals table
+     * - This ensures both Admin and Super Admin see the same data in their Archived tabs
      */
     public function updated(SocialContractRecord $socialContractRecord): void
     {
@@ -32,9 +35,11 @@ class SocialContractRecordObserver
             'all_dirty' => $socialContractRecord->getDirty(),
         ]);
         
-        // Check if status was changed to "Verified"
-        if ($socialContractRecord->isDirty('status') && $socialContractRecord->status === 'Verified') {
-            \Log::info('Status changed to Verified, creating approval record', [
+        // Check if status was changed to "Verified" or "Rejected"
+        if ($socialContractRecord->isDirty('status') && 
+            in_array($socialContractRecord->status, ['Verified', 'Rejected'])) {
+            
+            \Log::info('Status changed to ' . $socialContractRecord->status . ', creating approval record', [
                 'record_id' => $socialContractRecord->id
             ]);
             
@@ -53,6 +58,16 @@ class SocialContractRecordObserver
                 $existingApproval = SocialContractApproval::where('social_contract_record_id', $socialContractRecord->id)->first();
                 
                 if (!$existingApproval) {
+                    // Determine who performed the action (admin or superadmin)
+                    $verifiedBy = null;
+                    $rejectedBy = null;
+                    
+                    if ($socialContractRecord->status === 'Verified') {
+                        $verifiedBy = auth()->guard('admin')->id() ?? auth()->guard('superadmin')->id();
+                    } elseif ($socialContractRecord->status === 'Rejected') {
+                        $rejectedBy = auth()->guard('admin')->id() ?? auth()->guard('superadmin')->id();
+                    }
+                    
                     // Create new approval record
                     $approval = SocialContractApproval::create([
                         'social_contract_record_id' => $socialContractRecord->id,
@@ -63,9 +78,12 @@ class SocialContractRecordObserver
                         'venue' => $socialContractRecord->venue,
                         'hours_rendered' => $socialContractRecord->hours_rendered,
                         'date' => $socialContractRecord->date,
-                        'status' => 'Verified',
-                        'verified_by' => auth()->guard('admin')->id() ?? null,
-                        'verified_at' => now(),
+                        'status' => $socialContractRecord->status, // 'Verified' or 'Rejected'
+                        'verified_by' => $verifiedBy,
+                        'verified_at' => $socialContractRecord->status === 'Verified' ? now() : null,
+                        'rejected_by' => $rejectedBy,
+                        'rejected_at' => $socialContractRecord->status === 'Rejected' ? now() : null,
+                        'rejection_reason' => $socialContractRecord->rejection_reason,
                     ]);
                     
                     \Log::info('Approval record created successfully', [

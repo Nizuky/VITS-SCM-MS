@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\SocialContractRecord;
-use App\Models\SocialContractApproval;
 use App\Models\SuperAdminActivityLog;
 use App\Models\StudentNotification;
 use Carbon\Carbon;
@@ -97,7 +96,10 @@ class SuperAdminDashboardController extends Controller
                 'rejected_in_approvals' => $rejectedCount,
             ]);
             
-            // Get pending records from social_contract_records
+            // PENDING TAB DATA SOURCE:
+            // Get ALL pending records directly from social_contract_records table
+            // This shows all student submissions that haven't been verified or rejected yet
+            // Both Admin and Super Admin see the SAME pending records from this table
             $pendingRecords = SocialContractRecord::where('status', 'Pending')
                 ->with(['socialContract.student'])
                 ->orderBy('updated_at', 'desc')
@@ -129,89 +131,89 @@ class SuperAdminDashboardController extends Controller
                     ];
                 });
 
-            // Get verified records (for approval) from social_contract_approvals
-            $forApprovalRecords = \App\Models\SocialContractApproval::where('status', 'Verified')
+            // FOR APPROVAL TAB DATA SOURCE (Super Admin Only):
+            // Get verified records directly from social_contract_records table
+            // These are records that Admin/Super Admin verified and are awaiting final approval
+            // Only Super Admin can approve/reject these records
+            $forApprovalRecords = SocialContractRecord::where('status', 'Verified')
+                ->with(['socialContract.student'])
                 ->orderBy('updated_at', 'desc')
                 ->get()
-                ->map(function ($approval) {
+                ->map(function ($record) {
+                    $student = $record->socialContract->student ?? null;
                     $dateFormatted = null;
-                    if ($approval->date) {
+                    if ($record->date) {
                         try {
-                            $dateObj = $approval->date instanceof \Carbon\Carbon ? $approval->date : Carbon::parse($approval->date);
+                            $dateObj = $record->date instanceof \Carbon\Carbon ? $record->date : Carbon::parse($record->date);
                             $dateFormatted = $dateObj->format('Y-m-d');
                         } catch (\Exception $e) {
-                            $dateFormatted = $approval->date;
+                            $dateFormatted = $record->date;
                         }
                     }
                     
                     // Set action_date for verified records
                     $actionDate = null;
-                    if ($approval->verified_at) {
-                        $actionDate = $approval->verified_at->format('m-d-Y');
+                    if ($record->updated_at) {
+                        $actionDate = $record->updated_at->format('m-d-Y');
                     }
                     
                     return [
-                        'id' => $approval->id,
-                        'record_id' => $approval->social_contract_record_id,
-                        'student_id' => $approval->student_id,
-                        'student_name' => $approval->student_name,
-                        'event_name' => $approval->event_name,
-                        'organization' => $approval->organization,
-                        'venue' => $approval->venue,
-                        'hours_rendered' => $approval->hours_rendered,
+                        'id' => $record->id,
+                        'student_id' => $student ? ($student->student_id ?? 'N/A') : 'N/A',
+                        'student_name' => $student->name ?? '',
+                        'event_name' => $record->event_name,
+                        'organization' => $record->organization,
+                        'venue' => $record->venue,
+                        'hours_rendered' => $record->hours_rendered,
                         'date' => $dateFormatted,
                         'status' => 'Verified',
-                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
                         'action_date' => $actionDate,
-                        'created_at' => $approval->created_at->toIso8601String(),
-                        'updated_at' => $approval->updated_at->toIso8601String(),
+                        'rejection_reason' => $record->rejection_reason ?? '',
+                        'created_at' => $record->created_at->toIso8601String(),
+                        'updated_at' => $record->updated_at->toIso8601String(),
                     ];
                 });
 
-            // Get ALL archived records (approved/rejected/verified) from social_contract_approvals
-            // This includes admin's archived records (verified) AND super admin's final decisions (approved/rejected)
-            $archivedRecords = \App\Models\SocialContractApproval::whereIn('status', ['Approved', 'Rejected', 'Verified'])
+            // ARCHIVED TAB DATA SOURCE:
+            // Get ALL archived records directly from social_contract_records table
+            // This includes: Verified, Approved, and Rejected records
+            // Both Admin and Super Admin see the SAME archived data from this table
+            $archivedRecords = SocialContractRecord::whereIn('status', ['Verified', 'Approved', 'Rejected'])
+                ->with(['socialContract.student'])
                 ->orderBy('updated_at', 'desc')
                 ->get()
-                ->map(function ($approval) {
+                ->map(function ($record) {
+                    $student = $record->socialContract->student ?? null;
                     $dateFormatted = null;
-                    if ($approval->date) {
+                    if ($record->date) {
                         try {
-                            $dateObj = $approval->date instanceof \Carbon\Carbon ? $approval->date : Carbon::parse($approval->date);
+                            $dateObj = $record->date instanceof \Carbon\Carbon ? $record->date : Carbon::parse($record->date);
                             $dateFormatted = $dateObj->format('Y-m-d');
                         } catch (\Exception $e) {
-                            $dateFormatted = $approval->date;
+                            $dateFormatted = $record->date;
                         }
                     }
                     
-                    // Determine which action date to show
+                    // Determine which action date to show based on status
                     $actionDate = null;
-                    if ($approval->status === 'Approved' && $approval->approved_at) {
-                        $actionDate = $approval->approved_at->format('m-d-Y');
-                    } elseif ($approval->status === 'Rejected' && $approval->rejected_at) {
-                        $actionDate = $approval->rejected_at->format('m-d-Y');
-                    } elseif ($approval->status === 'Verified' && $approval->verified_at) {
-                        $actionDate = $approval->verified_at->format('m-d-Y');
+                    if ($record->updated_at) {
+                        $actionDate = $record->updated_at->format('m-d-Y');
                     }
                     
                     return [
-                        'id' => $approval->id,
-                        'record_id' => $approval->social_contract_record_id,
-                        'student_id' => $approval->student_id,
-                        'student_name' => $approval->student_name,
-                        'event_name' => $approval->event_name,
-                        'organization' => $approval->organization,
-                        'venue' => $approval->venue,
-                        'hours_rendered' => $approval->hours_rendered,
+                        'id' => $record->id,
+                        'student_id' => $student ? ($student->student_id ?? 'N/A') : 'N/A',
+                        'student_name' => $student->name ?? '',
+                        'event_name' => $record->event_name,
+                        'organization' => $record->organization,
+                        'venue' => $record->venue,
+                        'hours_rendered' => $record->hours_rendered,
                         'date' => $dateFormatted,
-                        'status' => $approval->status,
-                        'rejection_reason' => $approval->rejection_reason,
-                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
-                        'approved_at' => $approval->approved_at ? $approval->approved_at->format('m-d-Y') : null,
-                        'rejected_at' => $approval->rejected_at ? $approval->rejected_at->format('m-d-Y') : null,
+                        'status' => $record->status,
+                        'rejection_reason' => $record->rejection_reason ?? '',
                         'action_date' => $actionDate,
-                        'created_at' => $approval->created_at->toIso8601String(),
-                        'updated_at' => $approval->updated_at->toIso8601String(),
+                        'created_at' => $record->created_at->toIso8601String(),
+                        'updated_at' => $record->updated_at->toIso8601String(),
                     ];
                 });
 
@@ -228,13 +230,11 @@ class SuperAdminDashboardController extends Controller
                 'total' => $allSubmissions->count(),
             ]);
             
-            // Remove duplicates by tracking the underlying social_contract_record_id
-            // Approvals take precedence over pending records
+            // Remove duplicates by tracking record IDs
+            // Since all data comes from social_contract_records, we just use id
             $seen = [];
             $uniqueSubmissions = $allSubmissions->filter(function ($record) use (&$seen) {
-                // For approval records, use the social_contract_record_id
-                // For pending records, use their own id
-                $recordId = isset($record['record_id']) ? $record['record_id'] : $record['id'];
+                $recordId = $record['id'];
                 
                 if (in_array($recordId, $seen)) {
                     return false; // Skip duplicate
@@ -274,18 +274,17 @@ class SuperAdminDashboardController extends Controller
         try {
             Log::info('Attempting to approve submission', ['id' => $id]);
             
-            // Find the approval record (not the original record)
-            $approval = \App\Models\SocialContractApproval::findOrFail($id);
+            // Find the record directly from social_contract_records
+            $record = SocialContractRecord::with('socialContract.student')->findOrFail($id);
             
-            Log::info('Found approval record', [
-                'approval_id' => $approval->id,
-                'status' => $approval->status,
-                'record_id' => $approval->social_contract_record_id
+            Log::info('Found record', [
+                'record_id' => $record->id,
+                'status' => $record->status
             ]);
             
             // Check if already approved
-            if ($approval->status === 'Approved') {
-                Log::warning('Approval already approved', ['id' => $id]);
+            if ($record->status === 'Approved') {
+                Log::warning('Record already approved', ['id' => $id]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Submission is already approved'
@@ -293,47 +292,39 @@ class SuperAdminDashboardController extends Controller
             }
             
             // Check if verified (SuperAdmin can only approve verified submissions)
-            if ($approval->status !== 'Verified') {
-                Log::warning('Approval status is not Verified', ['id' => $id, 'status' => $approval->status]);
+            if ($record->status !== 'Verified') {
+                Log::warning('Record status is not Verified', ['id' => $id, 'status' => $record->status]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only verified submissions can be approved. Current status: ' . $approval->status
+                    'message' => 'Only verified submissions can be approved. Current status: ' . $record->status
                 ], 400);
             }
             
-            DB::transaction(function () use ($approval) {
-                // Update the approval record status
-                $approval->status = 'Approved';
-                $approval->approved_by = Auth::guard('superadmin')->id();
-                $approval->approved_at = now();
-                $approval->save();
+            DB::transaction(function () use ($record) {
+                // Update the record status to Approved
+                $record->status = 'Approved';
+                $record->approved_by = Auth::guard('superadmin')->id();
+                $record->approved_at = now();
+                $record->save();
                 
-                // Update the original record status
-                if ($approval->socialContractRecord) {
-                    $approval->socialContractRecord->load('socialContract');
-                    $approval->socialContractRecord->status = 'Approved';
-                    $approval->socialContractRecord->save();
-                    
-                    // Create notification for student
-                    StudentNotification::create([
-                        'user_id' => $approval->socialContractRecord->socialContract->student_id,
-                        'social_contract_record_id' => $approval->social_contract_record_id,
-                        'type' => 'approved',
-                        'message' => 'Your social contract submission has been approved by the super admin.',
-                        'is_read' => false,
-                    ]);
-                }
+                // Create notification for student
+                StudentNotification::create([
+                    'user_id' => $record->socialContract->student_id,
+                    'social_contract_record_id' => $record->id,
+                    'type' => 'approved',
+                    'message' => 'Your social contract submission has been approved by the super admin.',
+                    'is_read' => false,
+                ]);
                 
                 // Log activity for calendar
                 SuperAdminActivityLog::create([
                     'super_admin_id' => Auth::guard('superadmin')->id(),
                     'action' => 'approved_submission',
-                    'description' => "Approved submission for {$approval->event_name}",
+                    'description' => "Approved submission for {$record->socialContract->event_name}",
                     'metadata' => json_encode([
-                        'approval_id' => $approval->id,
-                        'record_id' => $approval->social_contract_record_id,
-                        'event_name' => $approval->event_name,
-                        'student_name' => $approval->student_name
+                        'record_id' => $record->id,
+                        'event_name' => $record->socialContract->event_name ?? 'N/A',
+                        'student_name' => $record->socialContract->student->name ?? 'N/A'
                     ])
                 ]);
             });
@@ -432,9 +423,7 @@ class SuperAdminDashboardController extends Controller
 
     /**
      * Reject a submission
-     * Can reject both:
-     * 1. Pending records (from social_contract_records table)
-     * 2. Verified records (from social_contract_approvals table)
+     * Works with social_contract_records table directly
      */
     public function rejectSubmission(Request $request, $id)
     {
@@ -443,138 +432,83 @@ class SuperAdminDashboardController extends Controller
             
             $reason = $request->input('reason', 'Rejected by SuperAdmin');
             
-            // First, try to find as an approval record (for verified submissions)
-            $approval = \App\Models\SocialContractApproval::find($id);
+            // Find the record directly from social_contract_records
+            $record = SocialContractRecord::with('socialContract.student')->findOrFail($id);
             
-            if ($approval) {
-                // This is a verified submission (from approvals table)
-                Log::info('Found approval record to reject', ['approval_id' => $approval->id]);
-                
-                // Check if already rejected or approved
-                if ($approval->status === 'Rejected') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Submission is already rejected'
-                    ], 400);
-                }
-                
-                if ($approval->status === 'Approved') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Approved submissions cannot be rejected'
-                    ], 400);
-                }
-                
-                DB::transaction(function () use ($approval, $reason) {
-                    // Update the approval record status
-                    $approval->status = 'Rejected';
-                    $approval->approved_by = Auth::guard('superadmin')->id();
-                    $approval->rejected_at = now();
-                    $approval->rejection_reason = $reason;
-                    $approval->save();
-                    
-                    // Update the original record status and rejection reason
-                    if ($approval->socialContractRecord) {
-                        $approval->socialContractRecord->load('socialContract');
-                        $approval->socialContractRecord->status = 'Rejected';
-                        $approval->socialContractRecord->rejection_reason = $reason;
-                        
-                        // Only set rejected_at if the column exists
-                        if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
-                            $approval->socialContractRecord->rejected_at = now();
-                        }
-                        
-                        $approval->socialContractRecord->save();
-                        
-                        // Create notification for student
-                        StudentNotification::create([
-                            'user_id' => $approval->socialContractRecord->socialContract->student_id,
-                            'social_contract_record_id' => $approval->social_contract_record_id,
-                            'type' => 'rejected',
-                            'message' => 'Your social contract submission has been rejected by the super admin.',
-                            'rejection_reason' => $reason,
-                            'is_read' => false,
-                        ]);
-                    }
-                    
-                    // Log activity for calendar
-                    SuperAdminActivityLog::create([
-                        'super_admin_id' => Auth::guard('superadmin')->id(),
-                        'action' => 'rejected_submission',
-                        'description' => "Rejected submission for {$approval->event_name}",
-                        'metadata' => json_encode([
-                            'approval_id' => $approval->id,
-                            'record_id' => $approval->social_contract_record_id,
-                            'event_name' => $approval->event_name,
-                            'student_name' => $approval->student_name,
-                            'reason' => $reason
-                        ])
-                    ]);
-                });
-                
+            Log::info('Found record to reject', ['record_id' => $record->id, 'status' => $record->status]);
+            
+            // Check if already rejected
+            if ($record->status === 'Rejected') {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Submission rejected successfully'
-                ]);
+                    'success' => false,
+                    'message' => 'Submission is already rejected'
+                ], 400);
             }
             
-            // If not found in approvals, try to find as a pending record
-            $record = SocialContractRecord::find($id);
-            
-            if ($record) {
-                // This is a pending submission (from records table)
-                Log::info('Found pending record to reject', ['record_id' => $record->id]);
-                
-                // Check if already rejected
-                if ($record->status === 'Rejected') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Submission is already rejected'
-                    ], 400);
-                }
-                
-                if ($record->status === 'Approved') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Approved submissions cannot be rejected'
-                    ], 400);
-                }
-                
-                DB::transaction(function () use ($record, $reason) {
-                    // Update the record status to Rejected
-                    $record->status = 'Rejected';
-                    $record->rejection_reason = $reason;
-                    
-                    // Only set rejected_at if the column exists
-                    if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
-                        $record->rejected_at = now();
-                    }
-                    
-                    $record->save();
-                    
-                    // Log activity for calendar
-                    SuperAdminActivityLog::create([
-                        'super_admin_id' => Auth::guard('superadmin')->id(),
-                        'action' => 'rejected_submission',
-                        'description' => "Rejected submission for {$record->event_name}",
-                        'metadata' => json_encode([
-                            'record_id' => $record->id,
-                            'event_name' => $record->event_name,
-                            'reason' => $reason
-                        ])
-                    ]);
-                });
-                
+            if ($record->status === 'Approved') {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Submission rejected successfully'
-                ]);
+                    'success' => false,
+                    'message' => 'Approved submissions cannot be rejected'
+                ], 400);
             }
             
-            // Not found in either table
+            DB::transaction(function () use ($record, $reason) {
+                // Update the record status to Rejected
+                $record->status = 'Rejected';
+                $record->rejection_reason = $reason;
+                $record->rejected_by = Auth::guard('superadmin')->id();
+                
+                // Set rejected_at if the column exists
+                if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
+                    $record->rejected_at = now();
+                }
+                
+                $record->save();
+                
+                // Create notification for student
+                StudentNotification::create([
+                    'user_id' => $record->socialContract->student_id,
+                    'social_contract_record_id' => $record->id,
+                    'type' => 'rejected',
+                    'message' => 'Your social contract submission has been rejected by the super admin.',
+                    'rejection_reason' => $reason,
+                    'is_read' => false,
+                ]);
+                
+                // Log activity for calendar
+                SuperAdminActivityLog::create([
+                    'super_admin_id' => Auth::guard('superadmin')->id(),
+                    'action' => 'rejected_submission',
+                    'description' => "Rejected submission for {$record->socialContract->event_name}",
+                    'metadata' => json_encode([
+                        'record_id' => $record->id,
+                        'event_name' => $record->socialContract->event_name ?? 'N/A',
+                        'student_name' => $record->socialContract->student->name ?? 'N/A',
+                        'reason' => $reason
+                    ])
+                ]);
+            });
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Submission rejected successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('SuperAdmin failed to reject submission', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Submission not found'
+                'message' => 'Failed to reject submission: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a specific submission details for editing
             ], 404);
             
         } catch (\Exception $e) {

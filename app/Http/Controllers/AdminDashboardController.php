@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\SocialContractRecord;
-use App\Models\SocialContractApproval;
 use App\Models\SocialContract;
 use App\Models\User;
 use App\Models\StudentNotification;
@@ -71,24 +70,25 @@ class AdminDashboardController extends Controller
         try {
             \Log::info('AdminDashboardController@getSubmissions called');
             
-            // Log table counts for debugging
+            // Log table counts for debugging - All from social_contract_records now
             $pendingCount = SocialContractRecord::where('status', 'Pending')->count();
-            $verifiedInRecordsCount = SocialContractRecord::where('status', 'Verified')->count();
-            $verifiedInApprovalsCount = SocialContractApproval::where('status', 'Verified')->count();
-            $approvedCount = SocialContractApproval::where('status', 'Approved')->count();
-            $rejectedCount = SocialContractApproval::where('status', 'Rejected')->count();
+            $verifiedCount = SocialContractRecord::where('status', 'Verified')->count();
+            $approvedCount = SocialContractRecord::where('status', 'Approved')->count();
+            $rejectedCount = SocialContractRecord::where('status', 'Rejected')->count();
             
-            \Log::info('Admin getSubmissions - Table counts', [
-                'pending_in_records' => $pendingCount,
-                'verified_in_records' => $verifiedInRecordsCount,
-                'verified_in_approvals' => $verifiedInApprovalsCount,
-                'approved_in_approvals' => $approvedCount,
-                'rejected_in_approvals' => $rejectedCount,
+            \Log::info('Admin getSubmissions - Table counts (all from social_contract_records)', [
+                'pending' => $pendingCount,
+                'verified' => $verifiedCount,
+                'approved' => $approvedCount,
+                'rejected' => $rejectedCount,
             ]);
             
             $allSubmissions = collect();
             
-            // Get pending records from social_contract_records
+            // PENDING TAB DATA SOURCE:
+            // Get ALL pending records directly from social_contract_records table
+            // This shows all student submissions that haven't been verified or rejected yet
+            // Both Admin and Super Admin see the SAME pending records from this table
             $pendingRecords = SocialContractRecord::where('status', 'Pending')
                 ->with(['socialContract.student'])
                 ->orderBy('updated_at', 'desc')
@@ -120,49 +120,52 @@ class AdminDashboardController extends Controller
                     ];
                 });
             
-            // Get archived records from social_contract_approvals (Verified, Approved, Rejected)
-            $archivedRecords = \App\Models\SocialContractApproval::whereIn('status', ['Verified', 'Approved', 'Rejected'])
+            // ARCHIVED TAB DATA SOURCE:
+            // Get archived records from social_contract_records table
+            // This includes: Verified, Approved, and Rejected records
+            // Both Admin and Super Admin see the SAME archived data from this single source of truth
+            $archivedRecords = SocialContractRecord::whereIn('status', ['Verified', 'Approved', 'Rejected'])
+                ->with(['socialContract.student'])
                 ->orderBy('updated_at', 'desc')
                 ->get()
-                ->map(function ($approval) {
+                ->map(function ($record) {
                     $dateFormatted = null;
-                    if ($approval->date) {
+                    if ($record->socialContract && $record->socialContract->date) {
                         try {
-                            $dateObj = $approval->date instanceof \Carbon\Carbon ? $approval->date : Carbon::parse($approval->date);
+                            $dateObj = $record->socialContract->date instanceof \Carbon\Carbon ? $record->socialContract->date : Carbon::parse($record->socialContract->date);
                             $dateFormatted = $dateObj->format('Y-m-d');
                         } catch (\Exception $e) {
-                            $dateFormatted = $approval->date;
+                            $dateFormatted = $record->socialContract->date;
                         }
                     }
                     
                     // Determine which action date to show
                     $actionDate = null;
-                    if ($approval->status === 'Approved' && $approval->approved_at) {
-                        $actionDate = $approval->approved_at->format('m-d-Y');
-                    } elseif ($approval->status === 'Rejected' && $approval->rejected_at) {
-                        $actionDate = $approval->rejected_at->format('m-d-Y');
-                    } elseif ($approval->status === 'Verified' && $approval->verified_at) {
-                        $actionDate = $approval->verified_at->format('m-d-Y');
+                    if ($record->status === 'Approved' && $record->approved_at) {
+                        $actionDate = $record->approved_at->format('m-d-Y');
+                    } elseif ($record->status === 'Rejected' && $record->rejected_at) {
+                        $actionDate = $record->rejected_at->format('m-d-Y');
+                    } elseif ($record->status === 'Verified' && $record->verified_at) {
+                        $actionDate = $record->verified_at->format('m-d-Y');
                     }
                     
                     return [
-                        'id' => $approval->id,
-                        'record_id' => $approval->social_contract_record_id,
-                        'student_id' => $approval->student_id,
-                        'student_name' => $approval->student_name,
-                        'event_name' => $approval->event_name,
-                        'organization' => $approval->organization,
-                        'venue' => $approval->venue,
-                        'hours_rendered' => $approval->hours_rendered,
+                        'id' => $record->id,
+                        'student_id' => $record->socialContract->student->id ?? null,
+                        'student_name' => $record->socialContract->student->name ?? 'N/A',
+                        'event_name' => $record->socialContract->event_name ?? 'N/A',
+                        'organization' => $record->socialContract->organization ?? 'N/A',
+                        'venue' => $record->socialContract->venue ?? 'N/A',
+                        'hours_rendered' => $record->socialContract->hours_rendered ?? 'N/A',
                         'date' => $dateFormatted,
-                        'status' => $approval->status, // Keep the actual status (Verified/Approved/Rejected)
-                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
-                        'approved_at' => $approval->approved_at ? $approval->approved_at->format('m-d-Y') : null,
-                        'rejected_at' => $approval->rejected_at ? $approval->rejected_at->format('m-d-Y') : null,
+                        'status' => $record->status, // Keep the actual status (Verified/Approved/Rejected)
+                        'verified_at' => $record->verified_at ? $record->verified_at->format('m-d-Y') : null,
+                        'approved_at' => $record->approved_at ? $record->approved_at->format('m-d-Y') : null,
+                        'rejected_at' => $record->rejected_at ? $record->rejected_at->format('m-d-Y') : null,
                         'action_date' => $actionDate,
-                        'rejection_reason' => $approval->rejection_reason,
-                        'created_at' => $approval->created_at->toIso8601String(),
-                        'updated_at' => $approval->updated_at->toIso8601String(),
+                        'rejection_reason' => $record->rejection_reason,
+                        'created_at' => $record->created_at->toIso8601String(),
+                        'updated_at' => $record->updated_at->toIso8601String(),
                     ];
                 });
             
@@ -235,29 +238,16 @@ class AdminDashboardController extends Controller
                 'admin_id' => auth()->guard('admin')->id()
             ]);
             
-            // Update status to Verified
+            // Update status to Verified and set verified_at timestamp
             $record->status = 'Verified';
+            $record->verified_at = now();
+            $record->verified_by = auth()->guard('admin')->id();
             $record->save();
             
-            // IMPORTANT: The SocialContractRecordObserver will automatically:
-            // 1. Detect the status change to "Verified"
-            // 2. Create a corresponding record in social_contract_approvals table
-            // 3. Set verified_at timestamp and verified_by admin ID
-            // This ensures data consistency between records and approvals tables
-            
-            // Verify the observer created the approval record
-            $approval = \App\Models\SocialContractApproval::where('social_contract_record_id', $id)->first();
-            if ($approval) {
-                \Log::info('Approval record created by observer', [
-                    'approval_id' => $approval->id,
-                    'record_id' => $id,
-                    'status' => $approval->status
-                ]);
-            } else {
-                \Log::error('Observer failed to create approval record', [
-                    'record_id' => $id
-                ]);
-            }
+            \Log::info('Record verified successfully', [
+                'record_id' => $id,
+                'verified_by' => auth()->guard('admin')->id()
+            ]);
             
             // Create notification for student
             StudentNotification::create([
@@ -310,9 +300,12 @@ class AdminDashboardController extends Controller
             $record->status = 'Rejected';
             $record->rejection_reason = $validated['reason'];
             
-            // Only set rejected_at if the column exists
+            // Set rejected_at and rejected_by
             if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
                 $record->rejected_at = now();
+            }
+            if (Schema::hasColumn('social_contract_records', 'rejected_by')) {
+                $record->rejected_by = auth()->guard('admin')->id();
             }
             
             $record->save();

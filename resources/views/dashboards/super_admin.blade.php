@@ -539,12 +539,42 @@ table{overflow:visible!important}
                         <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <th class="w-[10%] text-center">Student ID</th>
-                                    <th class="w-[18%] text-center">Full Name</th>
-                                    <th class="w-[22%] text-center">Email</th>
-                                    <th class="w-[12%] text-center">Email Verified</th>
-                                    <th class="w-[12%] text-center">Approved Hours</th>
-                                    <th class="w-[10%] text-center">Status</th>
+                                    <th class="w-[10%] text-center">
+                                        <button id="student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Student ID">
+                                            Student ID
+                                            <span id="student-id-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[18%] text-center">
+                                        <button id="full-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Full Name">
+                                            Full Name
+                                            <span id="full-name-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[22%] text-center">
+                                        <button id="email-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Email">
+                                            Email
+                                            <span id="email-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[12%] text-center">
+                                        <button id="email-verified-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Email Verified">
+                                            Email Verified
+                                            <span id="email-verified-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[12%] text-center">
+                                        <button id="approved-hours-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Approved Hours">
+                                            Approved Hours
+                                            <span id="approved-hours-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[10%] text-center">
+                                        <button id="status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200" title="Sort by Status">
+                                            Status
+                                            <span id="status-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
                                     <th class="w-[11%] text-center">Action</th>
                                 </tr>
                             </thead>
@@ -2786,6 +2816,80 @@ table{overflow:visible!important}
         var allStudents = [];
         var lastStudentsData = null;
         var isLoadingStudents = false;
+        var studentsSortColumn = null;
+        var studentsSortDirection = 'asc';
+        
+        // Student sorting function
+        function sortStudents(column) {
+            // Toggle direction if same column, otherwise default to ascending
+            if (studentsSortColumn === column) {
+                studentsSortDirection = studentsSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                studentsSortColumn = column;
+                studentsSortDirection = 'asc';
+            }
+            
+            // Reset all sort icons
+            document.querySelectorAll('[id$="-sort-icon"]').forEach(icon => {
+                if (icon.id.includes('student-id-sort') || 
+                    icon.id.includes('full-name-sort') || 
+                    icon.id.includes('email-sort') || 
+                    icon.id.includes('email-verified-sort') || 
+                    icon.id.includes('approved-hours-sort') || 
+                    icon.id.includes('status-sort')) {
+                    icon.textContent = '⇅';
+                }
+            });
+            
+            // Update current column icon
+            var iconId = column + '-sort-icon';
+            var icon = document.getElementById(iconId);
+            if (icon) {
+                icon.textContent = studentsSortDirection === 'asc' ? '↑' : '↓';
+            }
+            
+            // Sort the students array
+            var sortedStudents = [...allStudents].sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(column) {
+                    case 'student-id':
+                        aVal = parseInt(a.id) || 0;
+                        bVal = parseInt(b.id) || 0;
+                        break;
+                    case 'full-name':
+                        aVal = (a.name || '').toLowerCase();
+                        bVal = (b.name || '').toLowerCase();
+                        break;
+                    case 'email':
+                        aVal = (a.email || '').toLowerCase();
+                        bVal = (b.email || '').toLowerCase();
+                        break;
+                    case 'email-verified':
+                        aVal = a.email_verified_at ? 1 : 0;
+                        bVal = b.email_verified_at ? 1 : 0;
+                        break;
+                    case 'approved-hours':
+                        aVal = parseInt(a.approved_hours) || 0;
+                        bVal = parseInt(b.approved_hours) || 0;
+                        break;
+                    case 'status':
+                        aVal = (a.status || 'active').toLowerCase();
+                        bVal = (b.status || 'active').toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (studentsSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                }
+            });
+            
+            renderStudents(sortedStudents);
+        }
         
         function loadStudents(showLoading = true) {
             if (isLoadingStudents) {
@@ -3269,6 +3373,61 @@ table{overflow:visible!important}
                     resetAllSortIndicators();
                     organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'organization');
+                });
+            }
+            
+            // ========== STUDENT TABLE SORTING EVENT LISTENERS ==========
+            // Student ID sort
+            var studentIdSort = document.getElementById('student-id-sort');
+            if (studentIdSort) {
+                studentIdSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('student-id');
+                });
+            }
+            
+            // Full Name sort
+            var fullNameSort = document.getElementById('full-name-sort');
+            if (fullNameSort) {
+                fullNameSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('full-name');
+                });
+            }
+            
+            // Email sort
+            var emailSort = document.getElementById('email-sort');
+            if (emailSort) {
+                emailSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('email');
+                });
+            }
+            
+            // Email Verified sort
+            var emailVerifiedSort = document.getElementById('email-verified-sort');
+            if (emailVerifiedSort) {
+                emailVerifiedSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('email-verified');
+                });
+            }
+            
+            // Approved Hours sort
+            var approvedHoursSort = document.getElementById('approved-hours-sort');
+            if (approvedHoursSort) {
+                approvedHoursSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('approved-hours');
+                });
+            }
+            
+            // Status sort
+            var statusSort = document.getElementById('status-sort');
+            if (statusSort) {
+                statusSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortStudents('status');
                 });
             }
             
