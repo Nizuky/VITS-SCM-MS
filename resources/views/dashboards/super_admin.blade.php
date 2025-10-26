@@ -964,8 +964,8 @@ table{overflow:visible!important}
                     <input 
                         type="email" 
                         id="edit-student-email" 
-                        class="input input-bordered w-full" 
-                        required 
+                        class="input input-bordered w-full bg-gray-100" 
+                        readonly 
                     />
                 </div>
                 
