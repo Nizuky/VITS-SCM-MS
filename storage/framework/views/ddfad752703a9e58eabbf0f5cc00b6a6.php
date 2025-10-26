@@ -1521,6 +1521,7 @@ table{overflow:visible!important}
                 'archived': 'archived'
             };
             var filterStatus = statusMap[normalizedStatus] || normalizedStatus;
+            var isArchivedTab = filterStatus === 'archived';
             
             rs.forEach(function(r) {
                 // Skip if it's the loading row or header row
@@ -1551,6 +1552,22 @@ table{overflow:visible!important}
                 
                 if (statusMatch && ms) {
                     r.classList.remove('hidden');
+                    
+                    // Toggle visibility of action buttons vs status badges for Verified records
+                    var actionButtons = r.querySelector('.for-approval-actions');
+                    var statusBadge = r.querySelector('.archived-status');
+                    
+                    if (actionButtons && statusBadge) {
+                        if (isArchivedTab) {
+                            // In Archived tab: hide action buttons, show status badge
+                            actionButtons.style.display = 'none';
+                            statusBadge.style.display = 'block';
+                        } else {
+                            // In For Approval tab: show action buttons, hide status badge
+                            actionButtons.style.display = 'block';
+                            statusBadge.style.display = 'none';
+                        }
+                    }
                 } else {
                     r.classList.add('hidden');
                 }
@@ -1570,8 +1587,12 @@ table{overflow:visible!important}
                 var rowStatus = (r.dataset.status || '').toLowerCase();
                 var archiveStatus = r.dataset.archiveStatus;
                 
+                // Check if row belongs to Archived tab
+                var statuses = rowStatus.split(',').map(function(s) { return s.trim(); });
+                var isInArchivedTab = statuses.includes('archived');
+                
                 // Only filter rows that are in the Archived tab
-                if (rowStatus !== 'archived') {
+                if (!isInArchivedTab) {
                     return;
                 }
                 
@@ -1589,6 +1610,15 @@ table{overflow:visible!important}
                 
                 if (statusMatch && ms) {
                     r.classList.remove('hidden');
+                    
+                    // Make sure status badge is shown and action buttons are hidden in Archived tab
+                    var actionButtons = r.querySelector('.for-approval-actions');
+                    var statusBadge = r.querySelector('.archived-status');
+                    
+                    if (actionButtons && statusBadge) {
+                        actionButtons.style.display = 'none';
+                        statusBadge.style.display = 'block';
+                    }
                 } else {
                     r.classList.add('hidden');
                 }
@@ -1867,40 +1897,47 @@ table{overflow:visible!important}
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
                         '<td class="text-center">' + dateStr + '</td>';
                 
-                // For archived records, show status with action date below it
-                if (isArchived) {
-                    // Status column with action date below
-                    html += '<td class="text-center">';
-                    if (isApproved) {
-                        html += '<span class="scms-badge scms-badge--approved">Approved</span>';
-                    } else if (isRejected) {
-                        html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-                    } else if (isVerified) {
-                        html += '<span class="scms-badge scms-badge--verified">Verified</span>';
-                    }
-                    
-                    // Show action date below the badge if it exists
+                // Action column logic: 
+                // - Pending tab: show Verify/Reject buttons for Pending records
+                // - For Approval tab: show Approve/Reject buttons for Verified records  
+                // - Archived tab: show status badge for Approved/Rejected/Verified records
+                html += '<td class="text-center">';
+                
+                if (isPending) {
+                    // Pending records always show action buttons
+                    html += '<div class="space-x-2">' +
+                            '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
+                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
+                            '</div>';
+                } else if (isVerified) {
+                    // Verified records: Show both action buttons AND status badge (will be filtered by tab)
+                    // Action buttons (hidden in Archived tab via CSS class)
+                    html += '<div class="space-x-2 for-approval-actions">' +
+                            '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
+                            '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
+                            '</div>';
+                    // Status badge (hidden in For Approval tab via CSS class)
+                    html += '<div class="archived-status">';
+                    html += '<span class="scms-badge scms-badge--verified">Verified</span>';
                     if (actionDateStr) {
                         html += '<div class="text-xs text-gray-500 mt-1">' + actionDateStr + '</div>';
                     }
-                    html += '</td>';
-                } else {
-                    // For pending and verified records, show action buttons
-                    html += '<td class="text-center">';
-                    if (isPending) {
-                        html += '<div class="space-x-2">' +
-                                '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
-                                '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                                '</div>';
-                    } else if (isVerified) {
-                        // Admin verified records - awaiting super admin approval/rejection
-                        html += '<div class="space-x-2">' +
-                                '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
-                                '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
-                                '</div>';
+                    html += '</div>';
+                } else if (isApproved) {
+                    // Approved records only show status badge
+                    html += '<span class="scms-badge scms-badge--approved">Approved</span>';
+                    if (actionDateStr) {
+                        html += '<div class="text-xs text-gray-500 mt-1">' + actionDateStr + '</div>';
                     }
-                    html += '</td>';
+                } else if (isRejected) {
+                    // Rejected records only show status badge
+                    html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
+                    if (actionDateStr) {
+                        html += '<div class="text-xs text-gray-500 mt-1">' + actionDateStr + '</div>';
+                    }
                 }
+                
+                html += '</td>';
                 
                 html += '</tr>';
             });
