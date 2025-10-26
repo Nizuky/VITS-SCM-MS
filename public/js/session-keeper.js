@@ -9,10 +9,10 @@
 
     const SessionKeeper = {
         config: {
-            // Refresh CSRF token every 10 minutes
-            csrfRefreshInterval: 10 * 60 * 1000,
-            // Keep session alive every 5 minutes
-            sessionKeepAliveInterval: 5 * 60 * 1000,
+            // Refresh CSRF token every 5 minutes (more frequent)
+            csrfRefreshInterval: 5 * 60 * 1000,
+            // Keep session alive every 2 minutes (more frequent)
+            sessionKeepAliveInterval: 2 * 60 * 1000,
             // Auto-refresh data every 30 seconds (configurable per page)
             dataRefreshInterval: 30 * 1000,
             // Enable auto refresh by default
@@ -38,6 +38,12 @@
             
             this.log('Session Keeper initialized');
             
+            // Immediately ping session to restore markers on page load
+            this.pingSession();
+            
+            // Immediately refresh CSRF token
+            this.refreshCsrfToken();
+            
             // Start CSRF token refresh
             this.startCsrfRefresh();
             
@@ -51,6 +57,9 @@
             
             // Handle visibility change (pause when tab is hidden)
             this.handleVisibilityChange();
+            
+            // Handle page refresh/reload
+            this.handlePageRefresh();
             
             // Intercept all AJAX requests to update CSRF token
             this.interceptAjaxRequests();
@@ -161,10 +170,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                self.log('Session pinged', data);
+                self.log('Session pinged successfully', data);
+                
+                // If markers were restored, log it
+                if (data.markers_restored) {
+                    self.log('Session markers restored by ping endpoint');
+                }
             })
             .catch(error => {
                 self.log('Error pinging session', error);
+                
+                // If ping fails, try to refresh CSRF token as fallback
+                self.refreshCsrfToken();
             });
         },
 
@@ -209,6 +226,32 @@
                     self.refreshCsrfToken();
                     self.pingSession();
                 }
+            });
+        },
+
+        /**
+         * Handle page refresh/reload to ensure session persists
+         */
+        handlePageRefresh: function() {
+            const self = this;
+            
+            // Before page unload, ping session one more time
+            window.addEventListener('beforeunload', function() {
+                // Use sendBeacon for reliable delivery even during page unload
+                const token = self.getCsrfToken();
+                const data = JSON.stringify({});
+                const blob = new Blob([data], { type: 'application/json' });
+                
+                // Try to send a final ping
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/ping', blob);
+                }
+            });
+            
+            // On page load, immediately restore session
+            window.addEventListener('load', function() {
+                self.pingSession();
+                self.refreshCsrfToken();
             });
         },
 

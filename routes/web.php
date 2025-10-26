@@ -46,6 +46,21 @@ Route::get('/api/csrf-cookie', function (
 Route::get('/api/refresh-csrf', function (\Illuminate\Http\Request $request) {
     try {
         $token = $request->session()->token() ?: csrf_token();
+        
+        // Also ensure session markers are present based on authenticated guard
+        if (auth()->guard('admin')->check()) {
+            if (!$request->session()->has('admin_session_active')) {
+                $request->session()->put('admin_session_active', true);
+            }
+        } elseif (auth()->guard('superadmin')->check()) {
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+            }
+        }
+        
+        // Save session to ensure markers persist
+        $request->session()->save();
+        
         return response()->json(['token' => $token]);
     } catch (\Throwable $e) {
         return response()->json(['error' => 'Failed to refresh token'], 500);
@@ -58,31 +73,35 @@ Route::post('/api/ping', function (\Illuminate\Http\Request $request) {
         // Touch the session to keep it alive
         $request->session()->put('last_activity', time());
         
-        // Determine which guard is authenticated
+        // Determine which guard is authenticated and ensure session marker is present
         $guard = null;
         if (auth()->guard('web')->check()) {
             $guard = 'web';
         } elseif (auth()->guard('admin')->check()) {
             $guard = 'admin';
-            // Ensure admin session marker stays active
-            if (!$request->session()->has('admin_session_active')) {
-                $request->session()->put('admin_session_active', true);
-            }
+            // Always ensure admin session marker is present
+            $request->session()->put('admin_session_active', true);
         } elseif (auth()->guard('superadmin')->check()) {
             $guard = 'superadmin';
-            // Ensure superadmin session marker stays active
-            if (!$request->session()->has('superadmin_session_active')) {
-                $request->session()->put('superadmin_session_active', true);
-            }
+            // Always ensure superadmin session marker is present
+            $request->session()->put('superadmin_session_active', true);
         }
+        
+        // Force save the session to ensure persistence
+        $request->session()->save();
         
         return response()->json([
             'status' => 'ok',
             'timestamp' => time(),
             'guard' => $guard,
-            'session_id' => $request->session()->getId()
+            'session_id' => $request->session()->getId(),
+            'markers_restored' => true
         ]);
     } catch (\Throwable $e) {
+        \Log::error('Ping endpoint error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
         return response()->json(['error' => 'Ping failed'], 500);
     }
 });
