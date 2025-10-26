@@ -34,8 +34,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $user = $this->validateCredentials();
 
-        // Defense-in-depth: regenerate session ID before switching auth state
-        try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
+        // IMPORTANT: Only regenerate CSRF token, NOT session ID
+        // Regenerating session ID causes browser to lose session tracking
+        request()->session()->regenerateToken();
 
         // If the user's email is not verified yet, log them in non-persistently
         // and send them to the verification prompt where they can resend the link.
@@ -43,7 +44,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
             Auth::guard('web')->login($user, false); // explicitly use web guard for students
             RateLimiter::clear($this->throttleKey());
             Session::put('remembered', false);
-            Session::regenerate();
 
             // Ensure no stale remember cookie keeps the user logged in after browser close
             try {
@@ -102,8 +102,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
         Session::put('remembered', (bool) $this->remember);
 
         RateLimiter::clear($this->throttleKey());
-        // Regenerate again after login per best practices
-        try { Session::regenerate(); } catch (\Throwable $e) { /* ignore */ }
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
