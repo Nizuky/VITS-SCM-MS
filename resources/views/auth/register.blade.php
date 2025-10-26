@@ -8,7 +8,7 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
             <div class="mb-3">
-                <label class="block mb-1">Full name</label>
+                <label class="block mb-1">Surname, First Name Middle Initial</label>
                 <input name="name" type="text" required class="w-full p-2 border rounded" />
             </div>
             <div class="mb-3">

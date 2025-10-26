@@ -1196,7 +1196,8 @@ table{overflow:visible!important}
         var eventNameSortDirection = 'desc'; // 'asc' or 'desc'
         var organizationSortDirection = 'desc'; // 'asc' or 'desc'
         var actionDateSortDirection = 'desc'; // 'asc' or 'desc'
-        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'actiondate'
+        var statusSortDirection = 'desc'; // 'asc' or 'desc'
+        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'actiondate', 'status'
         var currentStatusFilter = 'All'; // Track current status filter for archived tab
 
         // Toast notification function
@@ -1325,7 +1326,7 @@ table{overflow:visible!important}
         function attachSortEventListeners() {
             // Helper function to reset all indicators
             function resetAllIndicators(exceptId) {
-                var indicators = ['studentid', 'studentname', 'eventname', 'organization', 'hours', 'date', 'actiondate'];
+                var indicators = ['studentid', 'studentname', 'eventname', 'organization', 'hours', 'date', 'actiondate', 'status'];
                 indicators.forEach(function(id) {
                     if (id !== exceptId) {
                         var indicator = document.getElementById(id + '-sort-indicator');
@@ -1342,8 +1343,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('studentid');
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'studentid');
                 };
             }
@@ -1356,8 +1357,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('studentname');
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'studentname');
                 };
             }
@@ -1370,8 +1371,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('eventname');
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'eventname');
                 };
             }
@@ -1384,8 +1385,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('organization');
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'organization');
                 };
             }
@@ -1398,8 +1399,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('hours');
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'hours');
                 };
             }
@@ -1412,8 +1413,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('date');
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'date');
                 };
             }
@@ -1426,9 +1427,23 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'actiondate';
                     actionDateSortDirection = actionDateSortDirection === 'asc' ? 'desc' : 'asc';
-                    actionDateSortIndicator.textContent = actionDateSortDirection === 'asc' ? '▲' : '▼';
                     resetAllIndicators('actiondate');
+                    actionDateSortIndicator.textContent = actionDateSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'actiondate');
+                };
+            }
+            
+            // Status sort
+            var statusSortToggle = document.getElementById('status-sort-toggle');
+            var statusSortIndicator = document.getElementById('status-sort-indicator');
+            if (statusSortToggle && statusSortIndicator) {
+                statusSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'status';
+                    statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllIndicators('status');
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'status');
                 };
             }
         }
@@ -1481,7 +1496,10 @@ table{overflow:visible!important}
                     </th>
                     <th class="w-[10%] text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <span>Status</span>
+                            <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
+                                Status
+                                <span id="status-sort-indicator">▼</span>
+                            </button>
                             <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
                                 <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -1507,9 +1525,24 @@ table{overflow:visible!important}
                             <span id="studentid-sort-indicator">▼</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center">Student Name</th>
-                    <th class="w-[20%] text-center">Event Name</th>
-                    <th class="w-[15%] text-center">Organization</th>
+                    <th class="w-[15%] text-center">
+                        <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
+                            Student Name
+                            <span id="studentname-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[20%] text-center">
+                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                            Event Name
+                            <span id="eventname-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[15%] text-center">
+                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                            Organization
+                            <span id="organization-sort-indicator">▼</span>
+                        </button>
+                    </th>
                     <th class="w-[12%] text-center">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                             Hours Rendered
@@ -1528,6 +1561,41 @@ table{overflow:visible!important}
             
             // Reattach sort event listeners after updating headers
             attachSortEventListeners();
+            
+            // Restore the current sort indicator if there's an active sort
+            if (currentSortBy) {
+                var indicator = document.getElementById(currentSortBy + '-sort-indicator');
+                if (indicator) {
+                    var direction = 'desc'; // default
+                    switch(currentSortBy) {
+                        case 'hours':
+                            direction = hoursSortDirection;
+                            break;
+                        case 'studentid':
+                            direction = studentIdSortDirection;
+                            break;
+                        case 'date':
+                            direction = dateSortDirection;
+                            break;
+                        case 'studentname':
+                            direction = studentNameSortDirection;
+                            break;
+                        case 'eventname':
+                            direction = eventNameSortDirection;
+                            break;
+                        case 'organization':
+                            direction = organizationSortDirection;
+                            break;
+                        case 'actiondate':
+                            direction = actionDateSortDirection;
+                            break;
+                        case 'status':
+                            direction = statusSortDirection;
+                            break;
+                    }
+                    indicator.textContent = direction === 'asc' ? '▲' : '▼';
+                }
+            }
             
             // Reattach dropdown positioning fix after header update
             setTimeout(function() {
@@ -1917,6 +1985,12 @@ table{overflow:visible!important}
                     var dateA = parseActionDate(a.action_date);
                     var dateB = parseActionDate(b.action_date);
                     return actionDateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                });
+            } else if (sortBy === 'status') {
+                sortedSubmissions.sort(function(a, b) {
+                    var statusA = (a.status || '').toString().toLowerCase();
+                    var statusB = (b.status || '').toString().toLowerCase();
+                    return statusSortDirection === 'asc' ? statusA.localeCompare(statusB) : statusB.localeCompare(statusA);
                 });
             }
             

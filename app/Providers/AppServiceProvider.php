@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SocialContractRecord;
+use App\Models\User;
 use App\Observers\SocialContractRecordObserver;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
         
         // Register observers
         SocialContractRecord::observe(SocialContractRecordObserver::class);
+        User::observe(UserObserver::class);
     }
 }

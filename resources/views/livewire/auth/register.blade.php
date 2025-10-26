@@ -28,6 +28,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
             // require institutional email domain only
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class, 'regex:/^[^@\s]+@plv\.edu\.ph$/i'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'email.regex' => 'The email field format is invalid. Use plv email account.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -54,15 +56,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form method="POST" wire:submit="register" class="flex flex-col gap-6">
         <!-- Name -->
-        <flux:input
-            wire:model="name"
-            :label="__('Name')"
-            type="text"
-            required
-            autofocus
-            autocomplete="name"
-            :placeholder="__('Full name')"
-        />
+        <div>
+            <flux:input
+                wire:model="name"
+                :label="__('Name')"
+                type="text"
+                required
+                autofocus
+                autocomplete="name"
+                :placeholder="__('Full name')"
+            />
+            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Format: Surname, First Name Middle Initial
+            </p>
+        </div>
 
         <!-- Student ID -->
         <flux:input
