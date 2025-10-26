@@ -3051,5 +3051,25 @@
             return d ? d.getFullYear() : null;
         }
     </script>
+
+    <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
+    <script src="{{ asset('js/session-keeper.js') }}"></script>
+    <script>
+        // Initialize Session Keeper for Student Dashboard
+        if (window.SessionKeeper) {
+            SessionKeeper.init({
+                debug: false, // Set to true for debugging
+                autoRefreshEnabled: true,
+                dataRefreshInterval: 30 * 1000, // Refresh data every 30 seconds
+                onDataRefresh: function() {
+                    // Refresh records data automatically
+                    if (typeof fetchRecords === 'function') {
+                        console.log('[Student Dashboard] Auto-refreshing records...');
+                        fetchRecords();
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -16,7 +16,7 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css">
-@php
+<?php
     $iconCandidates = ['vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
     $iconUrl = null;
     $iconMTime = null;
@@ -40,10 +40,10 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
     if ($iconUrl && $iconMTime) {
         $iconUrl .= '?v=' . $iconMTime;
     }
-@endphp
-<link rel="icon" href="{{ $iconUrl }}" sizes="any">
-<link rel="icon" href="{{ $iconUrl }}" type="image/png">
-<link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
+?>
+<link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+<link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+<link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@ body{font-family:'Inter',sans-serif}
 .scms-badge--verified{background-color:#B2F5EA!important;color:#0D9488!important}
 .scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
 .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
-.bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
+.bg-custom{background-color:#EDF1FA;background-image:url('<?php echo e(asset("vits_bg_white.png")); ?>');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
 #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
 #toast-root .alert{pointer-events:auto}
 .scms-toast{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 0.875rem;border-radius:9999px;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,0.18),0 2px 6px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.08);max-width:520px}
@@ -110,7 +110,7 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
 [data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
 [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
-[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('{{ asset("storage/vits_bg_black.png") }}')}
+[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('<?php echo e(asset("storage/vits_bg_black.png")); ?>')}
 [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
 [data-theme="dark"] .table th,[data-theme="dark"] .table td{border-color:#374151!important}
 [data-theme="dark"] .bg-white{background-color:#1f2937!important}
@@ -139,10 +139,10 @@ table{overflow:visible!important}
 #submission-page .overflow-x-auto{overflow:visible!important}
 #action-status-header{overflow:visible!important;position:relative}
 </style>
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 <body class="min-h-screen bg-custom">
-@php
+<?php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
     $fullName = trim(auth('admin')->user()->name ?? 'Admin');
     
@@ -169,7 +169,7 @@ table{overflow:visible!important}
     
     if (!$initials)
         $initials = 'AD';
-@endphp
+?>
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
@@ -178,12 +178,12 @@ table{overflow:visible!important}
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
                     <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" 
-                         title="{{ $fullName }}" 
-                         aria-label="{{ $fullName }}">
-                        <span class="text-3xl font-bold leading-none">{{ $initials }}</span>
+                         title="<?php echo e($fullName); ?>" 
+                         aria-label="<?php echo e($fullName); ?>">
+                        <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 class="font-bold text-lg">{{ $fullName }}</h2>
+                <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
                 <p class="text-sm text-gray-500">Administrator</p>
             </div>
 
@@ -222,11 +222,11 @@ table{overflow:visible!important}
                 </li>
                 <li>
                     <form id="logout-form-visible" 
-                          action="{{ route('admin.logout') }}" 
+                          action="<?php echo e(route('admin.logout')); ?>" 
                           method="POST" 
                           class="m-0 p-0 pl-2 pr-0" 
                           novalidate>
-                        @csrf
+                        <?php echo csrf_field(); ?>
                         <button id="logout-button-visible" 
                                 type="button" 
                                 class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
@@ -258,7 +258,8 @@ table{overflow:visible!important}
                             <h2 class="text-3xl font-semibold text-white">
                                 Welcome, 
                                 <span class="text-white font-bold">
-                                    {{ Str::of(auth('admin')->user()->name)->explode(' ')->first() }}
+                                    <?php echo e(Str::of(auth('admin')->user()->name)->explode(' ')->first()); ?>
+
                                 </span>
                             </h2>
                             <br>
@@ -510,7 +511,7 @@ table{overflow:visible!important}
                                 <div class="label">
                                     <span class="label-text font-semibold">Full Name</span>
                                 </div>
-                                <input id="admin-name" type="text" value="{{ auth()->guard('admin')->user()->name }}" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
+                                <input id="admin-name" type="text" value="<?php echo e(auth()->guard('admin')->user()->name); ?>" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
                             </label>
                             
                             <div class="pt-4 flex justify-end">
@@ -524,7 +525,7 @@ table{overflow:visible!important}
                     <!-- Change Password Section -->
                     <div>
                         <h2 class="text-xl font-bold text-text-header mb-4">Change Password</h2>
-                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong>{{ auth()->guard('admin')->user()->email }}</strong> to confirm your password change.</p>
+                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong><?php echo e(auth()->guard('admin')->user()->email); ?></strong> to confirm your password change.</p>
                         
                         <form id="password-change-form" class="space-y-4 max-w-md">
                         <!-- Current Password -->
@@ -810,7 +811,7 @@ table{overflow:visible!important}
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
-        var BASE_PATH = @json($BASE_PATH);
+        var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
@@ -1632,16 +1633,16 @@ table{overflow:visible!important}
                             keepalive: true
                         }).finally(function() {
                             try {
-                                window.location.replace(@json(route('admin.login')));
+                                window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
                             } catch(_) {
-                                window.location.href = @json(route('admin.login'));
+                                window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
                             }
                         });
                     } catch(err) {
                         try {
-                            window.location.replace(@json(route('admin.login')));
+                            window.location.replace(<?php echo json_encode(route('admin.login'), 15, 512) ?>);
                         } catch(_) {
-                            window.location.href = @json(route('admin.login'));
+                            window.location.href = <?php echo json_encode(route('admin.login'), 15, 512) ?>;
                         }
                     }
                 }, {passive: true});
@@ -2465,7 +2466,7 @@ table{overflow:visible!important}
     </script>
 
     <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
-    <script src="{{ asset('js/session-keeper.js') }}"></script>
+    <script src="<?php echo e(asset('js/session-keeper.js')); ?>"></script>
     <script>
         // Initialize Session Keeper for Admin Dashboard
         if (window.SessionKeeper) {
@@ -2487,4 +2488,4 @@ table{overflow:visible!important}
         }
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>

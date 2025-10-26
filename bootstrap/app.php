@@ -28,6 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)
         $middleware->append(App\Http\Middleware\ForcePendingLogout::class);
         
+        // Global middleware to refresh session activity on every request
+        $middleware->append(App\Http\Middleware\RefreshSessionActivity::class);
+        
         // Configure authentication redirect per guard (for guests trying to access protected routes)
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
             // Check which guard is being used for this request

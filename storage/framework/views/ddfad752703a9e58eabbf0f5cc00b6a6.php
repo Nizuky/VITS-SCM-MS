@@ -3616,5 +3616,31 @@ table{overflow:visible!important}
             }
         });
     </script>
+
+    <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
+    <script src="<?php echo e(asset('js/session-keeper.js')); ?>"></script>
+    <script>
+        // Initialize Session Keeper for Super Admin Dashboard
+        if (window.SessionKeeper) {
+            SessionKeeper.init({
+                debug: false, // Set to true for debugging
+                autoRefreshEnabled: true,
+                dataRefreshInterval: 30 * 1000, // Refresh data every 30 seconds
+                onDataRefresh: function() {
+                    // Refresh submissions, students, and stats automatically
+                    console.log('[Super Admin Dashboard] Auto-refreshing data...');
+                    if (typeof fetchSubmissions === 'function') {
+                        fetchSubmissions();
+                    }
+                    if (typeof fetchStudents === 'function') {
+                        fetchStudents();
+                    }
+                    if (typeof fetchDashboardStats === 'function') {
+                        fetchDashboardStats();
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/super_admin.blade.php ENDPATH**/ ?>

@@ -1,17 +1,18 @@
 <?php
 
 return [
-    // Session driver (default to file for local dev)
-    'driver' => env('SESSION_DRIVER', 'file'),
+    // Session driver (database recommended for production)
+    'driver' => env('SESSION_DRIVER', 'database'),
 
     // Minutes the session can remain idle before it expires
-    'lifetime' => env('SESSION_LIFETIME', 120),
+    // Set to 1 year (525600 minutes) but session keeper will ping to keep alive
+    'lifetime' => env('SESSION_LIFETIME', 525600),
 
-    // Set to false so sessions persist across page refreshes
-    // Sessions will expire after 'lifetime' minutes of inactivity instead
+    // Set to false so sessions persist across browser close
+    // Sessions will only expire after 'lifetime' minutes of inactivity
     'expire_on_close' => false,
 
-    // Session encryption
+    // Session encryption (false for better performance)
     'encrypt' => false,
 
     // Session file location (for file driver)
@@ -23,7 +24,7 @@ return [
     // Store (for redis)
     'store' => env('SESSION_STORE', null),
 
-    // Lottery for garbage collection
+    // Lottery for garbage collection (run less frequently)
     'lottery' => [2, 100],
 
     // Cookie name
@@ -35,4 +36,7 @@ return [
     'secure' => env('SESSION_SECURE_COOKIE', false),
     'http_only' => true,
     'same_site' => env('SESSION_SAME_SITE', 'lax'),
+
+    // Partitioned cookies (for Chrome's CHIPS)
+    'partitioned' => false,
 ];

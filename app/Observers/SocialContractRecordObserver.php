@@ -5,6 +5,18 @@ namespace App\Observers;
 use App\Models\SocialContractRecord;
 use App\Models\SocialContractApproval;
 
+/**
+ * Observer for SocialContractRecord model
+ * 
+ * CRITICAL WORKFLOW:
+ * When admin verifies a submission (status changes to "Verified"):
+ * 1. This observer automatically creates a record in social_contract_approvals table
+ * 2. The approval record contains all submission details + verified_at timestamp
+ * 3. Super admin then works with records from social_contract_approvals table
+ * 4. This ensures data consistency between submissions and approvals
+ * 
+ * DO NOT REMOVE THIS OBSERVER - It's essential for the approval workflow!
+ */
 class SocialContractRecordObserver
 {
     /**

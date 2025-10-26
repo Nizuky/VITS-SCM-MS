@@ -42,6 +42,43 @@ Route::get('/api/csrf-cookie', function (
     return response()->noContent()->withCookie($cookie);
 })->name('csrf.cookie');
 
+// API: Refresh CSRF token (for session keeper)
+Route::get('/api/refresh-csrf', function (\Illuminate\Http\Request $request) {
+    try {
+        $token = $request->session()->token() ?: csrf_token();
+        return response()->json(['token' => $token]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Failed to refresh token'], 500);
+    }
+});
+
+// API: Session keep-alive ping (for all authenticated users)
+Route::post('/api/ping', function (\Illuminate\Http\Request $request) {
+    try {
+        // Touch the session to keep it alive
+        $request->session()->put('last_activity', time());
+        
+        // Determine which guard is authenticated
+        $guard = null;
+        if (auth()->guard('web')->check()) {
+            $guard = 'web';
+        } elseif (auth()->guard('admin')->check()) {
+            $guard = 'admin';
+        } elseif (auth()->guard('superadmin')->check()) {
+            $guard = 'superadmin';
+        }
+        
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => time(),
+            'guard' => $guard,
+            'session_id' => $request->session()->getId()
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Ping failed'], 500);
+    }
+});
+
 // Social Contract records API for the authenticated student
 Route::middleware(['auth:web', 'verified'])->group(function () {
     // contracts

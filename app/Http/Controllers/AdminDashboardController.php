@@ -228,9 +228,36 @@ class AdminDashboardController extends Controller
             $record = SocialContractRecord::with('socialContract')->findOrFail($id);
             $oldStatus = $record->status;
             
-            // Update status
+            \Log::info('Admin verifying submission', [
+                'record_id' => $id,
+                'old_status' => $oldStatus,
+                'new_status' => 'Verified',
+                'admin_id' => auth()->guard('admin')->id()
+            ]);
+            
+            // Update status to Verified
             $record->status = 'Verified';
             $record->save();
+            
+            // IMPORTANT: The SocialContractRecordObserver will automatically:
+            // 1. Detect the status change to "Verified"
+            // 2. Create a corresponding record in social_contract_approvals table
+            // 3. Set verified_at timestamp and verified_by admin ID
+            // This ensures data consistency between records and approvals tables
+            
+            // Verify the observer created the approval record
+            $approval = \App\Models\SocialContractApproval::where('social_contract_record_id', $id)->first();
+            if ($approval) {
+                \Log::info('Approval record created by observer', [
+                    'approval_id' => $approval->id,
+                    'record_id' => $id,
+                    'status' => $approval->status
+                ]);
+            } else {
+                \Log::error('Observer failed to create approval record', [
+                    'record_id' => $id
+                ]);
+            }
             
             // Create notification for student
             StudentNotification::create([
@@ -241,8 +268,6 @@ class AdminDashboardController extends Controller
                 'is_read' => false,
             ]);
             
-            // Observer will automatically create approval record in social_contract_approvals table
-            
             DB::commit();
             
             return response()->json([
@@ -251,6 +276,12 @@ class AdminDashboardController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            \Log::error('Failed to verify submission', [
+                'record_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
