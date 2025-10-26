@@ -23,6 +23,13 @@ class SuperAdminStudentController extends Controller
                 Log::info('Restored missing superadmin session marker in students index');
             }
             
+            // Log the request for debugging
+            Log::info('SuperAdminStudentController@index called', [
+                'auth_check' => auth()->guard('superadmin')->check(),
+                'user_id' => auth()->guard('superadmin')->id(),
+                'session_id' => $request->session()->getId(),
+            ]);
+            
             // Use a subquery approach - join through social_contracts table
             $students = User::select('users.*')
                 ->selectSub(function ($query) {
@@ -41,6 +48,10 @@ class SuperAdminStudentController extends Controller
                     $student->approved_hours = (int) $student->approved_hours;
                     return $student;
                 });
+            
+            Log::info('Fetched students successfully', [
+                'count' => $students->count()
+            ]);
             
             return response()->json([
                 'success' => true,

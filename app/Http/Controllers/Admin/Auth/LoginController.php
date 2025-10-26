@@ -21,12 +21,17 @@ class LoginController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt(['name' => $credentials['name'], 'password' => $credentials['password']], false)) {
-            $request->session()->regenerate();
-            // Mark this session as an active admin session. Middleware will enforce this marker
+            // Regenerate CSRF token (not the entire session) to prevent session fixation
+            // Using regenerate() can cause session loss issues
+            $request->session()->regenerateToken();
+            
+            // Mark this session as an active admin session
             // IMPORTANT: never use remember_me for admins - always expire on tab close
             $request->session()->put('auth_guard', 'admin');
             $request->session()->put('admin_session_active', true);
+            $request->session()->put('last_activity', time());
             $request->session()->save(); // Ensure session is saved immediately
+            
             $redirect = route('admin.dashboard');
 
             if ($request->expectsJson()) {

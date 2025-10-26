@@ -13,21 +13,8 @@ class EnsureAdminSessionActive
      */
     public function handle(Request $request, Closure $next)
     {
-        // If the admin is authenticated but our session marker is missing, restore it instead of forcing logout.
-        if (Auth::guard('admin')->check()) {
-            if (! $request->session()->has('admin_session_active')) {
-                \Log::info('Admin session marker missing, restoring it', [
-                    'url' => $request->url(),
-                    'session_id' => $request->session()->getId(),
-                    'admin_id' => Auth::guard('admin')->id(),
-                ]);
-                
-                // Restore the session marker instead of logging out
-                $request->session()->put('admin_session_active', true);
-                $request->session()->save();
-            }
-        } else {
-            // If not authenticated, redirect to login
+        // Simply check if admin is authenticated - rely on Laravel's session handling
+        if (!Auth::guard('admin')->check()) {
             \Log::info('Admin not authenticated, redirecting to login', [
                 'url' => $request->url(),
             ]);
@@ -43,10 +30,16 @@ class EnsureAdminSessionActive
             
             return redirect()->route('admin.login');
         }
+        
+        // Ensure session marker is present (for compatibility, but don't enforce it)
+        if (!$request->session()->has('admin_session_active')) {
+            $request->session()->put('admin_session_active', true);
+            $request->session()->save();
+        }
 
         $response = $next($request);
 
-        // Ensure admin pages are not cached by browsers so back/refresh won't show stale auth content.
+        // Ensure admin pages are not cached by browsers
         if (method_exists($response, 'headers')) {
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
             $response->headers->set('Pragma', 'no-cache');

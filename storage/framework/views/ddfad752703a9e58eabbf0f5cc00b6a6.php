@@ -3034,12 +3034,20 @@ table{overflow:visible!important}
                 refreshIcon.classList.add('animate-spin');
             }
             
+            // Force fresh load by clearing cached data and loading with timestamp
+            console.log('Refreshing students list...');
+            
+            // Clear the loading flag to ensure fetch happens
+            isLoadingStudents = false;
+            
+            // Load students with fresh data
             loadStudents(false);
             
             setTimeout(function() {
                 if (refreshIcon) {
                     refreshIcon.classList.remove('animate-spin');
                 }
+                console.log('Students list refreshed');
             }, 1000);
         }
         

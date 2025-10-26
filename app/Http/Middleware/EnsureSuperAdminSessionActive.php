@@ -13,21 +13,8 @@ class EnsureSuperAdminSessionActive
      */
     public function handle(Request $request, Closure $next)
     {
-        // If the superadmin is authenticated but our session marker is missing, restore it instead of forcing logout.
-        if (Auth::guard('superadmin')->check()) {
-            if (! $request->session()->has('superadmin_session_active')) {
-                \Log::info('SuperAdmin session marker missing, restoring it', [
-                    'url' => $request->url(),
-                    'session_id' => $request->session()->getId(),
-                    'superadmin_id' => Auth::guard('superadmin')->id(),
-                ]);
-                
-                // Restore the session marker instead of logging out
-                $request->session()->put('superadmin_session_active', true);
-                $request->session()->save();
-            }
-        } else {
-            // If not authenticated, redirect to login
+        // Simply check if superadmin is authenticated - rely on Laravel's session handling
+        if (!Auth::guard('superadmin')->check()) {
             \Log::info('SuperAdmin not authenticated, redirecting to login', [
                 'url' => $request->url(),
             ]);
@@ -43,10 +30,16 @@ class EnsureSuperAdminSessionActive
             
             return redirect()->route('superadmin.login');
         }
+        
+        // Ensure session marker is present (for compatibility, but don't enforce it)
+        if (!$request->session()->has('superadmin_session_active')) {
+            $request->session()->put('superadmin_session_active', true);
+            $request->session()->save();
+        }
 
         $response = $next($request);
 
-        // Ensure superadmin pages are not cached by browsers so back/refresh won't show stale auth content.
+        // Ensure superadmin pages are not cached by browsers
         if (method_exists($response, 'headers')) {
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
             $response->headers->set('Pragma', 'no-cache');

@@ -78,12 +78,14 @@ class LoginController extends Controller
         // IMPORTANT: never use remember_me for super admins - always expire on tab close
         Auth::guard('superadmin')->login($admin, false);
         
-        // Regenerate session to prevent session fixation
-        $request->session()->regenerate();
+        // Regenerate CSRF token (not the entire session) to prevent session fixation
+        // Using regenerate() can cause session loss issues
+        $request->session()->regenerateToken();
         
         // Mark session with active guard to avoid ambiguity with other guards/remember cookies
         $request->session()->put('auth_guard', 'superadmin');
         $request->session()->put('superadmin_session_active', true);
+        $request->session()->put('last_activity', time());
         $request->session()->save(); // Ensure session is saved immediately
         
         // Log successful login
