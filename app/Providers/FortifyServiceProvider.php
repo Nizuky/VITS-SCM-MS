@@ -34,8 +34,11 @@ class FortifyServiceProvider extends ServiceProvider
         // Use a CreateNewUser action so Fortify can create users (and enforce domain)
         Fortify::createUsersUsing(\App\Actions\Fortify\CreateNewUser::class);
 
-        // bind custom login response to handle role-based redirects
+        // Bind custom login response to handle role-based redirects
         $this->app->singleton(\Laravel\Fortify\Contracts\LoginResponse::class, \App\Http\Responses\LoginResponse::class);
+
+        // Bind custom register response to prevent auto-login (avoids session conflicts)
+        $this->app->singleton(\Laravel\Fortify\Contracts\RegisterResponse::class, \App\Http\Responses\RegisterResponse::class);
 
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
