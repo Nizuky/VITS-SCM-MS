@@ -65,13 +65,13 @@ class LoginController extends Controller
             ]);
             // AJAX/json request -> return JSON error
             if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['message' => 'Invalid credentials.'], 422);
+                return response()->json(['message' => 'Unknown user or invalid password.'], 422);
             }
 
             return back()
                 ->withInput($request->only('name'))
-                ->withErrors(['name' => 'Invalid credentials.'])
-                ->with('error', 'Invalid credentials.');
+                ->withErrors(['name' => 'Unknown user or invalid password.'])
+                ->with('error', 'Unknown user or invalid password.');
         }
 
         // Login via the 'superadmin' guard

@@ -114,7 +114,7 @@
             }).catch(err => {
                 setLoading(false);
                 // show error banner
-                let msg = 'Invalid credentials.';
+                let msg = 'Unknown user or invalid password.';
                 if (err && err.message) msg = err.message;
                 if (err && err.errors && err.errors.name) msg = err.errors.name[0];
                 
