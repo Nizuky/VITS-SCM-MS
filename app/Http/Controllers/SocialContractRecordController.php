@@ -14,12 +14,17 @@ class SocialContractRecordController extends Controller
             \Illuminate\Support\Facades\Log::debug('SocialContractRecordController@index called', [
                 'session_id' => $request->session()->getId(),
                 'user_id' => optional($request->user())->getKey(),
-                'cookies' => $request->cookies->all(),
                 'path' => $request->getPathInfo(),
             ]);
         } catch (\Throwable $_) { }
 
-        $user = Auth::user();
+        // Ensure we're working with the web guard (student)
+        $user = Auth::guard('web')->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
         $all = (string) $request->query('all', '0') === '1';
         $contractId = $request->query('contract_id');
 
@@ -88,6 +93,14 @@ class SocialContractRecordController extends Controller
 
     public function store(Request $request)
     {
+        // Ensure we're working with the web guard (student)
+        // This prevents any interference with admin/superadmin sessions
+        $user = Auth::guard('web')->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
         $data = $request->validate([
             'date' => ['required', 'date'],
             'event_name' => ['required', 'string', 'max:255'],
@@ -99,12 +112,10 @@ class SocialContractRecordController extends Controller
 
         \Illuminate\Support\Facades\Log::debug('SocialContractRecordController@store called', [
             'session_id' => $request->session()->getId(),
-            'user_id' => optional($request->user())->getKey(),
+            'user_id' => $user->getKey(),
             'payload' => $data,
-            'cookies' => $request->cookies->all(),
         ]);
 
-        $user = Auth::user();
         $contract = isset($data['contract_id']) && $data['contract_id']
             ? $user->socialContracts()->whereKey($data['contract_id'])->firstOrFail()
             : $user->currentSocialContract();
@@ -118,12 +129,22 @@ class SocialContractRecordController extends Controller
             'status' => 'Pending',
         ]);
 
-        return response()->json($record, 201);
+        // Add cache prevention headers to ensure fresh data
+        return response()->json($record, 201)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id, Request $request)
     {
-        $user = Auth::user();
+        // Ensure we're working with the web guard (student)
+        $user = Auth::guard('web')->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
         $record = \App\Models\SocialContractRecord::query()
             ->whereKey($id)
             ->whereHas('socialContract', fn($q) => $q->where('student_id', $user->getKey()))
@@ -134,6 +155,10 @@ class SocialContractRecordController extends Controller
         }
 
         $record->delete();
-        return response()->json(['deleted' => true]);
+        
+        return response()->json(['deleted' => true])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }
