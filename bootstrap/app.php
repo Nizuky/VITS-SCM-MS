@@ -31,6 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Global middleware to refresh session activity on every request
         $middleware->append(App\Http\Middleware\RefreshSessionActivity::class);
         
+        // CRITICAL: Isolate web guard session during registration to prevent
+        // Fortify's auto-login from affecting admin/superadmin sessions
+        $middleware->appendToGroup('web', App\Http\Middleware\IsolateWebGuardSession::class);
+        
         // Configure authentication redirect per guard (for guests trying to access protected routes)
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
             // Check which guard is being used for this request
