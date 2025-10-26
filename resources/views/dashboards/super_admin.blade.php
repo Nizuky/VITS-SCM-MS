@@ -2252,12 +2252,11 @@ table{overflow:visible!important}
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
                     'Pragma': 'no-cache',
                     'Expires': '0'
                 },
-                credentials: 'same-origin'
+                credentials: 'include'
             })
             .then(async function(response) {
                 const contentType = response.headers.get('content-type') || '';
@@ -3267,12 +3266,11 @@ table{overflow:visible!important}
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
                     'Pragma': 'no-cache',
                     'Expires': '0'
                 },
-                credentials: 'same-origin'
+                credentials: 'include'
             })
             .then(async (r) => {
                 const ct = r.headers.get('content-type') || '';
