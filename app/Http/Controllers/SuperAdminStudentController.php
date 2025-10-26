@@ -30,24 +30,23 @@ class SuperAdminStudentController extends Controller
                 'session_id' => $request->session()->getId(),
             ]);
             
-            // Use a subquery approach - join through social_contracts table
-            $students = User::select('users.*')
-                ->selectSub(function ($query) {
-                    $query->selectRaw('COALESCE(SUM(social_contract_records.hours_rendered), 0)')
-                          ->from('social_contract_records')
-                          ->join('social_contracts', 'social_contract_records.social_contract_id', '=', 'social_contracts.id')
-                          ->whereColumn('social_contracts.student_id', 'users.id')
-                          ->where('social_contract_records.status', 'Approved');
-                }, 'approved_hours')
-                ->orderBy('users.name', 'asc')
-                ->get()
-                ->map(function($student) {
-                    // Get the actual status from the database
-                    $student->status = $student->status ?? 'active';
-                    // Ensure approved_hours is numeric
-                    $student->approved_hours = (int) $student->approved_hours;
-                    return $student;
-                });
+            // Get all users first
+            $users = User::orderBy('name', 'asc')->get();
+            
+            // Get approved hours for all students in one query
+            $approvedHours = \DB::table('social_contract_records')
+                ->join('social_contracts', 'social_contract_records.social_contract_id', '=', 'social_contracts.id')
+                ->where('social_contract_records.status', 'Approved')
+                ->groupBy('social_contracts.student_id')
+                ->select('social_contracts.student_id', \DB::raw('SUM(social_contract_records.hours_rendered) as total_hours'))
+                ->pluck('total_hours', 'student_id');
+            
+            // Map the hours to users
+            $students = $users->map(function($student) use ($approvedHours) {
+                $student->status = $student->status ?? 'active';
+                $student->approved_hours = (int) ($approvedHours[$student->id] ?? 0);
+                return $student;
+            });
             
             Log::info('Fetched students successfully', [
                 'count' => $students->count()

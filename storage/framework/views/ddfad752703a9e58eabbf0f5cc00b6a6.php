@@ -1690,6 +1690,11 @@ table{overflow:visible!important}
             if (p === 'support') {
                 loadSupportTickets();
             }
+            
+            // Load students when showing students page
+            if (p === 'students') {
+                loadStudents();
+            }
         }
 
         // Attach sort event listeners to table headers
@@ -3279,7 +3284,7 @@ table{overflow:visible!important}
         function loadStudents(showLoading = true) {
             if (isLoadingStudents) {
                 console.log('Already loading students, skipping...');
-                return;
+                return Promise.resolve();
             }
             
             var tbody = document.getElementById('students-table-body');
@@ -3290,7 +3295,9 @@ table{overflow:visible!important}
             isLoadingStudents = true;
             var timestamp = new Date().getTime();
             
-            fetch(`${BASE_PATH}/super-admin/api/students?_=${timestamp}`, {
+            console.log('Fetching students from API...', `${BASE_PATH}/super-admin/api/students`);
+            
+            return fetch(`${BASE_PATH}/super-admin/api/students?_=${timestamp}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -3303,17 +3310,27 @@ table{overflow:visible!important}
                 credentials: 'include'
             })
             .then(async (r) => {
+                console.log('Received response:', r.status, r.statusText);
                 const ct = r.headers.get('content-type') || '';
-                if (!r.ok) throw r;
+                console.log('Content-Type:', ct);
+                
+                if (!r.ok) {
+                    console.error('Response not OK:', r.status);
+                    throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                }
+                
                 if (!ct.includes('application/json')) {
                     console.warn('loadStudents: non-JSON response, session may have expired');
-                    // Silently handle non-JSON response, don't redirect
+                    const text = await r.text();
+                    console.log('Response body:', text.substring(0, 500));
                     return Promise.reject(new Error('Non-JSON response'));
                 }
+                
                 return r.json();
             })
             .then((data) => {
                 isLoadingStudents = false;
+                console.log('Received data:', data);
                 
                 // Check for authentication error
                 if (data.unauthenticated) {
@@ -3321,7 +3338,8 @@ table{overflow:visible!important}
                     return;
                 }
                 
-                if (data.success !== false) {
+                if (data.success !== false && data.students) {
+                    console.log('Processing', data.students.length, 'students');
                     lastStudentsData = data.students;
                     allStudents = data.students;
                     renderStudents(allStudents);
@@ -3409,12 +3427,16 @@ table{overflow:visible!important}
             tbody.innerHTML = html;
         }
         
-        function refreshStudents() {
+        async function refreshStudents() {
             var refreshBtn = document.getElementById('refresh-students-btn');
             var refreshIcon = document.getElementById('refresh-students-icon');
             
             if (refreshIcon) {
                 refreshIcon.classList.add('animate-spin');
+            }
+            
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
             }
             
             // Force fresh load by clearing cached data and loading with timestamp
@@ -3423,15 +3445,22 @@ table{overflow:visible!important}
             // Clear the loading flag to ensure fetch happens
             isLoadingStudents = false;
             
-            // Load students with fresh data
-            loadStudents(false);
-            
-            setTimeout(function() {
+            try {
+                // Load students with fresh data and wait for it to complete
+                await loadStudents(true);
+                showToast('Students list refreshed successfully', 'success');
+            } catch (error) {
+                console.error('Error refreshing students:', error);
+                showToast('Failed to refresh students', 'error');
+            } finally {
                 if (refreshIcon) {
                     refreshIcon.classList.remove('animate-spin');
                 }
-                console.log('Students list refreshed');
-            }, 1000);
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                }
+                console.log('Students list refresh complete');
+            }
         }
         
         function openStudentEditModal(userId) {
