@@ -12,6 +12,7 @@ class StudentNotification extends Model
     protected $fillable = [
         'user_id',
         'social_contract_record_id',
+        'title',
         'type',
         'message',
         'rejection_reason',

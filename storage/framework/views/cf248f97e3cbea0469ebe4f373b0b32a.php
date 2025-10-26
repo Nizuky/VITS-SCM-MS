@@ -597,6 +597,51 @@
             <!-- Dashboard overview page with summary cards and charts -->
             <div id="dashboard-page" class="page-content hidden flex-col flex-1-dynamic">
 
+                <!-- Inactive Account Warning Banner -->
+                <?php if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at): ?>
+                    <?php
+                        $inactiveSince = \Carbon\Carbon::parse(auth()->user()->inactive_at);
+                        $deletionDate = $inactiveSince->copy()->addDays(7);
+                        $now = now();
+                        
+                        // Calculate days remaining - use ceiling to always round up
+                        $totalHours = $now->diffInHours($deletionDate, false);
+                        $daysRemaining = max(0, (int) ceil($totalHours / 24));
+                        $hoursRemaining = max(0, (int) $totalHours);
+                    ?>
+                    <div class="alert alert-error shadow-lg mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg" role="alert">
+                        <div class="flex items-start w-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div class="ml-3 flex-1">
+                                <h3 class="text-lg font-bold text-red-800">Account Inactive - Scheduled for Deletion</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p class="font-semibold mb-2">⚠️ Your account has been deactivated by an administrator.</p>
+                                    <div class="bg-red-100 p-3 rounded-md mb-2">
+                                        <p class="text-base font-bold text-red-900">
+                                            <?php if($daysRemaining > 0): ?>
+                                                <span class="text-2xl"><?php echo e($daysRemaining); ?></span> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> remaining
+                                            <?php else: ?>
+                                                <span class="text-2xl"><?php echo e($hoursRemaining); ?></span> hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> remaining
+                                            <?php endif; ?>
+                                        </p>
+                                        <p class="text-sm">Your account will be permanently deleted on <strong><?php echo e($deletionDate->format('F d, Y \a\t g:i A')); ?></strong></p>
+                                    </div>
+                                    <p class="text-sm">
+                                        <strong>What this means:</strong> You currently have limited access to the system. 
+                                        All your data, including social contract records, will be permanently removed on the deletion date.
+                                    </p>
+                                    <p class="text-sm mt-2">
+                                        <strong>Action Required:</strong> Please contact your administrator immediately to reactivate your account 
+                                        and prevent permanent deletion.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Personalized greeting and summary cards -->
                 <!-- Outer wrapper (for background and overlay effect) -->
                 <div class="relative rounded-2xl bg-transparent p-2 mb-10 h-[250px]">
@@ -1263,6 +1308,46 @@
             <div class="divider my-4"></div>
             
             <div id="all-notifications-list" class="space-y-2 overflow-y-auto max-h-[500px]">
+                <!-- Inactive Account Warning (Always at top if account is inactive) -->
+                <?php if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at): ?>
+                    <?php
+                        $inactiveSince = \Carbon\Carbon::parse(auth()->user()->inactive_at);
+                        $deletionDate = $inactiveSince->copy()->addDays(7);
+                        $now = now();
+                        
+                        // Calculate days remaining - use ceiling to always round up
+                        $totalHours = $now->diffInHours($deletionDate, false);
+                        $daysRemaining = max(0, (int) ceil($totalHours / 24));
+                        $hoursRemaining = max(0, (int) $totalHours);
+                    ?>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm sticky top-0 z-10">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-red-800 text-sm">⚠️ Account Inactive - Deletion Scheduled</h4>
+                                <p class="text-xs text-red-700 mt-1">
+                                    Your account will be deleted in 
+                                    <strong class="text-red-900">
+                                        <?php if($daysRemaining > 0): ?>
+                                            <?php echo e($daysRemaining); ?> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?>
+
+                                        <?php else: ?>
+                                            <?php echo e($hoursRemaining); ?> hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?>
+
+                                        <?php endif; ?>
+                                    </strong>
+                                    (<?php echo e($deletionDate->format('M d, Y')); ?>)
+                                </p>
+                                <p class="text-xs text-red-600 mt-1">Contact your administrator immediately to reactivate your account.</p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                
                 <!-- All notifications will be loaded here -->
                 <div class="flex items-center justify-center py-8">
                     <span class="loading loading-spinner loading-md text-primary-purple"></span>

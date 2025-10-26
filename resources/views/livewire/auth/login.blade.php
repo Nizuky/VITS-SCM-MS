@@ -21,9 +21,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
     #[Validate('required|string')]
     public string $password = '';
 
-    // Optional student ID to further identify account (format: 23-3402)
-    public string $student_id = '';
-
     public bool $remember = false;
 
     /**
@@ -119,11 +116,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // Use the web guard explicitly for student authentication
         $guard = Auth::guard('web');
         
-        // Try to retrieve the user by email first. If student_id provided, include it in the query.
+        // Try to retrieve the user by email
         $credentials = ['email' => $this->email];
-        if (! empty($this->student_id)) {
-            $credentials['student_id'] = $this->student_id;
-        }
 
         $user = $guard->getProvider()->retrieveByCredentials(array_merge($credentials, ['password' => $this->password]));
 
@@ -168,7 +162,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 <div class="flex flex-col gap-6 scms-login">
-    <x-auth-header :title="__('Student Login')" :description="__('Enter your plv  email, student number, and password below to log in')" />
+    <x-auth-header :title="__('Student Login')" :description="__('Enter your plv email and password below to log in')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -183,14 +177,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
             autofocus
             autocomplete="email"
             placeholder="name@plv.edu.ph"
-        />
-
-        <!-- Student ID (optional) -->
-        <flux:input
-            wire:model="student_id"
-            :label="__('Student ID (optional)')"
-            type="text"
-            placeholder="00-0000"
         />
 
         <!-- Password -->

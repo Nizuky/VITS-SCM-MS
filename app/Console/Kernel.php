@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ExportSeeders::class,
         \App\Console\Commands\SetSuperAdmin::class,
         \App\Console\Commands\DeleteOldRejectedRecords::class,
+        \App\Console\Commands\DeleteInactiveAccounts::class,
     ];
 
     /**
@@ -27,6 +28,9 @@ class Kernel extends ConsoleKernel
     {
         // Run once daily to delete rejected records older than 7 days
         $schedule->command('scms:delete-old-rejected')->daily();
+        
+        // Run daily at midnight to delete inactive accounts after 7 days
+        $schedule->command('users:delete-inactive')->dailyAt('00:00');
     }
 
     /**

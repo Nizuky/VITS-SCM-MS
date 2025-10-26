@@ -140,6 +140,7 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
     // Super-admin Students Management API endpoints
     Route::get('super-admin/api/students', [App\Http\Controllers\SuperAdminStudentController::class, 'index'])->name('superadmin.students.index');
     Route::put('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'update'])->name('superadmin.students.update');
+    Route::delete('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'destroy'])->name('superadmin.students.destroy');
 
     // Super-admin logout
     Route::post('super-admin/logout', [App\Http\Controllers\SuperAdmin\LoginController::class, 'logout'])

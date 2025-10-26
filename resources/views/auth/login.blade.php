@@ -15,10 +15,6 @@
                 <input name="email" type="email" required class="w-full p-2 border rounded" />
             </div>
             <div class="mb-3">
-                <label class="block mb-1">Student ID (optional)</label>
-                <input name="student_id" type="text" placeholder="23-3402" class="w-full p-2 border rounded" />
-            </div>
-            <div class="mb-3">
                 <label class="block mb-1">Password</label>
                 <input name="password" type="password" required class="w-full p-2 border rounded" />
             </div>

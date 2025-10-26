@@ -23,6 +23,7 @@ class StudentNotificationController extends Controller
                     $record = $notification->socialContractRecord;
                     return [
                         'id' => $notification->id,
+                        'title' => $notification->title,
                         'type' => $notification->type,
                         'message' => $notification->message,
                         'rejection_reason' => $notification->rejection_reason,
@@ -65,6 +66,7 @@ class StudentNotificationController extends Controller
                     $record = $notification->socialContractRecord;
                     return [
                         'id' => $notification->id,
+                        'title' => $notification->title,
                         'type' => $notification->type,
                         'message' => $notification->message,
                         'rejection_reason' => $notification->rejection_reason,

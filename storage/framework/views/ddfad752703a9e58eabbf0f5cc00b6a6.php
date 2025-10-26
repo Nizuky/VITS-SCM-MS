@@ -540,17 +540,18 @@ table{overflow:visible!important}
                         <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <th class="w-[12%] text-center">Student ID</th>
-                                    <th class="w-[20%] text-center">Full Name</th>
-                                    <th class="w-[25%] text-center">Email</th>
-                                    <th class="w-[13%] text-center">Email Verified</th>
-                                    <th class="w-[12%] text-center">Status</th>
-                                    <th class="w-[13%] text-center">Action</th>
+                                    <th class="w-[10%] text-center">Student ID</th>
+                                    <th class="w-[18%] text-center">Full Name</th>
+                                    <th class="w-[22%] text-center">Email</th>
+                                    <th class="w-[12%] text-center">Email Verified</th>
+                                    <th class="w-[12%] text-center">Approved Hours</th>
+                                    <th class="w-[10%] text-center">Status</th>
+                                    <th class="w-[11%] text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="students-table-body">
                                 <tr id="students-loading-row">
-                                    <td colspan="6" class="text-center py-8">
+                                    <td colspan="7" class="text-center py-8">
                                         <span class="loading loading-spinner loading-lg text-primary-purple"></span>
                                         <p class="mt-2 text-text-muted">Loading students...</p>
                                     </td>
@@ -969,25 +970,85 @@ table{overflow:visible!important}
                     />
                 </div>
                 
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Account Status</span>
-                    </label>
-                    <select id="edit-student-status" class="select select-bordered w-full">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Approved Hours</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="edit-student-approved-hours" 
+                            class="input input-bordered w-full bg-gray-100" 
+                            readonly 
+                        />
+                    </div>
+                    
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Account Status</span>
+                        </label>
+                        <select id="edit-student-status" class="select select-bordered w-full">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        
+                        <!-- Inactive Account Warning -->
+                        <div id="inactive-warning-box" class="hidden mt-2 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                            <div class="flex items-start gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-red-800">Account scheduled for deletion</p>
+                                    <p id="inactive-countdown-text" class="text-xs text-red-700 mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="modal-action">
-                    <form method="dialog" class="inline">
-                        <button type="button" class="btn" onclick="document.getElementById('student_edit_modal').close()">Cancel</button>
-                    </form>
-                    <button type="submit" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Save Changes
+                <div class="modal-action justify-between">
+                    <button type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white" onclick="openDeleteStudentModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Account
                     </button>
+                    <div class="flex gap-2">
+                        <form method="dialog" class="inline">
+                            <button type="button" class="btn" onclick="document.getElementById('student_edit_modal').close()">Cancel</button>
+                        </form>
+                        <button type="submit" class="btn bg-success-green hover:bg-success-green-hover text-white">
+                            Save Changes
+                        </button>
+                    </div>
                 </div>
             </form>
+        </div>
+    </dialog>
+
+    <!-- Delete Student Confirmation Modal -->
+    <dialog id="delete_student_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg text-danger-red">Delete Student Account</h3>
+            <p class="py-4">Are you sure you want to permanently delete this student account?</p>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg mb-4" role="alert">
+                <p class="font-bold">Warning</p>
+                <p>This action cannot be undone. All data associated with this student will be permanently deleted from the database.</p>
+            </div>
+            <div class="space-y-2 mb-4">
+                <p class="text-sm"><strong>Student Name:</strong> <span id="delete-student-name-display"></span></p>
+                <p class="text-sm"><strong>Student ID:</strong> <span id="delete-student-id-display"></span></p>
+                <p class="text-sm"><strong>Email:</strong> <span id="delete-student-email-display"></span></p>
+            </div>
+            <div class="modal-action">
+                <form method="dialog" class="flex gap-2">
+                    <button class="btn">Cancel</button>
+                    <button id="confirm-delete-student-btn" type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                        Yes, Delete Account
+                    </button>
+                </form>
+            </div>
         </div>
     </dialog>
 
@@ -2661,7 +2722,7 @@ table{overflow:visible!important}
             
             var tbody = document.getElementById('students-table-body');
             if (showLoading && !lastStudentsData) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8"><span class="loading loading-spinner loading-lg text-primary-purple"></span><p class="mt-2 text-text-muted">Loading students...</p></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8"><span class="loading loading-spinner loading-lg text-primary-purple"></span><p class="mt-2 text-text-muted">Loading students...</p></td></tr>';
             }
             
             isLoadingStudents = true;
@@ -2698,7 +2759,7 @@ table{overflow:visible!important}
                 isLoadingStudents = false;
                 console.error('Failed to load students', err);
                 if (!lastStudentsData && showLoading) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-red-500">Failed to load students. Please refresh.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">Failed to load students. Please refresh.</td></tr>';
                 }
             });
         }
@@ -2707,27 +2768,61 @@ table{overflow:visible!important}
             var tbody = document.getElementById('students-table-body');
             
             if (!students || students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-text-muted">No students found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-text-muted">No students found.</td></tr>';
                 return;
             }
             
             var html = '';
             students.forEach(function(student) {
                 var status = student.status || 'active';
-                var statusBadge = status === 'active' 
-                    ? '<span class="badge badge-success text-white">Active</span>' 
-                    : '<span class="badge badge-error text-white">Inactive</span>';
+                var statusBadge = '';
+                
+                if (status === 'active') {
+                    statusBadge = '<span class="badge badge-success text-white">Active</span>';
+                } else {
+                    // Calculate days remaining for inactive accounts
+                    var daysRemaining = '';
+                    if (student.inactive_at) {
+                        var inactiveDate = new Date(student.inactive_at);
+                        var deletionDate = new Date(inactiveDate);
+                        deletionDate.setDate(deletionDate.getDate() + 7);
+                        
+                        var now = new Date();
+                        var timeDiff = deletionDate - now;
+                        var daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                        var hoursLeft = Math.ceil(timeDiff / (1000 * 60 * 60));
+                        
+                        if (daysLeft > 0) {
+                            daysRemaining = '<div class="text-xs text-red-600 font-semibold mt-1">' + 
+                                          daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' remaining</div>';
+                        } else if (hoursLeft > 0) {
+                            daysRemaining = '<div class="text-xs text-red-600 font-semibold mt-1">' + 
+                                          hoursLeft + ' hour' + (hoursLeft !== 1 ? 's' : '') + ' remaining</div>';
+                        } else {
+                            daysRemaining = '<div class="text-xs text-red-700 font-bold mt-1">Deletion pending</div>';
+                        }
+                    }
+                    
+                    statusBadge = '<div class="flex flex-col items-center">' +
+                                '<span class="badge badge-error text-white">Inactive</span>' +
+                                daysRemaining +
+                                '</div>';
+                }
                 
                 var emailVerified = student.email_verified_at;
                 var verifiedBadge = emailVerified 
                     ? '<span class="badge badge-success text-white">✓ Verified</span>' 
                     : '<span class="badge badge-warning text-white">✗ Not Verified</span>';
                 
+                var approvedHours = student.approved_hours || 0;
+                var hoursDisplay = '<span class="font-semibold text-primary-purple">' + approvedHours + ' hours</span>';
+                
                 html += '<tr class="hover cursor-pointer" onclick="openStudentEditModal(' + student.id + ')">' +
                         '<td class="text-center">' + (student.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (student.name || '—') + '</td>' +
                         '<td class="text-center">' + (student.email || '—') + '</td>' +
                         '<td class="text-center">' + verifiedBadge + '</td>' +
+                        '<td class="text-center">' + hoursDisplay + '</td>' +
                         '<td class="text-center">' + statusBadge + '</td>' +
                         '<td class="text-center">' +
                         '<button class="btn btn-sm bg-primary-purple hover:bg-primary-purple-hover text-white" onclick="event.stopPropagation(); openStudentEditModal(' + student.id + ')">Edit</button>' +
@@ -2765,10 +2860,126 @@ table{overflow:visible!important}
             document.getElementById('edit-student-name').value = student.name || '';
             document.getElementById('edit-student-id').value = student.student_id || '';
             document.getElementById('edit-student-email').value = student.email || '';
+            document.getElementById('edit-student-approved-hours').value = (student.approved_hours || 0) + ' hours';
             document.getElementById('edit-student-status').value = student.status || 'active';
+            
+            // Update inactive warning box
+            updateInactiveWarning(student);
             
             document.getElementById('student_edit_modal').showModal();
         }
+        
+        // Update inactive account warning in edit modal
+        function updateInactiveWarning(student) {
+            var warningBox = document.getElementById('inactive-warning-box');
+            var countdownText = document.getElementById('inactive-countdown-text');
+            var statusSelect = document.getElementById('edit-student-status');
+            
+            function showWarning() {
+                if (student.status === 'inactive' && student.inactive_at) {
+                    var inactiveDate = new Date(student.inactive_at);
+                    var deletionDate = new Date(inactiveDate);
+                    deletionDate.setDate(deletionDate.getDate() + 7);
+                    
+                    var now = new Date();
+                    var timeDiff = deletionDate - now;
+                    var daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    var hoursLeft = Math.ceil(timeDiff / (1000 * 60 * 60));
+                    
+                    var countdownMessage = '';
+                    if (daysLeft > 0) {
+                        countdownMessage = 'This account will be permanently deleted in <strong>' + 
+                                         daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + '</strong> on ' +
+                                         deletionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    } else if (hoursLeft > 0) {
+                        countdownMessage = 'This account will be permanently deleted in <strong>' + 
+                                         hoursLeft + ' hour' + (hoursLeft !== 1 ? 's' : '') + '</strong>';
+                    } else {
+                        countdownMessage = 'This account is <strong>pending deletion</strong>';
+                    }
+                    
+                    countdownText.innerHTML = countdownMessage;
+                    warningBox.classList.remove('hidden');
+                } else {
+                    warningBox.classList.add('hidden');
+                }
+            }
+            
+            // Show/hide warning initially
+            showWarning();
+            
+            // Update warning when status changes
+            statusSelect.removeEventListener('change', statusSelect._warningHandler);
+            statusSelect._warningHandler = function() {
+                student.status = statusSelect.value;
+                showWarning();
+            };
+            statusSelect.addEventListener('change', statusSelect._warningHandler);
+        }
+        
+        // Open delete student confirmation modal
+        function openDeleteStudentModal() {
+            var userId = document.getElementById('edit-student-user-id').value;
+            var student = allStudents.find(s => s.id === parseInt(userId));
+            
+            if (!student) {
+                showToast('Student not found', 'error');
+                return;
+            }
+            
+            // Populate delete confirmation modal with student details
+            document.getElementById('delete-student-name-display').textContent = student.name || '—';
+            document.getElementById('delete-student-id-display').textContent = student.student_id || '—';
+            document.getElementById('delete-student-email-display').textContent = student.email || '—';
+            
+            // Close edit modal and open delete confirmation modal
+            document.getElementById('student_edit_modal').close();
+            document.getElementById('delete_student_modal').showModal();
+        }
+        
+        // Handle delete student confirmation
+        document.getElementById('confirm-delete-student-btn').addEventListener('click', async function() {
+            var userId = document.getElementById('edit-student-user-id').value;
+            
+            if (!userId) {
+                showToast('Student ID not found', 'error');
+                return;
+            }
+            
+            // Disable button to prevent double submission
+            this.disabled = true;
+            this.textContent = 'Deleting...';
+            
+            try {
+                const response = await fetch(`${BASE_PATH}/super-admin/api/students/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to delete student');
+                }
+                
+                showToast(data.message || 'Student account deleted successfully', 'success');
+                document.getElementById('delete_student_modal').close();
+                loadStudents(false);
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showToast(error.message || 'Failed to delete student account', 'error');
+            } finally {
+                // Re-enable button
+                this.disabled = false;
+                this.textContent = 'Yes, Delete Account';
+            }
+        });
         
         // Handle student search
         var studentsSearchInput = document.getElementById('students-search');
@@ -2858,6 +3069,7 @@ table{overflow:visible!important}
         window.loadStudents = loadStudents;
         window.refreshStudents = refreshStudents;
         window.openStudentEditModal = openStudentEditModal;
+        window.openDeleteStudentModal = openDeleteStudentModal;
         // ========== END STUDENTS MANAGEMENT ==========
 
         // DOM ready
