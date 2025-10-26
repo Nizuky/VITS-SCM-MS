@@ -26,13 +26,21 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware) {
         // Exclude specific routes from CSRF verification
+        // All dashboard API routes are excluded since they use session-based auth
         $middleware->validateCsrfTokens(except: [
-            // Student dashboard routes
+            // Student dashboard routes - all CRUD operations
             '/api/social-contract/records',
             '/api/social-contract/records/*',
             '/api/support-tickets',
             '/api/support-tickets/*',
             '/api/notifications/*',
+            '/api/profile/*',
+            
+            // Admin dashboard routes - all operations
+            '/admin/api/*',
+            
+            // Super Admin dashboard routes - all operations
+            '/super-admin/api/*',
         ]);
         
         // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)

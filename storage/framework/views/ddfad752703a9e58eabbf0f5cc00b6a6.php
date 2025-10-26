@@ -696,9 +696,17 @@ table{overflow:visible!important}
 
             <!-- Support Tickets Page -->
             <div id="support-page" class="page-content hidden">
-                <div class="p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
-                    <p class="text-sm text-gray-600 mt-2">Review and resolve student support requests</p>
+                <div class="p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
+                        <p class="text-sm text-gray-600 mt-2">Review and resolve student support requests</p>
+                    </div>
+                    <button onclick="refreshSupportTickets()" id="refresh-support-tickets-btn" class="btn btn-outline btn-primary rounded-lg" title="Refresh support tickets">
+                        <svg id="refresh-support-tickets-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh
+                    </button>
                 </div>
                 
                 <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto">
@@ -1405,6 +1413,27 @@ table{overflow:visible!important}
         // Support tickets data
         var allTickets = [];
         var currentTicketId = null;
+
+        // Refresh support tickets with loading animation
+        async function refreshSupportTickets() {
+            const refreshBtn = document.getElementById('refresh-support-tickets-btn');
+            const refreshIcon = document.getElementById('refresh-support-tickets-icon');
+            
+            // Add spinning animation
+            refreshBtn.disabled = true;
+            refreshIcon.classList.add('animate-spin');
+            
+            try {
+                await loadSupportTickets();
+                showToast('Support tickets refreshed successfully', 'success');
+            } catch (error) {
+                showToast('Failed to refresh support tickets', 'error');
+            } finally {
+                // Remove spinning animation
+                refreshBtn.disabled = false;
+                refreshIcon.classList.remove('animate-spin');
+            }
+        }
 
         // Load support tickets from API
         async function loadSupportTickets() {
