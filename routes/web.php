@@ -138,6 +138,14 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::delete('/api/notifications/{id}', [\App\Http\Controllers\StudentNotificationController::class, 'delete'])->name('notifications.delete');
     Route::post('/api/notifications/mark-all-read', [\App\Http\Controllers\StudentNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
+    // Support tickets
+    Route::get('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('support-tickets.index');
+    Route::post('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('support-tickets.store');
+    Route::get('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'show'])->name('support-tickets.show');
+    Route::delete('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'destroy'])->name('support-tickets.destroy');
+    Route::put('/api/support-tickets/{id}/done', [\App\Http\Controllers\SupportTicketController::class, 'markAsDone'])->name('support-tickets.done');
+    Route::get('/api/support-tickets/check-limit', [\App\Http\Controllers\SupportTicketController::class, 'checkLimit'])->name('support-tickets.check-limit');
+
     // Profile: send password reset link to PLV email with redirect back to profile
     Route::post('/api/profile/send-reset-link', [\App\Http\Controllers\ProfileController::class, 'sendPasswordResetLink'])
         ->name('profile.sendResetLink');

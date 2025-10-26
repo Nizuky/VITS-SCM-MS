@@ -691,4 +691,160 @@ class SuperAdminDashboardController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get all support tickets (for super admin)
+     */
+    public function getSupportTickets(Request $request)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+            }
+
+            $tickets = \App\Models\SupportTicket::with('student')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($ticket) {
+                    return [
+                        'id' => $ticket->id,
+                        'student_id' => $ticket->student_id,
+                        'student_name' => $ticket->student_name,
+                        'type' => $ticket->issue_type,
+                        'details' => $ticket->details,
+                        'status' => $ticket->status,
+                        'date' => $ticket->created_at->format('Y-m-d'),
+                        'submitted_at' => $ticket->created_at->format('M d, Y g:i A'),
+                        'updated_at' => $ticket->updated_at->format('M d, Y g:i A'),
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'tickets' => $tickets
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to get support tickets', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load support tickets'
+            ], 500);
+        }
+    }
+
+    /**
+     * Update support ticket status (for super admin)
+     */
+    public function updateTicketStatus(Request $request, $id)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+            }
+
+            $ticket = \App\Models\SupportTicket::findOrFail($id);
+            
+            $validated = $request->validate([
+                'status' => 'required|in:Pending,Resolved,Closed'
+            ]);
+
+            $ticket->status = $validated['status'];
+            $ticket->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket status updated successfully',
+                'ticket' => [
+                    'id' => $ticket->id,
+                    'student_id' => $ticket->student_id,
+                    'student_name' => $ticket->student_name,
+                    'type' => $ticket->issue_type,
+                    'details' => $ticket->details,
+                    'status' => $ticket->status,
+                    'date' => $ticket->created_at->format('Y-m-d'),
+                    'submitted_at' => $ticket->created_at->format('M d, Y g:i A'),
+                    'updated_at' => $ticket->updated_at->format('M d, Y g:i A'),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update ticket status', [
+                'error' => $e->getMessage(),
+                'ticket_id' => $id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update ticket status'
+            ], 500);
+        }
+    }
+
+    /**
+     * Resolve support ticket and notify student
+     */
+    public function resolveTicket(Request $request, $id)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+            }
+
+            $ticket = \App\Models\SupportTicket::findOrFail($id);
+            
+            // Only allow resolving pending tickets
+            if ($ticket->status !== 'Pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only pending tickets can be resolved'
+                ], 400);
+            }
+
+            $ticket->status = 'Resolved';
+            $ticket->save();
+
+            // Create notification for the student
+            StudentNotification::create([
+                'user_id' => $ticket->student_id,
+                'type' => 'ticket_resolved',
+                'title' => 'Support Ticket Resolved',
+                'message' => "Your support ticket (#{$ticket->id}) regarding '{$ticket->issue_type}' has been resolved by the admin. Please review and mark as done if satisfied.",
+                'is_read' => false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket resolved successfully. Student has been notified.',
+                'ticket' => [
+                    'id' => $ticket->id,
+                    'student_id' => $ticket->student_id,
+                    'student_name' => $ticket->student_name,
+                    'type' => $ticket->issue_type,
+                    'details' => $ticket->details,
+                    'status' => $ticket->status,
+                    'date' => $ticket->created_at->format('Y-m-d'),
+                    'submitted_at' => $ticket->created_at->format('M d, Y g:i A'),
+                    'updated_at' => $ticket->updated_at->format('M d, Y g:i A'),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to resolve ticket', [
+                'error' => $e->getMessage(),
+                'ticket_id' => $id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to resolve ticket'
+            ], 500);
+        }
+    }
 }

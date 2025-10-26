@@ -225,6 +225,14 @@ table{overflow:visible!important}
             <!-- Bottom Navigation -->
             <ul class="menu p-0">
                 <li>
+                    <a class="py-3 pl-2" id="nav-support" onclick="showPage('support')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Support Tickets
+                    </a>
+                </li>
+                <li>
                     <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0" 
                        id="nav-settings" 
                        onclick="showPage('settings')">
@@ -682,6 +690,37 @@ table{overflow:visible!important}
                             </button>
                         </div>
                     </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Tickets Page -->
+            <div id="support-page" class="page-content hidden">
+                <div class="p-4">
+                    <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
+                    <p class="text-sm text-gray-600 mt-2">Review and resolve student support requests</p>
+                </div>
+                
+                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto">
+                    <div class="mb-4">
+                        <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered w-full max-w-md rounded-lg" />
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr class="bg-base-200">
+                                    <th class="font-semibold text-text-header">Ticket ID</th>
+                                    <th class="font-semibold text-text-header">Student Name</th>
+                                    <th class="font-semibold text-text-header">Issue Type</th>
+                                    <th class="font-semibold text-text-header">Details</th>
+                                    <th class="font-semibold text-text-header">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticket-table-body">
+                                <tr><td colspan="5" class="text-center text-gray-500 py-4">Loading tickets...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1210,6 +1249,70 @@ table{overflow:visible!important}
         </form>
     </dialog>
 
+    <!-- Submit Ticket Modal -->
+    <dialog id="submit_ticket_modal" class="modal">
+        <!-- Removed: Super admin doesn't submit tickets -->
+    </dialog>
+
+    <!-- Ticket Details Modal for Super Admin -->
+    <dialog id="ticket_details_modal" class="modal">
+        <div class="modal-box p-6 max-w-2xl rounded-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            <h3 class="font-bold text-2xl mb-6 text-center text-primary-purple">Ticket Details</h3>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Ticket ID</p>
+                        <p id="modal-ticket-id" class="text-lg font-bold text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Status</p>
+                        <div id="modal-ticket-status" class="inline-block mt-1"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="text-sm font-semibold text-gray-600">Student Name</p>
+                    <p id="modal-ticket-student" class="text-base text-gray-900"></p>
+                </div>
+                
+                <div>
+                    <p class="text-sm font-semibold text-gray-600">Issue Type</p>
+                    <p id="modal-ticket-type" class="text-base text-gray-900"></p>
+                </div>
+                
+                <div>
+                    <p class="text-sm font-semibold text-gray-600">Details</p>
+                    <p id="modal-ticket-details" class="text-base text-gray-900 whitespace-pre-wrap"></p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Submitted</p>
+                        <p id="modal-ticket-submitted" class="text-sm text-gray-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Last Updated</p>
+                        <p id="modal-ticket-updated" class="text-sm text-gray-700"></p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t" id="resolve-action-container">
+                    <p class="text-sm font-semibold text-gray-600 mb-2">Actions</p>
+                    <button type="button" id="resolve-ticket-btn" class="btn bg-green-600 hover:bg-green-700 text-white rounded-lg w-full">
+                        Mark as Resolved
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
 
@@ -1220,6 +1323,74 @@ table{overflow:visible!important}
         var allSubmissions = []; // Store all submissions data
         var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
+        
+        // ==================== CSRF TOKEN SETUP ====================
+        // Simple helper to get CSRF token from meta tag
+        function getCsrfToken() {
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            return metaTag ? metaTag.getAttribute('content') : '';
+        }
+        
+        // Auto-refresh CSRF token every 5 minutes to prevent expiration
+        setInterval(async () => {
+            try {
+                const response = await fetch(`${BASE_PATH}/api/refresh-csrf`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.token) {
+                    // Update meta tag with new token
+                    const metaTag = document.querySelector('meta[name="csrf-token"]');
+                    if (metaTag) {
+                        metaTag.setAttribute('content', data.token);
+                    }
+                }
+            } catch (e) {
+                console.warn('[CSRF] Failed to auto-refresh token');
+            }
+        }, 5 * 60 * 1000); // Every 5 minutes
+        
+        // CSRF Cookie Helper Functions
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+        
+        async function ensureCsrfCookie() {
+            try {
+                // Always fetch fresh CSRF cookie to ensure it's valid
+                const response = await fetch(`${BASE_PATH}/api/csrf-cookie`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 
+                        'Accept': 'application/json', 
+                        'X-Requested-With': 'XMLHttpRequest', 
+                        'Cache-Control': 'no-cache' 
+                    }
+                });
+                
+                // Wait a moment for cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Update CSRF token in meta tag
+                if (response.ok) {
+                    const xsrfToken = getCookie('XSRF-TOKEN');
+                    if (xsrfToken) {
+                        const csrfToken = decodeURIComponent(xsrfToken);
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) {
+                            metaTag.setAttribute('content', csrfToken);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not fetch CSRF cookie:', e);
+            }
+        }
+        
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
@@ -1230,6 +1401,120 @@ table{overflow:visible!important}
         var statusSortDirection = 'desc'; // 'asc' or 'desc'
         var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'actiondate', 'status'
         var currentStatusFilter = 'All'; // Track current status filter for archived tab
+
+        // Support tickets data
+        var allTickets = [];
+        var currentTicketId = null;
+
+        // Load support tickets from API
+        async function loadSupportTickets() {
+            try {
+                const response = await fetch(`${BASE_PATH}/super-admin/api/support-tickets`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    allTickets = data.tickets || [];
+                    renderTicketsTable();
+                } else {
+                    console.error('Failed to load tickets:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+            }
+        }
+
+        // Show ticket details in modal
+        function showTicketDetails(ticketId) {
+            const ticket = allTickets.find(t => t.id == ticketId);
+            if (!ticket) return;
+
+            currentTicketId = ticketId;
+            document.getElementById('modal-ticket-id').textContent = ticket.id;
+            document.getElementById('modal-ticket-student').textContent = ticket.student_name || 'N/A';
+            document.getElementById('modal-ticket-type').textContent = ticket.type;
+            document.getElementById('modal-ticket-details').textContent = ticket.details;
+            document.getElementById('modal-ticket-submitted').textContent = ticket.submitted_at || ticket.date;
+            document.getElementById('modal-ticket-updated').textContent = ticket.updated_at || ticket.date;
+
+            // Status badge
+            let statusBadgeClass = '';
+            switch(ticket.status) {
+                case 'Pending':
+                    statusBadgeClass = 'badge bg-yellow-100 text-yellow-800 border-0';
+                    break;
+                case 'Resolved':
+                    statusBadgeClass = 'badge bg-green-100 text-green-800 border-0';
+                    break;
+                case 'Closed':
+                    statusBadgeClass = 'badge bg-gray-100 text-gray-800 border-0';
+                    break;
+                default:
+                    statusBadgeClass = 'badge bg-blue-100 text-blue-800 border-0';
+            }
+            document.getElementById('modal-ticket-status').innerHTML = 
+                `<div class="${statusBadgeClass} font-semibold">${ticket.status}</div>`;
+
+            // Show/hide resolve button based on status
+            const resolveContainer = document.getElementById('resolve-action-container');
+            const resolveBtn = document.getElementById('resolve-ticket-btn');
+            if (ticket.status === 'Pending') {
+                resolveContainer.style.display = 'block';
+                resolveBtn.disabled = false;
+            } else {
+                resolveContainer.style.display = 'none';
+            }
+
+            document.getElementById('ticket_details_modal').showModal();
+        }
+
+        // Resolve ticket (super admin marks as resolved)
+        async function resolveTicket() {
+            if (!currentTicketId) return;
+
+            const resolveBtn = document.getElementById('resolve-ticket-btn');
+            
+            resolveBtn.disabled = true;
+            resolveBtn.textContent = 'Resolving...';
+
+            try {
+                const response = await fetch(`${BASE_PATH}/super-admin/api/support-tickets/${currentTicketId}/resolve`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Ticket resolved successfully. Student has been notified.', 'success');
+                    await loadSupportTickets();
+                    document.getElementById('ticket_details_modal').close();
+                } else {
+                    showToast(data.message || 'Failed to resolve ticket', 'error');
+                }
+            } catch (error) {
+                console.error('Error resolving ticket:', error);
+                showToast('Error resolving ticket', 'error');
+            } finally {
+                resolveBtn.disabled = false;
+                resolveBtn.textContent = 'Mark as Resolved';
+            }
+        }
 
         // Toast notification function
         function showToast(m, t) {
@@ -1283,10 +1568,31 @@ table{overflow:visible!important}
         // Ensure CSRF cookie exists
         async function ensureCsrfCookie() {
             try {
-                await fetch(`${BASE_PATH}/sanctum/csrf-cookie`, {
+                // Always fetch fresh CSRF cookie to ensure it's valid
+                const response = await fetch(`${BASE_PATH}/api/csrf-cookie`, {
                     method: 'GET',
-                    credentials: 'same-origin'
+                    credentials: 'same-origin',
+                    headers: { 
+                        'Accept': 'application/json', 
+                        'X-Requested-With': 'XMLHttpRequest', 
+                        'Cache-Control': 'no-cache' 
+                    }
                 });
+                
+                // Wait a moment for cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Update CSRF token in meta tag
+                if (response.ok) {
+                    const xsrfToken = getCookie('XSRF-TOKEN');
+                    if (xsrfToken) {
+                        const csrfToken = decodeURIComponent(xsrfToken);
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) {
+                            metaTag.setAttribute('content', csrfToken);
+                        }
+                    }
+                }
             } catch (e) {
                 console.warn('Could not fetch CSRF cookie:', e);
             }
@@ -1350,6 +1656,11 @@ table{overflow:visible!important}
                         filterSubmissions(savedTab, targetTab);
                     }
                 }, 100);
+            }
+            
+            // Render tickets when showing support page
+            if (p === 'support') {
+                loadSupportTickets();
             }
         }
 
@@ -1477,6 +1788,46 @@ table{overflow:visible!important}
                     renderSubmissions(allSubmissions, 'status');
                 };
             }
+        }
+
+        // Render support tickets table
+        function renderTicketsTable(tickets = allTickets) {
+            const tbody = document.getElementById('ticket-table-body');
+            if (!tbody) return;
+
+            if (!tickets || tickets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
+                return;
+            }
+
+            let statusBadges = {
+                'Pending': '<span class="badge bg-yellow-100 text-yellow-800 border-0">Pending</span>',
+                'Resolved': '<span class="badge bg-green-100 text-green-800 border-0">Resolved</span>',
+                'Closed': '<span class="badge bg-gray-100 text-gray-800 border-0">Closed</span>'
+            };
+
+            tbody.innerHTML = '';
+            tickets.forEach(ticket => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 cursor-pointer';
+                tr.onclick = () => showTicketDetails(ticket.id);
+                
+                const shortDetails = (ticket.details || '').substring(0, 100) + (ticket.details && ticket.details.length > 100 ? '...' : '');
+                
+                tr.innerHTML = `
+                    <td class="font-medium text-text-header">${ticket.id}</td>
+                    <td class="text-text-header">${ticket.student_name || 'N/A'}</td>
+                    <td class="text-text-header">${ticket.type}</td>
+                    <td class="text-text-muted text-sm" title="${ticket.details}">${shortDetails}</td>
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            ${statusBadges[ticket.status] || ticket.status}
+                            <span class="text-xs text-gray-500">${ticket.date}</span>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         // Update table headers based on active tab
@@ -1785,7 +2136,10 @@ table{overflow:visible!important}
         }
 
         // Load dashboard statistics
-        function loadDashboardStats() {
+        async function loadDashboardStats() {
+            // Ensure CSRF cookie exists before making request
+            await ensureCsrfCookie();
+            
             fetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
                 method: 'GET',
                 headers: {
@@ -1869,7 +2223,7 @@ table{overflow:visible!important}
         var lastSubmissionsData = null; // Store last data to detect changes
         var isLoadingSubmissions = false; // Prevent concurrent requests
         
-        function loadSubmissions(showLoading = true) {
+        async function loadSubmissions(showLoading = true) {
             // Prevent concurrent requests
             if (isLoadingSubmissions) {
                 console.log('Already loading submissions, skipping...');
@@ -1886,6 +2240,9 @@ table{overflow:visible!important}
             }
             
             isLoadingSubmissions = true;
+            
+            // Ensure CSRF cookie exists before making request
+            await ensureCsrfCookie();
             
             // Add timestamp to URL to prevent caching
             var timestamp = new Date().getTime();
@@ -3878,6 +4235,34 @@ table{overflow:visible!important}
                     }, 500);
                 }, 5000);
             }
+
+            // ========== SUPPORT TICKET EVENT LISTENERS ==========
+            // Resolve ticket button
+            const resolveTicketBtn = document.getElementById('resolve-ticket-btn');
+            if (resolveTicketBtn) {
+                resolveTicketBtn.addEventListener('click', resolveTicket);
+            }
+
+            // Ticket search functionality
+            const ticketSearchInput = document.getElementById('ticket-search-input');
+            if (ticketSearchInput) {
+                ticketSearchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    if (!query) {
+                        renderTicketsTable();
+                        return;
+                    }
+
+                    const filtered = allTickets.filter(ticket =>
+                        ticket.id.toString().includes(query) ||
+                        (ticket.student_name && ticket.student_name.toLowerCase().includes(query)) ||
+                        ticket.type.toLowerCase().includes(query) ||
+                        ticket.details.toLowerCase().includes(query)
+                    );
+                    renderTicketsTable(filtered);
+                });
+            }
+            // ========== END SUPPORT TICKET EVENT LISTENERS ==========
         });
     </script>
 

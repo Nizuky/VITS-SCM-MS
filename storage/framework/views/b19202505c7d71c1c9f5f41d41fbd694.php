@@ -816,6 +816,44 @@ table{overflow:visible!important}
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
+        
+        // CSRF Cookie Helper Functions
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+        
+        async function ensureCsrfCookie() {
+            try {
+                // Always fetch fresh CSRF cookie to ensure it's valid
+                const response = await fetch(`${BASE_PATH}/api/csrf-cookie`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 
+                        'Accept': 'application/json', 
+                        'X-Requested-With': 'XMLHttpRequest', 
+                        'Cache-Control': 'no-cache' 
+                    }
+                });
+                
+                // Update CSRF token in meta tag
+                if (response.ok) {
+                    const xsrfToken = getCookie('XSRF-TOKEN');
+                    if (xsrfToken) {
+                        const csrfToken = decodeURIComponent(xsrfToken);
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) {
+                            metaTag.setAttribute('content', csrfToken);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not fetch CSRF cookie:', e);
+            }
+        }
+        
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
@@ -826,7 +864,10 @@ table{overflow:visible!important}
         var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'status'
 
         // Load dashboard statistics
-        function loadDashboardStats() {
+        async function loadDashboardStats() {
+            // Ensure CSRF cookie exists before making request
+            await ensureCsrfCookie();
+            
             fetch('/admin/api/dashboard-stats', {
                 method: 'GET',
                 headers: {
@@ -913,7 +954,7 @@ table{overflow:visible!important}
         var lastSubmissionsData = null; // Store last data to detect changes
         var isLoadingSubmissions = false; // Prevent concurrent requests
         
-        function loadSubmissions(showLoading = true) {
+        async function loadSubmissions(showLoading = true) {
             // Prevent concurrent requests
             if (isLoadingSubmissions) {
                 console.log('Already loading submissions, skipping...');
@@ -930,6 +971,9 @@ table{overflow:visible!important}
             }
             
             isLoadingSubmissions = true;
+            
+            // Ensure CSRF cookie exists before making request
+            await ensureCsrfCookie();
             
             // Add timestamp to URL to prevent caching
             var timestamp = new Date().getTime();

@@ -55,7 +55,7 @@
     <x-return-to-welcome />
 @endcomponent
 
-        <script>
+<script>
     (function(){
         const form = document.getElementById('superadmin-login-form');
         const btn = document.getElementById('superadmin-login-btn');

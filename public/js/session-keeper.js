@@ -157,29 +157,27 @@
         pingSession: function() {
             const self = this;
             
-            fetch('/api/ping', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': this.getCsrfToken(),
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
+            // Use a simple GET request to avoid CSRF issues
+            // The keep-alive route will be accessed as GET
+            fetch('/keep-alive', {
+                method: 'GET',
                 credentials: 'same-origin',
-                body: JSON.stringify({})
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 self.log('Session pinged successfully', data);
-                
-                // If markers were restored, log it
-                if (data.markers_restored) {
-                    self.log('Session markers restored by ping endpoint');
-                }
             })
             .catch(error => {
                 self.log('Error pinging session', error);
-                
                 // If ping fails, try to refresh CSRF token as fallback
                 self.refreshCsrfToken();
             });
@@ -205,8 +203,25 @@
          * Get current CSRF token
          */
         getCsrfToken: function() {
+            // First try to get from XSRF cookie (decoded)
+            const xsrfToken = this.getCookie('XSRF-TOKEN');
+            if (xsrfToken) {
+                return decodeURIComponent(xsrfToken);
+            }
+            
+            // Fallback to meta tag
             const metaTag = document.querySelector('meta[name="csrf-token"]');
             return metaTag ? metaTag.getAttribute('content') : '';
+        },
+
+        /**
+         * Get cookie value by name
+         */
+        getCookie: function(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
         },
 
         /**
