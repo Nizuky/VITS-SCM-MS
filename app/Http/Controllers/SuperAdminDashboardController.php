@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class SuperAdminDashboardController extends Controller
 {
@@ -81,6 +82,21 @@ class SuperAdminDashboardController extends Controller
         try {
             $allSubmissions = collect();
             
+            // Log table counts for debugging
+            $pendingCount = SocialContractRecord::where('status', 'Pending')->count();
+            $verifiedInRecordsCount = SocialContractRecord::where('status', 'Verified')->count();
+            $verifiedInApprovalsCount = \App\Models\SocialContractApproval::where('status', 'Verified')->count();
+            $approvedCount = \App\Models\SocialContractApproval::where('status', 'Approved')->count();
+            $rejectedCount = \App\Models\SocialContractApproval::where('status', 'Rejected')->count();
+            
+            \Log::info('SuperAdmin getSubmissions - Table counts', [
+                'pending_in_records' => $pendingCount,
+                'verified_in_records' => $verifiedInRecordsCount,
+                'verified_in_approvals' => $verifiedInApprovalsCount,
+                'approved_in_approvals' => $approvedCount,
+                'rejected_in_approvals' => $rejectedCount,
+            ]);
+            
             // Get pending records from social_contract_records
             $pendingRecords = SocialContractRecord::where('status', 'Pending')
                 ->with(['socialContract.student'])
@@ -128,6 +144,12 @@ class SuperAdminDashboardController extends Controller
                         }
                     }
                     
+                    // Set action_date for verified records
+                    $actionDate = null;
+                    if ($approval->verified_at) {
+                        $actionDate = $approval->verified_at->format('m-d-Y');
+                    }
+                    
                     return [
                         'id' => $approval->id,
                         'record_id' => $approval->social_contract_record_id,
@@ -139,13 +161,16 @@ class SuperAdminDashboardController extends Controller
                         'hours_rendered' => $approval->hours_rendered,
                         'date' => $dateFormatted,
                         'status' => 'Verified',
+                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
+                        'action_date' => $actionDate,
                         'created_at' => $approval->created_at->toIso8601String(),
                         'updated_at' => $approval->updated_at->toIso8601String(),
                     ];
                 });
 
-            // Get archived records (approved/rejected) from social_contract_approvals
-            $archivedRecords = \App\Models\SocialContractApproval::whereIn('status', ['Approved', 'Rejected'])
+            // Get ALL archived records (approved/rejected/verified) from social_contract_approvals
+            // This includes admin's archived records (verified) AND super admin's final decisions (approved/rejected)
+            $archivedRecords = \App\Models\SocialContractApproval::whereIn('status', ['Approved', 'Rejected', 'Verified'])
                 ->orderBy('updated_at', 'desc')
                 ->get()
                 ->map(function ($approval) {
@@ -157,6 +182,16 @@ class SuperAdminDashboardController extends Controller
                         } catch (\Exception $e) {
                             $dateFormatted = $approval->date;
                         }
+                    }
+                    
+                    // Determine which action date to show
+                    $actionDate = null;
+                    if ($approval->status === 'Approved' && $approval->approved_at) {
+                        $actionDate = $approval->approved_at->format('m-d-Y');
+                    } elseif ($approval->status === 'Rejected' && $approval->rejected_at) {
+                        $actionDate = $approval->rejected_at->format('m-d-Y');
+                    } elseif ($approval->status === 'Verified' && $approval->verified_at) {
+                        $actionDate = $approval->verified_at->format('m-d-Y');
                     }
                     
                     return [
@@ -171,6 +206,10 @@ class SuperAdminDashboardController extends Controller
                         'date' => $dateFormatted,
                         'status' => $approval->status,
                         'rejection_reason' => $approval->rejection_reason,
+                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
+                        'approved_at' => $approval->approved_at ? $approval->approved_at->format('m-d-Y') : null,
+                        'rejected_at' => $approval->rejected_at ? $approval->rejected_at->format('m-d-Y') : null,
+                        'action_date' => $actionDate,
                         'created_at' => $approval->created_at->toIso8601String(),
                         'updated_at' => $approval->updated_at->toIso8601String(),
                     ];
@@ -181,6 +220,13 @@ class SuperAdminDashboardController extends Controller
                 ->concat($pendingRecords)
                 ->concat($forApprovalRecords)
                 ->concat($archivedRecords);
+            
+            \Log::info('SuperAdmin getSubmissions - Record counts before deduplication', [
+                'pending' => $pendingRecords->count(),
+                'for_approval' => $forApprovalRecords->count(),
+                'archived' => $archivedRecords->count(),
+                'total' => $allSubmissions->count(),
+            ]);
             
             // Remove duplicates by tracking the underlying social_contract_record_id
             // Approvals take precedence over pending records
@@ -198,10 +244,17 @@ class SuperAdminDashboardController extends Controller
                 return true;
             });
             
+            \Log::info('SuperAdmin getSubmissions - Final count after deduplication', [
+                'unique_submissions' => $uniqueSubmissions->count(),
+            ]);
+            
             return response()->json([
                 'success' => true,
                 'data' => $uniqueSubmissions->values() // Re-index after filtering
-            ]);
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Failed to get submissions', ['error' => $e->getMessage()]);
             
@@ -416,7 +469,7 @@ class SuperAdminDashboardController extends Controller
                     // Update the approval record status
                     $approval->status = 'Rejected';
                     $approval->approved_by = Auth::guard('superadmin')->id();
-                    $approval->approved_at = now();
+                    $approval->rejected_at = now();
                     $approval->rejection_reason = $reason;
                     $approval->save();
                     
@@ -425,7 +478,12 @@ class SuperAdminDashboardController extends Controller
                         $approval->socialContractRecord->load('socialContract');
                         $approval->socialContractRecord->status = 'Rejected';
                         $approval->socialContractRecord->rejection_reason = $reason;
-                        $approval->socialContractRecord->rejected_at = now();
+                        
+                        // Only set rejected_at if the column exists
+                        if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
+                            $approval->socialContractRecord->rejected_at = now();
+                        }
+                        
                         $approval->socialContractRecord->save();
                         
                         // Create notification for student
@@ -486,7 +544,12 @@ class SuperAdminDashboardController extends Controller
                     // Update the record status to Rejected
                     $record->status = 'Rejected';
                     $record->rejection_reason = $reason;
-                    $record->rejected_at = now();
+                    
+                    // Only set rejected_at if the column exists
+                    if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
+                        $record->rejected_at = now();
+                    }
+                    
                     $record->save();
                     
                     // Log activity for calendar

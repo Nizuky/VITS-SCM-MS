@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\SocialContractRecord;
+use App\Models\SocialContractApproval;
 use App\Models\SocialContract;
 use App\Models\User;
 use App\Models\StudentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
@@ -67,28 +69,141 @@ class AdminDashboardController extends Controller
     public function getSubmissions()
     {
         try {
-            $submissions = DB::table('social_contract_records as scr')
-                ->join('social_contracts as sc', 'scr.social_contract_id', '=', 'sc.id')
-                ->join('users as u', 'sc.student_id', '=', 'u.id')
-                ->select(
-                    'scr.id',
-                    'u.student_id',
-                    'u.name as student_name',
-                    'scr.event_name',
-                    'scr.organization',
-                    'scr.hours_rendered',
-                    'scr.date',
-                    'scr.status',
-                    'scr.venue',
-                    'scr.created_at'
-                )
-                ->orderBy('scr.created_at', 'desc')
-                ->get();
+            \Log::info('AdminDashboardController@getSubmissions called');
+            
+            // Log table counts for debugging
+            $pendingCount = SocialContractRecord::where('status', 'Pending')->count();
+            $verifiedInRecordsCount = SocialContractRecord::where('status', 'Verified')->count();
+            $verifiedInApprovalsCount = SocialContractApproval::where('status', 'Verified')->count();
+            $approvedCount = SocialContractApproval::where('status', 'Approved')->count();
+            $rejectedCount = SocialContractApproval::where('status', 'Rejected')->count();
+            
+            \Log::info('Admin getSubmissions - Table counts', [
+                'pending_in_records' => $pendingCount,
+                'verified_in_records' => $verifiedInRecordsCount,
+                'verified_in_approvals' => $verifiedInApprovalsCount,
+                'approved_in_approvals' => $approvedCount,
+                'rejected_in_approvals' => $rejectedCount,
+            ]);
+            
+            $allSubmissions = collect();
+            
+            // Get pending records from social_contract_records
+            $pendingRecords = SocialContractRecord::where('status', 'Pending')
+                ->with(['socialContract.student'])
+                ->orderBy('updated_at', 'desc')
+                ->get()
+                ->map(function ($record) {
+                    $student = $record->socialContract->student ?? null;
+                    $dateFormatted = null;
+                    if ($record->date) {
+                        try {
+                            $dateObj = $record->date instanceof \Carbon\Carbon ? $record->date : Carbon::parse($record->date);
+                            $dateFormatted = $dateObj->format('Y-m-d');
+                        } catch (\Exception $e) {
+                            $dateFormatted = $record->date;
+                        }
+                    }
+                    
+                    return [
+                        'id' => $record->id,
+                        'student_id' => $student ? ($student->student_id ?? 'N/A') : 'N/A',
+                        'student_name' => $student->name ?? '',
+                        'event_name' => $record->event_name,
+                        'organization' => $record->organization,
+                        'venue' => $record->venue,
+                        'hours_rendered' => $record->hours_rendered,
+                        'date' => $dateFormatted,
+                        'status' => 'Pending',
+                        'created_at' => $record->created_at->toIso8601String(),
+                        'updated_at' => $record->updated_at->toIso8601String(),
+                    ];
+                });
+            
+            // Get archived records from social_contract_approvals (Verified, Approved, Rejected)
+            $archivedRecords = \App\Models\SocialContractApproval::whereIn('status', ['Verified', 'Approved', 'Rejected'])
+                ->orderBy('updated_at', 'desc')
+                ->get()
+                ->map(function ($approval) {
+                    $dateFormatted = null;
+                    if ($approval->date) {
+                        try {
+                            $dateObj = $approval->date instanceof \Carbon\Carbon ? $approval->date : Carbon::parse($approval->date);
+                            $dateFormatted = $dateObj->format('Y-m-d');
+                        } catch (\Exception $e) {
+                            $dateFormatted = $approval->date;
+                        }
+                    }
+                    
+                    // Determine which action date to show
+                    $actionDate = null;
+                    if ($approval->status === 'Approved' && $approval->approved_at) {
+                        $actionDate = $approval->approved_at->format('m-d-Y');
+                    } elseif ($approval->status === 'Rejected' && $approval->rejected_at) {
+                        $actionDate = $approval->rejected_at->format('m-d-Y');
+                    } elseif ($approval->status === 'Verified' && $approval->verified_at) {
+                        $actionDate = $approval->verified_at->format('m-d-Y');
+                    }
+                    
+                    return [
+                        'id' => $approval->id,
+                        'record_id' => $approval->social_contract_record_id,
+                        'student_id' => $approval->student_id,
+                        'student_name' => $approval->student_name,
+                        'event_name' => $approval->event_name,
+                        'organization' => $approval->organization,
+                        'venue' => $approval->venue,
+                        'hours_rendered' => $approval->hours_rendered,
+                        'date' => $dateFormatted,
+                        'status' => $approval->status, // Keep the actual status (Verified/Approved/Rejected)
+                        'verified_at' => $approval->verified_at ? $approval->verified_at->format('m-d-Y') : null,
+                        'approved_at' => $approval->approved_at ? $approval->approved_at->format('m-d-Y') : null,
+                        'rejected_at' => $approval->rejected_at ? $approval->rejected_at->format('m-d-Y') : null,
+                        'action_date' => $actionDate,
+                        'rejection_reason' => $approval->rejection_reason,
+                        'created_at' => $approval->created_at->toIso8601String(),
+                        'updated_at' => $approval->updated_at->toIso8601String(),
+                    ];
+                });
+            
+            // Merge pending and archived records
+            $allSubmissions = collect()
+                ->concat($pendingRecords)
+                ->concat($archivedRecords);
+            
+            \Log::info('Admin getSubmissions - Record counts before deduplication', [
+                'pending' => $pendingRecords->count(),
+                'archived' => $archivedRecords->count(),
+                'total' => $allSubmissions->count(),
+            ]);
+            
+            // Remove duplicates by tracking the underlying social_contract_record_id
+            // Approvals take precedence over pending records
+            $seen = [];
+            $uniqueSubmissions = $allSubmissions->filter(function ($record) use (&$seen) {
+                // For approval records, use the social_contract_record_id
+                // For pending records, use their own id
+                $recordId = isset($record['record_id']) ? $record['record_id'] : $record['id'];
+                
+                if (in_array($recordId, $seen)) {
+                    return false; // Skip duplicate
+                }
+                
+                $seen[] = $recordId;
+                return true;
+            });
+            
+            \Log::info('Admin getSubmissions - Final count after deduplication', [
+                'unique_submissions' => $uniqueSubmissions->count(),
+            ]);
 
             return response()->json([
                 'success' => true,
-                'data' => $submissions
-            ]);
+                'data' => $uniqueSubmissions->values() // Re-index after filtering
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
         } catch (\Exception $e) {
             \Log::error('Failed to fetch admin submissions', [
                 'error' => $e->getMessage(),
@@ -160,10 +275,15 @@ class AdminDashboardController extends Controller
             $record = SocialContractRecord::with('socialContract')->findOrFail($id);
             $oldStatus = $record->status;
             
-            // Update status, rejection reason and timestamp
+            // Update status and rejection reason
             $record->status = 'Rejected';
             $record->rejection_reason = $validated['reason'];
-            $record->rejected_at = now();
+            
+            // Only set rejected_at if the column exists
+            if (Schema::hasColumn('social_contract_records', 'rejected_at')) {
+                $record->rejected_at = now();
+            }
+            
             $record->save();
             
             // Create notification for student

@@ -61,6 +61,10 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     // Profile: send password reset link to PLV email with redirect back to profile
     Route::post('/api/profile/send-reset-link', [\App\Http\Controllers\ProfileController::class, 'sendPasswordResetLink'])
         ->name('profile.sendResetLink');
+    
+    // Profile: update name and/or password
+    Route::post('/api/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])
+        ->name('profile.update');
 });
 
 // Admin users auth routes (separate from superadmin)

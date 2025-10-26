@@ -120,7 +120,8 @@ Route::middleware('auth:web')->group(function () {
 Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessionActive::class])->group(function () {
     // Redirect to the main super admin dashboard view defined in routes/web.php
         Route::get('super-admin/dashboard', function () {
-            return view('dashboards.super_admin');
+            $BASE_PATH = '';
+            return view('dashboards.super_admin', compact('BASE_PATH'));
         })->name('superadmin.dashboard');
 
     // Super-admin API endpoints
@@ -135,6 +136,10 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
     // Super-admin Settings API endpoints
     Route::post('super-admin/api/settings/update-name', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'updateName'])->name('superadmin.settings.updateName');
     Route::post('super-admin/api/settings/request-password-change', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'requestPasswordChange'])->name('superadmin.settings.requestPasswordChange');
+
+    // Super-admin Students Management API endpoints
+    Route::get('super-admin/api/students', [App\Http\Controllers\SuperAdminStudentController::class, 'index'])->name('superadmin.students.index');
+    Route::put('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'update'])->name('superadmin.students.update');
 
     // Super-admin logout
     Route::post('super-admin/logout', [App\Http\Controllers\SuperAdmin\LoginController::class, 'logout'])

@@ -24,7 +24,25 @@ class SocialContractRecordController extends Controller
         $contractId = $request->query('contract_id');
 
         if ($all) {
-            $records = $user->socialContractRecords()->latest('date')->get();
+            $records = $user->socialContractRecords()->with('approval')->latest('date')->get()->map(function($record) {
+                $data = $record->toArray();
+                // Add action dates from approval table if exists
+                if ($record->approval) {
+                    $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->format('m-d-Y') : null;
+                    $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->format('m-d-Y') : null;
+                    $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->format('m-d-Y') : null;
+                    
+                    // Determine action date based on status
+                    if ($record->status === 'Approved' && $record->approval->approved_at) {
+                        $data['action_date'] = $record->approval->approved_at->format('m-d-Y');
+                    } elseif ($record->status === 'Rejected' && $record->approval->rejected_at) {
+                        $data['action_date'] = $record->approval->rejected_at->format('m-d-Y');
+                    } elseif ($record->status === 'Verified' && $record->approval->verified_at) {
+                        $data['action_date'] = $record->approval->verified_at->format('m-d-Y');
+                    }
+                }
+                return $data;
+            });
             return response()->json([
                 'contract' => null,
                 'records' => $records,
@@ -35,7 +53,25 @@ class SocialContractRecordController extends Controller
             ? $user->socialContracts()->whereKey($contractId)->firstOrFail()
             : $user->currentSocialContract();
 
-        $records = $contract->records()->latest('date')->get();
+        $records = $contract->records()->with('approval')->latest('date')->get()->map(function($record) {
+            $data = $record->toArray();
+            // Add action dates from approval table if exists
+            if ($record->approval) {
+                $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->format('m-d-Y') : null;
+                $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->format('m-d-Y') : null;
+                $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->format('m-d-Y') : null;
+                
+                // Determine action date based on status
+                if ($record->status === 'Approved' && $record->approval->approved_at) {
+                    $data['action_date'] = $record->approval->approved_at->format('m-d-Y');
+                } elseif ($record->status === 'Rejected' && $record->approval->rejected_at) {
+                    $data['action_date'] = $record->approval->rejected_at->format('m-d-Y');
+                } elseif ($record->status === 'Verified' && $record->approval->verified_at) {
+                    $data['action_date'] = $record->approval->verified_at->format('m-d-Y');
+                }
+            }
+            return $data;
+        });
 
         return response()->json([
             'contract' => [
@@ -44,7 +80,10 @@ class SocialContractRecordController extends Controller
                 'submission_date' => optional($contract->submission_date)->toISOString(),
             ],
             'records' => $records,
-        ]);
+        ])
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function store(Request $request)

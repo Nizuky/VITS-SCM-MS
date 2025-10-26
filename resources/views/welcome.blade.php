@@ -129,7 +129,7 @@
                     <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" class="role-btn text-sm">
                         Yes — Login
                     </a>
-                    <a href="{{ route('register') }}" class="role-btn text-sm">
+                    <a href="#" onclick="event.preventDefault(); clearSessionAndRegister();" class="role-btn text-sm">
                         No — Sign up
                     </a>
                     </div>
@@ -230,6 +230,52 @@
         // Redirect to login page with a small delay to ensure logout completes
         setTimeout(function() {
           window.location.href = '{{ route('login') }}';
+        }, 100);
+      }
+
+      // Function to clear any existing session and go to register
+      async function clearSessionAndRegister() {
+        try {
+          // Logout from all possible guards (web, admin, superadmin)
+          const logoutUrls = [
+            '{{ route('logout') }}',
+            '/admin/logout',
+            '/super-admin/logout'
+          ];
+          
+          const csrfToken = document.querySelector('meta[name="csrf-token"]');
+          const csrf = csrfToken ? csrfToken.getAttribute('content') : '';
+          
+          // Try to logout from all guards
+          for (const url of logoutUrls) {
+            try {
+              await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRF-TOKEN': csrf,
+                  'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+              }).catch(() => {}); // Ignore errors
+            } catch(e) {}
+          }
+          
+          // Clear localStorage
+          localStorage.clear();
+          // Clear sessionStorage
+          sessionStorage.clear();
+          // Clear all cookies
+          document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+          });
+        } catch(e) { 
+          console.log('Error clearing storage:', e); 
+        }
+        
+        // Redirect to register page with a small delay to ensure logout completes
+        setTimeout(function() {
+          window.location.href = '{{ route('register') }}';
         }, 100);
       }
 

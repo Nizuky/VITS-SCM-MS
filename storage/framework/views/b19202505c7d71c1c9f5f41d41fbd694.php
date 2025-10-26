@@ -402,8 +402,8 @@ table{overflow:visible!important}
                     </label>
                     
                     <!-- Refresh Button -->
-                    <button onclick="loadSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <button id="refresh-submissions-btn" onclick="refreshSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
+                        <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
                         <span class="hidden md:inline">Refresh</span>
@@ -422,9 +422,24 @@ table{overflow:visible!important}
                                             <span id="studentid-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">Student Name</th>
-                                    <th class="w-[20%] text-center">Event Name</th>
-                                    <th class="w-[15%] text-center">Organization</th>
+                                    <th class="w-[15%] text-center">
+                                        <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
+                                            Student Name
+                                            <span id="studentname-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[20%] text-center">
+                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                                            Event Name
+                                            <span id="eventname-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[15%] text-center">
+                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                                            Organization
+                                            <span id="organization-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
                                     <th class="w-[12%] text-center">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                                             Hours Rendered
@@ -441,7 +456,10 @@ table{overflow:visible!important}
                                         <span id="action-label">Action</span>
                                         <div class="hidden" id="status-header-wrapper">
                                             <div class="flex items-center justify-center gap-1">
-                                                <span>Status</span>
+                                                <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
+                                                    Status
+                                                    <span id="status-sort-indicator">▼</span>
+                                                </button>
                                                 <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
                                                     <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -797,22 +815,45 @@ table{overflow:visible!important}
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
-        var currentSortBy = null; // 'hours', 'studentid', or 'date'
+        var studentNameSortDirection = 'desc'; // 'asc' or 'desc'
+        var eventNameSortDirection = 'desc'; // 'asc' or 'desc'
+        var organizationSortDirection = 'desc'; // 'asc' or 'desc'
+        var statusSortDirection = 'desc'; // 'asc' or 'desc'
+        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'status'
 
         // Load dashboard statistics
         function loadDashboardStats() {
             fetch('/admin/api/dashboard-stats', {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 },
                 credentials: 'same-origin'
             })
-            .then(function(response) {
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
-                    throw new Error('Failed to load dashboard stats');
+                    throw response;
+                }
+                // Check if response is JSON (not redirected to login page)
+                if (!contentType.includes('application/json')) {
+                    console.warn('loadDashboardStats: non-JSON response', { 
+                        status: response.status, 
+                        url: response.url, 
+                        contentType: contentType 
+                    });
+                    // Likely session expired, redirect to login
+                    try { 
+                        window.location.replace(BASE_PATH + '/admin/login'); 
+                    } catch(_) { 
+                        window.location.href = BASE_PATH + '/admin/login'; 
+                    }
+                    return Promise.reject(new Error('Non-JSON response'));
                 }
                 return response.json();
             })
@@ -834,56 +875,121 @@ table{overflow:visible!important}
             });
         }
 
+        // Refresh submissions with visual feedback
+        function refreshSubmissions() {
+            var refreshBtn = document.getElementById('refresh-submissions-btn');
+            var refreshIcon = document.getElementById('refresh-icon');
+            
+            if (refreshBtn && refreshIcon) {
+                refreshBtn.disabled = true;
+                refreshIcon.style.animation = 'spin 1s linear infinite';
+                
+                // Add CSS animation if not exists
+                if (!document.getElementById('refresh-spin-style')) {
+                    var style = document.createElement('style');
+                    style.id = 'refresh-spin-style';
+                    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+                    document.head.appendChild(style);
+                }
+            }
+            
+            // Call loadSubmissions with loading indicator
+            loadSubmissions(true);
+            
+            // Re-enable button after 2 seconds
+            setTimeout(function() {
+                if (refreshBtn && refreshIcon) {
+                    refreshBtn.disabled = false;
+                    refreshIcon.style.animation = '';
+                }
+            }, 2000);
+        }
+
         // Load submissions from database
         var lastSubmissionsData = null; // Store last data to detect changes
+        var isLoadingSubmissions = false; // Prevent concurrent requests
         
         function loadSubmissions(showLoading = true) {
+            // Prevent concurrent requests
+            if (isLoadingSubmissions) {
+                console.log('Already loading submissions, skipping...');
+                return;
+            }
+            
             var tbody = document.getElementById('submission-table-body');
             
-            // Only show loading state on initial load
-            if (showLoading) {
+            // Only show loading state on initial load or explicit refresh
+            if (showLoading && !lastSubmissionsData) {
                 tbody.innerHTML = '<tr id="loading-row"><td colspan="7" class="text-center py-8">' +
                     '<span class="loading loading-spinner loading-lg text-primary-purple"></span>' +
                     '<p class="mt-2 text-text-muted">Loading submissions...</p></td></tr>';
             }
             
+            isLoadingSubmissions = true;
+            
+            // Add timestamp to URL to prevent caching
+            var timestamp = new Date().getTime();
+            
             // Fetch submissions from API
-            fetch('/admin/api/submissions', {
+            fetch(`/admin/api/submissions?_=${timestamp}`, {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
                 },
                 credentials: 'same-origin'
             })
-            .then(function(response) {
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
-                    throw new Error('Failed to load submissions');
+                    throw response;
+                }
+                // Check if response is JSON (not redirected to login page)
+                if (!contentType.includes('application/json')) {
+                    console.warn('loadSubmissions: non-JSON response', { 
+                        status: response.status, 
+                        url: response.url, 
+                        contentType: contentType 
+                    });
+                    // Likely session expired, redirect to login
+                    try { 
+                        window.location.replace(BASE_PATH + '/admin/login'); 
+                    } catch(_) { 
+                        window.location.href = BASE_PATH + '/admin/login'; 
+                    }
+                    return Promise.reject(new Error('Non-JSON response'));
                 }
                 return response.json();
             })
             .then(function(result) {
+                isLoadingSubmissions = false;
+                
                 if (result.success && result.data) {
-                    // Check if data actually changed
-                    var dataChanged = JSON.stringify(result.data) !== JSON.stringify(lastSubmissionsData);
-                    
-                    if (dataChanged || showLoading) {
-                        lastSubmissionsData = result.data;
-                        allSubmissions = result.data;
-                        renderSubmissions(result.data);
-                        updateWeeklySummaryFromData(result.data);
-                    }
+                    // Always update the data when we get a successful response
+                    lastSubmissionsData = result.data;
+                    allSubmissions = result.data;
+                    renderSubmissions(result.data);
+                    updateWeeklySummaryFromData(result.data);
                 } else {
                     throw new Error('Invalid response format');
                 }
             })
             .catch(function(error) {
+                isLoadingSubmissions = false;
                 console.error('Error loading submissions:', error);
-                if (showLoading) {
+                
+                // Only show error if we have no cached data AND it's the first load
+                if (!lastSubmissionsData && showLoading) {
                     tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">' +
                         'Failed to load submissions. Please refresh the page.</td></tr>';
                 }
+                // If we have cached data, silently keep using it - no toast notification
+                // The data will automatically update on next successful refresh
             });
         }
         
@@ -916,6 +1022,30 @@ table{overflow:visible!important}
                     var dateA = new Date(a.date || 0);
                     var dateB = new Date(b.date || 0);
                     return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                });
+            } else if (sortBy === 'studentname') {
+                sortedSubmissions.sort(function(a, b) {
+                    var nameA = (a.student_name || '').toString().toLowerCase();
+                    var nameB = (b.student_name || '').toString().toLowerCase();
+                    return studentNameSortDirection === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+                });
+            } else if (sortBy === 'eventname') {
+                sortedSubmissions.sort(function(a, b) {
+                    var eventA = (a.event_name || '').toString().toLowerCase();
+                    var eventB = (b.event_name || '').toString().toLowerCase();
+                    return eventNameSortDirection === 'asc' ? eventA.localeCompare(eventB) : eventB.localeCompare(eventA);
+                });
+            } else if (sortBy === 'organization') {
+                sortedSubmissions.sort(function(a, b) {
+                    var orgA = (a.organization || '').toString().toLowerCase();
+                    var orgB = (b.organization || '').toString().toLowerCase();
+                    return organizationSortDirection === 'asc' ? orgA.localeCompare(orgB) : orgB.localeCompare(orgA);
+                });
+            } else if (sortBy === 'status') {
+                sortedSubmissions.sort(function(a, b) {
+                    var statusA = (a.status || '').toString().toLowerCase();
+                    var statusB = (b.status || '').toString().toLowerCase();
+                    return statusSortDirection === 'asc' ? statusA.localeCompare(statusB) : statusB.localeCompare(statusA);
                 });
             }
             
@@ -1493,6 +1623,18 @@ table{overflow:visible!important}
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
             
+            // Helper function to reset all indicators
+            function resetAllSortIndicators() {
+                document.getElementById('hours-sort-indicator').textContent = '▼';
+                document.getElementById('studentid-sort-indicator').textContent = '▼';
+                document.getElementById('date-sort-indicator').textContent = '▼';
+                document.getElementById('studentname-sort-indicator').textContent = '▼';
+                document.getElementById('eventname-sort-indicator').textContent = '▼';
+                document.getElementById('organization-sort-indicator').textContent = '▼';
+                var statusIndicator = document.getElementById('status-sort-indicator');
+                if (statusIndicator) statusIndicator.textContent = '▼';
+            }
+            
             // Hours sort toggle event listener
             var hoursSortToggle = document.getElementById('hours-sort-toggle');
             var hoursSortIndicator = document.getElementById('hours-sort-indicator');
@@ -1501,10 +1643,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -1517,10 +1657,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -1533,11 +1671,65 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'date');
+                });
+            }
+            
+            // Student Name sort toggle event listener
+            var studentNameSortToggle = document.getElementById('studentname-sort-toggle');
+            var studentNameSortIndicator = document.getElementById('studentname-sort-indicator');
+            if (studentNameSortToggle && studentNameSortIndicator) {
+                studentNameSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentname';
+                    studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'studentname');
+                });
+            }
+            
+            // Event Name sort toggle event listener
+            var eventNameSortToggle = document.getElementById('eventname-sort-toggle');
+            var eventNameSortIndicator = document.getElementById('eventname-sort-indicator');
+            if (eventNameSortToggle && eventNameSortIndicator) {
+                eventNameSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'eventname';
+                    eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'eventname');
+                });
+            }
+            
+            // Organization sort toggle event listener
+            var organizationSortToggle = document.getElementById('organization-sort-toggle');
+            var organizationSortIndicator = document.getElementById('organization-sort-indicator');
+            if (organizationSortToggle && organizationSortIndicator) {
+                organizationSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'organization';
+                    organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'organization');
+                });
+            }
+            
+            // Status sort toggle event listener (for Archived tab)
+            var statusSortToggle = document.getElementById('status-sort-toggle');
+            var statusSortIndicator = document.getElementById('status-sort-indicator');
+            if (statusSortToggle && statusSortIndicator) {
+                statusSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'status';
+                    statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'status');
                 });
             }
             

@@ -212,6 +212,14 @@ table{overflow:visible!important}
                         Submission
                     </a>
                 </li>
+                <li>
+                    <a class="py-3" id="nav-students" onclick="showPage('students')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Students Information
+                    </a>
+                </li>
             </ul>
 
             <!-- Bottom Navigation -->
@@ -398,50 +406,52 @@ table{overflow:visible!important}
             </div>
             
             <!-- Submission Page -->
-            <div id="submission-page" class="page-content hidden flex-col flex-1-dynamic">
-                <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
-                
-                <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
-                    <!-- Tabs -->
-                    <!-- 
-                        Workflow:
-                        1. Pending: Records submitted by students (not yet reviewed by anyone)
-                        2. For Approval: Records with "Verified" status (admin verified from their archived section) - awaiting super admin's final decision
-                        3. Archived: Records with super admin's final decision (Approved or Rejected)
+            <div id="submission-page" class="page-content hidden flex flex-col h-full">
+                <div class="flex-shrink-0">
+                    <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
+                        <!-- Tabs -->
+                        <!-- 
+                            Workflow:
+                            1. Pending: Records submitted by students (not yet reviewed by anyone)
+                            2. For Approval: Records with "Verified" status (admin verified from their archived section) - awaiting super admin's final decision
+                            3. Archived: Records with super admin's final decision (Approved or Rejected)
+                            
+                            Status mapping: 
+                            - DB Status "Pending" → Shows in "Pending" tab
+                            - DB Status "Verified" → Shows in "For Approval" tab (these are admin's archived verified records)
+                            - DB Status "Approved"/"Rejected" → Shows in "Archived" tab (super admin's final decisions)
+                        -->
+                        <div class="flex space-x-2 custom-tab-wrapper">
+                            <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('pending',this)">Pending</a>
+                            <a role="tab" class="custom-tab" onclick="filterSubmissions('for-approval',this)">For Approval</a>
+                            <a role="tab" class="custom-tab" onclick="filterSubmissions('archived',this)">Archived</a>
+                        </div>
                         
-                        Status mapping: 
-                        - DB Status "Pending" → Shows in "Pending" tab
-                        - DB Status "Verified" → Shows in "For Approval" tab (these are admin's archived verified records)
-                        - DB Status "Approved"/"Rejected" → Shows in "Archived" tab (super admin's final decisions)
-                    -->
-                    <div class="flex space-x-2 custom-tab-wrapper">
-                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('for-approval',this)">For Approval</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('archived',this)">Archived</a>
+                        <!-- Search -->
+                        <label class="input input-bordered flex items-center gap-2 rounded-lg bg-white h-10 w-full md:w-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70">
+                                <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd"/>
+                            </svg>
+                            <input type="text" class="grow bg-transparent" placeholder="Search" id="search-input">
+                        </label>
+                        
+                        <!-- Refresh Button -->
+                        <button id="refresh-submissions-btn" onclick="refreshSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
+                            <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                            <span class="hidden md:inline">Refresh</span>
+                        </button>
                     </div>
-                    
-                    <!-- Search -->
-                    <label class="input input-bordered flex items-center gap-2 rounded-lg bg-white h-10 w-full md:w-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70">
-                            <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd"/>
-                        </svg>
-                        <input type="text" class="grow bg-transparent" placeholder="Search" id="search-input">
-                    </label>
-                    
-                    <!-- Refresh Button -->
-                    <button onclick="loadSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
-                        <span class="hidden md:inline">Refresh</span>
-                    </button>
                 </div>
 
                 <!-- Submission Table -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
-                    <div class="overflow-x-auto" style="overflow: visible;">
-                        <table class="table table-fixed w-full" style="overflow: visible;">
-                            <thead class="bg-gray-50 text-gray-600" style="overflow: visible;">
+                <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+                    <div class="overflow-x-auto overflow-y-auto flex-1">
+                        <table class="table table-fixed w-full">
+                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10">
                                 <tr id="table-header-row">
                                     <th class="w-[10%] text-center">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
@@ -449,9 +459,24 @@ table{overflow:visible!important}
                                             <span id="studentid-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">Student Name</th>
-                                    <th class="w-[20%] text-center">Event Name</th>
-                                    <th class="w-[15%] text-center">Organization</th>
+                                    <th class="w-[15%] text-center">
+                                        <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
+                                            Student Name
+                                            <span id="studentname-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[20%] text-center">
+                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                                            Event Name
+                                            <span id="eventname-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="w-[15%] text-center">
+                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                                            Organization
+                                            <span id="organization-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
                                     <th class="w-[12%] text-center">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                                             Hours Rendered
@@ -473,6 +498,61 @@ table{overflow:visible!important}
                                     <td colspan="7" class="text-center py-8">
                                         <span class="loading loading-spinner loading-lg text-primary-purple"></span>
                                         <p class="mt-2 text-text-muted">Loading submissions...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Information Page -->
+            <div id="students-page" class="page-content hidden flex-col flex-1-dynamic">
+                <h1 class="text-4xl font-bold text-primary-purple px-4">Students Information</h1>
+                
+                <!-- Search and Actions Bar -->
+                <div class="flex items-center justify-between px-4 py-3 gap-4">
+                    <!-- Search Input -->
+                    <div class="relative flex-1 max-w-md">
+                        <input 
+                            type="text" 
+                            id="students-search" 
+                            placeholder="Search by name, student ID, or email..." 
+                            class="input input-bordered w-full rounded-lg pr-10"
+                        />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Refresh Button -->
+                    <button id="refresh-students-btn" onclick="refreshStudents()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh students list">
+                        <svg id="refresh-students-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+
+                <!-- Students Table -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
+                    <div class="overflow-x-auto">
+                        <table class="table table-fixed w-full">
+                            <thead class="bg-gray-50 text-gray-600">
+                                <tr>
+                                    <th class="w-[12%] text-center">Student ID</th>
+                                    <th class="w-[20%] text-center">Full Name</th>
+                                    <th class="w-[25%] text-center">Email</th>
+                                    <th class="w-[13%] text-center">Email Verified</th>
+                                    <th class="w-[12%] text-center">Status</th>
+                                    <th class="w-[13%] text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                <tr id="students-loading-row">
+                                    <td colspan="6" class="text-center py-8">
+                                        <span class="loading loading-spinner loading-lg text-primary-purple"></span>
+                                        <p class="mt-2 text-text-muted">Loading students...</p>
                                     </td>
                                 </tr>
                             </tbody>
@@ -839,6 +919,78 @@ table{overflow:visible!important}
         </div>
     </dialog>
 
+    <!-- Student Edit Modal -->
+    <dialog id="student_edit_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl p-6 relative">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <h3 class="font-bold text-2xl text-primary-purple mb-6">Student Profile</h3>
+            
+            <form id="student-edit-form" class="space-y-4">
+                <input type="hidden" id="edit-student-user-id" />
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Full Name</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="edit-student-name" 
+                            class="input input-bordered w-full" 
+                            required 
+                        />
+                    </div>
+                    
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Student ID</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="edit-student-id" 
+                            class="input input-bordered w-full" 
+                            required 
+                        />
+                    </div>
+                </div>
+                
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Email Address</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="edit-student-email" 
+                        class="input input-bordered w-full" 
+                        required 
+                    />
+                </div>
+                
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Account Status</span>
+                    </label>
+                    <select id="edit-student-status" class="select select-bordered w-full">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="modal-action">
+                    <form method="dialog" class="inline">
+                        <button type="button" class="btn" onclick="document.getElementById('student_edit_modal').close()">Cancel</button>
+                    </form>
+                    <button type="submit" class="btn bg-success-green hover:bg-success-green-hover text-white">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
     <!-- Submission Details Modal -->
     <dialog id="submission_details_modal" class="modal">
         <div class="modal-box w-11/12 max-w-2xl p-6 relative">
@@ -887,7 +1039,10 @@ table{overflow:visible!important}
             
             <div id="details-status-section" class="mt-6">
                 <label class="details-label">Status</label>
-                <div id="details-status-badge" class="status-badge"></div>
+                <div class="flex items-center gap-2">
+                    <div id="details-status-badge" class="status-badge"></div>
+                    <span id="details-action-date" class="text-sm text-gray-500"></span>
+                </div>
             </div>
             
             <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
@@ -977,7 +1132,11 @@ table{overflow:visible!important}
         var hoursSortDirection = 'desc'; // 'asc' or 'desc'
         var studentIdSortDirection = 'desc'; // 'asc' or 'desc'
         var dateSortDirection = 'desc'; // 'asc' or 'desc'
-        var currentSortBy = null; // 'hours', 'studentid', or 'date'
+        var studentNameSortDirection = 'desc'; // 'asc' or 'desc'
+        var eventNameSortDirection = 'desc'; // 'asc' or 'desc'
+        var organizationSortDirection = 'desc'; // 'asc' or 'desc'
+        var actionDateSortDirection = 'desc'; // 'asc' or 'desc'
+        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'actiondate'
         var currentStatusFilter = 'All'; // Track current status filter for archived tab
 
         // Toast notification function
@@ -1104,23 +1263,18 @@ table{overflow:visible!important}
 
         // Attach sort event listeners to table headers
         function attachSortEventListeners() {
-            var hoursSortToggle = document.getElementById('hours-sort-toggle');
-            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
-            if (hoursSortToggle && hoursSortIndicator) {
-                hoursSortToggle.onclick = function(e) {
-                    e.preventDefault();
-                    currentSortBy = 'hours';
-                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    var siIndicator = document.getElementById('studentid-sort-indicator');
-                    var dIndicator = document.getElementById('date-sort-indicator');
-                    if (siIndicator) siIndicator.textContent = '▼';
-                    if (dIndicator) dIndicator.textContent = '▼';
-                    renderSubmissions(allSubmissions, 'hours');
-                };
+            // Helper function to reset all indicators
+            function resetAllIndicators(exceptId) {
+                var indicators = ['studentid', 'studentname', 'eventname', 'organization', 'hours', 'date', 'actiondate'];
+                indicators.forEach(function(id) {
+                    if (id !== exceptId) {
+                        var indicator = document.getElementById(id + '-sort-indicator');
+                        if (indicator) indicator.textContent = '▼';
+                    }
+                });
             }
             
+            // Student ID sort
             var studentIdSortToggle = document.getElementById('studentid-sort-toggle');
             var studentIdSortIndicator = document.getElementById('studentid-sort-indicator');
             if (studentIdSortToggle && studentIdSortIndicator) {
@@ -1129,15 +1283,68 @@ table{overflow:visible!important}
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    var hIndicator = document.getElementById('hours-sort-indicator');
-                    var dIndicator = document.getElementById('date-sort-indicator');
-                    if (hIndicator) hIndicator.textContent = '▼';
-                    if (dIndicator) dIndicator.textContent = '▼';
+                    resetAllIndicators('studentid');
                     renderSubmissions(allSubmissions, 'studentid');
                 };
             }
             
+            // Student Name sort
+            var studentNameSortToggle = document.getElementById('studentname-sort-toggle');
+            var studentNameSortIndicator = document.getElementById('studentname-sort-indicator');
+            if (studentNameSortToggle && studentNameSortIndicator) {
+                studentNameSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentname';
+                    studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    resetAllIndicators('studentname');
+                    renderSubmissions(allSubmissions, 'studentname');
+                };
+            }
+            
+            // Event Name sort
+            var eventNameSortToggle = document.getElementById('eventname-sort-toggle');
+            var eventNameSortIndicator = document.getElementById('eventname-sort-indicator');
+            if (eventNameSortToggle && eventNameSortIndicator) {
+                eventNameSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'eventname';
+                    eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    resetAllIndicators('eventname');
+                    renderSubmissions(allSubmissions, 'eventname');
+                };
+            }
+            
+            // Organization sort
+            var organizationSortToggle = document.getElementById('organization-sort-toggle');
+            var organizationSortIndicator = document.getElementById('organization-sort-indicator');
+            if (organizationSortToggle && organizationSortIndicator) {
+                organizationSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'organization';
+                    organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    resetAllIndicators('organization');
+                    renderSubmissions(allSubmissions, 'organization');
+                };
+            }
+            
+            // Hours sort
+            var hoursSortToggle = document.getElementById('hours-sort-toggle');
+            var hoursSortIndicator = document.getElementById('hours-sort-indicator');
+            if (hoursSortToggle && hoursSortIndicator) {
+                hoursSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'hours';
+                    hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    resetAllIndicators('hours');
+                    renderSubmissions(allSubmissions, 'hours');
+                };
+            }
+            
+            // Date sort
             var dateSortToggle = document.getElementById('date-sort-toggle');
             var dateSortIndicator = document.getElementById('date-sort-indicator');
             if (dateSortToggle && dateSortIndicator) {
@@ -1146,12 +1353,22 @@ table{overflow:visible!important}
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    var hIndicator = document.getElementById('hours-sort-indicator');
-                    var siIndicator = document.getElementById('studentid-sort-indicator');
-                    if (hIndicator) hIndicator.textContent = '▼';
-                    if (siIndicator) siIndicator.textContent = '▼';
+                    resetAllIndicators('date');
                     renderSubmissions(allSubmissions, 'date');
+                };
+            }
+            
+            // Action Date sort
+            var actionDateSortToggle = document.getElementById('actiondate-sort-toggle');
+            var actionDateSortIndicator = document.getElementById('actiondate-sort-indicator');
+            if (actionDateSortToggle && actionDateSortIndicator) {
+                actionDateSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'actiondate';
+                    actionDateSortDirection = actionDateSortDirection === 'asc' ? 'desc' : 'asc';
+                    actionDateSortIndicator.textContent = actionDateSortDirection === 'asc' ? '▲' : '▼';
+                    resetAllIndicators('actiondate');
+                    renderSubmissions(allSubmissions, 'actiondate');
                 };
             }
         }
@@ -1166,28 +1383,42 @@ table{overflow:visible!important}
             if (normalizedTab === 'archived') {
                 // Archived tab: show Status with filter and Rejection Reason columns
                 headerRow.innerHTML = `
-                    <th class="w-[10%] text-center">
+                    <th class="w-[9%] text-center">
                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                             Student ID
                             <span id="studentid-sort-indicator">▼</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center">Student Name</th>
-                    <th class="w-[15%] text-center">Event Name</th>
-                    <th class="w-[15%] text-center">Organization</th>
-                    <th class="w-[10%] text-center">
+                    <th class="w-[12%] text-center">
+                        <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
+                            Student Name
+                            <span id="studentname-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[14%] text-center">
+                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                            Event Name
+                            <span id="eventname-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[12%] text-center">
+                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                            Organization
+                            <span id="organization-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[9%] text-center">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
-                            Hours Rendered
+                            Hours
                             <span id="hours-sort-indicator">▼</span>
                         </button>
                     </th>
-                    <th class="w-[10%] text-center">
+                    <th class="w-[9%] text-center">
                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                             Date
                             <span id="date-sort-indicator">▼</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center">Rejection Reason</th>
                     <th class="w-[10%] text-center">
                         <div class="flex items-center justify-center gap-1">
                             <span>Status</span>
@@ -1199,6 +1430,7 @@ table{overflow:visible!important}
                                 </div>
                                 <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
                                     <li><a onclick="filterTableByStatus('All', event)">All</a></li>
+                                    <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
                                     <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
                                     <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
                                 </ul>
@@ -1298,8 +1530,11 @@ table{overflow:visible!important}
                 
                 var dataStatus = (r.dataset.status || '').toLowerCase().trim();
                 
-                // Check if status matches
-                var statusMatch = (dataStatus === filterStatus);
+                // Handle comma-separated status values (e.g., "for approval,archived" for Verified records)
+                var statuses = dataStatus.split(',').map(function(status) { return status.trim(); });
+                
+                // Check if status matches (record can belong to multiple tabs)
+                var statusMatch = statuses.includes(filterStatus);
                 
                 // For search term matching
                 var ms = true;
@@ -1365,15 +1600,34 @@ table{overflow:visible!important}
             fetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 },
                 credentials: 'same-origin'
             })
-            .then(function(response) {
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
-                    throw new Error('Failed to load dashboard stats');
+                    throw response;
+                }
+                // Check if response is JSON (not redirected to login page)
+                if (!contentType.includes('application/json')) {
+                    console.warn('loadDashboardStats: non-JSON response', { 
+                        status: response.status, 
+                        url: response.url, 
+                        contentType: contentType 
+                    });
+                    // Likely session expired, redirect to login
+                    try { 
+                        window.location.replace(BASE_PATH + '/super-admin/login'); 
+                    } catch(_) { 
+                        window.location.href = BASE_PATH + '/super-admin/login'; 
+                    }
+                    return Promise.reject(new Error('Non-JSON response'));
                 }
                 return response.json();
             })
@@ -1392,56 +1646,121 @@ table{overflow:visible!important}
             });
         }
 
+        // Refresh submissions with visual feedback
+        function refreshSubmissions() {
+            var refreshBtn = document.getElementById('refresh-submissions-btn');
+            var refreshIcon = document.getElementById('refresh-icon');
+            
+            if (refreshBtn && refreshIcon) {
+                refreshBtn.disabled = true;
+                refreshIcon.style.animation = 'spin 1s linear infinite';
+                
+                // Add CSS animation if not exists
+                if (!document.getElementById('refresh-spin-style')) {
+                    var style = document.createElement('style');
+                    style.id = 'refresh-spin-style';
+                    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+                    document.head.appendChild(style);
+                }
+            }
+            
+            // Call loadSubmissions with loading indicator
+            loadSubmissions(true);
+            
+            // Re-enable button after 2 seconds
+            setTimeout(function() {
+                if (refreshBtn && refreshIcon) {
+                    refreshBtn.disabled = false;
+                    refreshIcon.style.animation = '';
+                }
+            }, 2000);
+        }
+
         // Load submissions from database
         var lastSubmissionsData = null; // Store last data to detect changes
+        var isLoadingSubmissions = false; // Prevent concurrent requests
         
         function loadSubmissions(showLoading = true) {
+            // Prevent concurrent requests
+            if (isLoadingSubmissions) {
+                console.log('Already loading submissions, skipping...');
+                return;
+            }
+            
             var tbody = document.getElementById('submission-table-body');
             
-            // Only show loading state on initial load
-            if (showLoading) {
+            // Only show loading state on initial load or explicit refresh
+            if (showLoading && !lastSubmissionsData) {
                 tbody.innerHTML = '<tr id="loading-row"><td colspan="7" class="text-center py-8">' +
                     '<span class="loading loading-spinner loading-lg text-primary-purple"></span>' +
                     '<p class="mt-2 text-text-muted">Loading submissions...</p></td></tr>';
             }
             
+            isLoadingSubmissions = true;
+            
+            // Add timestamp to URL to prevent caching
+            var timestamp = new Date().getTime();
+            
             // Fetch submissions from API
-            fetch(`${BASE_PATH}/super-admin/api/submissions`, {
+            fetch(`${BASE_PATH}/super-admin/api/submissions?_=${timestamp}`, {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
                 },
                 credentials: 'same-origin'
             })
-            .then(function(response) {
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
-                    throw new Error('Failed to load submissions');
+                    throw response;
+                }
+                // Check if response is JSON (not redirected to login page)
+                if (!contentType.includes('application/json')) {
+                    console.warn('loadSubmissions: non-JSON response', { 
+                        status: response.status, 
+                        url: response.url, 
+                        contentType: contentType 
+                    });
+                    // Likely session expired, redirect to login
+                    try { 
+                        window.location.replace(BASE_PATH + '/super-admin/login'); 
+                    } catch(_) { 
+                        window.location.href = BASE_PATH + '/super-admin/login'; 
+                    }
+                    return Promise.reject(new Error('Non-JSON response'));
                 }
                 return response.json();
             })
             .then(function(result) {
+                isLoadingSubmissions = false;
+                
                 if (result.success && result.data) {
-                    // Check if data actually changed
-                    var dataChanged = JSON.stringify(result.data) !== JSON.stringify(lastSubmissionsData);
-                    
-                    if (dataChanged || showLoading) {
-                        lastSubmissionsData = result.data;
-                        allSubmissions = result.data;
-                        renderSubmissions(result.data);
-                        updateDashboardStats(result.data);
-                    }
+                    // Always update the data when we get a successful response
+                    lastSubmissionsData = result.data;
+                    allSubmissions = result.data;
+                    renderSubmissions(result.data);
+                    updateDashboardStats(result.data);
                 } else {
                     throw new Error('Invalid response format');
                 }
             })
             .catch(function(error) {
+                isLoadingSubmissions = false;
                 console.error('Error loading submissions:', error);
-                if (showLoading) {
+                
+                // Only show error if we have no cached data AND it's the first load
+                if (!lastSubmissionsData && showLoading) {
                     tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">' +
                         'Failed to load submissions. Please refresh the page.</td></tr>';
                 }
+                // If we have cached data, silently keep using it - no toast notification
+                // The data will automatically update on next successful refresh
             });
         }
         
@@ -1475,25 +1794,63 @@ table{overflow:visible!important}
                     var dateB = new Date(b.date || 0);
                     return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                 });
+            } else if (sortBy === 'studentname') {
+                sortedSubmissions.sort(function(a, b) {
+                    var nameA = (a.student_name || '').toString().toLowerCase();
+                    var nameB = (b.student_name || '').toString().toLowerCase();
+                    return studentNameSortDirection === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+                });
+            } else if (sortBy === 'eventname') {
+                sortedSubmissions.sort(function(a, b) {
+                    var eventA = (a.event_name || '').toString().toLowerCase();
+                    var eventB = (b.event_name || '').toString().toLowerCase();
+                    return eventNameSortDirection === 'asc' ? eventA.localeCompare(eventB) : eventB.localeCompare(eventA);
+                });
+            } else if (sortBy === 'organization') {
+                sortedSubmissions.sort(function(a, b) {
+                    var orgA = (a.organization || '').toString().toLowerCase();
+                    var orgB = (b.organization || '').toString().toLowerCase();
+                    return organizationSortDirection === 'asc' ? orgA.localeCompare(orgB) : orgB.localeCompare(orgA);
+                });
+            } else if (sortBy === 'actiondate') {
+                sortedSubmissions.sort(function(a, b) {
+                    // Parse action_date in format mm-dd-yyyy
+                    var parseActionDate = function(dateStr) {
+                        if (!dateStr || dateStr === '—') return new Date(0);
+                        var parts = dateStr.split('-');
+                        if (parts.length === 3) {
+                            // month-day-year format
+                            return new Date(parts[2], parts[0] - 1, parts[1]);
+                        }
+                        return new Date(0);
+                    };
+                    var dateA = parseActionDate(a.action_date);
+                    var dateB = parseActionDate(b.action_date);
+                    return actionDateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                });
             }
             
             var html = '';
             sortedSubmissions.forEach(function(record) {
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
-                var isVerified = status === 'Verified'; // Admin verified - shown in "For Approval" tab
+                var isVerified = status === 'Verified'; // Admin verified - shown in BOTH "For Approval" tab AND "Archived" tab
                 var isApproved = status === 'Approved';
                 var isRejected = status === 'Rejected';
-                var isArchived = isApproved || isRejected;
+                var isArchived = isApproved || isRejected || isVerified; // Include Verified in Archived
                 
-                // Map status to tab: Pending → Pending tab, Verified → For Approval tab, Approved/Rejected → Archived tab
-                var dataStatus = isPending ? 'Pending' : (isVerified ? 'For Approval' : 'Archived');
-                var dataArchiveStatus = (isApproved || isRejected) ? status : '';
+                // Map status to tab: Pending → Pending tab, Verified → BOTH For Approval AND Archived, Approved/Rejected → Archived tab only
+                // Use special handling for Verified: it appears in both tabs
+                var dataStatus = isPending ? 'Pending' : (isVerified ? 'For Approval,Archived' : 'Archived');
+                var dataArchiveStatus = (isApproved || isRejected || isVerified) ? status : '';
                 
                 var dateStr = record.date ? formatDate(record.date) : '—';
                 
                 // Escape rejection reason for HTML attribute
                 var rejectionReason = (record.rejection_reason || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                
+                // Get action date
+                var actionDateStr = record.action_date || '';
                 
                 html += '<tr data-status="' + dataStatus + '" ' +
                         (dataArchiveStatus ? 'data-archive-status="' + dataArchiveStatus + '" ' : '') +
@@ -1501,6 +1858,7 @@ table{overflow:visible!important}
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
                         'data-rejection-reason="' + rejectionReason + '" ' +
+                        'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
@@ -1509,22 +1867,21 @@ table{overflow:visible!important}
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
                         '<td class="text-center">' + dateStr + '</td>';
                 
-                // For archived records, show rejection reason and status columns
+                // For archived records, show status with action date below it
                 if (isArchived) {
-                    // Rejection Reason column (show only first line, truncated)
-                    var shortReason = '-';
-                    if (isRejected && record.rejection_reason) {
-                        var firstLine = record.rejection_reason.split('\n')[0];
-                        shortReason = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
-                    }
-                    html += '<td class="text-center" title="' + (record.rejection_reason || '') + '">' + shortReason + '</td>';
-                    
-                    // Status column
+                    // Status column with action date below
                     html += '<td class="text-center">';
                     if (isApproved) {
                         html += '<span class="scms-badge scms-badge--approved">Approved</span>';
                     } else if (isRejected) {
                         html += '<span class="scms-badge scms-badge--rejected">Rejected</span>';
+                    } else if (isVerified) {
+                        html += '<span class="scms-badge scms-badge--verified">Verified</span>';
+                    }
+                    
+                    // Show action date below the badge if it exists
+                    if (actionDateStr) {
+                        html += '<div class="text-xs text-gray-500 mt-1">' + actionDateStr + '</div>';
                     }
                     html += '</td>';
                 } else {
@@ -1691,7 +2048,7 @@ table{overflow:visible!important}
                     var statusBadge = '';
                     
                     if (rec.status === 'Verified') {
-                        statusBadge = '<span class="badge badge-info text-white">Verified</span>';
+                        statusBadge = '<span class="scms-badge scms-badge--verified">Verified</span>';
                     } else if (rec.status === 'Approved') {
                         statusBadge = '<span class="badge badge-success text-white">Approved</span>';
                     } else if (rec.status === 'Rejected') {
@@ -1753,6 +2110,7 @@ table{overflow:visible!important}
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
             var rejectionReason = r.dataset.rejectionReason || '';
+            var actionDate = r.dataset.actionDate || '';
             
             document.getElementById('details-event-name').value = en;
             document.getElementById('details-supervisor-name').value = org;
@@ -1764,34 +2122,52 @@ table{overflow:visible!important}
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
             var sb = document.getElementById('details-status-badge');
+            var ad = document.getElementById('details-action-date');
             var reasonContainer = document.getElementById('details-reason-container');
             var reasonText = document.getElementById('details-reason-text');
             
             sb.innerHTML = '';
             ab.innerHTML = '';
+            ad.textContent = ''; // Clear action date
             reasonContainer.classList.add('hidden'); // Hide reason by default
             
-            if (s === 'Pending') {
+            if (s === 'Pending' || s === 'pending') {
                 ss.classList.add('hidden');
                 ab.classList.remove('hidden');
                 ab.innerHTML = '<button class="btn btn-action btn-action-verify flex-1" onclick="handleDetailsVerify()">Verify</button>' +
                                '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
-            } else if (s === 'For Approval') {
+            } else if (s.toLowerCase().includes('for approval')) {
                 // Records verified by admin - awaiting super admin approval/rejection
-                ss.classList.add('hidden');
+                ss.classList.remove('hidden');
                 ab.classList.remove('hidden');
+                
+                // Show Verified status with action date
+                sb.textContent = 'Verified';
+                sb.className = 'scms-badge scms-badge--verified';
+                if (actionDate) {
+                    ad.textContent = actionDate;
+                }
+                
                 ab.innerHTML = '<button class="btn btn-action btn-action-approve flex-1" onclick="handleDetailsApprove()">Approve</button>' +
                                '<button class="btn btn-action btn-action-reject flex-1" onclick="handleDetailsReject()">Reject</button>';
             } else {
-                // Archived records - show final status (Approved or Rejected by super admin)
+                // Archived records - show final status (Verified, Approved or Rejected by super admin)
                 ss.classList.remove('hidden');
                 ab.classList.add('hidden');
                 var as = r.dataset.archiveStatus;
-                sb.textContent = as;
+                
                 if (as === 'Approved') {
-                    sb.className = 'status-badge approved';
+                    sb.textContent = 'Approved';
+                    sb.className = 'scms-badge scms-badge--approved';
+                    if (actionDate) {
+                        ad.textContent = actionDate;
+                    }
                 } else if (as === 'Rejected') {
-                    sb.className = 'status-badge rejected';
+                    sb.textContent = 'Rejected';
+                    sb.className = 'scms-badge scms-badge--rejected';
+                    if (actionDate) {
+                        ad.textContent = actionDate;
+                    }
                     
                     // Show rejection reason if it exists
                     if (rejectionReason) {
@@ -1805,6 +2181,12 @@ table{overflow:visible!important}
                         
                         reasonText.textContent = decodedReason;
                         reasonContainer.classList.remove('hidden');
+                    }
+                } else if (as === 'Verified') {
+                    sb.textContent = 'Verified';
+                    sb.className = 'scms-badge scms-badge--verified';
+                    if (actionDate) {
+                        ad.textContent = actionDate;
                     }
                 }
             }
@@ -2229,6 +2611,218 @@ table{overflow:visible!important}
         // Remove old sample data function
         // function generateSampleActivityData() - REMOVED
 
+        // ========== STUDENTS MANAGEMENT ==========
+        var allStudents = [];
+        var lastStudentsData = null;
+        var isLoadingStudents = false;
+        
+        function loadStudents(showLoading = true) {
+            if (isLoadingStudents) {
+                console.log('Already loading students, skipping...');
+                return;
+            }
+            
+            var tbody = document.getElementById('students-table-body');
+            if (showLoading && !lastStudentsData) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8"><span class="loading loading-spinner loading-lg text-primary-purple"></span><p class="mt-2 text-text-muted">Loading students...</p></td></tr>';
+            }
+            
+            isLoadingStudents = true;
+            var timestamp = new Date().getTime();
+            
+            fetch(`${BASE_PATH}/super-admin/api/students?_=${timestamp}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                credentials: 'same-origin'
+            })
+            .then(async (r) => {
+                const ct = r.headers.get('content-type') || '';
+                if (!r.ok) throw r;
+                if (!ct.includes('application/json')) {
+                    console.warn('loadStudents: non-JSON response');
+                    window.location.href = `${BASE_PATH}/super-admin/login`;
+                    return Promise.reject(new Error('Non-JSON response'));
+                }
+                return r.json();
+            })
+            .then((data) => {
+                isLoadingStudents = false;
+                lastStudentsData = data.students;
+                allStudents = data.students;
+                renderStudents(allStudents);
+            })
+            .catch((err) => {
+                isLoadingStudents = false;
+                console.error('Failed to load students', err);
+                if (!lastStudentsData && showLoading) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-red-500">Failed to load students. Please refresh.</td></tr>';
+                }
+            });
+        }
+        
+        function renderStudents(students) {
+            var tbody = document.getElementById('students-table-body');
+            
+            if (!students || students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-text-muted">No students found.</td></tr>';
+                return;
+            }
+            
+            var html = '';
+            students.forEach(function(student) {
+                var status = student.status || 'active';
+                var statusBadge = status === 'active' 
+                    ? '<span class="badge badge-success text-white">Active</span>' 
+                    : '<span class="badge badge-error text-white">Inactive</span>';
+                
+                var emailVerified = student.email_verified_at;
+                var verifiedBadge = emailVerified 
+                    ? '<span class="badge badge-success text-white">✓ Verified</span>' 
+                    : '<span class="badge badge-warning text-white">✗ Not Verified</span>';
+                
+                html += '<tr class="hover cursor-pointer" onclick="openStudentEditModal(' + student.id + ')">' +
+                        '<td class="text-center">' + (student.student_id || '—') + '</td>' +
+                        '<td class="text-center">' + (student.name || '—') + '</td>' +
+                        '<td class="text-center">' + (student.email || '—') + '</td>' +
+                        '<td class="text-center">' + verifiedBadge + '</td>' +
+                        '<td class="text-center">' + statusBadge + '</td>' +
+                        '<td class="text-center">' +
+                        '<button class="btn btn-sm bg-primary-purple hover:bg-primary-purple-hover text-white" onclick="event.stopPropagation(); openStudentEditModal(' + student.id + ')">Edit</button>' +
+                        '</td></tr>';
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function refreshStudents() {
+            var refreshBtn = document.getElementById('refresh-students-btn');
+            var refreshIcon = document.getElementById('refresh-students-icon');
+            
+            if (refreshIcon) {
+                refreshIcon.classList.add('animate-spin');
+            }
+            
+            loadStudents(false);
+            
+            setTimeout(function() {
+                if (refreshIcon) {
+                    refreshIcon.classList.remove('animate-spin');
+                }
+            }, 1000);
+        }
+        
+        function openStudentEditModal(userId) {
+            var student = allStudents.find(s => s.id === userId);
+            if (!student) {
+                showToast('Student not found', 'error');
+                return;
+            }
+            
+            document.getElementById('edit-student-user-id').value = student.id;
+            document.getElementById('edit-student-name').value = student.name || '';
+            document.getElementById('edit-student-id').value = student.student_id || '';
+            document.getElementById('edit-student-email').value = student.email || '';
+            document.getElementById('edit-student-status').value = student.status || 'active';
+            
+            document.getElementById('student_edit_modal').showModal();
+        }
+        
+        // Handle student search
+        var studentsSearchInput = document.getElementById('students-search');
+        if (studentsSearchInput) {
+            studentsSearchInput.addEventListener('input', function() {
+                var query = this.value.toLowerCase().trim();
+                
+                if (!query) {
+                    renderStudents(allStudents);
+                    return;
+                }
+                
+                var filtered = allStudents.filter(function(student) {
+                    return (student.name || '').toLowerCase().includes(query) ||
+                           (student.student_id || '').toLowerCase().includes(query) ||
+                           (student.email || '').toLowerCase().includes(query);
+                });
+                
+                renderStudents(filtered);
+            });
+        }
+        
+        // Handle student edit form submission
+        var studentEditForm = document.getElementById('student-edit-form');
+        if (studentEditForm) {
+            studentEditForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                var userId = document.getElementById('edit-student-user-id').value;
+                var name = document.getElementById('edit-student-name').value.trim();
+                var studentId = document.getElementById('edit-student-id').value.trim();
+                var email = document.getElementById('edit-student-email').value.trim();
+                var status = document.getElementById('edit-student-status').value;
+                
+                // Validation
+                if (!name || name.length < 3) {
+                    showToast('Name must be at least 3 characters', 'error');
+                    return;
+                }
+                
+                if (!studentId || studentId.length < 3) {
+                    showToast('Student ID is required', 'error');
+                    return;
+                }
+                
+                if (!email || !email.includes('@')) {
+                    showToast('Please enter a valid email', 'error');
+                    return;
+                }
+                
+                var requestBody = {
+                    name: name,
+                    student_id: studentId,
+                    email: email,
+                    status: status
+                };
+                
+                try {
+                    const response = await fetch(`${BASE_PATH}/super-admin/api/students/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to update student');
+                    }
+                    
+                    showToast(data.message || 'Student updated successfully', 'success');
+                    document.getElementById('student_edit_modal').close();
+                    loadStudents(false);
+                } catch (error) {
+                    console.error('Error updating student:', error);
+                    showToast(error.message || 'Failed to update student', 'error');
+                }
+            });
+        }
+        
+        window.loadStudents = loadStudents;
+        window.refreshStudents = refreshStudents;
+        window.openStudentEditModal = openStudentEditModal;
+        // ========== END STUDENTS MANAGEMENT ==========
+
         // DOM ready
         document.addEventListener('DOMContentLoaded', function() {
             // Restore saved page for super admin, default to dashboard
@@ -2262,6 +2856,16 @@ table{overflow:visible!important}
                 }
             }, 500);
             
+            // Helper function to reset all indicators
+            function resetAllSortIndicators() {
+                document.getElementById('hours-sort-indicator').textContent = '▼';
+                document.getElementById('studentid-sort-indicator').textContent = '▼';
+                document.getElementById('date-sort-indicator').textContent = '▼';
+                document.getElementById('studentname-sort-indicator').textContent = '▼';
+                document.getElementById('eventname-sort-indicator').textContent = '▼';
+                document.getElementById('organization-sort-indicator').textContent = '▼';
+            }
+            
             // Hours sort toggle event listener
             var hoursSortToggle = document.getElementById('hours-sort-toggle');
             var hoursSortIndicator = document.getElementById('hours-sort-indicator');
@@ -2270,10 +2874,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -2286,10 +2888,8 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('date-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -2302,11 +2902,51 @@ table{overflow:visible!important}
                     e.preventDefault();
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
                     dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
-                    // Reset other indicators
-                    document.getElementById('hours-sort-indicator').textContent = '▼';
-                    document.getElementById('studentid-sort-indicator').textContent = '▼';
                     renderSubmissions(allSubmissions, 'date');
+                });
+            }
+            
+            // Student Name sort toggle event listener
+            var studentNameSortToggle = document.getElementById('studentname-sort-toggle');
+            var studentNameSortIndicator = document.getElementById('studentname-sort-indicator');
+            if (studentNameSortToggle && studentNameSortIndicator) {
+                studentNameSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'studentname';
+                    studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'studentname');
+                });
+            }
+            
+            // Event Name sort toggle event listener
+            var eventNameSortToggle = document.getElementById('eventname-sort-toggle');
+            var eventNameSortIndicator = document.getElementById('eventname-sort-indicator');
+            if (eventNameSortToggle && eventNameSortIndicator) {
+                eventNameSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'eventname';
+                    eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'eventname');
+                });
+            }
+            
+            // Organization sort toggle event listener
+            var organizationSortToggle = document.getElementById('organization-sort-toggle');
+            var organizationSortIndicator = document.getElementById('organization-sort-indicator');
+            if (organizationSortToggle && organizationSortIndicator) {
+                organizationSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'organization';
+                    organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'organization');
                 });
             }
             

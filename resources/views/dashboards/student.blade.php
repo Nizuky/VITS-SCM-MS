@@ -756,8 +756,8 @@
                         </label>
                         
                         <!-- Refresh Button -->
-                        <button onclick="loadRecords()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh records">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <button id="refresh-records-btn" onclick="refreshRecords()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh records">
+                            <svg id="refresh-records-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
                             <span class="hidden md:inline">Refresh</span>
@@ -862,9 +862,9 @@
                     <div id="profile-edit" class="space-y-6 hidden">
                         <form id="profile-info-form" class="grid grid-cols-2 gap-x-12 gap-y-4">
                             <label class="form-control w-full">
-                                <div class="label"><span class="label-text">Full Name</span></div>
-                                <input type="text" value="{{ auth()->user()->name }}" class="input input-bordered w-full rounded-lg bg-gray-100" readonly />
-                                <div class="label"><span class="label-text-alt">SN, FN, MI</span></div>
+                                <div class="label"><span class="label-text font-semibold">Full Name</span></div>
+                                <input id="edit-full-name" type="text" value="{{ auth()->user()->name }}" class="input input-bordered w-full rounded-lg" required />
+                                <div class="label"><span class="label-text-alt text-gray-500">Surname, First Name Middle Initial</span></div>
                             </label>
                             <label class="form-control w-full">
                                 <div class="label"><span class="label-text">Student Number</span></div>
@@ -1528,18 +1528,32 @@
                 try { return new Date(dateVal).toLocaleDateString('en-GB').replace(/\//g, '-'); } catch { return s; }
             }
             var lastRecordsData = null; // Store last data to detect changes
+            var isLoadingRecords = false; // Prevent concurrent requests
             
             function loadRecords(showLoading = true) {
-                if (showLoading) {
+                // Prevent concurrent requests
+                if (isLoadingRecords) {
+                    console.log('Already loading records, skipping...');
+                    return;
+                }
+                
+                // Only clear table on initial load
+                if (showLoading && !lastRecordsData) {
                     tableBody.innerHTML = '';
                 }
                 
-                fetch(`${BASE_PATH}/api/social-contract/records`, {
+                isLoadingRecords = true;
+                
+                // Add timestamp to URL to prevent caching
+                var timestamp = new Date().getTime();
+                
+                fetch(`${BASE_PATH}/api/social-contract/records?_=${timestamp}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Cache-Control': 'no-cache',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
                         'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     credentials: 'same-origin'
                 })
@@ -1555,21 +1569,59 @@
                         return r.json();
                     })
                     .then(({ records }) => {
-                        // Check if data actually changed
-                        var dataChanged = JSON.stringify(records) !== JSON.stringify(lastRecordsData);
-                        
-                        if (dataChanged || showLoading) {
-                            lastRecordsData = records;
-                            allRecords = records;
-                            renderTable();
-                            updateDashboardFromRecords(allRecords);
-                        }
+                        isLoadingRecords = false;
+                        // Always update when we get successful response
+                        lastRecordsData = records;
+                        allRecords = records;
+                        renderTable();
+                        updateDashboardFromRecords(allRecords);
                     })
-                    .catch((err) => { console.error('Failed to load records', err); });
+                    .catch((err) => { 
+                        isLoadingRecords = false;
+                        console.error('Failed to load records', err);
+                        
+                        // Only show error if we have no cached data AND it's the first load
+                        if (!lastRecordsData && showLoading) {
+                            showToast('Failed to load records. Please refresh the page.', 'error');
+                        }
+                        // If we have cached data, silently keep using it - no toast notification
+                        // The data will automatically update on next successful refresh
+                    });
             }
             
-            // Make loadRecords globally accessible for onclick handlers
+            // Refresh records with visual feedback
+            function refreshRecords() {
+                var refreshBtn = document.getElementById('refresh-records-btn');
+                var refreshIcon = document.getElementById('refresh-records-icon');
+                
+                if (refreshBtn && refreshIcon) {
+                    refreshBtn.disabled = true;
+                    refreshIcon.style.animation = 'spin 1s linear infinite';
+                    
+                    // Add CSS animation if not exists
+                    if (!document.getElementById('refresh-spin-style')) {
+                        var style = document.createElement('style');
+                        style.id = 'refresh-spin-style';
+                        style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+                        document.head.appendChild(style);
+                    }
+                }
+                
+                // Call loadRecords with loading indicator
+                loadRecords(true);
+                
+                // Re-enable button after 2 seconds
+                setTimeout(function() {
+                    if (refreshBtn && refreshIcon) {
+                        refreshBtn.disabled = false;
+                        refreshIcon.style.animation = '';
+                    }
+                }, 2000);
+            }
+            
+            // Make functions globally accessible for onclick handlers
             window.loadRecords = loadRecords;
+            window.refreshRecords = refreshRecords;
             
             let currentExpandedRecordId = null;
             
@@ -2220,6 +2272,12 @@
                         } catch (e) { return ''; }
                     })();
 
+                    // Add action date if available
+                    let statusHtml = renderStatusBadge(rec.status);
+                    if (rec.action_date) {
+                        statusHtml += `<div class="text-xs text-gray-500 mt-1">${rec.action_date}</div>`;
+                    }
+                    
                     row.innerHTML = `
                         <td class="text-center"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
                         <td class="text-center">${formattedDate}</td>
@@ -2227,7 +2285,7 @@
                         <td class="text-center">${rec.venue}</td>
                         <td class="text-center">${rec.organization}</td>
                         <td class="text-center">${rec.hours_rendered} hours</td>
-                        <td class="text-center">${renderStatusBadge(rec.status)} ${rec.status === 'Rejected' ? deletionCountdownHtml : ''}</td>
+                        <td class="text-center">${statusHtml} ${rec.status === 'Rejected' ? deletionCountdownHtml : ''}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -2310,9 +2368,20 @@
                         const messages = Object.values(err.err.errors).flat().join('\n');
                         showToast('Validation error: ' + messages, 'error');
                     } else if (err && err.status === 401) {
-                        window.location.href = `${BASE_PATH}/login`;
+                        showToast('Session expired. Please log in again.', 'error');
+                        setTimeout(() => {
+                            window.location.href = `${BASE_PATH}/login`;
+                        }, 2000);
+                    } else if (err && err.status === 419) {
+                        // CSRF token mismatch
+                        showToast('Session expired. Please refresh and try again.', 'error');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else if (err && err.err && err.err.message) {
+                        showToast('Error: ' + err.err.message, 'error');
                     } else {
-                        showToast('Failed to save record. Please sign in again if your session expired.', 'error');
+                        showToast('Failed to save record. Please try again.', 'error');
                     }
                     confirmationModal.close();
                 });
@@ -2321,30 +2390,65 @@
             if (profileSaveBtn) {
                 profileSaveBtn.addEventListener('click', async () => {
                     try {
-                        // Gather and validate password fields
-                        const wantEdit = !document.getElementById('password-edit-fields').classList.contains('hidden');
-                        if (!wantEdit) {
-                            showToast('Nothing to change. Click "Reset Password?" first.', 'warning');
+                        // Check if user wants to update name
+                        const newName = (document.getElementById('edit-full-name')?.value || '').trim();
+                        const originalName = '{{ auth()->user()->name }}';
+                        const nameChanged = newName && newName !== originalName;
+                        
+                        // Check if user wants to change password
+                        const wantPasswordEdit = !document.getElementById('password-edit-fields').classList.contains('hidden');
+                        
+                        // If neither name nor password changed, show warning
+                        if (!nameChanged && !wantPasswordEdit) {
+                            showToast('No changes detected. Please modify your name or click "Reset Password?" to change password.', 'warning');
                             return;
                         }
-                        const currentPwd = (document.getElementById('current-password')?.value || '').trim();
-                        const newPwd = (document.getElementById('new-password')?.value || '').trim();
-                        const confirmPwd = (document.getElementById('confirm-password')?.value || '').trim();
-                        if (!currentPwd || !newPwd || !confirmPwd) {
-                            showToast('Please fill in all password fields.', 'warning');
-                            return;
+                        
+                        // Validate name if changed
+                        if (nameChanged) {
+                            if (newName.length < 3) {
+                                showToast('Name must be at least 3 characters long.', 'error');
+                                return;
+                            }
                         }
-                        if (newPwd !== confirmPwd) {
-                            showToast('New password and confirm password do not match.', 'error');
-                            return;
+                        
+                        // Validate password fields if password edit is active
+                        let currentPwd = '';
+                        let newPwd = '';
+                        let confirmPwd = '';
+                        
+                        if (wantPasswordEdit) {
+                            currentPwd = (document.getElementById('current-password')?.value || '').trim();
+                            newPwd = (document.getElementById('new-password')?.value || '').trim();
+                            confirmPwd = (document.getElementById('confirm-password')?.value || '').trim();
+                            
+                            if (!currentPwd || !newPwd || !confirmPwd) {
+                                showToast('Please fill in all password fields.', 'warning');
+                                return;
+                            }
+                            if (newPwd !== confirmPwd) {
+                                showToast('New password and confirm password do not match.', 'error');
+                                return;
+                            }
+                            if (newPwd.length < 8) {
+                                showToast('Password must be at least 8 characters.', 'error');
+                                return;
+                            }
                         }
-                        if (newPwd.length < 8) {
-                            showToast('Password must be at least 8 characters.', 'error');
-                            return;
+                        
+                        // Prepare request body
+                        const requestBody = {};
+                        if (nameChanged) {
+                            requestBody.name = newName;
+                        }
+                        if (wantPasswordEdit) {
+                            requestBody.current_password = currentPwd;
+                            requestBody.password = newPwd;
+                            requestBody.password_confirmation = confirmPwd;
                         }
 
                         await ensureCsrfCookie();
-                        const res = await fetch(`${BASE_PATH}/api/profile/send-reset-link`, {
+                        const res = await fetch(`${BASE_PATH}/api/profile/update`, {
                             method: 'POST',
                             headers: {
                                 'Accept': 'application/json',
@@ -2353,26 +2457,55 @@
                                 'X-CSRF-TOKEN': csrf,
                             },
                             credentials: 'same-origin',
-                            body: JSON.stringify({
-                                current_password: currentPwd,
-                                password: newPwd,
-                                password_confirmation: confirmPwd,
-                            })
+                            body: JSON.stringify(requestBody)
                         });
                         const ct = res.headers.get('content-type') || '';
                         const data = ct.includes('application/json') ? await res.json().catch(() => ({})) : {};
                         if (!res.ok) {
-                            const msg = (data && data.message) ? data.message : 'Failed to send verification email.';
+                            const msg = (data && data.message) ? data.message : 'Failed to update profile.';
                             showToast(msg, 'error');
                             return;
                         }
-                        const who = data.email ? ` (${data.email})` : '';
-                        showToast(`Verification email sent${who}. Please check your inbox to confirm changes.`, 'success');
+                        
+                        let successMessage = 'Profile updated successfully!';
+                        if (nameChanged && wantPasswordEdit) {
+                            successMessage = 'Name and password updated successfully!';
+                        } else if (nameChanged) {
+                            successMessage = 'Name updated successfully!';
+                        } else if (wantPasswordEdit) {
+                            successMessage = 'Password updated successfully!';
+                        }
+                        
+                        showToast(successMessage, 'success');
+                        
+                        // Update the UI with new name if changed
+                        if (nameChanged && data.name) {
+                            document.querySelectorAll('[data-user-name]').forEach(el => {
+                                el.textContent = data.name;
+                            });
+                            // Update profile view
+                            const profileViewName = document.querySelector('#profile-view .font-semibold');
+                            if (profileViewName) {
+                                profileViewName.textContent = data.name;
+                            }
+                            // Update sidebar name
+                            const sidebarName = document.querySelector('.text-xl.font-bold.text-white');
+                            if (sidebarName) {
+                                sidebarName.textContent = data.name;
+                            }
+                        }
+                        
                         // Back to view mode
                         togglePasswordForm('hide');
                         showViewMode();
+                        
+                        // Refresh page to show updated data everywhere
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
                     } catch (e) {
-                        showToast('Failed to send verification email.', 'error');
+                        console.error('Profile update error:', e);
+                        showToast('Failed to update profile.', 'error');
                     }
                 });
             }
@@ -2437,7 +2570,21 @@
                 })
                 .catch((err) => { 
                     console.error('Failed to delete selected records', err);
-                    showToast('Failed to delete records', 'error');
+                    
+                    // Check for specific error types
+                    if (err && err.status === 401) {
+                        showToast('Session expired. Please log in again.', 'error');
+                        setTimeout(() => {
+                            window.location.href = `${BASE_PATH}/login`;
+                        }, 2000);
+                    } else if (err && err.status === 419) {
+                        showToast('Session expired. Please refresh and try again.', 'error');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showToast('Failed to delete records. Please try again.', 'error');
+                    }
                 });
             });
         }

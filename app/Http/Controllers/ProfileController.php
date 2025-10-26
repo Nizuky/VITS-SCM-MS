@@ -67,4 +67,71 @@ class ProfileController extends Controller
 
         return response()->json(['sent' => true, 'email' => $user->email]);
     }
+    
+    public function update(Request $request)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Validate the request - name is optional, password fields are optional
+        $data = $request->validate([
+            'name' => ['sometimes', 'string', 'min:3', 'max:255'],
+            'current_password' => ['required_with:password', 'string'],
+            'password' => ['sometimes', 'string', 'confirmed', PasswordRule::defaults()],
+            'password_confirmation' => ['required_with:password', 'string'],
+        ]);
+
+        $updated = false;
+        $updatedFields = [];
+
+        // Update name if provided
+        if (isset($data['name']) && $data['name'] !== $user->name) {
+            $user->name = $data['name'];
+            $updated = true;
+            $updatedFields[] = 'name';
+        }
+
+        // Update password if provided
+        if (isset($data['password'])) {
+            // Verify the current password matches
+            if (! Hash::check($data['current_password'], (string) $user->password)) {
+                return response()->json([
+                    'message' => 'The current password is incorrect.',
+                    'errors' => ['current_password' => ['The current password is incorrect.']]
+                ], 422);
+            }
+
+            $user->password = Hash::make($data['password']);
+            $updated = true;
+            $updatedFields[] = 'password';
+        }
+
+        if (!$updated) {
+            return response()->json(['message' => 'No changes detected.'], 422);
+        }
+
+        try {
+            $user->save();
+            
+            \Log::info('User profile updated', [
+                'user_id' => $user->id,
+                'updated_fields' => $updatedFields,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully.',
+                'name' => $user->name,
+                'updated_fields' => $updatedFields,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to update user profile', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['message' => 'Failed to update profile. Please try again.'], 500);
+        }
+    }
 }

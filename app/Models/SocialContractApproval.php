@@ -21,12 +21,14 @@ class SocialContractApproval extends Model
         'approved_by',
         'verified_at',
         'approved_at',
+        'rejected_at',
     ];
 
     protected $casts = [
         'date' => 'date',
         'verified_at' => 'datetime',
         'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
 
     /**
