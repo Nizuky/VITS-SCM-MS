@@ -856,6 +856,7 @@
                                     <th class="text-center w-2/6">Event Name</th>
                                     <th class="text-center w-1/6">Venue</th>
                                     <th class="text-center w-1/6">Organization</th>
+                                    <th class="text-center w-1/6">Supervisor</th>
                                     <th class="text-center w-1/6">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                                             Hours Rendered
@@ -1228,6 +1229,13 @@
                     <input type="text" id="organization" placeholder="Enter the name here" class="input input-bordered w-full rounded-lg" required />
                 </label>
 
+                <label class="form-control w-full">
+                    <div class="label">
+                        <span class="label-text font-semibold">Supervisor Name</span>
+                    </div>
+                    <input type="text" id="supervisor-name" placeholder="Enter supervisor name here" class="input input-bordered w-full rounded-lg" />
+                </label>
+
                 <div class="mt-8 pt-4 flex justify-center">
                     <button type="button" id="submit-record-button" class="btn bg-primary-purple hover:bg-primary-purple-hover text-white rounded-lg">
                         Submit
@@ -1280,6 +1288,7 @@
                             <th class="text-center">Date</th>
                             <th class="text-center">Event Name</th>
                             <th class="text-center">Venue</th>
+                            <th class="text-center">Supervisor Name</th>
                             <th class="text-center">Organization</th>
                             <th class="text-center">Hours</th>
                             <th class="text-center">Status</th>
@@ -2473,6 +2482,7 @@
                             <td class="text-center">${normalizeDateString(rec.date)}</td>
                             <td class="text-center">${rec.event_name || '-'}</td>
                             <td class="text-center">${rec.venue || '-'}</td>
+                            <td class="text-center">${rec.supervisor_name || '-'}</td>
                             <td class="text-center">${rec.organization || '-'}</td>
                             <td class="text-center">${rec.hours_rendered} hours</td>
                             <td class="text-center">${renderStatusBadge(rec.status, rec)}</td>
@@ -2891,7 +2901,8 @@
                     return (
                         (r.event_name || '').toLowerCase().includes(query) ||
                         (r.venue || '').toLowerCase().includes(query) ||
-                        (r.organization || '').toLowerCase().includes(query)
+                        (r.organization || '').toLowerCase().includes(query) ||
+                        (r.supervisor_name || '').toLowerCase().includes(query)
                     );
                 });
                 // sort by current sort column
@@ -2947,6 +2958,7 @@
                         <td class="text-center">${rec.event_name}</td>
                         <td class="text-center">${rec.venue}</td>
                         <td class="text-center">${rec.organization}</td>
+                        <td class="text-center">${rec.supervisor_name || '-'}</td>
                         <td class="text-center">${rec.hours_rendered} hours</td>
                         <td class="text-center">${statusHtml} ${rec.status === 'Rejected' ? deletionCountdownHtml : ''}</td>
                     `;
@@ -2989,6 +3001,7 @@
                     date: document.getElementById('date').value,
                     hours_rendered: parseInt(document.getElementById('hours-rendered').value || '0', 10),
                     organization: document.getElementById('organization').value,
+                    supervisor_name: document.getElementById('supervisor-name').value || null,
                 };
                 
                 fetch(`${BASE_PATH}/api/social-contract/records`, {

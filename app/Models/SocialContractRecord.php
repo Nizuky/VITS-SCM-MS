@@ -18,6 +18,7 @@ class SocialContractRecord extends Model
         'event_name',
         'venue',
         'organization',
+        'supervisor_name',
         'hours_rendered',
         'status',
         'rejection_reason',

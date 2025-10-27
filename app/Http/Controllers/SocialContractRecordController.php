@@ -106,6 +106,7 @@ class SocialContractRecordController extends Controller
             'event_name' => ['required', 'string', 'max:255'],
             'venue' => ['required', 'string', 'max:255'],
             'organization' => ['required', 'string', 'max:255'],
+            'supervisor_name' => ['nullable', 'string', 'max:255'],
             'hours_rendered' => ['required', 'integer', 'min:0'],
             'contract_id' => ['nullable', 'integer'],
         ]);
@@ -125,6 +126,7 @@ class SocialContractRecordController extends Controller
             'event_name' => $data['event_name'],
             'venue' => $data['venue'],
             'organization' => $data['organization'],
+            'supervisor_name' => $data['supervisor_name'] ?? null,
             'hours_rendered' => $data['hours_rendered'],
             'status' => 'Pending',
         ]);

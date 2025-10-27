@@ -458,52 +458,59 @@ table{overflow:visible!important}
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
                     <div class="overflow-x-auto overflow-y-auto flex-1">
-                        <table class="table table-fixed w-full">
+                        <!-- Updated table with Supervisor column - matching admin structure -->
+                        <table class="table w-full" style="min-width: 1200px;">
                             <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10">
                                 <tr id="table-header-row">
-                                    <th class="w-[10%] text-center">
+                                    <th class="text-center" style="width: 100px; min-width: 100px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                                             Student ID
                                             <span id="studentid-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="text-center" style="width: 140px; min-width: 140px;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                                             Student Name
                                             <span id="studentname-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[20%] text-center">
+                                    <th class="text-center" style="width: 160px; min-width: 160px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="text-center" style="width: 130px; min-width: 130px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
                                             Organization
                                             <span id="organization-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
+                                    <th class="text-center" style="width: 130px; min-width: 130px;">
+                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
+                                            Supervisor
+                                            <span id="supervisor-sort-indicator">▼</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center" style="width: 140px; min-width: 140px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                                             Hours Rendered
                                             <span id="hours-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center">
+                                    <th class="text-center" style="width: 110px; min-width: 110px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">Action</th>
+                                    <th class="text-center" style="width: 290px; min-width: 290px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body">
                                 <!-- Data will be loaded dynamically from database -->
                                 <tr id="loading-row">
-                                    <td colspan="7" class="text-center py-8">
+                                    <td colspan="8" class="text-center py-8">
                                         <span class="loading loading-spinner loading-lg text-primary-purple"></span>
                                         <p class="mt-2 text-text-muted">Loading submissions...</p>
                                     </td>
@@ -517,7 +524,7 @@ table{overflow:visible!important}
             <!-- Students Information Page -->
             <div id="students-page" class="page-content hidden flex-col flex-1-dynamic">
                 <h1 class="text-4xl font-bold text-primary-purple px-4">Students Information</h1>
-                
+
                 <!-- Search and Actions Bar -->
                 <div class="flex items-center justify-between px-4 py-3 gap-4">
                     <!-- Search Input -->
@@ -1405,9 +1412,10 @@ table{overflow:visible!important}
         var studentNameSortDirection = 'desc'; // 'asc' or 'desc'
         var eventNameSortDirection = 'desc'; // 'asc' or 'desc'
         var organizationSortDirection = 'desc'; // 'asc' or 'desc'
+        var supervisorSortDirection = 'desc'; // 'asc' or 'desc'
         var actionDateSortDirection = 'desc'; // 'asc' or 'desc'
         var statusSortDirection = 'desc'; // 'asc' or 'desc'
-        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'actiondate', 'status'
+        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'supervisor', 'actiondate', 'status'
         var currentStatusFilter = 'All'; // Track current status filter for archived tab
 
         // Support tickets data
@@ -1701,7 +1709,7 @@ table{overflow:visible!important}
         function attachSortEventListeners() {
             // Helper function to reset all indicators
             function resetAllIndicators(exceptId) {
-                var indicators = ['studentid', 'studentname', 'eventname', 'organization', 'hours', 'date', 'actiondate', 'status'];
+                var indicators = ['studentid', 'studentname', 'eventname', 'organization', 'supervisor', 'hours', 'date', 'actiondate', 'status'];
                 indicators.forEach(function(id) {
                     if (id !== exceptId) {
                         var indicator = document.getElementById(id + '-sort-indicator');
@@ -1763,6 +1771,20 @@ table{overflow:visible!important}
                     resetAllIndicators('organization');
                     organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'organization');
+                };
+            }
+            
+            // Supervisor sort
+            var supervisorSortToggle = document.getElementById('supervisor-sort-toggle');
+            var supervisorSortIndicator = document.getElementById('supervisor-sort-indicator');
+            if (supervisorSortToggle && supervisorSortIndicator) {
+                supervisorSortToggle.onclick = function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'supervisor';
+                    supervisorSortDirection = supervisorSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllIndicators('supervisor');
+                    supervisorSortIndicator.textContent = supervisorSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'supervisor');
                 };
             }
             
@@ -1897,6 +1919,12 @@ table{overflow:visible!important}
                             <span id="organization-sort-indicator">▼</span>
                         </button>
                     </th>
+                    <th class="w-[11%] text-center">
+                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
+                            Supervisor
+                            <span id="supervisor-sort-indicator">▼</span>
+                        </button>
+                    </th>
                     <th class="w-[9%] text-center">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                             Hours
@@ -1959,6 +1987,12 @@ table{overflow:visible!important}
                         </button>
                     </th>
                     <th class="w-[12%] text-center">
+                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
+                            Supervisor
+                            <span id="supervisor-sort-indicator">▼</span>
+                        </button>
+                    </th>
+                    <th class="w-[11%] text-center">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                             Hours Rendered
                             <span id="hours-sort-indicator">▼</span>
@@ -2000,6 +2034,9 @@ table{overflow:visible!important}
                             break;
                         case 'organization':
                             direction = organizationSortDirection;
+                            break;
+                        case 'supervisor':
+                            direction = supervisorSortDirection;
                             break;
                         case 'actiondate':
                             direction = actionDateSortDirection;
@@ -2390,6 +2427,12 @@ table{overflow:visible!important}
                     var orgB = (b.organization || '').toString().toLowerCase();
                     return organizationSortDirection === 'asc' ? orgA.localeCompare(orgB) : orgB.localeCompare(orgA);
                 });
+            } else if (sortBy === 'supervisor') {
+                sortedSubmissions.sort(function(a, b) {
+                    var supA = (a.supervisor_name || '').toString().toLowerCase();
+                    var supB = (b.supervisor_name || '').toString().toLowerCase();
+                    return supervisorSortDirection === 'asc' ? supA.localeCompare(supB) : supB.localeCompare(supA);
+                });
             } else if (sortBy === 'actiondate') {
                 sortedSubmissions.sort(function(a, b) {
                     // Parse action_date in format mm-dd-yyyy
@@ -2441,6 +2484,7 @@ table{overflow:visible!important}
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
+                        'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
                         'data-rejection-reason="' + rejectionReason + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
@@ -2448,6 +2492,7 @@ table{overflow:visible!important}
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.event_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.organization || '—') + '</td>' +
+                        '<td class="text-center">' + (record.supervisor_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
                         '<td class="text-center">' + dateStr + '</td>';
                 
@@ -2698,13 +2743,14 @@ table{overflow:visible!important}
             var v = r.dataset.venue;
             var en = r.cells[2].textContent;
             var org = r.cells[3].textContent;
-            var dt = r.cells[5].textContent;
-            var hr = r.cells[4].textContent;
+            var sup = r.cells[4].textContent;
+            var dt = r.cells[6].textContent;
+            var hr = r.cells[5].textContent;
             var rejectionReason = r.dataset.rejectionReason || '';
             var actionDate = r.dataset.actionDate || '';
             
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = org;
+            document.getElementById('details-supervisor-name').value = sup;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
@@ -3798,6 +3844,7 @@ table{overflow:visible!important}
                 document.getElementById('studentname-sort-indicator').textContent = '▼';
                 document.getElementById('eventname-sort-indicator').textContent = '▼';
                 document.getElementById('organization-sort-indicator').textContent = '▼';
+                document.getElementById('supervisor-sort-indicator').textContent = '▼';
             }
             
             // Hours sort toggle event listener
@@ -3881,6 +3928,20 @@ table{overflow:visible!important}
                     resetAllSortIndicators();
                     organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'organization');
+                });
+            }
+            
+            // Supervisor sort toggle event listener
+            var supervisorSortToggle = document.getElementById('supervisor-sort-toggle');
+            var supervisorSortIndicator = document.getElementById('supervisor-sort-indicator');
+            if (supervisorSortToggle && supervisorSortIndicator) {
+                supervisorSortToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSortBy = 'supervisor';
+                    supervisorSortDirection = supervisorSortDirection === 'asc' ? 'desc' : 'asc';
+                    resetAllSortIndicators();
+                    supervisorSortIndicator.textContent = supervisorSortDirection === 'asc' ? '▲' : '▼';
+                    renderSubmissions(allSubmissions, 'supervisor');
                 });
             }
             
