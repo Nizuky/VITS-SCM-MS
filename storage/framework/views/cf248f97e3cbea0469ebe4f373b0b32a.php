@@ -51,6 +51,15 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
         <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+        
+        <!-- PDF Export Libraries -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+        <!-- Toastify Library -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        
         <?php
             $iconCandidates = [
                  'vits_white.png',
@@ -804,6 +813,15 @@
                         Add New Record
                     </button>
                     <div class="flex items-center gap-4">
+                        <!-- Export PDF Button -->
+                        <button id="export-pdf-btn" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg border-0" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                            </svg>
+                            Export PDF
+                        </button>
+                        
                         <label class="input input-bordered flex items-center gap-2 rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" /></svg>
                             <input id="record-search" type="text" class="grow" placeholder="Search by event, venue, or organization" />
@@ -1525,6 +1543,40 @@
         </form>
     </dialog>
 
+    <!-- Export Options Modal -->
+    <dialog id="export_options_modal" class="modal">
+        <div class="modal-box p-6 max-w-sm rounded-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            <h3 class="font-bold text-xl mb-6 text-center text-text-header">Export Approved Records</h3>
+            <div class="space-y-4">
+                <label class="form-control w-full">
+                    <div class="label">
+                        <span class="label-text font-semibold">Select School Year</span>
+                    </div>
+                    <select id="export-school-year" class="select select-bordered w-full rounded-lg">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                        <span class="label-text font-semibold">Select Year Level</span>
+                    </div>
+                    <select id="export-year-level" class="select select-bordered w-full rounded-lg">
+                        <option>1st Year</option>
+                        <option>2nd Year</option>
+                        <option selected>3rd Year</option>
+                        <option>4th Year</option>
+                    </select>
+                </label>
+                <div class="modal-action mt-6">
+                    <button type="button" class="btn btn-neutral rounded-lg w-full" onclick="exportToPDF()">Generate PDF</button>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"> <button>close</button> </form>
+    </dialog>
 
     <!-- DaisyUI toast root (bottom-right) -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
@@ -2052,6 +2104,9 @@
             });
         }
 
+        // --- Global Records Array (accessible to PDF export functions) ---
+        let allRecords = [];
+
         // --- Table & Modal Logic ---
         function initDashboard() {
             // idempotent init: avoid double initialization if this script runs twice
@@ -2073,7 +2128,6 @@
             showPage('dashboard');
             // Load existing records for the current student's latest social contract (single-account mode)
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            let allRecords = [];
             // Date sort: 'desc' by default for latest first
             let dateSortDirection = 'desc';
             const dateSortToggle = document.getElementById('date-sort-toggle');
@@ -2144,6 +2198,16 @@
                         // Always update when we get successful response
                         lastRecordsData = records;
                         allRecords = records;
+                        console.log('✅ Records loaded into allRecords:', allRecords.length, 'records');
+                        console.log('Sample record with all fields:', allRecords[0]);
+                        console.log('Date fields in sample record:', {
+                            date: allRecords[0]?.date,
+                            date_of_activity: allRecords[0]?.date_of_activity,
+                            verified_at: allRecords[0]?.verified_at,
+                            approved_at: allRecords[0]?.approved_at,
+                            rejected_at: allRecords[0]?.rejected_at,
+                            action_date: allRecords[0]?.action_date
+                        });
                         renderTable();
                         updateDashboardFromRecords(allRecords);
                     })
@@ -2233,30 +2297,37 @@
                 let step2Class = '';
                 let step2Icon = '2';
                 let step2Label = 'Pending';
+                let step2Date = '';
                 let step3Class = '';
                 let step3Icon = '3';
                 let step3Label = 'Pending';
+                let step3Date = '';
                 let connector1Class = 'completed';
                 let connector2Class = '';
                 
                 if (record.status === 'Pending') {
                     step2Class = 'pending';
                     step2Label = 'Awaiting verification';
+                    step2Date = '';
                 } else if (record.status === 'Verified') {
                     step2Class = 'completed';
                     step2Icon = '2';
                     step2Label = 'Verified';
+                    step2Date = record.verified_at || '';
                     connector1Class = 'completed';
                     connector2Class = 'active';
                     step3Class = 'active';
                     step3Label = 'Awaiting approval';
+                    step3Date = '';
                 } else if (record.status === 'Approved') {
                     step2Class = 'completed';
                     step2Icon = '2';
                     step2Label = 'Verified';
+                    step2Date = record.verified_at || record.approval?.verified_at || record.action_date || '';
                     step3Class = 'completed';
                     step3Icon = '3';
                     step3Label = 'Approved';
+                    step3Date = record.approved_at || record.approval?.approved_at || record.action_date || record.verified_at || '';
                     connector1Class = 'completed';
                     connector2Class = 'completed';
                 } else if (record.status === 'Rejected') {
@@ -2265,7 +2336,24 @@
                     step2Class = 'rejected';
                     step2Icon = '✕';
                     step2Label = 'Rejected';
+                    // Try rejected_at, then approval date, then the raw date field, then action_date
+                    step2Date = record.rejected_at || record.approval?.rejected_at || record.date || record.action_date || '';
+                    // Format the date if it's in ISO format
+                    if (step2Date && step2Date.includes('T')) {
+                        const dateObj = new Date(step2Date);
+                        step2Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    }
                     connector1Class = 'completed';
+                    
+                    // Debug log for rejected records
+                    console.log('Rejected record stepper:', {
+                        rejected_at: record.rejected_at,
+                        'approval?.rejected_at': record.approval?.rejected_at,
+                        date: record.date,
+                        action_date: record.action_date,
+                        step2Date: step2Date,
+                        record: record
+                    });
                 }
                 
                 detailsRow.innerHTML = `
@@ -2284,11 +2372,13 @@
                                 <div class="step-connector ${connector2Class}"></div>
                                 <div class="step-label">Admin Review</div>
                                 <div class="step-sublabel">${step2Label}</div>
+                                ${step2Date && step2Date.trim() ? '<div class="step-sublabel" style="margin-top: 0.25rem;">' + step2Date + '</div>' : ''}
                             </div>
                             <div class="step-item">
                                 <div class="step-circle ${step3Class}">${step3Icon}</div>
                                 <div class="step-label">Super Admin Review</div>
                                 <div class="step-sublabel">${step3Label}</div>
+                                ${step3Date && step3Date.trim() ? '<div class="step-sublabel" style="margin-top: 0.25rem;">' + step3Date + '</div>' : ''}
                             </div>
                         </div>
                     </td>
@@ -2385,7 +2475,7 @@
                             <td class="text-center">${rec.venue || '-'}</td>
                             <td class="text-center">${rec.organization || '-'}</td>
                             <td class="text-center">${rec.hours_rendered} hours</td>
-                            <td class="text-center">${renderStatusBadge(rec.status)}</td>
+                            <td class="text-center">${renderStatusBadge(rec.status, rec)}</td>
                         `;
                         tableBody.appendChild(row);
                     });
@@ -2849,10 +2939,7 @@
                     })();
 
                     // Add action date if available
-                    let statusHtml = renderStatusBadge(rec.status);
-                    if (rec.action_date) {
-                        statusHtml += `<div class="text-xs text-gray-500 mt-1">${rec.action_date}</div>`;
-                    }
+                    let statusHtml = renderStatusBadge(rec.status, rec);
                     
                     row.innerHTML = `
                         <td class="text-center"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
@@ -3510,17 +3597,66 @@
         }
         // execute attachLogoutHandler once after DOM ready
         try { attachLogoutHandler(); } catch (_) {}
-        function renderStatusBadge(status) {
+        function renderStatusBadge(status, record = null) {
+            let badgeHtml = '';
+            let dateHtml = '';
+            
+            // Debug logging
+            if (record && (status === 'Approved' || status === 'Rejected')) {
+                console.log('renderStatusBadge called:', {
+                    status: status,
+                    approved_at: record.approved_at,
+                    rejected_at: record.rejected_at,
+                    verified_at: record.verified_at,
+                    action_date: record.action_date,
+                    finalDate: status === 'Approved' ? (record?.approved_at || record?.action_date) : (record?.rejected_at || record?.action_date)
+                });
+            }
+            
             if (status === 'Approved') {
-                return '<span class="scms-badge scms-badge--approved">Approved</span>';
+                badgeHtml = '<span class="scms-badge scms-badge--approved">Approved</span>';
+                // For approved records, try multiple sources:
+                // 1. approved_at field
+                // 2. approval.approved_at nested field
+                // 3. action_date field
+                // 4. verified_at as last resort (they were at least verified)
+                const approvedDate = record?.approved_at || 
+                                    record?.approval?.approved_at || 
+                                    record?.action_date || 
+                                    record?.verified_at;
+                console.log('Approved date being used:', approvedDate);
+                console.log('Checking approval object:', record?.approval);
+                if (approvedDate) {
+                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + approvedDate + '</div>';
+                    console.log('Date HTML for Approved:', dateHtml);
+                }
+            } else if (status === 'Verified') {
+                badgeHtml = '<span class="scms-badge scms-badge--verified">Verified</span>';
+                // Try verified_at first, fallback to action_date
+                const verifiedDate = record?.verified_at || record?.action_date;
+                if (verifiedDate) {
+                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + verifiedDate + '</div>';
+                }
+            } else if (status === 'Rejected') {
+                badgeHtml = '<span class="scms-badge scms-badge--rejected">Rejected</span>';
+                // Try rejected_at first, fallback to approval date, then raw date field, then action_date
+                let rejectedDate = record?.rejected_at || 
+                                    record?.approval?.rejected_at || 
+                                    record?.date ||
+                                    record?.action_date;
+                // Format the date if it's in ISO format (e.g., 2025-10-23T00:00:00.000000Z)
+                if (rejectedDate && rejectedDate.includes && rejectedDate.includes('T')) {
+                    const dateObj = new Date(rejectedDate);
+                    rejectedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                }
+                if (rejectedDate) {
+                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + rejectedDate + '</div>';
+                }
+            } else {
+                badgeHtml = '<span class="scms-badge scms-badge--pending">Pending</span>';
             }
-            if (status === 'Verified') {
-                return '<span class="scms-badge scms-badge--verified">Verified</span>';
-            }
-            if (status === 'Rejected') {
-                return '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-            }
-            return '<span class="scms-badge scms-badge--pending">Pending</span>';
+            
+            return badgeHtml + dateHtml;
         }
         function filterTableByStatus(status, event) {
             const tableBody = document.getElementById('record-table-body');
@@ -3669,6 +3805,408 @@
             const d = safeDate(val);
             return d ? d.getFullYear() : null;
         }
+
+        // ==================== PDF Export Functions ====================
+        
+        // Global variable to store logo as Base64
+        let logoBase64 = null;
+
+        // Function to convert image to Base64
+        function imageToBase64(url, callback) {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const dataURL = canvas.toDataURL('image/png');
+                callback(dataURL);
+            };
+            img.onerror = function() {
+                console.error('Failed to load image:', url);
+                callback(null);
+            };
+            img.src = url;
+        }
+
+        // Load logo on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Try to load PLV logo (optional - PDF will work without it)
+            imageToBase64('<?php echo e(asset("C:\Users\janar\Herd\scms\storage\app\public\VITS_logo.png")); ?>', function(base64) {
+                if (base64) {
+                    logoBase64 = base64;
+                    console.log('PLV logo loaded for PDF export');
+                } else {
+                    console.warn('PLV logo not found, PDF will generate without logo');
+                }
+            });
+            
+            // Verify functions are available
+            console.log('PDF Export functions loaded:', {
+                openExportModal: typeof openExportModal,
+                exportToPDF: typeof exportToPDF,
+                populateSchoolYearDropdown: typeof populateSchoolYearDropdown
+            });
+            
+            // Test that functions are globally accessible
+            if (typeof window.openExportModal === 'function') {
+                console.log('✅ openExportModal is globally accessible');
+                
+                // Test modal element exists
+                const modal = document.getElementById('export_options_modal');
+                if (modal) {
+                    console.log('✅ Export modal element found in DOM');
+                } else {
+                    console.error('❌ Export modal element NOT found in DOM');
+                }
+                
+                // Attach event listener to Export PDF button
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) {
+                    console.log('✅ Export PDF button found, attaching click listener...');
+                    exportBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('🔘 Export PDF button clicked!');
+                        window.openExportModal();
+                    });
+                } else {
+                    console.error('❌ Export PDF button NOT found');
+                }
+            } else {
+                console.error('❌ openExportModal is NOT globally accessible');
+            }
+        });
+
+        // Helper: Format database date to readable format
+        window.formatDbDate = function(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        // Helper: Check if a date falls within a school year
+        window.isDateInSchoolYear = function(dateStr, schoolYear) {
+            if (!dateStr || !schoolYear) return false;
+            const date = new Date(dateStr);
+            const [startYear, endYear] = schoolYear.split('-').map(Number);
+            const syStart = new Date(startYear, 7, 1); // August 1
+            const syEnd = new Date(endYear, 6, 31);    // July 31
+            return date >= syStart && date <= syEnd;
+        };
+
+        // Populate School Year dropdown with unique years from approved records
+        window.populateSchoolYearDropdown = function() {
+            console.log('=== populateSchoolYearDropdown called ===');
+            console.log('Total records in allRecords:', allRecords.length);
+            console.log('typeof allRecords:', typeof allRecords);
+            console.log('Is array?:', Array.isArray(allRecords));
+            if (allRecords.length > 0) {
+                console.log('First 3 records:', allRecords.slice(0, 3));
+                console.log('Sample statuses:', allRecords.slice(0, 5).map(r => ({ status: r.status, date: r.date })));
+            }
+            
+            const dropdown = document.getElementById('export-school-year');
+            dropdown.innerHTML = ''; // Clear existing options
+
+            // Get all approved records with dates (Verified or Approved status)
+            const approvedRecords = allRecords.filter(r => 
+                (r.status === 'Verified' || r.status === 'Approved') && r.date
+            );
+            
+            console.log('Approved records with dates:', approvedRecords.length);
+            
+            if (approvedRecords.length === 0) {
+                dropdown.innerHTML = '<option disabled selected>No approved records</option>';
+                return;
+            }
+
+            // Extract years and create school year ranges
+            const years = new Set();
+            approvedRecords.forEach(record => {
+                const date = new Date(record.date);
+                const year = date.getFullYear();
+                const month = date.getMonth(); // 0-11
+                // If Aug-Dec, belongs to current-next school year
+                // If Jan-Jul, belongs to previous-current school year
+                const schoolYearStart = month >= 7 ? year : year - 1;
+                years.add(schoolYearStart);
+            });
+
+            // Sort years and create school year options
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+            sortedYears.forEach((year, index) => {
+                const option = document.createElement('option');
+                option.value = `${year}-${year + 1}`;
+                option.textContent = `S.Y. ${year}-${year + 1}`;
+                if (index === 0) option.selected = true; // Select most recent by default
+                dropdown.appendChild(option);
+            });
+        };
+
+        // Open Export Modal
+        window.openExportModal = function() {
+            console.log('=== openExportModal called ===');
+            
+            try {
+                // Check if modal exists
+                const modal = document.getElementById('export_options_modal');
+                console.log('Modal element:', modal);
+                
+                if (!modal) {
+                    console.error('Modal element not found!');
+                    alert('Modal not found! Please refresh the page.');
+                    return;
+                }
+                
+                // Populate dropdown
+                console.log('Populating school year dropdown...');
+                populateSchoolYearDropdown();
+                
+                // Show modal using DaisyUI method
+                console.log('Showing modal...');
+                modal.showModal();
+                console.log('Modal should be visible now');
+                
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                alert('Error opening modal: ' + error.message);
+            }
+        };
+
+        // Export to PDF
+        window.exportToPDF = function() {
+            console.log('exportToPDF called');
+            console.log('allRecords:', allRecords);
+            
+            const schoolYear = document.getElementById('export-school-year').value;
+            const yearLevel = document.getElementById('export-year-level').value;
+
+            console.log('Selected school year:', schoolYear);
+            console.log('Selected year level:', yearLevel);
+
+            if (!schoolYear || schoolYear === 'No approved records') {
+                Toastify({
+                    text: "No approved records available for export",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#EF4444",
+                        borderRadius: "8px",
+                        padding: "12px 20px"
+                    }
+                }).showToast();
+                return;
+            }
+
+            // Filter approved records by selected school year (Verified or Approved status)
+            const filteredRecords = allRecords.filter(record => 
+                (record.status === 'Verified' || record.status === 'Approved') && 
+                isDateInSchoolYear(record.date, schoolYear)
+            );
+
+            if (filteredRecords.length === 0) {
+                Toastify({
+                    text: `No approved records found for S.Y. ${schoolYear}`,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#F59E0B",
+                        borderRadius: "8px",
+                        padding: "12px 20px"
+                    }
+                }).showToast();
+                return;
+            }
+
+            // Close modal
+            document.getElementById('export_options_modal').close();
+
+            // Show loading toast
+            Toastify({
+                text: "Generating PDF...",
+                duration: 2000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#3B82F6",
+                    borderRadius: "8px",
+                    padding: "12px 20px"
+                }
+            }).showToast();
+
+            // Generate PDF
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Add watermark (VITS white logo) in the background center
+                    const watermarkPath = '/storage/vits_whites.png';
+                    try {
+                        // Add watermark - centered, large, and semi-transparent
+                        doc.setGState(new doc.GState({ opacity: 0.1 })); // 10% opacity for watermark
+                        doc.addImage(watermarkPath, 'PNG', 30, 85, 150, 150); // 150x150, centered on page
+                        doc.setGState(new doc.GState({ opacity: 1.0 })); // Reset opacity back to 100%
+                    } catch (err) {
+                        console.warn('Could not load watermark:', err);
+                    }
+
+                    // Add VITS logo on the left
+                    const vitsLogoPath = '/storage/VITS_logo.png';
+                    try {
+                        // Left logo (VITS)
+                        doc.addImage(vitsLogoPath, 'PNG', 14, 10, 20, 20);
+                    } catch (err) {
+                        console.warn('Could not load VITS logo:', err);
+                    }
+
+                    // Add PLV logo on the right (if available)
+                    if (logoBase64) {
+                        doc.addImage(logoBase64, 'PNG', 175, 10, 20, 20);
+                    }
+
+                    // Header text
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Pamantasan ng Lungsod ng Valenzuela', 105, 15, { align: 'center' });
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Tongco Street, Maysan, Valenzuela City', 105, 20, { align: 'center' });
+                    doc.text('Tel. No.: 292-3247', 105, 25, { align: 'center' });
+
+                    // Document title
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Social Contract Record', 105, 35, { align: 'center' });
+
+                    // Student info
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    const studentName = '<?php echo e(Auth::user()->name ?? "Student Name"); ?>';
+                    const studentId = '<?php echo e(Auth::user()->student_id ?? "N/A"); ?>';
+                    doc.text(`Student Name: ${studentName}`, 14, 45);
+                    doc.text(`Student ID: ${studentId}`, 14, 50);
+                    doc.text(`Year Level: ${yearLevel}`, 14, 55);
+                    doc.text(`School Year: ${schoolYear}`, 14, 60);
+
+                    // Debug: Check venue data
+                    console.log('First record venue:', filteredRecords[0]?.venue);
+                    console.log('First record full:', filteredRecords[0]);
+
+                    // Prepare table data matching the format from the image
+                    const tableData = filteredRecords.map((record) => {
+                        const venue = record.venue || record.location || '';
+                        console.log('Record venue:', venue, 'from record:', record);
+                        return [
+                            formatDbDate(record.date),
+                            venue,
+                            (record.organization ? record.organization + ' - ' : '') + (record.event_name || ''),
+                            '', // Empty cell for "Printed Name and Signature of Supervisor"
+                            record.hours_rendered || 0
+                        ];
+                    });
+
+                    // Calculate total hours
+                    const totalHours = filteredRecords.reduce((sum, r) => sum + (parseFloat(r.hours_rendered) || 0), 0);
+
+                    // Add table with the exact columns from the image
+                   doc.autoTable({
+                        startY: 70,
+                        head: [['Date', 'Venue', 'Name of Organizing Committee\n/Activity', 'Printed Name and Signature of\nSupervisor', 'Hours\nRendered']],
+                        body: tableData,
+                        foot: [['', '', '', 'Total Hours:', totalHours.toFixed(2)]],
+                        theme: 'grid',
+                        styles: { 
+                            fontSize: 9, 
+                            cellPadding: 3,
+                            valign: 'middle',
+                            halign: 'center'
+                        },
+                        headStyles: { 
+                            fillColor: [109, 40, 217],  // Purple header
+                            textColor: 255, 
+                            fontStyle: 'bold',
+                            halign: 'center',
+                            valign: 'middle'
+                        },
+                        bodyStyles: {
+                            fillColor: null // ✅ transparent background for all body cells
+                        },
+                        footStyles: { 
+                            fillColor: null,  // ✅ transparent footer background
+                            textColor: 0, 
+                            fontStyle: 'bold',
+                            halign: 'right'
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 25, halign: 'center' },  // Date
+                            1: { cellWidth: 30, halign: 'left' },    // Venue
+                            2: { cellWidth: 60, halign: 'left' },    // Activity
+                            3: { cellWidth: 50, halign: 'center' },  // Supervisor
+                            4: { cellWidth: 20, halign: 'center' }   // Hours Rendered
+                        }
+                    });
+
+                    // Signature section
+                    const finalY = doc.lastAutoTable.finalY + 20;
+                    doc.setFontSize(10);
+                    doc.text('Prepared by:', 14, finalY);
+                    doc.text('_______________________', 14, finalY + 15);
+                    doc.setFontSize(9);
+                    doc.text(studentName, 14, finalY + 20);
+                    doc.text('Student', 14, finalY + 25);
+
+                    doc.setFontSize(10);
+                    doc.text('Verified by:', 120, finalY);
+                    doc.text('_______________________', 120, finalY + 15);
+                    doc.setFontSize(9);
+                    doc.text('Admin Name', 120, finalY + 20);
+                    doc.text('Administrator', 120, finalY + 25);
+
+                    // Footer
+                    doc.setFontSize(8);
+                    doc.setTextColor(128);
+                    doc.text(`Generated on: ${new Date().toLocaleString('en-US')}`, 105, 285, { align: 'center' });
+
+                    // Save PDF
+                    const fileName = `Social_Contract_${studentId}_${schoolYear}.pdf`;
+                    doc.save(fileName);
+
+                    // Success toast
+                    Toastify({
+                        text: `PDF exported successfully! (${filteredRecords.length} records)`,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#10B981",
+                            borderRadius: "8px",
+                            padding: "12px 20px"
+                        }
+                    }).showToast();
+
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    Toastify({
+                        text: "Failed to generate PDF. Please try again.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#EF4444",
+                            borderRadius: "8px",
+                            padding: "12px 20px"
+                        }
+                    }).showToast();
+                }
+            }, 500);
+        };
+
+        // ==================== End PDF Export Functions ====================
     </script>
 
     <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
