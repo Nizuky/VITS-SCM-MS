@@ -417,52 +417,46 @@ table{overflow:visible!important}
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
                     <div class="overflow-x-auto">
-                        <table class="table w-full">
+                        <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <th class="text-center" style="width: 8%;">
+                                    <th class="w-[10%] text-center">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                                             Student ID
                                             <span id="studentid-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 12%;">
+                                    <th class="w-[15%] text-center">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                                             Student Name
                                             <span id="studentname-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 14%;">
+                                    <th class="w-[20%] text-center">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 11%;">
+                                    <th class="w-[15%] text-center">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
                                             Organization
                                             <span id="organization-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 11%;">
-                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
-                                            Supervisor
-                                            <span id="supervisor-sort-indicator">▼</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="width: 12%;">
+                                    <th class="w-[12%] text-center">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                                             Hours Rendered
                                             <span id="hours-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 9%;">
+                                    <th class="w-[10%] text-center">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">▼</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 23%;" id="action-status-header">
+                                    <th class="w-[18%] text-center" id="action-status-header">
                                         <span id="action-label">Action</span>
                                         <div class="hidden" id="status-header-wrapper">
                                             <div class="flex items-center justify-center gap-1">
@@ -491,7 +485,7 @@ table{overflow:visible!important}
                             <tbody id="submission-table-body">
                                 <!-- Data will be loaded dynamically from database -->
                                 <tr id="loading-row">
-                                    <td colspan="8" class="text-center py-8">
+                                    <td colspan="7" class="text-center py-8">
                                         <span class="loading loading-spinner loading-lg text-primary-purple"></span>
                                         <p class="mt-2 text-text-muted">Loading submissions...</p>
                                     </td>
@@ -741,7 +735,10 @@ table{overflow:visible!important}
             
             <div id="details-status-section" class="mt-6">
                 <label class="details-label">Status</label>
-                <div id="details-status-badge" class="status-badge"></div>
+                <div class="flex items-center gap-3">
+                    <div id="details-status-badge" class="status-badge"></div>
+                    <span id="details-action-date" class="text-sm text-gray-500"></span>
+                </div>
             </div>
             
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
@@ -896,9 +893,8 @@ table{overflow:visible!important}
         var studentNameSortDirection = 'desc'; // 'asc' or 'desc'
         var eventNameSortDirection = 'desc'; // 'asc' or 'desc'
         var organizationSortDirection = 'desc'; // 'asc' or 'desc'
-        var supervisorSortDirection = 'desc'; // 'asc' or 'desc'
         var statusSortDirection = 'desc'; // 'asc' or 'desc'
-        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'supervisor', 'status'
+        var currentSortBy = null; // 'hours', 'studentid', 'date', 'studentname', 'eventname', 'organization', 'status'
 
         // Load dashboard statistics
         async function loadDashboardStats() {
@@ -1126,12 +1122,6 @@ table{overflow:visible!important}
                     var orgB = (b.organization || '').toString().toLowerCase();
                     return organizationSortDirection === 'asc' ? orgA.localeCompare(orgB) : orgB.localeCompare(orgA);
                 });
-            } else if (sortBy === 'supervisor') {
-                sortedSubmissions.sort(function(a, b) {
-                    var supA = (a.supervisor_name || '').toString().toLowerCase();
-                    var supB = (b.supervisor_name || '').toString().toLowerCase();
-                    return supervisorSortDirection === 'asc' ? supA.localeCompare(supB) : supB.localeCompare(supA);
-                });
             } else if (sortBy === 'status') {
                 sortedSubmissions.sort(function(a, b) {
                     var statusA = (a.status || '').toString().toLowerCase();
@@ -1158,19 +1148,22 @@ table{overflow:visible!important}
                 // Get action date (when it was verified/approved/rejected)
                 var actionDate = record.action_date || record.verified_at || record.approved_at || record.rejected_at || '';
                 
+                // Debug: Log the dates to console
+                if (record.status !== 'Pending') {
+                    console.log('Record status:', record.status, 'action_date:', record.action_date, 'verified_at:', record.verified_at, 'approved_at:', record.approved_at, 'rejected_at:', record.rejected_at, 'Final actionDate:', actionDate);
+                }
+                
                 html += '<tr data-status="' + dataStatus + '" ' +
                         (dataArchiveStatus ? 'data-archive-status="' + dataArchiveStatus + '" ' : '') +
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
-                        'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
                         'data-action-date="' + actionDate + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.event_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.organization || '—') + '</td>' +
-                        '<td class="text-center">' + (record.supervisor_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
                         '<td class="text-center">' + dateStr + '</td>' +
                         '<td class="text-center">';
@@ -1188,24 +1181,27 @@ table{overflow:visible!important}
                     // Verified records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--verified">Verified</span>';
-                    if (record.action_date || record.verified_at) {
-                        html += '<span class="text-xs text-gray-500">' + (record.action_date || record.verified_at) + '</span>';
+                    // Always show date if action_date exists
+                    if (actionDate) {
+                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
                     }
                     html += '</div>';
                 } else if (isApproved) {
                     // Approved records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--approved">Approved</span>';
-                    if (record.action_date || record.approved_at) {
-                        html += '<span class="text-xs text-gray-500">' + (record.action_date || record.approved_at) + '</span>';
+                    // Always show date if action_date exists
+                    if (actionDate) {
+                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
                     }
                     html += '</div>';
                 } else if (isRejected) {
                     // Rejected records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-                    if (record.action_date || record.rejected_at) {
-                        html += '<span class="text-xs text-gray-500">' + (record.action_date || record.rejected_at) + '</span>';
+                    // Always show date if action_date exists
+                    if (actionDate) {
+                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
                     }
                     html += '</div>';
                 }
@@ -1602,25 +1598,30 @@ table{overflow:visible!important}
             var s = r.dataset.status;
             var v = r.dataset.venue;
             var en = r.cells[2].textContent;
-            var org = r.cells[3].textContent;
-            var sup = r.cells[4].textContent;
-            var dt = r.cells[6].textContent;
-            var hr = r.cells[5].textContent;
+            var sn = r.cells[3].textContent;
+            var dt = r.cells[5].textContent;
+            var hr = r.cells[4].textContent;
+            var oc = r.cells[2].textContent;
             var actionDate = r.dataset.actionDate || ''; // Get the action date
             
+            // Debug: Log the action date
+            console.log('Modal opened - Status:', s, 'Archive Status:', r.dataset.archiveStatus, 'Action Date:', actionDate);
+            
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = sup;
+            document.getElementById('details-supervisor-name').value = sn;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
-            document.getElementById('details-organizing-committee').value = org;
+            document.getElementById('details-organizing-committee').value = oc;
             
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
             var sb = document.getElementById('details-status-badge');
+            var ad = document.getElementById('details-action-date');
             
             sb.innerHTML = '';
             ab.innerHTML = '';
+            ad.textContent = ''; // Clear action date
             
             if (s === 'Pending') {
                 ss.classList.add('hidden');
@@ -1632,24 +1633,19 @@ table{overflow:visible!important}
                 ab.classList.add('hidden');
                 var as = r.dataset.archiveStatus;
                 
-                // Create a flex container for status badge and date
-                sb.innerHTML = '<div class="inline-flex items-center gap-2">';
-                
                 // Add the status badge
                 if (as === 'Verified') {
-                    sb.innerHTML += '<span class="status-badge verified">Verified</span>';
+                    sb.innerHTML = '<span class="status-badge verified">Verified</span>';
                 } else if (as === 'Approved') {
-                    sb.innerHTML += '<span class="status-badge approved">Approved</span>';
+                    sb.innerHTML = '<span class="status-badge approved">Approved</span>';
                 } else if (as === 'Rejected') {
-                    sb.innerHTML += '<span class="status-badge rejected">Rejected</span>';
+                    sb.innerHTML = '<span class="status-badge rejected">Rejected</span>';
                 }
                 
-                // Add the action date beside the badge
+                // Add the action date on the right
                 if (actionDate) {
-                    sb.innerHTML += '<span class="text-sm text-gray-500">' + actionDate + '</span>';
+                    ad.textContent = actionDate;
                 }
-                
-                sb.innerHTML += '</div>';
             }
             
             document.getElementById('submission_details_modal').showModal();
@@ -1766,7 +1762,6 @@ table{overflow:visible!important}
                 document.getElementById('studentname-sort-indicator').textContent = '▼';
                 document.getElementById('eventname-sort-indicator').textContent = '▼';
                 document.getElementById('organization-sort-indicator').textContent = '▼';
-                document.getElementById('supervisor-sort-indicator').textContent = '▼';
                 var statusIndicator = document.getElementById('status-sort-indicator');
                 if (statusIndicator) statusIndicator.textContent = '▼';
             }
@@ -1852,20 +1847,6 @@ table{overflow:visible!important}
                     resetAllSortIndicators();
                     organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
                     renderSubmissions(allSubmissions, 'organization');
-                });
-            }
-            
-            // Supervisor sort toggle event listener
-            var supervisorSortToggle = document.getElementById('supervisor-sort-toggle');
-            var supervisorSortIndicator = document.getElementById('supervisor-sort-indicator');
-            if (supervisorSortToggle && supervisorSortIndicator) {
-                supervisorSortToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    currentSortBy = 'supervisor';
-                    supervisorSortDirection = supervisorSortDirection === 'asc' ? 'desc' : 'asc';
-                    resetAllSortIndicators();
-                    supervisorSortIndicator.textContent = supervisorSortDirection === 'asc' ? '▲' : '▼';
-                    renderSubmissions(allSubmissions, 'supervisor');
                 });
             }
             

@@ -166,10 +166,12 @@ class AdminDashboardController extends Controller
                         $actionDate = $record->rejected_at instanceof \Carbon\Carbon 
                             ? $record->rejected_at->format('m-d-Y') 
                             : (is_string($record->rejected_at) ? Carbon::parse($record->rejected_at)->format('m-d-Y') : $record->rejected_at);
-                    } elseif ($record->status === 'Verified' && $record->verified_at) {
-                        $actionDate = $record->verified_at instanceof \Carbon\Carbon 
-                            ? $record->verified_at->format('m-d-Y') 
-                            : (is_string($record->verified_at) ? Carbon::parse($record->verified_at)->format('m-d-Y') : $record->verified_at);
+                    } elseif ($record->status === 'Verified') {
+                        // For Verified records, use verified_at if available, otherwise fall back to updated_at
+                        $dateToUse = $record->verified_at ?? $record->updated_at;
+                        $actionDate = $dateToUse instanceof \Carbon\Carbon 
+                            ? $dateToUse->format('m-d-Y') 
+                            : (is_string($dateToUse) ? Carbon::parse($dateToUse)->format('m-d-Y') : $dateToUse);
                     }
                     
                     return [
@@ -183,7 +185,7 @@ class AdminDashboardController extends Controller
                         'hours_rendered' => $record->hours_rendered ?? 'N/A',
                         'date' => $dateFormatted,
                         'status' => $record->status, // Keep the actual status (Verified/Approved/Rejected)
-                        'verified_at' => $record->verified_at ? ($record->verified_at instanceof \Carbon\Carbon ? $record->verified_at->format('m-d-Y') : Carbon::parse($record->verified_at)->format('m-d-Y')) : null,
+                        'verified_at' => $record->verified_at ? ($record->verified_at instanceof \Carbon\Carbon ? $record->verified_at->format('m-d-Y') : Carbon::parse($record->verified_at)->format('m-d-Y')) : ($record->status === 'Verified' ? ($record->updated_at instanceof \Carbon\Carbon ? $record->updated_at->format('m-d-Y') : Carbon::parse($record->updated_at)->format('m-d-Y')) : null),
                         'approved_at' => $record->approved_at ? ($record->approved_at instanceof \Carbon\Carbon ? $record->approved_at->format('m-d-Y') : Carbon::parse($record->approved_at)->format('m-d-Y')) : null,
                         'rejected_at' => $record->rejected_at ? ($record->rejected_at instanceof \Carbon\Carbon ? $record->rejected_at->format('m-d-Y') : Carbon::parse($record->rejected_at)->format('m-d-Y')) : null,
                         'action_date' => $actionDate,
