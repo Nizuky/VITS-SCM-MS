@@ -481,7 +481,10 @@ table{overflow:visible!important}
                                     </th>
                                     <th class="w-[15%] text-center">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
-                                            Organization
+                                            <div class="flex flex-col items-center">
+                                                <span>Organization/</span>
+                                                <span>Supervisor</span>
+                                            </div>
                                             <span id="organization-sort-indicator">▼</span>
                                         </button>
                                     </th>
@@ -1892,8 +1895,8 @@ table{overflow:visible!important}
                         </button>
                     </th>
                     <th class="w-[12%] text-center">
-                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
-                            Organization
+                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col" title="Sort by Organization">
+                            <span>Organization/Supervisor</span>
                             <span id="organization-sort-indicator">▼</span>
                         </button>
                     </th>
@@ -1953,8 +1956,8 @@ table{overflow:visible!important}
                         </button>
                     </th>
                     <th class="w-[15%] text-center">
-                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
-                            Organization
+                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col" title="Sort by Organization">
+                            <span>Organization/Supervisor</span>
                             <span id="organization-sort-indicator">▼</span>
                         </button>
                     </th>
@@ -2447,7 +2450,12 @@ table{overflow:visible!important}
                         '<td class="text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="text-center">' + (record.student_name || '—') + '</td>' +
                         '<td class="text-center">' + (record.event_name || '—') + '</td>' +
-                        '<td class="text-center">' + (record.organization || '—') + '</td>' +
+                        '<td class="text-center">' + 
+                            '<div class="flex flex-col items-center">' +
+                                '<span class="font-medium">' + (record.organization || '—') + '</span>' +
+                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
+                            '</div>' +
+                        '</td>' +
                         '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
                         '<td class="text-center">' + dateStr + '</td>';
                 
