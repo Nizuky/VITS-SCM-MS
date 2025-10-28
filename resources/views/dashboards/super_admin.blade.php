@@ -17,7 +17,7 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css">
 @php
-    $iconCandidates = ['vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
+    $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
     $iconUrl = null;
     $iconMTime = null;
     foreach ($iconCandidates as $relPath) {
@@ -144,6 +144,10 @@ body{font-family:'Inter',sans-serif}
 thead{overflow:visible!important}
 table{overflow:visible!important}
 #submission-page .overflow-x-auto{overflow:visible!important}
+#table-header-row{transition:none!important}
+#table-header-row th{transition:none!important}
+.table thead tr{height:60px!important;max-height:60px!important}
+.table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -458,48 +462,52 @@ table{overflow:visible!important}
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
                     <div class="overflow-x-auto overflow-y-auto flex-1">
                         <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10">
+                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
                                 <tr id="table-header-row">
-                                    <th class="w-[10%] text-center">
+                                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                                             Student ID
-                                            <span id="studentid-sort-indicator">▼</span>
+                                            <span id="studentid-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                                             Student Name
-                                            <span id="studentname-sort-indicator">▼</span>
+                                            <span id="studentname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[20%] text-center">
+                                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                                             Event Name
-                                            <span id="eventname-sort-indicator">▼</span>
+                                            <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
                                             <div class="flex flex-col items-center">
                                                 <span>Organization/</span>
                                                 <span>Supervisor</span>
                                             </div>
-                                            <span id="organization-sort-indicator">▼</span>
+                                            <span id="organization-sort-indicator">⇅</span>
                                         </button>
-                                    </th>
-                                    <th class="w-[12%] text-center">
+                                    </th> 
+                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
-                                            Hours Rendered
-                                            <span id="hours-sort-indicator">▼</span>
+                                            Hours
+                                            <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center">
+                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                                             Date
-                                            <span id="date-sort-indicator">▼</span>
+                                            <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">Action</th>
+                                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <span>Action</span>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body">
@@ -1334,6 +1342,13 @@ table{overflow:visible!important}
         var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
         var BASE_PATH = @json($BASE_PATH);
         
+        // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
+        function getPhilippineDate(dateInput = null) {
+            const date = dateInput ? new Date(dateInput) : new Date();
+            // Convert to Philippine time (UTC+8)
+            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        }
+        
         // ==================== CSRF TOKEN SETUP ====================
         // Simple helper to get CSRF token from meta tag
         function getCsrfToken() {
@@ -1707,7 +1722,7 @@ table{overflow:visible!important}
                 indicators.forEach(function(id) {
                     if (id !== exceptId) {
                         var indicator = document.getElementById(id + '-sort-indicator');
-                        if (indicator) indicator.textContent = '▼';
+                        if (indicator) indicator.textContent = '⇅';
                     }
                 });
             }
@@ -1721,7 +1736,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('studentid');
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentid');
                 };
             }
@@ -1735,7 +1750,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('studentname');
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentname');
                 };
             }
@@ -1749,7 +1764,7 @@ table{overflow:visible!important}
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('eventname');
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'eventname');
                 };
             }
@@ -1763,7 +1778,7 @@ table{overflow:visible!important}
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('organization');
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'organization');
                 };
             }
@@ -1777,7 +1792,7 @@ table{overflow:visible!important}
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('hours');
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'hours');
                 };
             }
@@ -1791,7 +1806,7 @@ table{overflow:visible!important}
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('date');
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'date');
                 };
             }
@@ -1805,7 +1820,7 @@ table{overflow:visible!important}
                     currentSortBy = 'actiondate';
                     actionDateSortDirection = actionDateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('actiondate');
-                    actionDateSortIndicator.textContent = actionDateSortDirection === 'asc' ? '▲' : '▼';
+                    actionDateSortIndicator.textContent = actionDateSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'actiondate');
                 };
             }
@@ -1819,7 +1834,7 @@ table{overflow:visible!important}
                     currentSortBy = 'status';
                     statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllIndicators('status');
-                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '▲' : '▼';
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'status');
                 };
             }
@@ -1865,6 +1880,9 @@ table{overflow:visible!important}
             });
         }
 
+        // Track the current active tab to avoid unnecessary header updates
+        var currentActiveTab = null;
+
         // Update table headers based on active tab
         function updateTableHeaders(tabName) {
             var headerRow = document.getElementById('table-header-row');
@@ -1872,50 +1890,57 @@ table{overflow:visible!important}
             
             var normalizedTab = tabName.toLowerCase().trim();
             
+            // Skip update if we're already on this tab (prevents flicker when sorting)
+            if (currentActiveTab === normalizedTab) {
+                return;
+            }
+            
+            currentActiveTab = normalizedTab;
+            
             if (normalizedTab === 'archived') {
                 // Archived tab: show Status with filter and Rejection Reason columns
                 headerRow.innerHTML = `
-                    <th class="w-[9%] text-center">
+                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                             Student ID
-                            <span id="studentid-sort-indicator">▼</span>
+                            <span id="studentid-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[12%] text-center">
+                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                             Student Name
-                            <span id="studentname-sort-indicator">▼</span>
+                            <span id="studentname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[14%] text-center">
+                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                             Event Name
-                            <span id="eventname-sort-indicator">▼</span>
+                            <span id="eventname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[12%] text-center">
+                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col" title="Sort by Organization">
                             <span>Organization/Supervisor</span>
-                            <span id="organization-sort-indicator">▼</span>
+                            <span id="organization-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[9%] text-center">
+                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
                             Hours
-                            <span id="hours-sort-indicator">▼</span>
+                            <span id="hours-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[9%] text-center">
+                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                             Date
-                            <span id="date-sort-indicator">▼</span>
+                            <span id="date-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[10%] text-center">
+                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
                         <div class="flex items-center justify-center gap-1">
                             <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
                                 Status
-                                <span id="status-sort-indicator">▼</span>
+                                <span id="status-sort-indicator">⇅</span>
                             </button>
                             <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
                                 <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
@@ -1936,43 +1961,47 @@ table{overflow:visible!important}
             } else {
                 // Pending and For Approval tabs: show Action column with status filter
                 headerRow.innerHTML = `
-                    <th class="w-[10%] text-center">
+                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                             Student ID
-                            <span id="studentid-sort-indicator">▼</span>
+                            <span id="studentid-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center">
+                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                             Student Name
-                            <span id="studentname-sort-indicator">▼</span>
+                            <span id="studentname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[20%] text-center">
+                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                             Event Name
-                            <span id="eventname-sort-indicator">▼</span>
+                            <span id="eventname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center">
+                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col" title="Sort by Organization">
                             <span>Organization/Supervisor</span>
-                            <span id="organization-sort-indicator">▼</span>
+                            <span id="organization-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[12%] text-center">
+                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
-                            Hours Rendered
-                            <span id="hours-sort-indicator">▼</span>
+                            Hours
+                            <span id="hours-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[10%] text-center">
+                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                             Date
-                            <span id="date-sort-indicator">▼</span>
+                            <span id="date-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[18%] text-center">Action</th>
+                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
+                        <div class="flex items-center justify-center gap-1">
+                            <span>Action</span>
+                        </div>
+                    </th>
                 `;
             }
             
@@ -2010,7 +2039,7 @@ table{overflow:visible!important}
                             direction = statusSortDirection;
                             break;
                     }
-                    indicator.textContent = direction === 'asc' ? '▲' : '▼';
+                    indicator.textContent = direction === 'asc' ? '↑' : '↓';
                 }
             }
             
@@ -2370,8 +2399,8 @@ table{overflow:visible!important}
                 });
             } else if (sortBy === 'date') {
                 sortedSubmissions.sort(function(a, b) {
-                    var dateA = new Date(a.date || 0);
-                    var dateB = new Date(b.date || 0);
+                    var dateA = getPhilippineDate(a.date || 0);
+                    var dateB = getPhilippineDate(b.date || 0);
                     return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                 });
             } else if (sortBy === 'studentname') {
@@ -2416,7 +2445,7 @@ table{overflow:visible!important}
                 });
             }
             
-            var html = '';
+                var html = '';
             sortedSubmissions.forEach(function(record) {
                 var status = record.status || 'Pending';
                 var isPending = status === 'Pending';
@@ -2443,22 +2472,21 @@ table{overflow:visible!important}
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
+                        'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
                         'data-rejection-reason="' + rejectionReason + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center">' + (record.student_id || '—') + '</td>' +
-                        '<td class="text-center">' + (record.student_name || '—') + '</td>' +
-                        '<td class="text-center">' + (record.event_name || '—') + '</td>' +
-                        '<td class="text-center">' + 
+                        '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
+                        '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
+                        '<td class="w-[16%] text-center">' + (record.event_name || '—') + '</td>' +
+                        '<td class="w-[15%] text-center">' + 
                             '<div class="flex flex-col items-center">' +
                                 '<span class="font-medium">' + (record.organization || '—') + '</span>' +
                                 '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
                             '</div>' +
                         '</td>' +
-                        '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
-                        '<td class="text-center">' + dateStr + '</td>';
-                
-                // Action column logic: 
+                        '<td class="w-[10%] text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="w-[10%] text-center">' + dateStr + '</td>';                // Action column logic: 
                 // - Pending tab: show Verify/Reject buttons for Pending records
                 // - For Approval tab: show Approve/Reject buttons for Verified records  
                 // - Archived tab: show status badge for Approved/Rejected/Verified records
@@ -2519,10 +2547,10 @@ table{overflow:visible!important}
             }
         }
         
-        // Format date helper
+        // Format date helper using Philippine timezone
         function formatDate(dateStr) {
             try {
-                var date = new Date(dateStr);
+                var date = getPhilippineDate(dateStr);
                 var month = String(date.getMonth() + 1).padStart(2, '0');
                 var day = String(date.getDate()).padStart(2, '0');
                 var year = String(date.getFullYear()).slice(-2);
@@ -2703,15 +2731,16 @@ table{overflow:visible!important}
             activeRow = r;
             var s = r.dataset.status;
             var v = r.dataset.venue;
+            var org = r.dataset.organization;
+            var supervisorName = r.dataset.supervisorName || '';
             var en = r.cells[2].textContent;
-            var org = r.cells[3].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
             var rejectionReason = r.dataset.rejectionReason || '';
             var actionDate = r.dataset.actionDate || '';
             
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = org;
+            document.getElementById('details-supervisor-name').value = supervisorName;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
@@ -2888,8 +2917,8 @@ table{overflow:visible!important}
             initPendingRequestsChart(pendingCount);
         }
 
-        // Activity Calendar Variables
-        var currentCalendarYear = new Date().getFullYear();
+        // Activity Calendar Variables using Philippine timezone
+        var currentCalendarYear = getPhilippineDate().getFullYear();
         var activityDataCache = {};
 
         // Generate Activity Calendar (January to December for selected year)
@@ -2902,7 +2931,7 @@ table{overflow:visible!important}
             
             // Disable next button if viewing current year
             var nextBtn = document.getElementById('next-year-btn');
-            var currentYear = new Date().getFullYear();
+            var currentYear = getPhilippineDate().getFullYear();
             if (nextBtn) {
                 nextBtn.disabled = currentCalendarYear >= currentYear;
                 if (currentCalendarYear >= currentYear) {
@@ -3797,14 +3826,14 @@ table{overflow:visible!important}
                 }
             }, 500);
             
-            // Helper function to reset all indicators
+            // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
-                document.getElementById('hours-sort-indicator').textContent = '▼';
-                document.getElementById('studentid-sort-indicator').textContent = '▼';
-                document.getElementById('date-sort-indicator').textContent = '▼';
-                document.getElementById('studentname-sort-indicator').textContent = '▼';
-                document.getElementById('eventname-sort-indicator').textContent = '▼';
-                document.getElementById('organization-sort-indicator').textContent = '▼';
+                document.getElementById('hours-sort-indicator').textContent = '⇅';
+                document.getElementById('studentid-sort-indicator').textContent = '⇅';
+                document.getElementById('date-sort-indicator').textContent = '⇅';
+                document.getElementById('studentname-sort-indicator').textContent = '⇅';
+                document.getElementById('eventname-sort-indicator').textContent = '⇅';
+                document.getElementById('organization-sort-indicator').textContent = '⇅';
             }
             
             // Hours sort toggle event listener
@@ -3816,7 +3845,7 @@ table{overflow:visible!important}
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -3830,7 +3859,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -3844,7 +3873,7 @@ table{overflow:visible!important}
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'date');
                 });
             }
@@ -3858,7 +3887,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentname');
                 });
             }
@@ -3872,7 +3901,7 @@ table{overflow:visible!important}
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'eventname');
                 });
             }
@@ -3886,7 +3915,7 @@ table{overflow:visible!important}
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'organization');
                 });
             }

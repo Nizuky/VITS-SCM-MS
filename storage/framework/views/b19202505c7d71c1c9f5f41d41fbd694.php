@@ -17,7 +17,7 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css">
 <?php
-    $iconCandidates = ['vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
+    $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
     $iconUrl = null;
     $iconMTime = null;
     foreach ($iconCandidates as $relPath) {
@@ -142,6 +142,8 @@ thead{overflow:visible!important}
 table{overflow:visible!important}
 #submission-page .overflow-x-auto{overflow:visible!important}
 #action-status-header{overflow:visible!important;position:relative}
+.table thead tr{height:60px!important;max-height:60px!important}
+.table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -415,54 +417,56 @@ table{overflow:visible!important}
                 </div>
 
                 <!-- Submission Table -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
-                    <div class="overflow-x-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+                    <div class="overflow-x-auto overflow-y-auto flex-1">
                         <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600">
+                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
                                 <tr>
-                                    <th class="w-[10%] text-center">
+                                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student ID">
                                             Student ID
-                                            <span id="studentid-sort-indicator">▼</span>
+                                            <span id="studentid-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Student Name">
                                             Student Name
-                                            <span id="studentname-sort-indicator">▼</span>
+                                            <span id="studentname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[20%] text-center">
+                                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
                                             Event Name
-                                            <span id="eventname-sort-indicator">▼</span>
+                                            <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center">
+                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col" title="Sort by Organization">
                                             <span>Organization/Supervisor</span>
-                                            <span id="organization-sort-indicator">▼</span>
+                                            <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
+                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
-                                            Hours Rendered
-                                            <span id="hours-sort-indicator">▼</span>
+                                            Hours
+                                            <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center">
+                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                                             Date
-                                            <span id="date-sort-indicator">▼</span>
+                                            <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center" id="action-status-header">
-                                        <span id="action-label">Action</span>
-                                        <div class="hidden" id="status-header-wrapper">
+                                    <th class="w-[22%] text-center" id="action-status-header" style="height: 60px; max-height: 60px;">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <span id="action-label">Action</span>
+                                        </div>
+                                        <div class="hidden flex items-center justify-center gap-1" id="status-header-wrapper">
                                             <div class="flex items-center justify-center gap-1">
                                                 <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
                                                     Status
-                                                    <span id="status-sort-indicator">▼</span>
+                                                    <span id="status-sort-indicator">⇅</span>
                                                 </button>
                                                 <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
                                                     <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
@@ -820,6 +824,13 @@ table{overflow:visible!important}
         var allSubmissions = []; // Store all submissions data
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         
+        // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
+        function getPhilippineDate(dateInput = null) {
+            const date = dateInput ? new Date(dateInput) : new Date();
+            // Convert to Philippine time (UTC+8)
+            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        }
+        
         // ==================== CSRF TOKEN SETUP ====================
         // Simple helper to get CSRF token from meta tag
         function getCsrfToken() {
@@ -1100,8 +1111,8 @@ table{overflow:visible!important}
                 });
             } else if (sortBy === 'date') {
                 sortedSubmissions.sort(function(a, b) {
-                    var dateA = new Date(a.date || 0);
-                    var dateB = new Date(b.date || 0);
+                    var dateA = getPhilippineDate(a.date || 0);
+                    var dateB = getPhilippineDate(b.date || 0);
                     return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                 });
             } else if (sortBy === 'studentname') {
@@ -1158,19 +1169,20 @@ table{overflow:visible!important}
                         'data-record-id="' + record.id + '" ' +
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
+                        'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
                         'data-action-date="' + actionDate + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center">' + (record.student_id || '—') + '</td>' +
-                        '<td class="text-center">' + (record.student_name || '—') + '</td>' +
-                        '<td class="text-center">' + (record.event_name || '—') + '</td>' +
-                        '<td class="text-center">' + 
+                        '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
+                        '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
+                        '<td class="w-[16%] text-center">' + (record.event_name || '—') + '</td>' +
+                        '<td class="w-[15%] text-center">' + 
                             '<div class="flex flex-col items-center">' +
                                 '<span class="font-medium">' + (record.organization || '—') + '</span>' +
                                 '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
                             '</div>' +
                         '</td>' +
-                        '<td class="text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
-                        '<td class="text-center">' + dateStr + '</td>' +
+                        '<td class="w-[10%] text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="w-[10%] text-center">' + dateStr + '</td>' +
                         '<td class="text-center">';
                 
                 // Admin workflow:
@@ -1223,10 +1235,10 @@ table{overflow:visible!important}
             }
         }
         
-        // Format date helper
+        // Format date helper using Philippine timezone
         function formatDate(dateStr) {
             try {
-                var date = new Date(dateStr);
+                var date = getPhilippineDate(dateStr);
                 var month = String(date.getMonth() + 1).padStart(2, '0');
                 var day = String(date.getDate()).padStart(2, '0');
                 var year = String(date.getFullYear()).slice(-2);
@@ -1236,16 +1248,16 @@ table{overflow:visible!important}
             }
         }
         
-        // Update weekly summary from loaded data
+        // Update weekly summary from loaded data using Philippine timezone
         function updateWeeklySummaryFromData(submissions) {
-            var now = new Date();
+            var now = getPhilippineDate();
             var weekAgo = new Date(now);
             weekAgo.setDate(weekAgo.getDate() - 7);
             
             var pending = 0, accepted = 0, rejected = 0;
             
             submissions.forEach(function(record) {
-                var recordDate = new Date(record.updated_at || record.created_at);
+                var recordDate = getPhilippineDate(record.updated_at || record.created_at);
                 var isThisWeek = recordDate >= weekAgo && recordDate <= now;
                 
                 if (record.status === 'Pending') {
@@ -1284,12 +1296,12 @@ table{overflow:visible!important}
             // Filter records by status
             // Pending: Show all pending (no date filter)
             // Verified/Rejected: Show only this month (resets at end of month)
-            var now = new Date();
+            var now = getPhilippineDate();
             var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // First day of current month
             var endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // Last day of current month
             
             var filteredRecords = allSubmissions.filter(function(r) {
-                var recordDate = new Date(r.updated_at || r.created_at);
+                var recordDate = getPhilippineDate(r.updated_at || r.created_at);
                 var isThisMonth = recordDate >= startOfMonth && recordDate <= endOfMonth;
                 
                 if (status === 'Pending') {
@@ -1602,22 +1614,22 @@ table{overflow:visible!important}
             activeRow = r;
             var s = r.dataset.status;
             var v = r.dataset.venue;
+            var org = r.dataset.organization;
+            var supervisorName = r.dataset.supervisorName || '';
             var en = r.cells[2].textContent;
-            var sn = r.cells[3].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
-            var oc = r.cells[2].textContent;
             var actionDate = r.dataset.actionDate || ''; // Get the action date
             
-            // Debug: Log the action date
-            console.log('Modal opened - Status:', s, 'Archive Status:', r.dataset.archiveStatus, 'Action Date:', actionDate);
+            // Debug: Log the action date and supervisor name
+            console.log('Modal opened - Status:', s, 'Archive Status:', r.dataset.archiveStatus, 'Action Date:', actionDate, 'Supervisor:', supervisorName, 'Organization:', org);
             
             document.getElementById('details-event-name').value = en;
-            document.getElementById('details-supervisor-name').value = sn;
+            document.getElementById('details-supervisor-name').value = supervisorName;
             document.getElementById('details-venue').value = v;
             document.getElementById('details-date').value = dt;
             document.getElementById('details-hours-rendered').value = hr;
-            document.getElementById('details-organizing-committee').value = oc;
+            document.getElementById('details-organizing-committee').value = org;
             
             var ss = document.getElementById('details-status-section');
             var ab = document.getElementById('details-action-buttons');
@@ -1759,16 +1771,16 @@ table{overflow:visible!important}
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
             
-            // Helper function to reset all indicators
+            // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
-                document.getElementById('hours-sort-indicator').textContent = '▼';
-                document.getElementById('studentid-sort-indicator').textContent = '▼';
-                document.getElementById('date-sort-indicator').textContent = '▼';
-                document.getElementById('studentname-sort-indicator').textContent = '▼';
-                document.getElementById('eventname-sort-indicator').textContent = '▼';
-                document.getElementById('organization-sort-indicator').textContent = '▼';
+                document.getElementById('hours-sort-indicator').textContent = '⇅';
+                document.getElementById('studentid-sort-indicator').textContent = '⇅';
+                document.getElementById('date-sort-indicator').textContent = '⇅';
+                document.getElementById('studentname-sort-indicator').textContent = '⇅';
+                document.getElementById('eventname-sort-indicator').textContent = '⇅';
+                document.getElementById('organization-sort-indicator').textContent = '⇅';
                 var statusIndicator = document.getElementById('status-sort-indicator');
-                if (statusIndicator) statusIndicator.textContent = '▼';
+                if (statusIndicator) statusIndicator.textContent = '⇅';
             }
             
             // Hours sort toggle event listener
@@ -1780,7 +1792,7 @@ table{overflow:visible!important}
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -1794,7 +1806,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '▲' : '▼';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -1808,7 +1820,7 @@ table{overflow:visible!important}
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'date');
                 });
             }
@@ -1822,7 +1834,7 @@ table{overflow:visible!important}
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '▲' : '▼';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentname');
                 });
             }
@@ -1836,7 +1848,7 @@ table{overflow:visible!important}
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '▲' : '▼';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'eventname');
                 });
             }
@@ -1850,7 +1862,7 @@ table{overflow:visible!important}
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '▲' : '▼';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'organization');
                 });
             }
@@ -1864,7 +1876,7 @@ table{overflow:visible!important}
                     currentSortBy = 'status';
                     statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '▲' : '▼';
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'status');
                 });
             }
@@ -2195,8 +2207,8 @@ table{overflow:visible!important}
             // Auto-refresh removed - use manual refresh buttons instead
         });
 
-        // Calendar year management
-        var currentCalendarYear = new Date().getFullYear();
+        // Calendar year management using Philippine timezone
+        var currentCalendarYear = getPhilippineDate().getFullYear();
         var activityDataCache = {}; // Cache for activity data by year
 
         // Generate Activity Calendar (GitHub-style) - Year-based (Jan-Dec)
@@ -2205,11 +2217,14 @@ table{overflow:visible!important}
             if (!container) return;
             
             // Update year display
-            document.getElementById('calendar-year').textContent = currentCalendarYear;
+            var yearDisplay = document.getElementById('calendar-year');
+            if (yearDisplay) {
+                yearDisplay.textContent = currentCalendarYear;
+            }
             
             // Disable next button if viewing current year
+            var currentYear = getPhilippineDate().getFullYear();
             var nextBtn = document.getElementById('calendar-next-year');
-            var currentYear = new Date().getFullYear();
             if (nextBtn) {
                 nextBtn.disabled = (currentCalendarYear >= currentYear);
                 if (nextBtn.disabled) {
@@ -2672,4 +2687,5 @@ table{overflow:visible!important}
         setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
     </script>
 </body>
-</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>

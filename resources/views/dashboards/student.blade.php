@@ -59,27 +59,30 @@
         <!-- Toastify Library -->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        
         @php
-            $iconCandidates = [
-                 'vits_white.png',
-                 'storage/vits_whites.png',
-                 'vits_whites.png',
-                 'vitswhite.png',
-                 'vitslogo.png',
-                'public/storage/vits_white.png',
-                'storage/vits_header.png',
-            ];
+            $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
             $iconUrl = null;
             $iconMTime = null;
             foreach ($iconCandidates as $relPath) {
                 try {
                     $full = public_path($relPath);
-                    if (file_exists($full)) { $iconUrl = asset($relPath); try { $iconMTime = @filemtime($full) ?: null; } catch (Throwable $e) {} break; }
-                } catch (Throwable $e) {}
+                    if (file_exists($full)) {
+                        $iconUrl = asset($relPath);
+                        try {
+                            $iconMTime = @filemtime($full) ?: null;
+                        } catch (Throwable $e) {
+                        }
+                        break;
+                    }
+                } catch (Throwable $e) {
+                }
             }
-            if (!$iconUrl) { $iconUrl = asset('vits_white.png'); }
-            if ($iconUrl && $iconMTime) { $iconUrl .= '?v=' . $iconMTime; }
+            if (!$iconUrl) {
+                $iconUrl = asset('vits_white.png');
+            }
+            if ($iconUrl && $iconMTime) {
+                $iconUrl .= '?v=' . $iconMTime;
+            }
         @endphp
         <link rel="icon" href="{{ $iconUrl }}" sizes="any">
         <link rel="icon" href="{{ $iconUrl }}" type="image/png">
@@ -459,6 +462,12 @@
             width: 0.25rem; height: 0.5rem;
             border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
+        :root:not([data-theme="dark"]) .record-checkbox:disabled { 
+            opacity: .4; 
+            cursor: not-allowed; 
+            background-color: #f3f4f6; /* gray-100 */
+            border-color: #d1d5db; /* gray-300 */
+        }
         [data-theme="dark"] .record-checkbox {
             appearance: none;
             -webkit-appearance: none;
@@ -495,6 +504,8 @@
         thead{overflow:visible!important}
         table{overflow:visible!important}
         #record-status-page .overflow-x-auto{overflow:visible!important}
+        .table thead tr{height:60px!important;max-height:60px!important}
+        .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -513,6 +524,10 @@
                 $initials .= mb_strtoupper(mb_substr($nameWords[1], 0, 1));
             }
         }
+
+        // Get the first super admin's name for PDF signature
+        $superAdmin = \App\Models\SuperAdmin::first();
+        $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
     @endphp
     <div class="flex p-4 gap-4 min-h-screen"> 
         <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
@@ -836,35 +851,58 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
-                    <div class="overflow-x-auto"> 
+                <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+                    <div class="overflow-x-auto overflow-y-auto flex-1"> 
                         <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600">
+                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
                                 <tr>
-                                    <th class="w-10 text-center">
+                                    <th class="w-10 text-center" style="height: 60px; max-height: 60px;">
                                         <button id="delete-selected" class="btn btn-ghost btn-xs" title="Delete selected (Pending only)">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
                                         </button>
                                     </th>
-                                    <th class="text-center w-1/6">
+                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
                                             Date
-                                            <span id="date-sort-indicator">▼</span>
+                                            <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-2/6">Event Name</th>
-                                    <th class="text-center w-1/6">Venue</th>
-                                    <th class="text-center w-1/6">Organization</th>
-                                    <th class="text-center w-1/6">Supervisor</th>
-                                    <th class="text-center w-1/6">
+                                    <th class="text-center w-[18%]" style="height: 60px; max-height: 60px;">
+                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                                            Event Name
+                                            <span id="eventname-sort-indicator">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                        <button id="venue-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Venue">
+                                            Venue
+                                            <span id="venue-sort-indicator">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                                            Organization
+                                            <span id="organization-sort-indicator">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
+                                            Supervisor
+                                            <span id="supervisor-sort-indicator">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center w-[10%]" style="height: 60px; max-height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
-                                            Hours Rendered
-                                            <span id="hours-sort-indicator">▼</span>
+                                            Hours
+                                            <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-1/6">
+                                    <th class="text-center w-[14%]" style="height: 60px; max-height: 60px;">
                                         <div class="flex items-center justify-center gap-1">
-                                            <span>Status</span>
+                                            <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
+                                                <span>Status</span>
+                                                <span id="status-sort-indicator">⇅</span>
+                                            </button>
                                             <div class="dropdown dropdown-end" id="status-filter-dropdown">
                                                 <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -1780,6 +1818,7 @@
         // ==================== GLOBAL HELPERS ====================
         // Define these globally so they can be used by all functions
         const BASE_PATH = @json($BASE_PATH);
+        const SUPER_ADMIN_NAME = @json($superAdminName);
         
         // ==================== CSRF TOKEN SETUP ====================
         // Simple helper to get CSRF token from meta tag
@@ -2113,6 +2152,14 @@
         // --- Global Records Array (accessible to PDF export functions) ---
         let allRecords = [];
 
+        // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
+        // Defined globally so it can be used by all functions
+        function getPhilippineDate(dateInput = null) {
+            const date = dateInput ? new Date(dateInput) : new Date();
+            // Convert to Philippine time (UTC+8)
+            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        }
+
         // --- Table & Modal Logic ---
         function initDashboard() {
             // idempotent init: avoid double initialization if this script runs twice
@@ -2134,15 +2181,35 @@
             showPage('dashboard');
             // Load existing records for the current student's latest social contract (single-account mode)
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            // Date sort: 'desc' by default for latest first
+            // All sort directions default to 'desc' for consistency
             let dateSortDirection = 'desc';
             const dateSortToggle = document.getElementById('date-sort-toggle');
             const dateSortIndicator = document.getElementById('date-sort-indicator');
-            // Hours sort: 'desc' by default for highest hours first
             let hoursSortDirection = 'desc';
-            let currentSortBy = 'date'; // 'date' or 'hours'
+            let currentSortBy = 'date'; // 'date' or 'hours' or 'eventname' or 'venue' or 'organization' or 'supervisor' or 'status'
             const hoursSortToggle = document.getElementById('hours-sort-toggle');
             const hoursSortIndicator = document.getElementById('hours-sort-indicator');
+            // Event Name sort
+            let eventnameSortDirection = 'desc';
+            const eventnameSortToggle = document.getElementById('eventname-sort-toggle');
+            const eventnameSortIndicator = document.getElementById('eventname-sort-indicator');
+            // Venue sort
+            let venueSortDirection = 'desc';
+            const venueSortToggle = document.getElementById('venue-sort-toggle');
+            const venueSortIndicator = document.getElementById('venue-sort-indicator');
+            // Organization sort
+            let organizationSortDirection = 'desc';
+            const organizationSortToggle = document.getElementById('organization-sort-toggle');
+            const organizationSortIndicator = document.getElementById('organization-sort-indicator');
+            // Supervisor sort
+            let supervisorSortDirection = 'desc';
+            const supervisorSortToggle = document.getElementById('supervisor-sort-toggle');
+            const supervisorSortIndicator = document.getElementById('supervisor-sort-indicator');
+            // Status sort
+            let statusSortDirection = 'desc';
+            const statusSortToggle = document.getElementById('status-sort-toggle');
+            const statusSortIndicator = document.getElementById('status-sort-indicator');
+            
             // Normalize API date to YYYY-MM-DD and format to DD-MM-YYYY without timezone shifts
             function normalizeDateString(dateVal) {
                 if (!dateVal) return '';
@@ -2155,11 +2222,25 @@
                     const [y, m, d] = parts;
                     return `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
                 }
-                // Fallback to locale formatting
-                try { return new Date(dateVal).toLocaleDateString('en-GB').replace(/\//g, '-'); } catch { return s; }
+                // Fallback to locale formatting with Philippine timezone
+                try { 
+                    const phDate = getPhilippineDate(dateVal);
+                    return phDate.toLocaleDateString('en-GB').replace(/\//g, '-'); 
+                } catch { return s; }
             }
             var lastRecordsData = null; // Store last data to detect changes
             var isLoadingRecords = false; // Prevent concurrent requests
+            
+            // Reset all sort indicators to default (double arrow for inactive)
+            function resetAllSortIndicators() {
+                dateSortIndicator.textContent = '⇅';
+                hoursSortIndicator.textContent = '⇅';
+                eventnameSortIndicator.textContent = '⇅';
+                venueSortIndicator.textContent = '⇅';
+                organizationSortIndicator.textContent = '⇅';
+                supervisorSortIndicator.textContent = '⇅';
+                statusSortIndicator.textContent = '⇅';
+            }
             
             function loadRecords(showLoading = true) {
                 // Prevent concurrent requests
@@ -2344,9 +2425,9 @@
                     step2Label = 'Rejected';
                     // Try rejected_at, then approval date, then the raw date field, then action_date
                     step2Date = record.rejected_at || record.approval?.rejected_at || record.date || record.action_date || '';
-                    // Format the date if it's in ISO format
+                    // Format the date if it's in ISO format using Philippine timezone
                     if (step2Date && step2Date.includes('T')) {
-                        const dateObj = new Date(step2Date);
+                        const dateObj = getPhilippineDate(step2Date);
                         step2Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
                     }
                     connector1Class = 'completed';
@@ -2363,7 +2444,7 @@
                 }
                 
                 detailsRow.innerHTML = `
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="steps-horizontal">
                             <div class="step-item">
                                 <div class="step-circle ${step1Class}">${step1Icon}</div>
@@ -2908,10 +2989,40 @@
                         const ha = parseInt(a.hours_rendered) || 0;
                         const hb = parseInt(b.hours_rendered) || 0;
                         return hoursSortDirection === 'asc' ? ha - hb : hb - ha;
+                    } else if (currentSortBy === 'eventname') {
+                        const ea = (a.event_name || '').toLowerCase();
+                        const eb = (b.event_name || '').toLowerCase();
+                        if (ea < eb) return eventnameSortDirection === 'asc' ? -1 : 1;
+                        if (ea > eb) return eventnameSortDirection === 'asc' ? 1 : -1;
+                        return 0;
+                    } else if (currentSortBy === 'venue') {
+                        const va = (a.venue || '').toLowerCase();
+                        const vb = (b.venue || '').toLowerCase();
+                        if (va < vb) return venueSortDirection === 'asc' ? -1 : 1;
+                        if (va > vb) return venueSortDirection === 'asc' ? 1 : -1;
+                        return 0;
+                    } else if (currentSortBy === 'organization') {
+                        const oa = (a.organization || '').toLowerCase();
+                        const ob = (b.organization || '').toLowerCase();
+                        if (oa < ob) return organizationSortDirection === 'asc' ? -1 : 1;
+                        if (oa > ob) return organizationSortDirection === 'asc' ? 1 : -1;
+                        return 0;
+                    } else if (currentSortBy === 'supervisor') {
+                        const sa = (a.supervisor_name || '').toLowerCase();
+                        const sb = (b.supervisor_name || '').toLowerCase();
+                        if (sa < sb) return supervisorSortDirection === 'asc' ? -1 : 1;
+                        if (sa > sb) return supervisorSortDirection === 'asc' ? 1 : -1;
+                        return 0;
+                    } else if (currentSortBy === 'status') {
+                        const sta = (a.status || '').toLowerCase();
+                        const stb = (b.status || '').toLowerCase();
+                        if (sta < stb) return statusSortDirection === 'asc' ? -1 : 1;
+                        if (sta > stb) return statusSortDirection === 'asc' ? 1 : -1;
+                        return 0;
                     } else {
-                        // sort by date
-                        const da = new Date(a.date);
-                        const db = new Date(b.date);
+                        // sort by date using Philippine timezone
+                        const da = getPhilippineDate(a.date);
+                        const db = getPhilippineDate(b.date);
                         if (isNaN(da) && isNaN(db)) return 0;
                         if (isNaN(da)) return dateSortDirection === 'asc' ? -1 : 1;
                         if (isNaN(db)) return dateSortDirection === 'asc' ? 1 : -1;
@@ -2934,10 +3045,10 @@
                         try {
                             const rejectedAtRaw = rec.rejected_at || rec.rejectedAt || rec.updated_at || rec.updatedAt || null;
                             if (!rejectedAtRaw) return '';
-                            const rej = new Date(String(rejectedAtRaw));
+                            const rej = getPhilippineDate(String(rejectedAtRaw));
                             if (isNaN(rej)) return '';
                             const deleteAt = new Date(rej.getTime() + 7 * 24 * 60 * 60 * 1000);
-                            const now = new Date();
+                            const now = getPhilippineDate();
                             const diff = deleteAt - now;
                             if (diff <= 0) return '<div class="text-xs text-red-500">Deleting soon</div>'; // fallback
                             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -2968,8 +3079,8 @@
                 e.preventDefault();
                 currentSortBy = 'date';
                 dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
-                dateSortIndicator.textContent = dateSortDirection === 'asc' ? '▲' : '▼';
-                hoursSortIndicator.textContent = '▼'; // Reset hours indicator
+                resetAllSortIndicators();
+                dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
                 renderTable();
             });
             // Hours sort toggle
@@ -2977,8 +3088,53 @@
                 e.preventDefault();
                 currentSortBy = 'hours';
                 hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
-                hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '▲' : '▼';
-                dateSortIndicator.textContent = '▼'; // Reset date indicator
+                resetAllSortIndicators();
+                hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
+                renderTable();
+            });
+            // Event Name sort toggle
+            eventnameSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'eventname';
+                eventnameSortDirection = eventnameSortDirection === 'asc' ? 'desc' : 'asc';
+                resetAllSortIndicators();
+                eventnameSortIndicator.textContent = eventnameSortDirection === 'asc' ? '↑' : '↓';
+                renderTable();
+            });
+            // Venue sort toggle
+            venueSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'venue';
+                venueSortDirection = venueSortDirection === 'asc' ? 'desc' : 'asc';
+                resetAllSortIndicators();
+                venueSortIndicator.textContent = venueSortDirection === 'asc' ? '↑' : '↓';
+                renderTable();
+            });
+            // Organization sort toggle
+            organizationSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'organization';
+                organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
+                resetAllSortIndicators();
+                organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
+                renderTable();
+            });
+            // Supervisor sort toggle
+            supervisorSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'supervisor';
+                supervisorSortDirection = supervisorSortDirection === 'asc' ? 'desc' : 'asc';
+                resetAllSortIndicators();
+                supervisorSortIndicator.textContent = supervisorSortDirection === 'asc' ? '↑' : '↓';
+                renderTable();
+            });
+            // Status sort toggle
+            statusSortToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentSortBy = 'status';
+                statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
+                resetAllSortIndicators();
+                statusSortIndicator.textContent = statusSortDirection === 'asc' ? '↑' : '↓';
                 renderTable();
             });
             // Initial load: ensure CSRF cookie exists for consistent behavior
@@ -3654,9 +3810,9 @@
                                     record?.approval?.rejected_at || 
                                     record?.date ||
                                     record?.action_date;
-                // Format the date if it's in ISO format (e.g., 2025-10-23T00:00:00.000000Z)
+                // Format the date if it's in ISO format using Philippine timezone
                 if (rejectedDate && rejectedDate.includes && rejectedDate.includes('T')) {
-                    const dateObj = new Date(rejectedDate);
+                    const dateObj = getPhilippineDate(rejectedDate);
                     rejectedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
                 }
                 if (rejectedDate) {
@@ -3806,7 +3962,7 @@
                 if (!val) return null;
                 const s = String(val);
                 const iso = s.includes('T') ? s : s;
-                const d = new Date(iso);
+                const d = getPhilippineDate(iso);
                 return isNaN(d) ? null : d;
             } catch (_) { return null; }
         }
@@ -3889,17 +4045,17 @@
             }
         });
 
-        // Helper: Format database date to readable format
+        // Helper: Format database date to readable format using Philippine timezone
         window.formatDbDate = function(dateStr) {
             if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const date = getPhilippineDate(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Manila' });
         };
 
-        // Helper: Check if a date falls within a school year
+        // Helper: Check if a date falls within a school year using Philippine timezone
         window.isDateInSchoolYear = function(dateStr, schoolYear) {
             if (!dateStr || !schoolYear) return false;
-            const date = new Date(dateStr);
+            const date = getPhilippineDate(dateStr);
             const [startYear, endYear] = schoolYear.split('-').map(Number);
             const syStart = new Date(startYear, 7, 1); // August 1
             const syEnd = new Date(endYear, 6, 31);    // July 31
@@ -3920,9 +4076,9 @@
             const dropdown = document.getElementById('export-school-year');
             dropdown.innerHTML = ''; // Clear existing options
 
-            // Get all approved records with dates (Verified or Approved status)
+            // Get all approved records with dates (only Approved status, not Verified)
             const approvedRecords = allRecords.filter(r => 
-                (r.status === 'Verified' || r.status === 'Approved') && r.date
+                r.status === 'Approved' && r.date
             );
             
             console.log('Approved records with dates:', approvedRecords.length);
@@ -3935,7 +4091,7 @@
             // Extract years and create school year ranges
             const years = new Set();
             approvedRecords.forEach(record => {
-                const date = new Date(record.date);
+                const date = getPhilippineDate(record.date);
                 const year = date.getFullYear();
                 const month = date.getMonth(); // 0-11
                 // If Aug-Dec, belongs to current-next school year
@@ -4011,9 +4167,9 @@
                 return;
             }
 
-            // Filter approved records by selected school year (Verified or Approved status)
+            // Filter approved records by selected school year (only Approved status, not Verified)
             const filteredRecords = allRecords.filter(record => 
-                (record.status === 'Verified' || record.status === 'Approved') && 
+                record.status === 'Approved' && 
                 isDateInSchoolYear(record.date, schoolYear)
             );
 
@@ -4110,12 +4266,13 @@
                     // Prepare table data matching the format from the image
                     const tableData = filteredRecords.map((record) => {
                         const venue = record.venue || record.location || '';
-                        console.log('Record venue:', venue, 'from record:', record);
+                        const supervisorName = record.supervisor_name || '';
+                        console.log('Record venue:', venue, 'supervisor:', supervisorName, 'from record:', record);
                         return [
                             formatDbDate(record.date),
                             venue,
                             (record.organization ? record.organization + ' - ' : '') + (record.event_name || ''),
-                            '', // Empty cell for "Printed Name and Signature of Supervisor"
+                            supervisorName, // Supervisor name from the record
                             record.hours_rendered || 0
                         ];
                     });
@@ -4174,13 +4331,14 @@
                     doc.text('Verified by:', 120, finalY);
                     doc.text('_______________________', 120, finalY + 15);
                     doc.setFontSize(9);
-                    doc.text('Admin Name', 120, finalY + 20);
-                    doc.text('Administrator', 120, finalY + 25);
+                    doc.text(SUPER_ADMIN_NAME, 120, finalY + 20);
+                    doc.text('Super Administrator', 120, finalY + 25);
 
                     // Footer
                     doc.setFontSize(8);
                     doc.setTextColor(128);
-                    doc.text(`Generated on: ${new Date().toLocaleString('en-US')}`, 105, 285, { align: 'center' });
+                    const phDate = getPhilippineDate();
+                    doc.text(`Generated on: ${phDate.toLocaleString('en-US', { timeZone: 'Asia/Manila' })}`, 105, 285, { align: 'center' });
 
                     // Save PDF
                     const fileName = `Social_Contract_${studentId}_${schoolYear}.pdf`;
