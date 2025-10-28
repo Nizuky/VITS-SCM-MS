@@ -2195,9 +2195,15 @@
         // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
         // Defined globally so it can be used by all functions
         function getPhilippineDate(dateInput = null) {
-            const date = dateInput ? new Date(dateInput) : new Date();
-            // Convert to Philippine time (UTC+8)
-            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            if (!dateInput) {
+                // If no input, return current Philippine time
+                return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            }
+            // Parse the input date and convert to Philippine timezone
+            const date = new Date(dateInput);
+            // Convert to Philippine timezone by getting the locale string and creating a new Date
+            const phTimeString = date.toLocaleString('en-US', { timeZone: 'Asia/Manila' });
+            return new Date(phTimeString);
         }
 
         // --- Table & Modal Logic ---
@@ -2255,18 +2261,19 @@
                 if (!dateVal) return '';
                 let s = String(dateVal);
                 // handle ISO datetimes like 2025-10-04T00:00:00.000000Z
-                if (s.includes('T')) s = s.substring(0, 10);
+                if (s.includes('T')) {
+                    // Extract just the date part (YYYY-MM-DD) to avoid timezone conversion
+                    s = s.substring(0, 10);
+                }
                 // Expect s as YYYY-MM-DD now
                 const parts = s.split('-');
                 if (parts.length === 3) {
                     const [y, m, d] = parts;
+                    // Return DD-MM-YYYY format directly without timezone conversion
                     return `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
                 }
-                // Fallback to locale formatting with Philippine timezone
-                try { 
-                    const phDate = getPhilippineDate(dateVal);
-                    return phDate.toLocaleDateString('en-GB').replace(/\//g, '-'); 
-                } catch { return s; }
+                // If not in expected format, return as-is
+                return s;
             }
             var lastRecordsData = null; // Store last data to detect changes
             var isLoadingRecords = false; // Prevent concurrent requests
@@ -2441,6 +2448,11 @@
                     step2Icon = '2';
                     step2Label = 'Verified';
                     step2Date = record.verified_at || '';
+                    // Format the date if it's in ISO format using Philippine timezone
+                    if (step2Date && step2Date.includes('T')) {
+                        const dateObj = getPhilippineDate(step2Date);
+                        step2Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    }
                     connector1Class = 'completed';
                     connector2Class = 'active';
                     step3Class = 'active';
@@ -2450,11 +2462,21 @@
                     step2Class = 'completed';
                     step2Icon = '2';
                     step2Label = 'Verified';
-                    step2Date = record.verified_at || record.approval?.verified_at || record.action_date || '';
+                    step2Date = record.verified_at || record.approval?.verified_at || '';
+                    // Format step2Date if it's in ISO format using Philippine timezone
+                    if (step2Date && step2Date.includes('T')) {
+                        const dateObj = getPhilippineDate(step2Date);
+                        step2Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    }
                     step3Class = 'completed';
                     step3Icon = '3';
                     step3Label = 'Approved';
-                    step3Date = record.approved_at || record.approval?.approved_at || record.action_date || record.verified_at || '';
+                    step3Date = record.approved_at || record.approval?.approved_at || '';
+                    // Format step3Date if it's in ISO format using Philippine timezone
+                    if (step3Date && step3Date.includes('T')) {
+                        const dateObj = getPhilippineDate(step3Date);
+                        step3Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    }
                     connector1Class = 'completed';
                     connector2Class = 'completed';
                 } else if (record.status === 'Rejected') {
@@ -2464,7 +2486,7 @@
                     step2Icon = '✕';
                     step2Label = 'Rejected';
                     // Try rejected_at, then approval date, then the raw date field, then action_date
-                    step2Date = record.rejected_at || record.approval?.rejected_at || record.date || record.action_date || '';
+                    step2Date = record.rejected_at || record.approval?.rejected_at || '';
                     // Format the date if it's in ISO format using Philippine timezone
                     if (step2Date && step2Date.includes('T')) {
                         const dateObj = getPhilippineDate(step2Date);
@@ -3080,22 +3102,6 @@
                         if (e.target.classList.contains('record-checkbox')) return;
                         toggleRecordDetails(rec, row); 
                     };
-                    // Compute deletion countdown HTML if available
-                    const deletionCountdownHtml = (() => {
-                        try {
-                            const rejectedAtRaw = rec.rejected_at || rec.rejectedAt || rec.updated_at || rec.updatedAt || null;
-                            if (!rejectedAtRaw) return '';
-                            const rej = getPhilippineDate(String(rejectedAtRaw));
-                            if (isNaN(rej)) return '';
-                            const deleteAt = new Date(rej.getTime() + 7 * 24 * 60 * 60 * 1000);
-                            const now = getPhilippineDate();
-                            const diff = deleteAt - now;
-                            if (diff <= 0) return '<div class="text-xs text-red-500">Deleting soon</div>'; // fallback
-                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            return `<div class="text-xs text-gray-400 mt-1">Time left before deletion: ${days} day${days!==1?'s':''} ${hours} hour${hours!==1?'s':''}</div>`;
-                        } catch (e) { return ''; }
-                    })();
 
                     // Add action date if available
                     let statusHtml = renderStatusBadge(rec.status, rec);
@@ -3108,7 +3114,7 @@
                         <td class="text-center">${rec.organization}</td>
                         <td class="text-center">${rec.supervisor_name || '-'}</td>
                         <td class="text-center">${rec.hours_rendered} hours</td>
-                        <td class="text-center">${statusHtml} ${rec.status === 'Rejected' ? deletionCountdownHtml : ''}</td>
+                        <td class="text-center">${statusHtml}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -3806,63 +3812,84 @@
         function renderStatusBadge(status, record = null) {
             let badgeHtml = '';
             let dateHtml = '';
-            
-            // Debug logging
-            if (record && (status === 'Approved' || status === 'Rejected')) {
-                console.log('renderStatusBadge called:', {
-                    status: status,
-                    approved_at: record.approved_at,
-                    rejected_at: record.rejected_at,
-                    verified_at: record.verified_at,
-                    action_date: record.action_date,
-                    finalDate: status === 'Approved' ? (record?.approved_at || record?.action_date) : (record?.rejected_at || record?.action_date)
-                });
-            }
+            let countdownHtml = '';
             
             if (status === 'Approved') {
                 badgeHtml = '<span class="scms-badge scms-badge--approved">Approved</span>';
-                // For approved records, try multiple sources:
-                // 1. approved_at field
-                // 2. approval.approved_at nested field
-                // 3. action_date field
-                // 4. verified_at as last resort (they were at least verified)
-                const approvedDate = record?.approved_at || 
-                                    record?.approval?.approved_at || 
-                                    record?.action_date || 
-                                    record?.verified_at;
-                console.log('Approved date being used:', approvedDate);
-                console.log('Checking approval object:', record?.approval);
-                if (approvedDate) {
-                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + approvedDate + '</div>';
-                    console.log('Date HTML for Approved:', dateHtml);
+                // Use approved_at timestamp and format with Philippine timezone
+                const approvedTimestamp = record?.approved_at;
+                if (approvedTimestamp) {
+                    try {
+                        const dateObj = getPhilippineDate(approvedTimestamp);
+                        const formattedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                        dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + formattedDate + '</div>';
+                    } catch(e) {
+                        console.error('Error formatting approved date:', e);
+                    }
                 }
             } else if (status === 'Verified') {
                 badgeHtml = '<span class="scms-badge scms-badge--verified">Verified</span>';
-                // Try verified_at first, fallback to action_date
-                const verifiedDate = record?.verified_at || record?.action_date;
-                if (verifiedDate) {
-                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + verifiedDate + '</div>';
+                // Use verified_at timestamp and format with Philippine timezone
+                const verifiedTimestamp = record?.verified_at;
+                if (verifiedTimestamp) {
+                    try {
+                        const dateObj = getPhilippineDate(verifiedTimestamp);
+                        const formattedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                        dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + formattedDate + '</div>';
+                    } catch(e) {
+                        console.error('Error formatting verified date:', e);
+                    }
                 }
             } else if (status === 'Rejected') {
                 badgeHtml = '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-                // Try rejected_at first, fallback to approval date, then raw date field, then action_date
-                let rejectedDate = record?.rejected_at || 
-                                    record?.approval?.rejected_at || 
-                                    record?.date ||
-                                    record?.action_date;
-                // Format the date if it's in ISO format using Philippine timezone
-                if (rejectedDate && rejectedDate.includes && rejectedDate.includes('T')) {
-                    const dateObj = getPhilippineDate(rejectedDate);
-                    rejectedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
-                }
-                if (rejectedDate) {
-                    dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + rejectedDate + '</div>';
+                // Use rejected_at timestamp and format with Philippine timezone
+                const rejectedTimestamp = record?.rejected_at;
+                console.log('Rejected record:', { rejected_at: rejectedTimestamp, record });
+                if (rejectedTimestamp) {
+                    try {
+                        const dateObj = getPhilippineDate(rejectedTimestamp);
+                        const formattedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                        dateHtml = '<div class="text-xs mt-1" style="color: #6b7280; font-size: 0.75rem; line-height: 1rem;">' + formattedDate + '</div>';
+                        console.log('Rejected date formatted:', formattedDate);
+                        
+                        // Add deletion countdown
+                        try {
+                            const rej = getPhilippineDate(String(rejectedTimestamp));
+                            console.log('Rejection date object:', rej);
+                            if (!isNaN(rej.getTime())) {
+                                // Countdown starts from exact rejection time + 7 days
+                                const deleteAt = new Date(rej.getTime() + 7 * 24 * 60 * 60 * 1000);
+                                const now = getPhilippineDate();
+                                const diff = deleteAt - now;
+                                console.log('Countdown calculation:', { deleteAt, now, diff, diffInDays: diff / (1000 * 60 * 60 * 24) });
+                                
+                                if (diff > 0) {
+                                    // Calculate exact time remaining from the rejection timestamp
+                                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                    countdownHtml = `<div class="text-xs mt-1" style="color: #9ca3af; font-size: 0.75rem; line-height: 1rem;">Time left before deletion: ${days} day${days!==1?'s':''} ${hours} hour${hours!==1?'s':''}</div>`;
+                                    console.log('Countdown HTML created:', countdownHtml);
+                                } else {
+                                    countdownHtml = '<div class="text-xs text-red-500 mt-1">Deleting soon</div>';
+                                    console.log('Deletion imminent');
+                                }
+                            } else {
+                                console.warn('Invalid rejection date');
+                            }
+                        } catch(e) {
+                            console.error('Error calculating deletion countdown:', e);
+                        }
+                    } catch(e) {
+                        console.error('Error formatting rejected date:', e);
+                    }
+                } else {
+                    console.warn('No rejected_at timestamp found for Rejected record');
                 }
             } else {
                 badgeHtml = '<span class="scms-badge scms-badge--pending">Pending</span>';
             }
             
-            return badgeHtml + dateHtml;
+            return badgeHtml + dateHtml + countdownHtml;
         }
         function filterTableByStatus(status, event) {
             const tableBody = document.getElementById('record-table-body');

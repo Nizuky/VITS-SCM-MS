@@ -826,9 +826,19 @@ table{overflow:visible!important}
         
         // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
         function getPhilippineDate(dateInput = null) {
-            const date = dateInput ? new Date(dateInput) : new Date();
-            // Convert to Philippine time (UTC+8)
-            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            if (!dateInput) {
+                // Return current time in Philippine timezone
+                const now = new Date();
+                const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+                return phTime;
+            }
+            
+            // Parse input date - assume it's UTC from database
+            const date = new Date(dateInput);
+            
+            // Convert to Philippine timezone (UTC+8)
+            const phTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            return phTime;
         }
         
         // ==================== CSRF TOKEN SETUP ====================
@@ -1156,12 +1166,24 @@ table{overflow:visible!important}
                 
                 var dateStr = record.date ? formatDate(record.date) : '—';
                 
-                // Get action date (when it was verified/approved/rejected)
-                var actionDate = record.action_date || record.verified_at || record.approved_at || record.rejected_at || '';
+                // Get action date based on status - use the actual timestamp fields
+                var actionDateStr = '';
+                var actionTimestamp = null;
                 
-                // Debug: Log the dates to console
-                if (record.status !== 'Pending') {
-                    console.log('Record status:', record.status, 'action_date:', record.action_date, 'verified_at:', record.verified_at, 'approved_at:', record.approved_at, 'rejected_at:', record.rejected_at, 'Final actionDate:', actionDate);
+                if (isRejected && record.rejected_at) {
+                    actionTimestamp = record.rejected_at;
+                } else if (isApproved && record.approved_at) {
+                    actionTimestamp = record.approved_at;
+                } else if (isVerified && record.verified_at) {
+                    actionTimestamp = record.verified_at;
+                } else if (record.updated_at) {
+                    // Fallback to updated_at if specific timestamp not available
+                    actionTimestamp = record.updated_at;
+                }
+                
+                // Format the action date in Philippine timezone
+                if (actionTimestamp) {
+                    actionDateStr = formatDate(actionTimestamp);
                 }
                 
                 html += '<tr data-status="' + dataStatus + '" ' +
@@ -1170,7 +1192,7 @@ table{overflow:visible!important}
                         'data-venue="' + (record.venue || '') + '" ' +
                         'data-organization="' + (record.organization || '') + '" ' +
                         'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
-                        'data-action-date="' + actionDate + '" ' +
+                        'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
@@ -1198,27 +1220,27 @@ table{overflow:visible!important}
                     // Verified records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--verified">Verified</span>';
-                    // Always show date if action_date exists
-                    if (actionDate) {
-                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
+                    // Always show date if actionDateStr exists
+                    if (actionDateStr) {
+                        html += '<span class="text-xs text-gray-500">' + actionDateStr + '</span>';
                     }
                     html += '</div>';
                 } else if (isApproved) {
                     // Approved records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--approved">Approved</span>';
-                    // Always show date if action_date exists
-                    if (actionDate) {
-                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
+                    // Always show date if actionDateStr exists
+                    if (actionDateStr) {
+                        html += '<span class="text-xs text-gray-500">' + actionDateStr + '</span>';
                     }
                     html += '</div>';
                 } else if (isRejected) {
                     // Rejected records show badge with date
                     html += '<div class="flex flex-col items-center gap-1">' +
                             '<span class="scms-badge scms-badge--rejected">Rejected</span>';
-                    // Always show date if action_date exists
-                    if (actionDate) {
-                        html += '<span class="text-xs text-gray-500">' + actionDate + '</span>';
+                    // Always show date if actionDateStr exists
+                    if (actionDateStr) {
+                        html += '<span class="text-xs text-gray-500">' + actionDateStr + '</span>';
                     }
                     html += '</div>';
                 }
@@ -1238,12 +1260,15 @@ table{overflow:visible!important}
         // Format date helper using Philippine timezone
         function formatDate(dateStr) {
             try {
+                // Convert to Philippine timezone
                 var date = getPhilippineDate(dateStr);
                 var month = String(date.getMonth() + 1).padStart(2, '0');
                 var day = String(date.getDate()).padStart(2, '0');
-                var year = String(date.getFullYear()).slice(-2);
+                var year = date.getFullYear();
+                // Return in MM-DD-YYYY format
                 return month + '-' + day + '-' + year;
             } catch (e) {
+                console.error('Date formatting error:', e);
                 return dateStr;
             }
         }

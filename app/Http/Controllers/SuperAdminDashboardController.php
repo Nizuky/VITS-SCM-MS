@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SocialContractRecord;
+use App\Models\SocialContractApproval;
 use App\Models\SuperAdminActivityLog;
 use App\Models\StudentNotification;
 use Carbon\Carbon;
@@ -327,9 +328,30 @@ class SuperAdminDashboardController extends Controller
             DB::transaction(function () use ($record) {
                 // Update the record status to Approved
                 $record->status = 'Approved';
-                $record->approved_by = Auth::guard('superadmin')->id();
-                $record->approved_at = now();
                 $record->save();
+                
+                // Update or create the approval record with approved_at timestamp
+                if ($record->approval) {
+                    $record->approval->status = 'Approved';
+                    $record->approval->approved_by = Auth::guard('superadmin')->id();
+                    $record->approval->approved_at = now();
+                    $record->approval->save();
+                } else {
+                    // If no approval record exists, create one
+                    SocialContractApproval::create([
+                        'social_contract_record_id' => $record->id,
+                        'student_id' => $record->socialContract->student->student_id ?? '',
+                        'student_name' => $record->socialContract->student->name ?? '',
+                        'event_name' => $record->event_name,
+                        'organization' => $record->organization,
+                        'venue' => $record->venue,
+                        'hours_rendered' => $record->hours_rendered,
+                        'date' => $record->date,
+                        'status' => 'Approved',
+                        'approved_by' => Auth::guard('superadmin')->id(),
+                        'approved_at' => now(),
+                    ]);
+                }
                 
                 // Create notification for student
                 StudentNotification::create([

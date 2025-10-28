@@ -31,20 +31,31 @@ class SocialContractRecordController extends Controller
         if ($all) {
             $records = $user->socialContractRecords()->with('approval')->latest('date')->get()->map(function($record) {
                 $data = $record->toArray();
-                // Add action dates from approval table if exists
+                // Add action dates from approval table if exists - send as ISO timestamps for proper timezone handling
                 if ($record->approval) {
-                    $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->format('m-d-Y') : null;
-                    $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->format('m-d-Y') : null;
-                    $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->format('m-d-Y') : null;
+                    $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->toISOString() : null;
+                    $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->toISOString() : null;
+                    $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->toISOString() : null;
                     
-                    // Determine action date based on status
+                    // Debug log
+                    \Log::info('Record timestamps', [
+                        'id' => $record->id,
+                        'status' => $record->status,
+                        'verified_at' => $data['verified_at'],
+                        'approved_at' => $data['approved_at'],
+                        'rejected_at' => $data['rejected_at'],
+                    ]);
+                    
+                    // Determine action date based on status - also send as ISO timestamp
                     if ($record->status === 'Approved' && $record->approval->approved_at) {
-                        $data['action_date'] = $record->approval->approved_at->format('m-d-Y');
+                        $data['action_date'] = $record->approval->approved_at->toISOString();
                     } elseif ($record->status === 'Rejected' && $record->approval->rejected_at) {
-                        $data['action_date'] = $record->approval->rejected_at->format('m-d-Y');
+                        $data['action_date'] = $record->approval->rejected_at->toISOString();
                     } elseif ($record->status === 'Verified' && $record->approval->verified_at) {
-                        $data['action_date'] = $record->approval->verified_at->format('m-d-Y');
+                        $data['action_date'] = $record->approval->verified_at->toISOString();
                     }
+                } else {
+                    \Log::warning('No approval record found for record ID: ' . $record->id);
                 }
                 return $data;
             });
@@ -60,19 +71,19 @@ class SocialContractRecordController extends Controller
 
         $records = $contract->records()->with('approval')->latest('date')->get()->map(function($record) {
             $data = $record->toArray();
-            // Add action dates from approval table if exists
+            // Add action dates from approval table if exists - send as ISO timestamps for proper timezone handling
             if ($record->approval) {
-                $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->format('m-d-Y') : null;
-                $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->format('m-d-Y') : null;
-                $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->format('m-d-Y') : null;
+                $data['verified_at'] = $record->approval->verified_at ? $record->approval->verified_at->toISOString() : null;
+                $data['approved_at'] = $record->approval->approved_at ? $record->approval->approved_at->toISOString() : null;
+                $data['rejected_at'] = $record->approval->rejected_at ? $record->approval->rejected_at->toISOString() : null;
                 
-                // Determine action date based on status
+                // Determine action date based on status - also send as ISO timestamp
                 if ($record->status === 'Approved' && $record->approval->approved_at) {
-                    $data['action_date'] = $record->approval->approved_at->format('m-d-Y');
+                    $data['action_date'] = $record->approval->approved_at->toISOString();
                 } elseif ($record->status === 'Rejected' && $record->approval->rejected_at) {
-                    $data['action_date'] = $record->approval->rejected_at->format('m-d-Y');
+                    $data['action_date'] = $record->approval->rejected_at->toISOString();
                 } elseif ($record->status === 'Verified' && $record->approval->verified_at) {
-                    $data['action_date'] = $record->approval->verified_at->format('m-d-Y');
+                    $data['action_date'] = $record->approval->verified_at->toISOString();
                 }
             }
             return $data;

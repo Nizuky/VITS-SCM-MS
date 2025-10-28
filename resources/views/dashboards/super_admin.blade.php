@@ -1342,9 +1342,19 @@ table{overflow:visible!important}
         
         // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
         function getPhilippineDate(dateInput = null) {
-            const date = dateInput ? new Date(dateInput) : new Date();
-            // Convert to Philippine time (UTC+8)
-            return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            if (!dateInput) {
+                // Return current time in Philippine timezone
+                const now = new Date();
+                const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+                return phTime;
+            }
+            
+            // Parse input date - assume it's UTC from database
+            const date = new Date(dateInput);
+            
+            // Convert to Philippine timezone (UTC+8)
+            const phTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            return phTime;
         }
         
         // ==================== CSRF TOKEN SETUP ====================
@@ -2462,8 +2472,25 @@ table{overflow:visible!important}
                 // Escape rejection reason for HTML attribute
                 var rejectionReason = (record.rejection_reason || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                 
-                // Get action date
-                var actionDateStr = record.action_date || '';
+                // Get action date based on status - use the actual timestamp fields
+                var actionDateStr = '';
+                var actionTimestamp = null;
+                
+                if (isRejected && record.rejected_at) {
+                    actionTimestamp = record.rejected_at;
+                } else if (isApproved && record.approved_at) {
+                    actionTimestamp = record.approved_at;
+                } else if (isVerified && record.verified_at) {
+                    actionTimestamp = record.verified_at;
+                } else if (record.updated_at) {
+                    // Fallback to updated_at if specific timestamp not available
+                    actionTimestamp = record.updated_at;
+                }
+                
+                // Format the action date in Philippine timezone
+                if (actionTimestamp) {
+                    actionDateStr = formatDate(actionTimestamp);
+                }
                 
                 html += '<tr data-status="' + dataStatus + '" ' +
                         (dataArchiveStatus ? 'data-archive-status="' + dataArchiveStatus + '" ' : '') +
@@ -2548,12 +2575,15 @@ table{overflow:visible!important}
         // Format date helper using Philippine timezone
         function formatDate(dateStr) {
             try {
+                // Convert to Philippine timezone
                 var date = getPhilippineDate(dateStr);
                 var month = String(date.getMonth() + 1).padStart(2, '0');
                 var day = String(date.getDate()).padStart(2, '0');
-                var year = String(date.getFullYear()).slice(-2);
+                var year = date.getFullYear();
+                // Return in MM-DD-YYYY format
                 return month + '-' + day + '-' + year;
             } catch (e) {
+                console.error('Date formatting error:', e);
                 return dateStr;
             }
         }
