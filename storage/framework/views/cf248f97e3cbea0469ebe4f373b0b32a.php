@@ -214,10 +214,12 @@
         
         .steps-horizontal {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            padding: 2rem;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0;
+            padding: 3rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .step-item {
@@ -226,32 +228,35 @@
             align-items: center;
             position: relative;
             flex: 1;
-            max-width: 200px;
         }
         
         .step-circle {
-            width: 3rem;
-            height: 3rem;
+            width: 3.5rem;
+            height: 3.5rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             background-color: #e5e7eb;
             color: #6b7280;
             z-index: 2;
             position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
         }
         
         .step-circle.active {
             background-color: #3B82F6;
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
         
         .step-circle.completed {
             background-color: #4CAF50;
             color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
         
         .step-circle.rejected {
@@ -261,12 +266,13 @@
             transition: all 0.2s ease;
             position: relative;
             z-index: 10;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
         
         .step-circle.rejected:hover {
             background-color: #DC2626;
             transform: scale(1.1);
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
         }
         
         .step-circle.rejected:active {
@@ -276,28 +282,31 @@
         .step-circle.pending {
             background-color: #F59E0B;
             color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
         
         .step-label {
-            margin-top: 0.5rem;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             text-align: center;
+            color: #1f2937;
+            margin-bottom: 0.375rem;
+            line-height: 1.2;
         }
         
         .step-sublabel {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #6b7280;
             text-align: center;
-            margin-top: 0.25rem;
+            line-height: 1.3;
         }
         
         .step-connector {
             position: absolute;
-            top: 1.5rem;
-            left: 50%;
-            right: -50%;
-            height: 3px;
+            top: 1.75rem;
+            left: calc(50% + 1.75rem);
+            right: calc(-50% + 1.75rem);
+            height: 4px;
             background-color: #e5e7eb;
             z-index: 1;
         }
@@ -314,27 +323,56 @@
             background-color: #4CAF50;
         }
         
+        /* Dark theme styles */
         [data-theme="dark"] .step-circle {
             background-color: #374151;
             color: #9ca3af;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
+        
+        [data-theme="dark"] .step-label {
+            color: #e5e7eb;
+        }
+        
+        [data-theme="dark"] .step-sublabel {
+            color: #9ca3af;
+        }
+        
+        [data-theme="dark"] .step-connector {
+            background-color: #4b5563;
+        }
+        
         /* Force variant states to keep bright colors even in dark theme */
         [data-theme="dark"] .step-circle.active {
             background-color: #3B82F6 !important; /* blue */
             color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
         }
         [data-theme="dark"] .step-circle.completed {
             background-color: #4CAF50 !important; /* green */
             color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4) !important;
         }
         [data-theme="dark"] .step-circle.rejected {
             background-color: #EF4444 !important; /* red */
             color: #ffffff !important;
-            box-shadow: none !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+        }
+        [data-theme="dark"] .step-circle.rejected:hover {
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5) !important;
         }
         [data-theme="dark"] .step-circle.pending {
             background-color: #F59E0B !important; /* yellow/orange */
             color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+        }
+        
+        [data-theme="dark"] .step-connector.active {
+            background-color: #3B82F6 !important;
+        }
+        
+        [data-theme="dark"] .step-connector.completed {
+            background-color: #4CAF50 !important;
         }
         
         [data-theme="dark"] .step-sublabel {
@@ -853,7 +891,7 @@
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-x-auto overflow-y-auto flex-1"> 
+                    <div class="overflow-y-auto flex-1" style="max-height: calc(140vh - 280px);"> 
                         <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
                                 <tr>
@@ -926,19 +964,18 @@
                         </table>
                     </div>
                 </div>
-            </div> 
+            </div>
 
-            <div id="profile-page" class="page-content hidden">
-                <div class="flex items-center justify-between p-4">
+            <div id="profile-page" class="page-content hidden flex-col">
+                <div class="p-4 flex items-center justify-between">
                     <h4 class="text-4xl font-bold text-primary-purple">Profile Information</h4>
                     <label class="label cursor-pointer flex items-center gap-3">
                         <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
                         <input id="theme-toggle" type="checkbox" class="toggle toggle-primary" />
                     </label>
                 </div>
-                
-                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
 
+                <div class="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
                     <div id="profile-view" class="space-y-6">
                         <div class="grid grid-cols-2 gap-x-12 gap-y-6">
                             <div>
