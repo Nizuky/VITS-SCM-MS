@@ -97,6 +97,7 @@
         /* Ensure active nav exactly matches primary purple */
         .active-nav { background-color: #6D28D9; color: #ffffff; border-radius: 0.5rem; }
         .flex-1-dynamic { flex: 1 1 auto; min-height: 0; }
+        .page-content:not(.hidden) { display: flex !important; }
         .content-area-auto { height: auto; max-height: 100%; }
         /* Strong button color override to avoid DaisyUI theme side-effects */
         .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
@@ -503,7 +504,6 @@
         [data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
         thead{overflow:visible!important}
         table{overflow:visible!important}
-        #record-status-page .overflow-x-auto{overflow:visible!important}
         .table thead tr{height:60px!important;max-height:60px!important}
         .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
     </style>
@@ -862,44 +862,44 @@
                                         </button>
                                     </th>
                                     <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
-                                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Date">
+                                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[18%]" style="height: 60px; max-height: 60px;">
-                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Event Name">
+                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
-                                        <button id="venue-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Venue">
+                                        <button id="venue-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Venue">
                                             Venue
                                             <span id="venue-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
-                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Organization">
+                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Organization">
                                             Organization
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
-                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Supervisor">
+                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Supervisor">
                                             Supervisor
                                             <span id="supervisor-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[10%]" style="height: 60px; max-height: 60px;">
-                                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Hours Rendered">
+                                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
                                     <th class="text-center w-[14%]" style="height: 60px; max-height: 60px;">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1" title="Sort by Status">
+                                        <div class="flex items-center justify-center gap-1 font-bold">
+                                            <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                                 <span>Status</span>
                                                 <span id="status-sort-indicator">⇅</span>
                                             </button>
