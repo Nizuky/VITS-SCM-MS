@@ -1079,27 +1079,32 @@
 
             <!-- Support Tickets Page -->
             <div id="support-page" class="page-content hidden flex flex-col">
-                <div class="p-4 flex justify-between items-center">
+                <div class="p-4">
                     <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
-                    <div class="flex gap-2">
-                        <button onclick="refreshTickets()" id="refresh-tickets-btn" class="btn btn-outline btn-primary rounded-lg" title="Refresh tickets">
-                            <svg id="refresh-tickets-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </div>
+                
+                <div class="flex justify-between items-center px-4 mb-6">
+                    <button class="btn btn-primary-purple rounded-lg border-0" onclick="document.getElementById('submit_ticket_modal').showModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Submit New Ticket
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, type, or details..." class="input input-bordered rounded-lg" />
+                        
+                        <!-- Refresh Button -->
+                        <button id="refresh-tickets-btn" onclick="refreshTickets()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh tickets">
+                            <svg id="refresh-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
-                            Refresh
-                        </button>
-                        <button onclick="document.getElementById('submit_ticket_modal').showModal()" class="btn bg-primary-purple hover:bg-primary-purple-hover text-white rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Submit New Ticket
+                            <span class="hidden md:inline">Refresh</span>
                         </button>
                     </div>
                 </div>
                 
-                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto">
-                    <div class="mb-4 flex justify-between items-center">
-                        <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, type, or details..." class="input input-bordered w-full max-w-md rounded-lg" />
+                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto mx-4">
+                    <div class="mb-4 flex justify-end items-center">
                         <div id="ticket-limit-info" class="text-sm text-gray-600"></div>
                     </div>
                     
