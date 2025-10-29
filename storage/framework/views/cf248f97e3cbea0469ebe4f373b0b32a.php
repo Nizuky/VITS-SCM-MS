@@ -891,7 +891,7 @@
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-y-auto flex-1" style="max-height: calc(140vh - 280px);"> 
+                    <div class="overflow-y-auto flex-1" style="max-height: calc(110vh - 280px);"> 
                         <table class="table table-fixed w-full">
                             <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
                                 <tr>
