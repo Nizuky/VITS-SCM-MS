@@ -2673,6 +2673,53 @@
             // Make it globally accessible
             window.showRejectionReason = showRejectionReason;
             
+            // Navigate to a specific record
+            async function goToRecord(recordId) {
+                try {
+                    // switch to record status page
+                    showPage('record-status');
+
+                    // ensure records are loaded
+                    if (!Array.isArray(allRecords) || allRecords.length === 0) {
+                        // loadRecords returns immediately if already fetching, otherwise populates allRecords
+                        await loadRecords();
+                        // small delay to allow DOM render
+                        await new Promise(r => setTimeout(r, 200));
+                    }
+
+                    // try to find the row
+                    const selector = `#record-table-body tr[data-record-id="${recordId}"]`;
+                    let row = document.querySelector(selector);
+
+                    // if not found, wait a bit and try again (records may still be rendering)
+                    if (!row) {
+                        await new Promise(r => setTimeout(r, 300));
+                        row = document.querySelector(selector);
+                    }
+
+                    if (row) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // trigger click to expand details (same as user click)
+                        row.click();
+                        return;
+                    }
+
+                    // fallback: if record exists in allRecords but row not rendered yet, open status modal for its status
+                    const rec = (Array.isArray(allRecords) && allRecords.find(r => String(r.id) === String(recordId)));
+                    if (rec && rec.status) {
+                        showStatusModal(rec.status);
+                        showToast('Record found but table row not rendered; opened status modal.', 'info');
+                        return;
+                    }
+
+                    showToast('Record not found', 'warning');
+                } catch (err) {
+                    console.error('goToRecord error', err);
+                    showToast('Failed to open record', 'error');
+                }
+            }
+            window.goToRecord = goToRecord;
+            
             // ========== NOTIFICATION SYSTEM ==========
             
             // Load recent notifications (max 3 for dropdown)
@@ -2744,6 +2791,7 @@
             }
             
             // Create notification HTML
+            // Create notification HTML
             function createNotificationHTML(notif, showDeleteBtn = true) {
                 let icon, iconColor, statusText, statusColor, statusHex;
                 
@@ -2772,7 +2820,7 @@
                     default:
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
                         iconColor = 'text-gray-500';
-                        statusText = 'Updated';
+                        statusText = 'Notification'; // Default text
                         statusColor = 'text-gray-700 dark:text-gray-700';
                         statusHex = '#374151';
                 }
@@ -2780,20 +2828,10 @@
                 const isUnread = !notif.is_read;
                 const bgClass = isUnread ? 'bg-purple-50 dark:bg-purple-900/10' : '';
                 
-                // Event details
-                let eventDetails = '';
-                    if (notif.event_name || notif.venue) {
-                    eventDetails = `
-                        <p class="text-xs text-gray-700 dark:text-gray mt-1">
-                            ${notif.event_name ? `<span class="font-medium">${notif.event_name}</span>` : ''}
-                            ${notif.event_name && notif.venue ? ' • ' : ''}
-                            ${notif.venue ? notif.venue : ''}
-                        </p>
-                    `;
-                }
+                // Use the 'message' field from your database
+                const messageDetails = notif.message ? `<p class="text-xs text-gray-700 dark:text-gray mt-1">${notif.message}</p>` : '';
                 
                 let reasonSection = '';
-                let expandedReasonSection = '';
                 if (notif.type === 'rejected' && notif.rejection_reason) {
                     if (showDeleteBtn) {
                         // For "All Notifications" modal - inline expandable reason
@@ -2830,25 +2868,66 @@
                         </svg>
                     </button>
                 ` : '';
-                
-                return `
-                    <li id="notif-${notif.id}" class="relative ${bgClass}">
-                        <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${iconColor} mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                ${icon}
-                            </svg>
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-black">
-                                    Your submission has been <span class="${statusColor} font-bold" ${statusHex ? `style="color: ${statusHex} !important"` : ''}>${statusText}</span>
-                                </p>
-                                ${eventDetails}
-                                <p class="text-xs text-gray dark:text-gray mt-1">${notif.created_at}</p>
-                                ${reasonSection}
-                            </div>
-                            ${deleteBtn}
-                        </div>
-                    </li>
+
+                // 1. Build the inner content
+                const innerContent = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${iconColor} mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        ${icon}
+                    </svg>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-black">
+                            ${notif.title || `Your submission has been ${statusText}`}
+                        </p>
+                        ${messageDetails}
+                        <p class="text-xs text-gray dark:text-gray mt-1">${notif.created_at}</p>
+                        ${reasonSection}
+                    </div>
                 `;
+
+                // 2. Check if it should be clickable
+                // We use social_contract_record_id, which you already have in your table
+                if (notif.social_contract_record_id) {
+                    // This notification is for a record. Use the SPA navigation.
+                    return `
+                        <li id="notif-${notif.id}" class="relative ${bgClass} p-0">
+                            <button onclick="goToRecord(${notif.social_contract_record_id})" class="flex items-start p-3 w-full text-left border-b border-gray-100 dark:border-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800/30 transition-all duration-200 cursor-pointer">
+                                ${innerContent}
+                            </button>
+                            ${deleteBtn}
+                        </li>
+                    `;
+                } else if (notif.link) {
+                    // This is a general link (e.g., to profile page) that was in your model
+                    // We will make it navigate to the 'profile' page using your SPA function
+                    // This assumes links are relative, like '/profile'
+                    let pageId = 'dashboard'; // default
+                    if (notif.link.includes('profile')) {
+                        pageId = 'profile';
+                    } else if (notif.link.includes('support')) {
+                        pageId = 'support';
+                    } // etc.
+                    
+                    // A better way: just check for a record ID.
+                    // If you have other links, we can add them here.
+                    return `
+                        <li id="notif-${notif.id}" class="relative ${bgClass}">
+                            <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
+                                ${innerContent}
+                                ${deleteBtn}
+                            </div>
+                        </li>
+                    `;
+                } else {
+                    // Not clickable (e.g., a general announcement)
+                    return `
+                        <li id="notif-${notif.id}" class="relative ${bgClass}">
+                            <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
+                                ${innerContent}
+                                ${deleteBtn}
+                            </div>
+                        </li>
+                    `;
+                }
             }
             
             // Load all notifications for modal
