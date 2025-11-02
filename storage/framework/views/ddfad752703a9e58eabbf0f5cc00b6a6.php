@@ -728,6 +728,7 @@ table{overflow:visible!important}
                             <thead>
                                 <tr class="bg-base-200">
                                     <th class="font-semibold text-text-header">Ticket ID</th>
+                                    <th class="font-semibold text-text-header">Student ID</th>
                                     <th class="font-semibold text-text-header">Student Name</th>
                                     <th class="font-semibold text-text-header">Issue Type</th>
                                     <th class="font-semibold text-text-header">Details</th>
@@ -735,7 +736,7 @@ table{overflow:visible!important}
                                 </tr>
                             </thead>
                             <tbody id="ticket-table-body">
-                                <tr><td colspan="5" class="text-center text-gray-500 py-4">Loading tickets...</td></tr>
+                                <tr><td colspan="6" class="text-center text-gray-500 py-4">Loading tickets...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1297,6 +1298,11 @@ table{overflow:visible!important}
                 </div>
                 
                 <div>
+                    <p class="text-sm font-semibold text-gray-600">Student ID</p>
+                    <p id="modal-ticket-student-id" class="text-base text-gray-900"></p>
+                </div>
+                
+                <div>
                     <p class="text-sm font-semibold text-gray-600">Issue Type</p>
                     <p id="modal-ticket-type" class="text-base text-gray-900"></p>
                 </div>
@@ -1496,6 +1502,7 @@ table{overflow:visible!important}
             currentTicketId = ticketId;
             document.getElementById('modal-ticket-id').textContent = ticket.id;
             document.getElementById('modal-ticket-student').textContent = ticket.student_name || 'N/A';
+            document.getElementById('modal-ticket-student-id').textContent = ticket.student_id || 'N/A';
             document.getElementById('modal-ticket-type').textContent = ticket.type;
             document.getElementById('modal-ticket-details').textContent = ticket.details;
             document.getElementById('modal-ticket-submitted').textContent = ticket.submitted_at || ticket.date;
@@ -1855,7 +1862,7 @@ table{overflow:visible!important}
             if (!tbody) return;
 
             if (!tickets || tickets.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
                 return;
             }
 
@@ -1875,6 +1882,7 @@ table{overflow:visible!important}
                 
                 tr.innerHTML = `
                     <td class="font-medium text-text-header">${ticket.id}</td>
+                    <td class="text-text-header">${ticket.student_id || 'N/A'}</td>
                     <td class="text-text-header">${ticket.student_name || 'N/A'}</td>
                     <td class="text-text-header">${ticket.type}</td>
                     <td class="text-text-muted text-sm" title="${ticket.details}">${shortDetails}</td>

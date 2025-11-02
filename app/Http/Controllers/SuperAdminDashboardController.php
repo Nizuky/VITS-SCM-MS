@@ -757,7 +757,7 @@ class SuperAdminDashboardController extends Controller
                 ->map(function ($ticket) {
                     return [
                         'id' => $ticket->id,
-                        'student_id' => $ticket->student_id,
+                        'student_id' => $ticket->student ? $ticket->student->student_id : 'N/A',
                         'student_name' => $ticket->student_name,
                         'type' => $ticket->issue_type,
                         'details' => $ticket->details,
@@ -771,7 +771,10 @@ class SuperAdminDashboardController extends Controller
             return response()->json([
                 'success' => true,
                 'tickets' => $tickets
-            ]);
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Failed to get support tickets', [
                 'error' => $e->getMessage()
