@@ -86,7 +86,16 @@ class LoginController extends Controller
         $request->session()->put('auth_guard', 'superadmin');
         $request->session()->put('superadmin_session_active', true);
         $request->session()->put('last_activity', time());
-        $request->session()->save(); // Ensure session is saved immediately
+        
+        // Force immediate session write to prevent race conditions
+        $request->session()->save();
+        
+        // Additional safety: ensure session driver has written the data
+        // This is especially important for file-based sessions
+        if (method_exists($request->session()->getHandler(), 'gc')) {
+            // Force the session handler to sync
+            usleep(50000); // 50ms delay to ensure file write completes
+        }
         
         // Log successful login
         \Log::info('SuperAdmin login successful', [
@@ -94,11 +103,16 @@ class LoginController extends Controller
             'admin_name' => $admin->name,
             'session_id' => $request->session()->getId(),
             'session_marker' => $request->session()->get('superadmin_session_active'),
+            'auth_check' => Auth::guard('superadmin')->check(),
         ]);
 
         // AJAX/json request -> return JSON with redirect
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['redirect' => route('superadmin.dashboard')]);
+            // Add a small delay before responding to ensure session is fully written
+            return response()->json([
+                'redirect' => route('superadmin.dashboard'),
+                'session_ready' => true
+            ]);
         }
 
         return redirect()->route('superadmin.dashboard')

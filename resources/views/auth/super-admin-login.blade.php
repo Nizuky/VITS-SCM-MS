@@ -107,7 +107,10 @@
                 });
             }).then(json => {
                 if (json.redirect) {
-                    window.location.href = json.redirect;
+                    // Small delay to ensure session cookie is set by browser
+                    setTimeout(function() {
+                        window.location.href = json.redirect;
+                    }, 100);
                 } else {
                     setLoading(false);
                 }
