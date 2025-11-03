@@ -550,6 +550,15 @@
         /* Record status table hover effect */
         #record-table-body tr:hover{background-color:#F2F2F2!important}
         [data-theme="dark"] #record-table-body tr:hover{background-color:#191E24!important}
+        /* Support ticket status badges - dark theme */
+        [data-theme="dark"] .badge.bg-yellow-100{background-color:#ff9d26!important;color:#fff!important}
+        [data-theme="dark"] .badge.bg-green-100{background-color:#4CAF50!important;color:#fff!important}
+        [data-theme="dark"] .badge.bg-gray-100{background-color:#6b7280!important;color:#fff!important}
+        [data-theme="dark"] .badge.bg-blue-100{background-color:#3b82f6!important;color:#fff!important}
+        [data-theme="dark"] .badge.text-yellow-800{color:#fff!important}
+        [data-theme="dark"] .badge.text-green-800{color:#fff!important}
+        [data-theme="dark"] .badge.text-gray-800{color:#fff!important}
+        [data-theme="dark"] .badge.text-blue-800{color:#fff!important}
     </style>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>

@@ -156,6 +156,18 @@ table{overflow:visible!important}
 .table tbody#students-table-body tr.hover:hover{background-color:#f3f4f6!important}
 [data-theme="dark"] .table tbody#students-table-body tr:hover,
 [data-theme="dark"] .table tbody#students-table-body tr.hover:hover{background-color:#191E24!important}
+/* Fix modal centering and backdrop */
+.modal{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
+.modal-box{margin:0!important;position:relative!important;z-index:1!important}
+.modal-backdrop{background-color:rgba(0,0,0,0.5)!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;z-index:0!important}
+.modal::backdrop{background-color:rgba(0,0,0,0.5)!important}
+/* Support ticket status badges - dark theme */
+[data-theme="dark"] .badge.bg-yellow-100{background-color:#ff9d26!important;color:#fff!important}
+[data-theme="dark"] .badge.bg-green-100{background-color:#4CAF50!important;color:#fff!important}
+[data-theme="dark"] .badge.bg-gray-100{background-color:#6b7280!important;color:#fff!important}
+[data-theme="dark"] .badge.text-yellow-800{color:#fff!important}
+[data-theme="dark"] .badge.text-green-800{color:#fff!important}
+[data-theme="dark"] .badge.text-gray-800{color:#fff!important}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
