@@ -1980,10 +1980,13 @@ table{overflow:visible!important}
                 var fb = document.getElementById('logout-button-visible');
                 if (!fb) return;
                 
-                fb.addEventListener('click', function(e) {
+                fb.addEventListener('click', async function(e) {
                     e.preventDefault();
                     try {
-                        fetch(f.action, {
+                        // Ensure CSRF cookie exists
+                        await ensureCsrfCookie();
+                        
+                        await fetch(f.action, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -1994,14 +1997,11 @@ table{overflow:visible!important}
                             credentials: 'same-origin',
                             body: new URLSearchParams({'_token': cs}).toString(),
                             keepalive: true
-                        }).finally(function() {
-                            try {
-                                window.location.replace(@json(route('admin.login')));
-                            } catch(_) {
-                                window.location.href = @json(route('admin.login'));
-                            }
                         });
                     } catch(err) {
+                        console.error('Logout error:', err);
+                    } finally {
+                        // Always redirect to login page
                         try {
                             window.location.replace(@json(route('admin.login')));
                         } catch(_) {

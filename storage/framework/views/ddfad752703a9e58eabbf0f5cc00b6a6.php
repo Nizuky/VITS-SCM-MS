@@ -279,6 +279,7 @@ table{overflow:visible!important}
                         Settings
                     </a>
                 </li>
+                 <!-- Logout Modal -->
                 <li>
                     <a class="py-3 pl-2" onclick="document.getElementById('logout_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1048,12 +1049,12 @@ table{overflow:visible!important}
             <h3 class="font-bold text-lg">Log Out?</h3>
             <p class="py-4">Are you sure you want to log out?</p>
             <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
+                <form method="dialog">
                     <button class="btn">Cancel</button>
-                    <button id="confirm-logout-btn" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
-                        Yes, log out
-                    </button>
                 </form>
+                <button onclick="window.location.href='<?php echo e(route('superadmin.logout.beacon')); ?>'" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                    Yes, log out
+                </button>
             </div>
         </div>
     </dialog>
@@ -4827,28 +4828,6 @@ table{overflow:visible!important}
                     spb.disabled = false;
                     spb.textContent = 'Request Password Change';
                 }
-            });
-
-            // Logout handler
-            document.getElementById('confirm-logout-btn').addEventListener('click', function() {
-                // Call the logout API endpoint
-                fetch(`${BASE_PATH}/super-admin/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(function() {
-                    // Redirect to super admin login page after successful logout
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                })
-                .catch(function(error) {
-                    console.error('Logout error:', error);
-                    // Still redirect even if there's an error
-                    window.location.href = `${BASE_PATH}/super-admin/login`;
-                });
             });
             
             // Auto-refresh removed - use manual refresh buttons instead
