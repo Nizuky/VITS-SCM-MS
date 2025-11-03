@@ -231,7 +231,9 @@ table{overflow:visible!important}
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
-        <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
+        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden relative" style="width: 256px; min-width: 200px; max-width: 400px;">
+            <!-- Resize Handle -->
+            <div id="resize-handle" class="absolute top-0 right-0 w-1 h-full cursor-ew-resize hover:bg-primary-purple transition-colors" style="background-color: transparent;"></div>
             <!-- Profile Section -->
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
@@ -4305,6 +4307,68 @@ table{overflow:visible!important}
         window.openDeleteStudentModal = openDeleteStudentModal;
         // ========== END STUDENTS MANAGEMENT ==========
 
+        // ========== SIDEBAR RESIZE FUNCTIONALITY ==========
+        function initSidebarResize() {
+            const sidebar = document.getElementById('sidebar');
+            const resizeHandle = document.getElementById('resize-handle');
+            
+            if (!sidebar || !resizeHandle) return;
+            
+            // Restore saved width from localStorage
+            try {
+                const savedWidth = localStorage.getItem('scms_superadmin_sidebar_width');
+                if (savedWidth) {
+                    sidebar.style.width = savedWidth + 'px';
+                    console.log('Super Admin - Restored sidebar width:', savedWidth);
+                }
+            } catch(e) {
+                console.error('Super Admin - Error restoring sidebar width:', e);
+            }
+            
+            let isResizing = false;
+            let startX = 0;
+            let startWidth = 0;
+            
+            resizeHandle.addEventListener('mousedown', function(e) {
+                isResizing = true;
+                startX = e.clientX;
+                startWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isResizing) return;
+                
+                const width = startWidth + (e.clientX - startX);
+                const minWidth = 200;
+                const maxWidth = 400;
+                
+                if (width >= minWidth && width <= maxWidth) {
+                    sidebar.style.width = width + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isResizing) {
+                    isResizing = false;
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                    
+                    // Save width to localStorage
+                    try {
+                        const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+                        localStorage.setItem('scms_superadmin_sidebar_width', currentWidth);
+                        console.log('Super Admin - Saved sidebar width:', currentWidth);
+                    } catch(e) {
+                        console.error('Super Admin - Error saving sidebar width:', e);
+                    }
+                }
+            });
+        }
+        // ========== END SIDEBAR RESIZE ==========
+
         // DOM ready
         document.addEventListener('DOMContentLoaded', function() {
             // Restore saved page for super admin, default to dashboard
@@ -4312,6 +4376,9 @@ table{overflow:visible!important}
             try {
                 savedPage = localStorage.getItem('scms_superadmin_current_page') || 'dashboard';
             } catch(_) {}
+            
+            // Initialize sidebar resizing
+            initSidebarResize();
             
             showPage(savedPage);
             initThemeToggle();

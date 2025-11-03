@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,22 @@
 <meta http-equiv="Expires" content="0">
 <title>Admin - Student Contract Management</title>
 <script>
-(function(){try{var s=localStorage.getItem('scms_admin_theme');if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}}catch(_){}})();
+(function(){
+    try{
+        var s=localStorage.getItem('scms_admin_theme');
+        console.log('Admin - Loaded theme from localStorage:', s);
+        if(!s){
+            s='light';
+            localStorage.setItem('scms_admin_theme','light');
+            console.log('Admin - Set default theme to light');
+        }
+        document.documentElement.setAttribute('data-theme',s);
+        console.log('Admin - Applied theme:', s);
+    }catch(e){
+        console.error('Admin - Error loading theme:', e);
+        document.documentElement.setAttribute('data-theme','light');
+    }
+})();
 </script>
 <script>
 tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{colors:{'background-light':'#EDF1FA','primary-purple':'#6D28D9','primary-purple-hover':'#5B21B6','text-header':'#2B3674','text-muted':'#707EAE','badge-pending-text':'#E29C44','badge-pending-bg':'#FAEAD0','badge-verified-text':'#399552','badge-verified-bg':'#CCEED6','badge-rejected-text':'#CC525D','badge-rejected-bg':'#FFD7DB','success-green':'#4CAF50','success-green-hover':'#45a049','danger-red':'#CC525D','danger-red-hover':'#b33e46'},fontFamily:{sans:['Inter','sans-serif']}}}};
@@ -191,7 +206,9 @@ table{overflow:visible!important}
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
-        <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
+        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden relative" style="width: 256px; min-width: 200px; max-width: 400px;">
+            <!-- Resize Handle -->
+            <div id="resize-handle" class="absolute top-0 right-0 w-1 h-full cursor-ew-resize hover:bg-primary-purple transition-colors" style="background-color: transparent;"></div>
             <!-- Profile Section -->
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
