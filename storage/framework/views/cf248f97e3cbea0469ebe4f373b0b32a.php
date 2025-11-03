@@ -1288,7 +1288,7 @@
                         <div class="collapse-content">
                             <p class="text-text-muted mb-3">The Support Tickets system allows you to request assistance from administrators for various account-related issues. Here's how it works:</p>
                             <ul class="list-disc list-inside space-y-2 text-white">
-                                <li><strong>Submit a Ticket:</strong> Click "Submit New Ticket" on the Support Tickets page, select your issue type (Incorrect Student Number, Inaccessible PLV Email, Incorrect/Misspelled Name, Submitted Record Linked to Wrong Academic Year, or Others), and provide details about your concern.</li>
+                                <li><strong>Submit a Ticket:</strong> Click "Submit New Ticket" on the Support Tickets page, select your issue type (Incorrect Student Number, Inaccessible PLV Email, Incorrect/Misspelled Name, Reactivate Account, Submitted Record Linked to Wrong Academic Year, or Others), and provide details about your concern.</li>
                                 <li><strong>Daily Limit:</strong> You can submit up to 2 support tickets per day to ensure fair access to support services.</li>
                                 <li><strong>Track Your Tickets:</strong> View all your submitted tickets in the Support Tickets table, showing Ticket ID, Student Name, Issue Type, Details, Status, and Action buttons.</li>
                                 <li><strong>Status Updates:</strong> Tickets have three statuses - <span class="text-yellow-700 font-semibold">Pending</span> (waiting for admin review), <span class="text-green-700 font-semibold">Resolved</span> (admin has addressed your issue), or <span class="text-gray-500 font-semibold">Closed</span> (ticket completed).</li>
@@ -1595,6 +1595,24 @@
                     </div>
                     <textarea id="ticket-details-other" class="textarea textarea-bordered h-24 rounded-lg"
                         placeholder="Please specify the exact nature of your issue..."></textarea>
+                </label>
+
+                <label id="record-selector-container" class="form-control w-full hidden">
+                    <div class="label">
+                        <span class="label-text font-semibold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 00-4 4v4a4 4 0 004 4h4a4 4 0 004-4V8a4 4 0 00-4-4H8zm0 2h4a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z" clip-rule="evenodd" />
+                                <path d="M5 5a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm0 4a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm9-4a1 1 0 10-2 0v1a1 1 0 102 0V5z" />
+                            </svg>
+                            Attach/Link Record (Required)
+                        </span>
+                    </div>
+                    <select id="ticket-record-id" class="select select-bordered w-full rounded-lg">
+                        <option value="" disabled selected>Loading records...</option>
+                    </select>
+                    <div class="label">
+                        <span class="label-text-alt text-text-muted">📌 Select the verified or approved record that was linked to the wrong academic year</span>
+                    </div>
                 </label>
                 
                 <label class="form-control w-full">
@@ -2342,7 +2360,7 @@
                 // Prevent concurrent requests
                 if (isLoadingRecords) {
                     console.log('Already loading records, skipping...');
-                    return;
+                    return Promise.resolve();
                 }
                 
                 // Only clear table on initial load
@@ -2355,7 +2373,7 @@
                 // Add timestamp to URL to prevent caching
                 var timestamp = new Date().getTime();
                 
-                fetch(`${BASE_PATH}/api/social-contract/records?_=${timestamp}`, {
+                return fetch(`${BASE_PATH}/api/social-contract/records?_=${timestamp}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
@@ -3735,16 +3753,114 @@
                 ticketDetails: document.getElementById('ticket-details'),
                 otherIssueContainer: document.getElementById('other-issue-container'),
                 ticketDetailsOther: document.getElementById('ticket-details-other'),
+                recordSelectorContainer: document.getElementById('record-selector-container'),
+                ticketRecordId: document.getElementById('ticket-record-id'),
                 submitTicketForm: document.getElementById('submit-ticket-form'),
                 submitTicketModal: document.getElementById('submit_ticket_modal'),
                 submitTicketButton: document.getElementById('confirm-ticket-submit'),
                 ticketSearchInput: document.getElementById('ticket-search-input')
             };
 
-            // Show/hide "Others" textarea based on dropdown selection
+            // Function to populate record selector with verified/approved records
+            async function populateRecordSelector() {
+                if (!ticketElements.ticketRecordId) {
+                    console.error('Record selector element not found');
+                    return;
+                }
+                
+                // Show loading state
+                ticketElements.ticketRecordId.innerHTML = '<option value="" disabled selected>Loading records...</option>';
+                
+                console.log('PopulateRecordSelector called. Current allRecords:', allRecords?.length || 0);
+                
+                // Ensure records are loaded
+                if (!allRecords || allRecords.length === 0) {
+                    console.log('No records in memory, loading...');
+                    try {
+                        await loadRecords(false);
+                        console.log('Records loaded. allRecords now has:', allRecords?.length || 0);
+                    } catch (e) {
+                        console.error('Failed to load records:', e);
+                        ticketElements.ticketRecordId.innerHTML = '<option value="" disabled selected>Error loading records</option>';
+                        return;
+                    }
+                }
+                
+                // Check again after loading
+                if (!allRecords || allRecords.length === 0) {
+                    console.warn('Still no records after loading attempt');
+                    ticketElements.ticketRecordId.innerHTML = '<option value="" disabled selected>No records found</option>';
+                    return;
+                }
+                
+                // Filter for verified or approved records only
+                const eligibleRecords = allRecords.filter(rec => 
+                    rec.status === 'Verified' || rec.status === 'Approved'
+                );
+                
+                console.log('Total records:', allRecords.length);
+                console.log('Eligible records (Verified/Approved):', eligibleRecords.length);
+                console.log('Sample statuses:', allRecords.slice(0, 5).map(r => ({ id: r.id, status: r.status })));
+                
+                if (eligibleRecords.length === 0) {
+                    ticketElements.ticketRecordId.innerHTML = '<option value="" disabled selected>No verified or approved records available</option>';
+                    return;
+                }
+                
+                ticketElements.ticketRecordId.innerHTML = '<option value="" disabled selected>Select a record...</option>';
+                
+                eligibleRecords.forEach(rec => {
+                    try {
+                        const option = document.createElement('option');
+                        option.value = rec.id;
+                        
+                        // Format date safely - extract only date part without time
+                        let dateStr = 'No date';
+                        if (rec.date) {
+                            try {
+                                let dateValue = String(rec.date);
+                                // Remove timestamp if present (e.g., "2025-10-28T00:00:00.000000Z" -> "2025-10-28")
+                                if (dateValue.includes('T')) {
+                                    dateValue = dateValue.split('T')[0];
+                                }
+                                // Convert YYYY-MM-DD to DD-MM-YYYY
+                                const parts = dateValue.split('-');
+                                if (parts.length === 3) {
+                                    const [y, m, d] = parts;
+                                    dateStr = `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
+                                } else {
+                                    dateStr = dateValue;
+                                }
+                            } catch (e) {
+                                console.error('Error formatting date:', e, rec.date);
+                                // Fallback: try to extract just date part
+                                let fallback = String(rec.date);
+                                if (fallback.includes('T')) {
+                                    fallback = fallback.split('T')[0];
+                                }
+                                dateStr = fallback;
+                            }
+                        }
+                        
+                        const org = rec.organization || 'No organization';
+                        const venue = rec.venue || 'No venue';
+                        const status = rec.status || 'Unknown';
+                        option.textContent = `${dateStr} - ${org} at ${venue} (${status})`;
+                        ticketElements.ticketRecordId.appendChild(option);
+                    } catch (e) {
+                        console.error('Error creating option for record:', rec.id, e);
+                    }
+                });
+                
+                console.log('✅ Populated dropdown with', eligibleRecords.length, 'records');
+            }
+
+            // Show/hide "Others" textarea and record selector based on dropdown selection
             if (ticketElements.ticketIssueType) {
                 ticketElements.ticketIssueType.addEventListener('change', (e) => {
                     const selectedValue = e.target.value;
+                    
+                    // Handle "Others" option
                     if (selectedValue === '99') {
                         ticketElements.otherIssueContainer.classList.remove('hidden');
                         ticketElements.ticketDetailsOther.required = true;
@@ -3752,6 +3868,17 @@
                         ticketElements.otherIssueContainer.classList.add('hidden');
                         ticketElements.ticketDetailsOther.required = false;
                         ticketElements.ticketDetailsOther.value = '';
+                    }
+                    
+                    // Handle "Submitted Record Linked to Wrong Academic Year" option
+                    if (selectedValue === '5') {
+                        ticketElements.recordSelectorContainer.classList.remove('hidden');
+                        ticketElements.ticketRecordId.required = true;
+                        populateRecordSelector();
+                    } else {
+                        ticketElements.recordSelectorContainer.classList.add('hidden');
+                        ticketElements.ticketRecordId.required = false;
+                        ticketElements.ticketRecordId.value = '';
                     }
                 });
             }
@@ -3762,6 +3889,7 @@
                     e.preventDefault();
                     
                     const isOtherSelected = ticketElements.ticketIssueType.value === '99';
+                    const isWrongAcademicYear = ticketElements.ticketIssueType.value === '5';
                     let specificReason = "";
                     
                     // Manual validation for 'Others' field
@@ -3770,6 +3898,16 @@
                         if (specificReason === "") {
                             showToast('Please specify the exact reason for your issue.', 'error');
                             ticketElements.ticketDetailsOther.focus();
+                            return;
+                        }
+                    }
+                    
+                    // Manual validation for record selector
+                    if (isWrongAcademicYear) {
+                        const selectedRecordId = ticketElements.ticketRecordId.value;
+                        if (!selectedRecordId) {
+                            showToast('Please select the record that was linked to the wrong academic year.', 'error');
+                            ticketElements.ticketRecordId.focus();
                             return;
                         }
                     }
@@ -3788,6 +3926,12 @@
                     if (isOtherSelected && specificReason) {
                         finalDetails = `Specific Issue: ${specificReason}\nDetails: ${finalDetails}`;
                     }
+                    
+                    // Add record information if wrong academic year issue
+                    if (isWrongAcademicYear && ticketElements.ticketRecordId.value) {
+                        const selectedRecordText = ticketElements.ticketRecordId.options[ticketElements.ticketRecordId.selectedIndex].textContent;
+                        finalDetails = `Record: ${selectedRecordText}\nDetails: ${finalDetails}`;
+                    }
 
                     // Disable button to prevent double submission
                     ticketElements.submitTicketButton.disabled = true;
@@ -3798,6 +3942,11 @@
                             issue_type: selectedIssueText,
                             details: finalDetails
                         };
+                        
+                        // Include record ID if applicable
+                        if (isWrongAcademicYear && ticketElements.ticketRecordId.value) {
+                            requestBody.record_id = ticketElements.ticketRecordId.value;
+                        }
                         
                         const response = await fetch(`${BASE_PATH}/api/support-tickets`, {
                             method: 'POST',
@@ -3826,6 +3975,8 @@
                             ticketElements.submitTicketForm.reset();
                             ticketElements.ticketDetailsOther.value = '';
                             ticketElements.otherIssueContainer.classList.add('hidden');
+                            ticketElements.ticketRecordId.value = '';
+                            ticketElements.recordSelectorContainer.classList.add('hidden');
                             ticketElements.submitTicketModal.close();
 
                             showToast(data.message || `Ticket #${data.ticket.id} submitted successfully!`, 'success');

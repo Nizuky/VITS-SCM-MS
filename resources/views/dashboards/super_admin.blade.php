@@ -1378,6 +1378,16 @@ table{overflow:visible!important}
                     <p id="modal-ticket-details" class="text-base text-gray-900 whitespace-pre-wrap"></p>
                 </div>
                 
+                <div id="modal-ticket-linked-record-container" class="hidden">
+                    <p class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 00-4 4v4a4 4 0 004 4h4a4 4 0 004-4V8a4 4 0 00-4-4H8zm0 2h4a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z" clip-rule="evenodd" />
+                        </svg>
+                        Linked Record
+                    </p>
+                    <p id="modal-ticket-linked-record" class="text-base text-gray-900 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mt-2"></p>
+                </div>
+                
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div>
                         <p class="text-sm font-semibold text-gray-600">Submitted</p>
@@ -1656,6 +1666,34 @@ table{overflow:visible!important}
             document.getElementById('modal-ticket-details').textContent = ticket.details;
             document.getElementById('modal-ticket-submitted').textContent = ticket.submitted_at || ticket.date;
             document.getElementById('modal-ticket-updated').textContent = ticket.updated_at || ticket.date;
+
+            // Show linked record if available
+            const linkedRecordContainer = document.getElementById('modal-ticket-linked-record-container');
+            const linkedRecordElement = document.getElementById('modal-ticket-linked-record');
+            if (ticket.record_id && ticket.linked_record) {
+                const record = ticket.linked_record;
+                let dateStr = 'No date';
+                if (record.date) {
+                    let dateValue = String(record.date);
+                    if (dateValue.includes('T')) {
+                        dateValue = dateValue.split('T')[0];
+                    }
+                    const parts = dateValue.split('-');
+                    if (parts.length === 3) {
+                        const [y, m, d] = parts;
+                        dateStr = `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
+                    } else {
+                        dateStr = dateValue;
+                    }
+                }
+                const org = record.organization || 'No organization';
+                const venue = record.venue || 'No venue';
+                const status = record.status || 'Unknown';
+                linkedRecordElement.textContent = `${dateStr} - ${org} at ${venue} (${status})`;
+                linkedRecordContainer.classList.remove('hidden');
+            } else {
+                linkedRecordContainer.classList.add('hidden');
+            }
 
             // Status badge
             let statusBadgeClass = '';
