@@ -797,7 +797,7 @@ table{overflow:visible!important}
             
             <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
                 <label class="details-label">Reason for Rejection</label>
-                <p class="font-medium text-badge-rejected-text whitespace-pre-line bg-gray-50 dark:bg-gray-700 dark:text-red-300 p-3 rounded-lg" id="details-reason-text"></p>
+                <p class="font-medium whitespace-pre-line bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3 rounded-lg" style="color: #1a1a1a;" id="details-reason-text"></p>
             </div>
             
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>

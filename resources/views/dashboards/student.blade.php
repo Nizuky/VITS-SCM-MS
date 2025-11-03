@@ -3820,11 +3820,11 @@
                                 if (dateValue.includes('T')) {
                                     dateValue = dateValue.split('T')[0];
                                 }
-                                // Convert YYYY-MM-DD to DD-MM-YYYY
+                                // Convert YYYY-MM-DD to MM-DD-YYYY
                                 const parts = dateValue.split('-');
                                 if (parts.length === 3) {
                                     const [y, m, d] = parts;
-                                    dateStr = `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
+                                    dateStr = `${m.padStart(2,'0')}-${d.padStart(2,'0')}-${y}`;
                                 } else {
                                     dateStr = dateValue;
                                 }
@@ -3839,10 +3839,10 @@
                             }
                         }
                         
-                        const org = rec.organization || 'No organization';
+                        const eventName = rec.event_name || rec.organization || 'No event name';
                         const venue = rec.venue || 'No venue';
                         const status = rec.status || 'Unknown';
-                        option.textContent = `${dateStr} - ${org} at ${venue} (${status})`;
+                        option.textContent = `${dateStr} - ${eventName} at ${venue} (${status})`;
                         ticketElements.ticketRecordId.appendChild(option);
                     } catch (e) {
                         console.error('Error creating option for record:', rec.id, e);

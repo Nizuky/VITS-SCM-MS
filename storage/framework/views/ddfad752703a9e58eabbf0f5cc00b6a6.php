@@ -122,6 +122,7 @@ body{font-family:'Inter',sans-serif}
 .scms-toast__close:hover{background:rgba(255,255,255,0.22);transform:translateY(-1px)}
 .scms-toast__progress{position:absolute;left:6px;right:6px;bottom:4px;height:3px;border-radius:9999px;background:rgba(255,255,255,0.55);transform-origin:left center}
 @keyframes scms-toast-progress{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 [data-theme="dark"] body{color:#fff}
 [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
 [data-theme="dark"] .scms-badge--pending{background-color:#ff9d26ff!important;color:#ffffffff!important}
@@ -1147,14 +1148,14 @@ table{overflow:visible!important}
                         </select>
                         
                         <!-- Inactive Account Warning -->
-                        <div id="inactive-warning-box" class="hidden mt-2 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                        <div id="inactive-warning-box" class="hidden mt-2 p-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-800 rounded-r-lg">
                             <div class="flex items-start gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                                 <div class="flex-1">
-                                    <p class="text-xs font-bold text-red-800">Account scheduled for deletion</p>
-                                    <p id="inactive-countdown-text" class="text-xs text-red-700 mt-1"></p>
+                                    <p class="text-xs font-bold text-red-800 dark:text-red-300">Account scheduled for deletion</p>
+                                    <p id="inactive-countdown-text" class="text-xs text-red-700 dark:text-red-400 mt-1"></p>
                                 </div>
                             </div>
                         </div>
@@ -1262,7 +1263,7 @@ table{overflow:visible!important}
             
             <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
                 <label class="details-label">Reason for Rejection</label>
-                <p class="font-medium text-badge-rejected-text whitespace-pre-line bg-gray-50 dark:bg-gray-700 dark:text-red-300 p-3 rounded-lg" id="details-reason-text"></p>
+                <p class="font-medium whitespace-pre-line bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3 rounded-lg" style="color: #1a1a1a;" id="details-reason-text"></p>
             </div>
             
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
@@ -1370,7 +1371,15 @@ table{overflow:visible!important}
                 </div>
                 
                 <div>
-                    <p class="text-sm font-semibold text-gray-600">Issue Type</p>
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-sm font-semibold text-gray-600">Issue Type</p>
+                        <button id="find-record-btn" class="btn btn-sm btn-outline btn-primary rounded-lg hidden" onclick="findLinkedRecord()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Find Record
+                        </button>
+                    </div>
                     <p id="modal-ticket-type" class="text-base text-gray-900"></p>
                 </div>
                 
@@ -1668,32 +1677,57 @@ table{overflow:visible!important}
             document.getElementById('modal-ticket-submitted').textContent = ticket.submitted_at || ticket.date;
             document.getElementById('modal-ticket-updated').textContent = ticket.updated_at || ticket.date;
 
-            // Show linked record if available
+            // Show linked record if available and show Find Record button
             const linkedRecordContainer = document.getElementById('modal-ticket-linked-record-container');
             const linkedRecordElement = document.getElementById('modal-ticket-linked-record');
-            if (ticket.record_id && ticket.linked_record) {
-                const record = ticket.linked_record;
-                let dateStr = 'No date';
-                if (record.date) {
-                    let dateValue = String(record.date);
-                    if (dateValue.includes('T')) {
-                        dateValue = dateValue.split('T')[0];
+            const findRecordBtn = document.getElementById('find-record-btn');
+            
+            console.log('Ticket data:', {
+                id: ticket.id,
+                type: ticket.type,
+                record_id: ticket.record_id,
+                has_linked_record: !!ticket.linked_record
+            });
+            
+            // Show Find Record button for "Submitted Record Linked to Wrong Academic Year" tickets
+            const isWrongAcademicYearIssue = ticket.type && ticket.type.includes('Submitted Record Linked to Wrong Academic Year');
+            
+            if (isWrongAcademicYearIssue) {
+                findRecordBtn.classList.remove('hidden');
+                
+                // If we have the linked record data, show it
+                if (ticket.record_id && ticket.linked_record) {
+                    const record = ticket.linked_record;
+                    let dateStr = 'No date';
+                    if (record.date) {
+                        let dateValue = String(record.date);
+                        if (dateValue.includes('T')) {
+                            dateValue = dateValue.split('T')[0];
+                        }
+                        const parts = dateValue.split('-');
+                        if (parts.length === 3) {
+                            const [y, m, d] = parts;
+                            dateStr = `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
+                        } else {
+                            dateStr = dateValue;
+                        }
                     }
-                    const parts = dateValue.split('-');
-                    if (parts.length === 3) {
-                        const [y, m, d] = parts;
-                        dateStr = `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
-                    } else {
-                        dateStr = dateValue;
-                    }
+                    const eventName = record.event_name || record.organization || 'No event name';
+                    const venue = record.venue || 'No venue';
+                    const status = record.status || 'Unknown';
+                    linkedRecordElement.textContent = `${dateStr} - ${eventName} at ${venue} (${status})`;
+                    linkedRecordContainer.classList.remove('hidden');
+                    
+                    // Store record_id for the find function
+                    findRecordBtn.setAttribute('data-record-id', ticket.record_id);
+                } else {
+                    // No linked record data, but still show button - it will try to find based on details
+                    linkedRecordContainer.classList.add('hidden');
+                    findRecordBtn.setAttribute('data-record-id', ticket.record_id || '');
                 }
-                const org = record.organization || 'No organization';
-                const venue = record.venue || 'No venue';
-                const status = record.status || 'Unknown';
-                linkedRecordElement.textContent = `${dateStr} - ${org} at ${venue} (${status})`;
-                linkedRecordContainer.classList.remove('hidden');
             } else {
                 linkedRecordContainer.classList.add('hidden');
+                findRecordBtn.classList.add('hidden');
             }
 
             // Status badge
@@ -1763,6 +1797,187 @@ table{overflow:visible!important}
                 resolveBtn.disabled = false;
                 resolveBtn.textContent = 'Mark as Resolved';
             }
+        }
+
+        // Find and highlight linked record in archived tab
+        function findLinkedRecord() {
+            const findBtn = document.getElementById('find-record-btn');
+            let recordId = findBtn.getAttribute('data-record-id');
+            
+            const ticketDetails = document.getElementById('modal-ticket-details').textContent;
+            const studentId = document.getElementById('modal-ticket-student-id').textContent;
+            
+            console.log('Finding record. Record ID:', recordId);
+            console.log('Ticket details:', ticketDetails);
+            console.log('Student ID:', studentId);
+            
+            // Extract information from ticket details
+            // Format: "Record: DD-MM-YYYY - Event Name at Venue (Status)\nDetails: ..."
+            let searchCriteria = {
+                studentId: studentId,
+                date: null,
+                eventName: null,
+                venue: null,
+                status: null
+            };
+            
+            // Try to parse record info from details
+            const recordMatch = ticketDetails.match(/Record:\s*([^\n]+)/);
+            if (recordMatch) {
+                const recordInfo = recordMatch[1].trim();
+                console.log('Extracted record info:', recordInfo);
+                
+                // Parse: "21-10-2025 - ITLYMPICS at Main Building (Approved)"
+                const dateMatch = recordInfo.match(/(\d{2}-\d{2}-\d{4})/);
+                
+                if (dateMatch) {
+                    searchCriteria.date = dateMatch[1].trim();
+                    
+                    // Remove the date from the beginning to get the rest
+                    const afterDate = recordInfo.substring(recordInfo.indexOf(dateMatch[1]) + dateMatch[1].length).trim();
+                    
+                    // Now parse: "- ITLYMPICS at Main Building (Approved)"
+                    const eventVenueMatch = afterDate.match(/^-\s*([^at]+)\s+at\s+([^(]+)\s*\(([^)]+)\)/);
+                    
+                    if (eventVenueMatch) {
+                        searchCriteria.eventName = eventVenueMatch[1].trim();
+                        searchCriteria.venue = eventVenueMatch[2].trim();
+                        searchCriteria.status = eventVenueMatch[3].trim();
+                    }
+                }
+                
+                console.log('Search criteria:', searchCriteria);
+            }
+            
+            // If we have record_id, use it directly
+            if (recordId) {
+                console.log('Finding record with ID:', recordId);
+            } else {
+                console.log('No record_id, will search by criteria');
+            }
+
+            // Close the ticket modal
+            document.getElementById('ticket_details_modal').close();
+
+            // Navigate to submission page
+            showPage('submission');
+
+            // Wait a moment for the page to load, then switch to archived tab
+            setTimeout(function() {
+                // Click on the archived tab
+                const tabs = document.querySelectorAll('.custom-tab');
+                let archivedTab = null;
+                
+                tabs.forEach(function(tab) {
+                    const tabText = tab.textContent.trim().toLowerCase();
+                    if (tabText === 'archived') {
+                        archivedTab = tab;
+                    }
+                });
+
+                if (archivedTab) {
+                    archivedTab.click();
+                    
+                    // Wait longer for archived records to fully load, then highlight the record
+                    setTimeout(function() {
+                        let targetRow = null;
+                        
+                        // Check if records are loaded
+                        const tbody = document.getElementById('submission-table-body');
+                        if (!tbody) {
+                            console.error('Submission table body not found!');
+                            showToast('Could not find submission records table', 'error');
+                            return;
+                        }
+                        
+                        // First try to find by record ID
+                        if (recordId) {
+                            targetRow = tbody.querySelector(`tr[data-record-id="${recordId}"]`);
+                            console.log('Searching by record ID:', recordId, 'Found:', !!targetRow);
+                        }
+                        
+                        // If not found by ID, search by matching criteria
+                        if (!targetRow && searchCriteria.date) {
+                            console.log('Searching by criteria:', searchCriteria);
+                            const allRows = tbody.querySelectorAll('tr');
+                            
+                            // The date from ticket details is already in MM-DD-YYYY format (extracted from student submission)
+                            // No conversion needed - use it as-is
+                            let searchDateConverted = searchCriteria.date;
+                            
+                            console.log('Search date (already MM-DD-YYYY):', searchDateConverted);
+                            console.log('Total rows to check:', allRows.length);
+                            
+                            allRows.forEach(function(row, index) {
+                                // Get row data - columns: Student ID, Student Name, Event Name, Organization/Supervisor, Hours, Date, Action
+                                const rowStudentId = row.cells[0]?.textContent.trim();
+                                const rowEventName = row.cells[2]?.textContent.trim();
+                                const rowDate = row.cells[5]?.textContent.trim();
+                                
+                                // Get venue and status from data attributes
+                                const rowVenue = row.dataset.venue || '';
+                                const rowStatus = row.dataset.recordStatus || '';
+                                
+                                // Match by student ID, date, and event name (primary criteria)
+                                const studentMatch = rowStudentId === searchCriteria.studentId;
+                                const dateMatch = rowDate === searchDateConverted;
+                                const eventMatch = searchCriteria.eventName && rowEventName.includes(searchCriteria.eventName);
+                                const venueMatch = !searchCriteria.venue || rowVenue.includes(searchCriteria.venue);
+                                const statusMatch = !searchCriteria.status || rowStatus.includes(searchCriteria.status);
+                                
+                                // Only log rows that match student and date
+                                if (studentMatch && dateMatch) {
+                                    console.log(`Row ${index + 1} (potential match):`, {
+                                        rowData: { rowStudentId, rowDate, rowEventName, rowVenue, rowStatus },
+                                        searching: { 
+                                            studentId: searchCriteria.studentId, 
+                                            date: searchDateConverted, 
+                                            eventName: searchCriteria.eventName, 
+                                            venue: searchCriteria.venue, 
+                                            status: searchCriteria.status 
+                                        },
+                                        matches: { studentMatch, dateMatch, eventMatch, venueMatch, statusMatch }
+                                    });
+                                }
+                                
+                                // Match requires student ID, date, and event name at minimum
+                                if (studentMatch && dateMatch && eventMatch) {
+                                    targetRow = row;
+                                    console.log('✅ Found matching row!');
+                                }
+                            });
+                        }
+                        
+                        if (targetRow) {
+                            // Remove any existing highlights
+                            document.querySelectorAll('#submission-table-body tr').forEach(function(row) {
+                                row.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30');
+                                row.style.animation = '';
+                            });
+                            
+                            // Scroll to the row
+                            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            // Highlight the row with animation
+                            targetRow.classList.add('bg-yellow-100', 'dark:bg-yellow-900/30');
+                            targetRow.style.animation = 'pulse 2s ease-in-out 3';
+                            
+                            showToast('Record found and highlighted!', 'success');
+                            
+                            // Remove highlight after 10 seconds
+                            setTimeout(function() {
+                                targetRow.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30');
+                                targetRow.style.animation = '';
+                            }, 10000);
+                        } else {
+                            console.log('No matching record found');
+                            showToast('Record not found in archived records. It may have been deleted or moved.', 'error');
+                        }
+                    }, 2000); // Increased timeout to 2 seconds for records to load
+                } else {
+                    showToast('Could not find archived tab', 'error');
+                }
+            }, 500); // Increased tab switching delay
         }
 
         // Toast notification function
