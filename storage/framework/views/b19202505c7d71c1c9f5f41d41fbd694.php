@@ -386,6 +386,25 @@ table{overflow:visible!important}
                         <!-- Data source: loadActivityData() function calls API endpoint -->
                     </div>
                 </div>
+
+                <!-- Yearly Approved and Rejected Records Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                    <!-- Yearly Approved Records -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-text-header mb-4">Yearly Approved Records</h2>
+                        <div class="relative" style="height: 300px;">
+                            <canvas id="yearlyApprovedChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Yearly Rejected Records -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-text-header mb-4">Yearly Rejected Records</h2>
+                        <div class="relative" style="height: 300px;">
+                            <canvas id="yearlyRejectedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Submission Page -->
@@ -794,7 +813,7 @@ table{overflow:visible!important}
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
                 <p class="text-gray-500 text-lg font-semibold">No records found</p>
-                <p class="text-gray-400 text-sm mt-2">There are no records with this status this week.</p>
+                <p id="status-modal-empty-text" class="text-gray-400 text-sm mt-2">There are no records with this status.</p>
             </div>
             
             <!-- Summary Footer -->
@@ -1004,6 +1023,173 @@ table{overflow:visible!important}
             }, 2000);
         }
 
+        // Chart instances
+        let yearlyApprovedChart = null;
+        let yearlyRejectedChart = null;
+
+        // Initialize yearly charts
+        function initYearlyCharts() {
+            const approvedCanvas = document.getElementById('yearlyApprovedChart');
+            const rejectedCanvas = document.getElementById('yearlyRejectedChart');
+            
+            if (!approvedCanvas || !rejectedCanvas) return;
+            
+            const approvedCtx = approvedCanvas.getContext('2d');
+            const rejectedCtx = rejectedCanvas.getContext('2d');
+            
+            // Destroy existing charts if they exist
+            if (yearlyApprovedChart) yearlyApprovedChart.destroy();
+            if (yearlyRejectedChart) yearlyRejectedChart.destroy();
+            
+            // Create approved chart (green)
+            yearlyApprovedChart = new Chart(approvedCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['2022', '2023', '2024', '2025', '2026'],
+                    datasets: [{
+                        label: 'Approved Records',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: '#10B981',
+                        borderRadius: 8,
+                        barThickness: 40,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: '#ffffff',
+                            titleColor: '#111827',
+                            bodyColor: '#111827',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#2B3674',
+                                stepSize: 1
+                            },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.06)',
+                                borderColor: 'rgba(0,0,0,0.12)'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#2B3674' },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.06)',
+                                borderColor: 'rgba(0,0,0,0.12)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Create rejected chart (red)
+            yearlyRejectedChart = new Chart(rejectedCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['2022', '2023', '2024', '2025', '2026'],
+                    datasets: [{
+                        label: 'Rejected Records',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: '#EF4444',
+                        borderRadius: 8,
+                        barThickness: 40,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: '#ffffff',
+                            titleColor: '#111827',
+                            bodyColor: '#111827',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#2B3674',
+                                stepSize: 1
+                            },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.06)',
+                                borderColor: 'rgba(0,0,0,0.12)'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#2B3674' },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.06)',
+                                borderColor: 'rgba(0,0,0,0.12)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update yearly charts with data
+        function updateYearlyCharts(submissions) {
+            if (!yearlyApprovedChart || !yearlyRejectedChart || !submissions) return;
+            
+            // Create maps for approved and rejected records by year
+            const approvedByYear = new Map();
+            const rejectedByYear = new Map();
+            
+            submissions.forEach(function(record) {
+                try {
+                    const dateStr = record.approved_at || record.rejected_at || record.updated_at || record.created_at;
+                    if (!dateStr) return;
+                    
+                    const date = getPhilippineDate(dateStr);
+                    if (isNaN(date.getTime())) return;
+                    
+                    const year = date.getFullYear();
+                    
+                    // Only count Approved status (super admin approved)
+                    if (record.status === 'Approved') {
+                        approvedByYear.set(year, (approvedByYear.get(year) || 0) + 1);
+                    } else if (record.status === 'Rejected') {
+                        rejectedByYear.set(year, (rejectedByYear.get(year) || 0) + 1);
+                    }
+                } catch (e) {
+                    console.warn('Error processing record for yearly chart:', e);
+                }
+            });
+            
+            // Get sorted years
+            const allYears = new Set([...approvedByYear.keys(), ...rejectedByYear.keys()]);
+            const sortedYears = Array.from(allYears).sort((a, b) => a - b);
+            
+            // If no data, use default years
+            const yearLabels = sortedYears.length > 0 ? sortedYears : [2022, 2023, 2024, 2025, 2026];
+            const approvedData = yearLabels.map(year => approvedByYear.get(year) || 0);
+            const rejectedData = yearLabels.map(year => rejectedByYear.get(year) || 0);
+            
+            // Update charts
+            yearlyApprovedChart.data.labels = yearLabels.map(String);
+            yearlyApprovedChart.data.datasets[0].data = approvedData;
+            yearlyApprovedChart.update();
+            
+            yearlyRejectedChart.data.labels = yearLabels.map(String);
+            yearlyRejectedChart.data.datasets[0].data = rejectedData;
+            yearlyRejectedChart.update();
+        }
+
         // Load submissions from database
         var lastSubmissionsData = null; // Store last data to detect changes
         var isLoadingSubmissions = false; // Prevent concurrent requests
@@ -1077,6 +1263,7 @@ table{overflow:visible!important}
                     allSubmissions = result.data;
                     renderSubmissions(result.data);
                     updateWeeklySummaryFromData(result.data);
+                    updateYearlyCharts(result.data);
                 } else {
                     throw new Error('Invalid response format');
                 }
@@ -1273,23 +1460,23 @@ table{overflow:visible!important}
             }
         }
         
-        // Update weekly summary from loaded data using Philippine timezone
+        // Update monthly summary from loaded data using Philippine timezone
         function updateWeeklySummaryFromData(submissions) {
             var now = getPhilippineDate();
-            var weekAgo = new Date(now);
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            var endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
             
             var pending = 0, accepted = 0, rejected = 0;
             
             submissions.forEach(function(record) {
                 var recordDate = getPhilippineDate(record.updated_at || record.created_at);
-                var isThisWeek = recordDate >= weekAgo && recordDate <= now;
+                var isThisMonth = recordDate >= startOfMonth && recordDate <= endOfMonth;
                 
                 if (record.status === 'Pending') {
                     pending++;
-                } else if (record.status === 'Verified' && isThisWeek) {
+                } else if (record.status === 'Verified' && isThisMonth) {
                     accepted++;
-                } else if (record.status === 'Rejected' && isThisWeek) {
+                } else if (record.status === 'Rejected' && isThisMonth) {
                     rejected++;
                 }
             });
@@ -1375,7 +1562,15 @@ table{overflow:visible!important}
             }, 0);
             
             if (filteredRecords.length === 0) {
-                // Show empty state
+                // Show empty state with appropriate message
+                var emptyText = document.getElementById('status-modal-empty-text');
+                if (status === 'Pending') {
+                    emptyText.textContent = 'There are no pending requests awaiting review.';
+                } else if (status === 'Verified') {
+                    emptyText.textContent = 'There are no verified requests this month.';
+                } else if (status === 'Rejected') {
+                    emptyText.textContent = 'There are no rejected requests this month.';
+                }
                 emptyState.classList.remove('hidden');
                 tableBody.closest('.overflow-x-auto').classList.add('hidden');
             } else {
@@ -1791,6 +1986,7 @@ table{overflow:visible!important}
             showPage(savedPage);
             initThemeToggle();
             attachLogoutHandler();
+            initYearlyCharts();
             loadDashboardStats(); // Load dashboard statistics
             generateActivityCalendar(); // Load activity calendar with API data
             loadSubmissions(); // Load initial submissions data
@@ -2416,7 +2612,6 @@ table{overflow:visible!important}
                         var dateStr = year + '-' + month + '-' + day;
                         
                         var level = activityData[dateStr] || 0;
-                        var color = getColor(level);
                         
                         // Check if this date is today in Philippines timezone
                         var isToday = date.getFullYear() === philippinesToday.getFullYear() && 
@@ -2425,6 +2620,14 @@ table{overflow:visible!important}
                         var isFuture = date > philippinesToday;
                         var isInYear = date.getFullYear() === currentCalendarYear;
                         var isInThisMonth = date.getMonth() === monthIndex;
+                        
+                        // Set color - use gray for future dates or dates not in this month, otherwise use activity color
+                        var color;
+                        if (isFuture || !isInYear || !isInThisMonth) {
+                            color = '#E5E7EB'; // Gray for future/out of range dates
+                        } else {
+                            color = getColor(level);
+                        }
                         
                         var title = dateStr + ': ' + level + ' update' + (level !== 1 ? 's' : '');
                         

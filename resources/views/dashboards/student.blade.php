@@ -577,6 +577,17 @@
                 </div>
                 <h2 class="font-bold text-lg">{{ auth()->user()->name }}</h2>
                 <p class="text-sm text-gray-500">Student Number: {{ auth()->user()->student_id ?? '—' }}</p>
+                @php
+                    $accountStatus = auth()->user()->status ?? 'active';
+                    $isActive = strtolower($accountStatus) === 'active';
+                @endphp
+                <div class="mt-2">
+                    @if($isActive)
+                        <span class="badge badge-success badge-sm text-white font-semibold">Active</span>
+                    @else
+                        <span class="badge badge-error badge-sm text-white font-semibold">Inactive</span>
+                    @endif
+                </div>
             </div>
 
             <ul class="menu p-0 my-4 flex-grow">
@@ -1250,6 +1261,24 @@
                         </div>
                         <div class="collapse-content">
                             <p class="text-text-muted">Yes. Once your form is approved by the head office reviewer, export and print it at the end of every academic year, then submit it to the Registrar's Office as proof of your completed service hours.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ 13 -->
+                    <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
+                        <div class="collapse-title text-lg font-semibold text-text-header">
+                            13. How do I use the Support Tickets system?
+                        </div>
+                        <div class="collapse-content">
+                            <p class="text-text-muted mb-3">The Support Tickets system allows you to request assistance from administrators for various account-related issues. Here's how it works:</p>
+                            <ul class="list-disc list-inside space-y-2 text-white">
+                                <li><strong>Submit a Ticket:</strong> Click "Submit New Ticket" on the Support Tickets page, select your issue type (Incorrect Student Number, Inaccessible PLV Email, Incorrect/Misspelled Name, Submitted Record Linked to Wrong Academic Year, or Others), and provide details about your concern.</li>
+                                <li><strong>Daily Limit:</strong> You can submit up to 2 support tickets per day to ensure fair access to support services.</li>
+                                <li><strong>Track Your Tickets:</strong> View all your submitted tickets in the Support Tickets table, showing Ticket ID, Student Name, Issue Type, Details, Status, and Action buttons.</li>
+                                <li><strong>Status Updates:</strong> Tickets have three statuses - <span class="text-yellow-700 font-semibold">Pending</span> (waiting for admin review), <span class="text-green-700 font-semibold">Resolved</span> (admin has addressed your issue), or <span class="text-gray-500 font-semibold">Closed</span> (ticket completed).</li>
+                                <li><strong>Mark as Done:</strong> Once a ticket is resolved and you've verified the fix, click "Mark as Done" to close the ticket.</li>
+                                <li><strong>When to Use:</strong> Submit a support ticket when you need corrections to your account information, have issues accessing your PLV email, or need help with records linked to the wrong academic year.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
