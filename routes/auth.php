@@ -130,6 +130,7 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
     Route::post('super-admin/api/submissions/{id}/verify', [App\Http\Controllers\SuperAdminDashboardController::class, 'verifySubmission']);
     Route::post('super-admin/api/submissions/{id}/approve', [App\Http\Controllers\SuperAdminDashboardController::class, 'approveSubmission']);
     Route::post('super-admin/api/submissions/{id}/reject', [App\Http\Controllers\SuperAdminDashboardController::class, 'rejectSubmission']);
+    Route::delete('super-admin/api/submissions/{id}', [App\Http\Controllers\SuperAdminDashboardController::class, 'deleteSubmission']);
     Route::get('super-admin/api/activity-calendar', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityCalendar']);
     Route::get('super-admin/api/activity-details', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityDetails']);
 

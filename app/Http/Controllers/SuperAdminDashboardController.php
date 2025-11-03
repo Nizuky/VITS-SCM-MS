@@ -586,6 +586,94 @@ class SuperAdminDashboardController extends Controller
     }
 
     /**
+     * Delete a submission record permanently
+     * This will delete the record from both social_contract_records and social_contract_approvals tables
+     */
+    public function deleteSubmission($id)
+    {
+        try {
+            Log::info('SuperAdmin attempting to delete submission', ['id' => $id]);
+            
+            // Find the record in social_contract_records table
+            $record = SocialContractRecord::findOrFail($id);
+            
+            Log::info('Found record to delete', [
+                'record_id' => $record->id,
+                'status' => $record->status,
+                'event_name' => $record->event_name
+            ]);
+            
+            DB::transaction(function () use ($record) {
+                // Store record data and student info before deletion
+                $eventName = $record->event_name;
+                $studentId = $record->socialContract->student->student_number ?? 'N/A';
+                $studentName = $record->socialContract->student->name ?? 'N/A';
+                $status = $record->status;
+                $hoursRendered = $record->hours_rendered;
+                $recordDate = $record->date;
+                $studentUserId = $record->socialContract->student_id;
+                
+                // Create notification for student about record deletion
+                StudentNotification::create([
+                    'user_id' => $studentUserId,
+                    'social_contract_record_id' => null, // Record will be deleted, so we can't reference it
+                    'title' => 'Record Deleted by Super Admin',
+                    'type' => 'deleted',
+                    'message' => "Your social contract record for '{$eventName}' has been permanently deleted by the super admin.\n\nNote: You have the option to re-submit this activity if needed.",
+                    'rejection_reason' => null,
+                    'is_read' => false,
+                ]);
+                
+                // Delete the approval record if it exists
+                SocialContractApproval::where('social_contract_record_id', $record->id)->delete();
+                
+                // Log activity before deletion
+                SuperAdminActivityLog::create([
+                    'super_admin_id' => Auth::guard('superadmin')->id(),
+                    'action' => 'deleted_submission',
+                    'description' => "Permanently deleted submission: {$eventName}",
+                    'metadata' => json_encode([
+                        'record_id' => $record->id,
+                        'event_name' => $eventName,
+                        'student_id' => $studentId,
+                        'student_name' => $studentName,
+                        'status' => $status,
+                        'hours_rendered' => $hoursRendered,
+                        'date' => $recordDate
+                    ])
+                ]);
+                
+                // Delete the record itself
+                $record->delete();
+            });
+            
+            Log::info('Successfully deleted submission', ['id' => $id]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Record deleted successfully'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Record not found for deletion', ['id' => $id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Record not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('SuperAdmin failed to delete submission', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete record: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get activity calendar data for a specific year
      */
     public function getActivityCalendar(Request $request)

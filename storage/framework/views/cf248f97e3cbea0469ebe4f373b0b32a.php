@@ -544,6 +544,12 @@
         table{overflow:visible!important}
         .table thead tr{height:60px!important;max-height:60px!important}
         .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
+        /* Support tickets table hover effect - match consistent hover styling */
+        #ticket-table-body tr:hover{background-color:#f3f4f6!important}
+        [data-theme="dark"] #ticket-table-body tr:hover{background-color:#191E24!important}
+        /* Record status table hover effect */
+        #record-table-body tr:hover{background-color:#F2F2F2!important}
+        [data-theme="dark"] #record-table-body tr:hover{background-color:#191E24!important}
     </style>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -2192,7 +2198,6 @@
                 }
 
                 const newRow = document.createElement('tr');
-                newRow.classList.add('hover:bg-gray-50');
                 
                 const shortDetails = ticket.details.split('\n')[0]; // Shows first line of details
                 
@@ -2472,6 +2477,7 @@
                 let step3Date = '';
                 let connector1Class = 'completed';
                 let connector2Class = '';
+                let deletionCountdown = '';
                 
                 if (record.status === 'Pending') {
                     step2Class = 'pending';
@@ -2520,12 +2526,28 @@
                     step2Icon = '✕';
                     step2Label = 'Rejected';
                     // Try rejected_at, then approval date, then the raw date field, then action_date
-                    step2Date = record.rejected_at || record.approval?.rejected_at || '';
-                    // Format the date if it's in ISO format using Philippine timezone
-                    if (step2Date && step2Date.includes('T')) {
-                        const dateObj = getPhilippineDate(step2Date);
-                        step2Date = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    const rejectedAtRaw = record.rejected_at || record.approval?.rejected_at || '';
+                    step2Date = rejectedAtRaw;
+                    
+                    // Calculate deletion countdown
+                    if (rejectedAtRaw && rejectedAtRaw.includes('T')) {
+                        const rejectedDate = getPhilippineDate(rejectedAtRaw);
+                        const deletionDate = new Date(rejectedDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from rejection
+                        const now = new Date();
+                        const timeLeft = deletionDate - now;
+                        
+                        if (timeLeft > 0) {
+                            const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                            const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            deletionCountdown = `Time left before deletion: ${daysLeft} days ${hoursLeft} hours`;
+                        } else {
+                            deletionCountdown = 'Scheduled for deletion';
+                        }
+                        
+                        // Format the date for display
+                        step2Date = `${String(rejectedDate.getMonth() + 1).padStart(2, '0')}-${String(rejectedDate.getDate()).padStart(2, '0')}-${rejectedDate.getFullYear()}`;
                     }
+                    
                     connector1Class = 'completed';
                     
                     // Debug log for rejected records
@@ -2535,6 +2557,7 @@
                         date: record.date,
                         action_date: record.action_date,
                         step2Date: step2Date,
+                        deletionCountdown: deletionCountdown,
                         record: record
                     });
                 }
@@ -2556,6 +2579,7 @@
                                 <div class="step-label">Admin Review</div>
                                 <div class="step-sublabel">${step2Label}</div>
                                 ${step2Date && step2Date.trim() ? '<div class="step-sublabel" style="margin-top: 0.25rem;">' + step2Date + '</div>' : ''}
+                                ${deletionCountdown ? '<div class="step-sublabel text-error" style="margin-top: 0.25rem; font-weight: 600;">' + deletionCountdown + '</div>' : ''}
                             </div>
                             <div class="step-item">
                                 <div class="step-circle ${step3Class}">${step3Icon}</div>
@@ -2848,6 +2872,13 @@
                         statusText = 'Rejected';
                         statusColor = 'text-red-600 dark:text-red-600';
                         statusHex = '#f85050ff';
+                        break;
+                    case 'deleted':
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />';
+                        iconColor = 'text-orange-500';
+                        statusText = 'Record Deleted';
+                        statusColor = 'text-orange-600 dark:text-orange-600';
+                        statusHex = '#f97316';
                         break;
                     default:
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';

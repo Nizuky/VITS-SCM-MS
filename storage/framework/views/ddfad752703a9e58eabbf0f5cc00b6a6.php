@@ -148,6 +148,14 @@ table{overflow:visible!important}
 #table-header-row th{transition:none!important}
 .table thead tr{height:60px!important;max-height:60px!important}
 .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
+/* Support tickets table hover effect - match Students Information table */
+#ticket-table-body tr:hover{background-color:#f3f4f6!important}
+[data-theme="dark"] #ticket-table-body tr:hover{background-color:#191E24!important}
+/* Students Information table hover effect */
+.table tbody#students-table-body tr:hover,
+.table tbody#students-table-body tr.hover:hover{background-color:#f3f4f6!important}
+[data-theme="dark"] .table tbody#students-table-body tr:hover,
+[data-theme="dark"] .table tbody#students-table-body tr.hover:hover{background-color:#191E24!important}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -1355,6 +1363,88 @@ table{overflow:visible!important}
         </form>
     </dialog>
 
+    <!-- First Delete Confirmation Modal -->
+    <dialog id="delete_record_modal_1" class="modal">
+        <div class="modal-box max-w-md rounded-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="text-center py-4">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-error/10 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                
+                <h3 class="font-bold text-2xl mb-2 text-text-header">Delete Record?</h3>
+                <p class="text-text-muted mb-4">Are you sure you want to delete this record?</p>
+                
+                <div class="bg-base-200 p-4 rounded-lg mb-6 text-left">
+                    <p class="text-sm text-text-muted mb-1">Student ID</p>
+                    <p id="delete-modal-1-student-id" class="font-semibold text-text-header mb-3"></p>
+                    <p class="text-sm text-text-muted mb-1">Event Name</p>
+                    <p id="delete-modal-1-event-name" class="font-semibold text-text-header"></p>
+                </div>
+                
+                <div class="flex gap-3 justify-center">
+                    <form method="dialog">
+                        <button class="btn btn-ghost">Cancel</button>
+                    </form>
+                    <button onclick="showSecondDeleteModal()" class="btn bg-error hover:bg-error/90 text-white">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Second Delete Confirmation Modal (Final Warning) -->
+    <dialog id="delete_record_modal_2" class="modal">
+        <div class="modal-box max-w-md rounded-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="text-center py-4">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-error mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                
+                <h3 class="font-bold text-2xl mb-2 text-error">Final Warning!</h3>
+                <p class="text-text-muted mb-2 font-semibold">This action cannot be undone!</p>
+                <p class="text-sm text-text-muted mb-6">All information about this record will be permanently deleted from the database and social contract.</p>
+                
+                <div class="alert alert-error mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span class="text-sm font-semibold">This will permanently delete the record!</span>
+                </div>
+                
+                <div class="flex gap-3 justify-center">
+                    <form method="dialog">
+                        <button class="btn btn-ghost">Cancel</button>
+                    </form>
+                    <button onclick="confirmDeleteRecord()" class="btn bg-error hover:bg-error/90 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
 
@@ -1365,6 +1455,7 @@ table{overflow:visible!important}
         var allSubmissions = []; // Store all submissions data
         var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
         var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
+        var recordToDelete = null; // Store record ID for deletion
         
         // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
         function getPhilippineDate(dateInput = null) {
@@ -1894,7 +1985,7 @@ table{overflow:visible!important}
             tbody.innerHTML = '';
             tickets.forEach(ticket => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 cursor-pointer';
+                tr.className = 'cursor-pointer';
                 tr.onclick = () => showTicketDetails(ticket.id);
                 
                 const shortDetails = (ticket.details || '').substring(0, 100) + (ticket.details && ticket.details.length > 100 ? '...' : '');
@@ -1934,45 +2025,45 @@ table{overflow:visible!important}
             currentActiveTab = normalizedTab;
             
             if (normalizedTab === 'archived') {
-                // Archived tab: show Status with filter and Rejection Reason columns
+                // Archived tab: show Status with filter and Rejection Reason columns + Delete
                 headerRow.innerHTML = `
-                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[11%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                             Student ID
                             <span id="studentid-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[13%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
                             Student Name
                             <span id="studentname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[14%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                             Event Name
                             <span id="eventname-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[13%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col font-bold" title="Sort by Organization">
                             <span>Organization/Supervisor</span>
                             <span id="organization-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[9%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                             Hours
                             <span id="hours-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[9%] text-center" style="height: 60px; max-height: 60px;">
                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                             Date
                             <span id="date-sort-indicator">⇅</span>
                         </button>
                     </th>
-                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
+                    <th class="w-[20%] text-center" style="height: 60px; max-height: 60px;">
                         <div class="flex items-center justify-center gap-1 font-bold">
                             <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                 Status
@@ -1992,6 +2083,9 @@ table{overflow:visible!important}
                                 </ul>
                             </div>
                         </div>
+                    </th>
+                    <th class="w-[11%] text-center" style="height: 60px; max-height: 60px;">
+                        <span class="font-bold">Action</span>
                     </th>
                 `;
             } else {
@@ -2166,17 +2260,23 @@ table{overflow:visible!important}
                     // Toggle visibility of action buttons vs status badges for Verified records
                     var actionButtons = r.querySelector('.for-approval-actions');
                     var statusBadge = r.querySelector('.archived-status');
+                    var deleteCell = r.querySelector('.delete-action-cell');
                     
                     if (actionButtons && statusBadge) {
                         if (isArchivedTab) {
-                            // In Archived tab: hide action buttons, show status badge
+                            // In Archived tab: hide action buttons, show status badge, show delete button
                             actionButtons.style.display = 'none';
                             statusBadge.style.display = 'block';
+                            if (deleteCell) deleteCell.style.display = 'table-cell';
                         } else {
-                            // In For Approval tab: show action buttons, hide status badge
+                            // In For Approval tab: show action buttons, hide status badge, hide delete button
                             actionButtons.style.display = 'block';
                             statusBadge.style.display = 'none';
+                            if (deleteCell) deleteCell.style.display = 'none';
                         }
+                    } else if (deleteCell) {
+                        // For non-Verified archived records, show/hide delete button
+                        deleteCell.style.display = isArchivedTab ? 'table-cell' : 'none';
                     }
                 } else {
                     r.classList.add('hidden');
@@ -2746,6 +2846,17 @@ table{overflow:visible!important}
                     }
                 }
                 
+                html += '</td>';
+                
+                // Add delete button column for archived records only
+                html += '<td class="text-center delete-action-cell" style="display:none;">';
+                if (isArchived) {
+                    html += '<button class="btn btn-ghost btn-sm" onclick="openDeleteModal(' + record.id + ', \'' + (record.student_id || '') + '\', \'' + (record.event_name || '').replace(/'/g, "\\'") + '\', event)" title="Delete Record">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' +
+                            '</svg>' +
+                            '</button>';
+                }
                 html += '</td>';
                 
                 html += '</tr>';

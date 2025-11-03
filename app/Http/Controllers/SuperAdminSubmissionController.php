@@ -89,4 +89,44 @@ class SuperAdminSubmissionController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Delete a record permanently from database and social contract
+     * Only accessible by super admin
+     */
+    public function destroy($id)
+    {
+        try {
+            // Find the record in social_contract_records table
+            $record = SocialContractRecord::findOrFail($id);
+            
+            // Get the social contract ID before deleting
+            $socialContractId = $record->social_contract_id;
+            
+            // Delete the approval record if it exists (cascade will handle this but be explicit)
+            SocialContractApproval::where('social_contract_record_id', $id)->delete();
+            
+            // Delete the record itself
+            $record->delete();
+            
+            // Note: The social contract itself remains (the student's contract)
+            // We're only deleting the specific record entry
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Record deleted successfully'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Record not found'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting record: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete record: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
