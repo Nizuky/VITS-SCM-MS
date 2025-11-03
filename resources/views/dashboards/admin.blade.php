@@ -795,6 +795,11 @@ table{overflow:visible!important}
                 </div>
             </div>
             
+            <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
+                <label class="details-label">Reason for Rejection</label>
+                <p class="font-medium text-badge-rejected-text whitespace-pre-line bg-gray-50 dark:bg-gray-700 dark:text-red-300 p-3 rounded-lg" id="details-reason-text"></p>
+            </div>
+            
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
         </div>
     </dialog>
@@ -1420,6 +1425,7 @@ table{overflow:visible!important}
                         'data-organization="' + (record.organization || '') + '" ' +
                         'data-supervisor-name="' + (record.supervisor_name || '') + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
+                        'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
                         '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
                         '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
@@ -1895,10 +1901,14 @@ table{overflow:visible!important}
             var ab = document.getElementById('details-action-buttons');
             var sb = document.getElementById('details-status-badge');
             var ad = document.getElementById('details-action-date');
+            var reasonContainer = document.getElementById('details-reason-container');
+            var reasonText = document.getElementById('details-reason-text');
             
             sb.innerHTML = '';
             ab.innerHTML = '';
             ad.textContent = ''; // Clear action date
+            reasonContainer.classList.add('hidden'); // Hide rejection reason by default
+            reasonText.textContent = '';
             
             if (s === 'Pending') {
                 ss.classList.add('hidden');
@@ -1917,6 +1927,13 @@ table{overflow:visible!important}
                     sb.innerHTML = '<span class="status-badge approved">Approved</span>';
                 } else if (as === 'Rejected') {
                     sb.innerHTML = '<span class="status-badge rejected">Rejected</span>';
+                    
+                    // Show rejection reason if available
+                    var rejectionReason = r.dataset.rejectionReason || '';
+                    if (rejectionReason) {
+                        reasonContainer.classList.remove('hidden');
+                        reasonText.textContent = rejectionReason;
+                    }
                 }
                 
                 // Add the action date on the right
