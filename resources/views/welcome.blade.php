@@ -215,8 +215,12 @@
             } catch(e) {}
           }
           
-          // Clear localStorage
+          // Clear localStorage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
           localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
           // Clear sessionStorage
           sessionStorage.clear();
           // Clear all cookies
@@ -261,8 +265,12 @@
             } catch(e) {}
           }
           
-          // Clear localStorage
+          // Clear localStorage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
           localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
           // Clear sessionStorage
           sessionStorage.clear();
           // Clear all cookies
@@ -306,8 +314,12 @@
             } catch(e) {}
           }
           
-          // Clear all storage
+          // Clear all storage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
           localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
           sessionStorage.clear();
           document.cookie.split(";").forEach(function(c) { 
             document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
@@ -349,8 +361,12 @@
             } catch(e) {}
           }
           
-          // Clear all storage
+          // Clear all storage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
           localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
           sessionStorage.clear();
           document.cookie.split(";").forEach(function(c) { 
             document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
