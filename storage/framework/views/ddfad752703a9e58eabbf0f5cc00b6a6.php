@@ -793,14 +793,39 @@ table{overflow:visible!important}
                     
                     <div class="overflow-x-auto">
                         <table class="table table-zebra w-full">
-                            <thead>
-                                <tr class="bg-base-200">
-                                    <th class="font-semibold text-text-header">Ticket ID</th>
-                                    <th class="font-semibold text-text-header">Student ID</th>
-                                    <th class="font-semibold text-text-header">Student Name</th>
-                                    <th class="font-semibold text-text-header">Issue Type</th>
-                                    <th class="font-semibold text-text-header">Details</th>
-                                    <th class="font-semibold text-text-header">Status</th>
+                            <thead class="bg-gray-50 text-gray-600">
+                                <tr>
+                                    <th class="text-center">
+                                        <button id="ticket-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Ticket ID">
+                                            Ticket ID
+                                            <span id="ticket-id-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center">
+                                        <button id="ticket-student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">
+                                            Student ID
+                                            <span id="ticket-student-id-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center">
+                                        <button id="ticket-student-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student Name">
+                                            Student Name
+                                            <span id="ticket-student-name-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center">
+                                        <button id="ticket-issue-type-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Issue Type">
+                                            Issue Type
+                                            <span id="ticket-issue-type-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center font-bold">Details</th>
+                                    <th class="text-center">
+                                        <button id="ticket-status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Status">
+                                            Status
+                                            <span id="ticket-status-sort-icon" class="text-xs">⇅</span>
+                                        </button>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="ticket-table-body">
@@ -2298,6 +2323,70 @@ table{overflow:visible!important}
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // Support tickets sorting
+        var ticketsSortColumn = null;
+        var ticketsSortDirection = 'asc';
+
+        function sortTickets(column) {
+            // Toggle direction if same column, otherwise default to ascending
+            if (ticketsSortColumn === column) {
+                ticketsSortDirection = ticketsSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                ticketsSortColumn = column;
+                ticketsSortDirection = 'asc';
+            }
+            
+            // Reset all ticket sort icons
+            document.querySelectorAll('[id^="ticket-"][id$="-sort-icon"]').forEach(icon => {
+                icon.textContent = '⇅';
+            });
+            
+            // Update current column icon
+            var iconId = column + '-sort-icon';
+            var icon = document.getElementById(iconId);
+            if (icon) {
+                icon.textContent = ticketsSortDirection === 'asc' ? '↑' : '↓';
+            }
+            
+            // Sort the tickets array
+            var sortedTickets = [...allTickets].sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(column) {
+                    case 'ticket-id':
+                        aVal = parseInt(a.id) || 0;
+                        bVal = parseInt(b.id) || 0;
+                        break;
+                    case 'ticket-student-id':
+                        aVal = (a.student_id || '').toLowerCase();
+                        bVal = (b.student_id || '').toLowerCase();
+                        break;
+                    case 'ticket-student-name':
+                        aVal = (a.student_name || '').toLowerCase();
+                        bVal = (b.student_name || '').toLowerCase();
+                        break;
+                    case 'ticket-issue-type':
+                        aVal = (a.type || '').toLowerCase();
+                        bVal = (b.type || '').toLowerCase();
+                        break;
+                    case 'ticket-status':
+                        aVal = (a.status || '').toLowerCase();
+                        bVal = (b.status || '').toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (ticketsSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                }
+            });
+            
+            renderTicketsTable(sortedTickets);
         }
 
         // Track the current active tab to avoid unnecessary header updates
@@ -4738,6 +4827,52 @@ table{overflow:visible!important}
                 statusSort.addEventListener('click', function(e) {
                     e.preventDefault();
                     sortStudents('status');
+                });
+            }
+            
+            // ========== SUPPORT TICKETS TABLE SORTING EVENT LISTENERS ==========
+            // Ticket ID sort
+            var ticketIdSort = document.getElementById('ticket-id-sort');
+            if (ticketIdSort) {
+                ticketIdSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortTickets('ticket-id');
+                });
+            }
+            
+            // Ticket Student ID sort
+            var ticketStudentIdSort = document.getElementById('ticket-student-id-sort');
+            if (ticketStudentIdSort) {
+                ticketStudentIdSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortTickets('ticket-student-id');
+                });
+            }
+            
+            // Ticket Student Name sort
+            var ticketStudentNameSort = document.getElementById('ticket-student-name-sort');
+            if (ticketStudentNameSort) {
+                ticketStudentNameSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortTickets('ticket-student-name');
+                });
+            }
+            
+            // Ticket Issue Type sort
+            var ticketIssueTypeSort = document.getElementById('ticket-issue-type-sort');
+            if (ticketIssueTypeSort) {
+                ticketIssueTypeSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortTickets('ticket-issue-type');
+                });
+            }
+            
+            // Ticket Status sort
+            var ticketStatusSort = document.getElementById('ticket-status-sort');
+            if (ticketStatusSort) {
+                ticketStatusSort.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sortTickets('ticket-status');
                 });
             }
             
