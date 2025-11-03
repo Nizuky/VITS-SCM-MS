@@ -705,30 +705,30 @@
                         $daysRemaining = max(0, (int) ceil($totalHours / 24));
                         $hoursRemaining = max(0, (int) $totalHours);
                     @endphp
-                    <div class="alert alert-error shadow-lg mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg" role="alert">
+                    <div class="alert alert-error shadow-lg mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-800 rounded-lg" role="alert">
                         <div class="flex items-start w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                             <div class="ml-3 flex-1">
-                                <h3 class="text-lg font-bold text-red-800">Account Inactive - Scheduled for Deletion</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p class="font-semibold mb-2">⚠️ Your account has been deactivated by an administrator.</p>
-                                    <div class="bg-red-100 p-3 rounded-md mb-2">
-                                        <p class="text-base font-bold text-red-900">
+                                <h3 class="text-lg font-bold dark:text-red-300" style="color: #000000;">Account Inactive - Scheduled for Deletion</h3>
+                                <div class="mt-2 text-sm dark:text-red-400">
+                                    <p class="font-semibold mb-2" style="color: #1a1a1a;">⚠️ Your account has been deactivated by an administrator.</p>
+                                    <div class="bg-red-100 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-3 rounded-md mb-2">
+                                        <p class="text-base font-bold dark:text-red-200" style="color: #000000;">
                                             @if($daysRemaining > 0)
                                                 <span class="text-2xl">{{ $daysRemaining }}</span> day{{ $daysRemaining != 1 ? 's' : '' }} remaining
                                             @else
                                                 <span class="text-2xl">{{ $hoursRemaining }}</span> hour{{ $hoursRemaining != 1 ? 's' : '' }} remaining
                                             @endif
                                         </p>
-                                        <p class="text-sm">Your account will be permanently deleted on <strong>{{ $deletionDate->format('F d, Y \a\t g:i A') }}</strong></p>
+                                        <p class="text-sm dark:text-red-300" style="color: #1a1a1a;">Your account will be permanently deleted on <strong>{{ $deletionDate->format('F d, Y \a\t g:i A') }}</strong></p>
                                     </div>
-                                    <p class="text-sm">
+                                    <p class="text-sm dark:text-red-400" style="color: #1a1a1a;">
                                         <strong>What this means:</strong> You currently have limited access to the system. 
                                         All your data, including social contract records, will be permanently removed on the deletion date.
                                     </p>
-                                    <p class="text-sm mt-2">
+                                    <p class="text-sm mt-2 dark:text-red-400" style="color: #1a1a1a;">
                                         <strong>Action Required:</strong> Please contact your administrator immediately to reactivate your account 
                                         and prevent permanent deletion.
                                     </p>
