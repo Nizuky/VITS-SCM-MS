@@ -144,6 +144,18 @@ table{overflow:visible!important}
 #action-status-header{overflow:visible!important;position:relative}
 .table thead tr{height:60px!important;max-height:60px!important}
 .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
+/* Activity calendar legend - light theme */
+.activity-legend-0{background-color:#E5E7EB}
+.activity-legend-1{background-color:#E5D4FF}
+.activity-legend-2{background-color:#C9A9FF}
+.activity-legend-3{background-color:#A475FF}
+.activity-legend-4{background-color:#6D28D9}
+/* Activity calendar legend - dark theme */
+[data-theme="dark"] .activity-legend-0{background-color:#2c354aff}
+[data-theme="dark"] .activity-legend-1{background-color:#411b7a}
+[data-theme="dark"] .activity-legend-2{background-color:#5A3590}
+[data-theme="dark"] .activity-legend-3{background-color:#804ED6}
+[data-theme="dark"] .activity-legend-4{background-color:#A770FF}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -357,25 +369,30 @@ table{overflow:visible!important}
                             <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
                             <p class="text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
                         </div>
-                        <div class="flex items-center gap-4">
+                       <div class="flex items-center gap-4">
                             <div class="flex items-center gap-3 text-xs">
                                 <span class="text-text-muted">Less</span>
                                 <div class="flex gap-1">
-                                     <div class="w-3 h-3 rounded-sm bg-gray-200" title="No activity"></div>
-                                    <div class="w-3 h-3 rounded-sm bg-[#E5D4FF]" title="1-2 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm bg-[#C9A9FF]" title="3-4 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm bg-[#A475FF]" title="5-6 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm bg-[#6D28D9]" title="7+ updates"></div>
+                                    <div class="w-3 h-3 rounded-sm activity-legend-0" title="No activity"></div>
+                                    <div class="w-3 h-3 rounded-sm activity-legend-1" title="1-2 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm activity-legend-2" title="3-4 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm activity-legend-3" title="5-6 updates"></div>
+                                    <div class="w-3 h-3 rounded-sm activity-legend-4" title="7+ updates"></div>
                                 </div>
                                 <span class="text-text-muted">More</span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <button id="calendar-prev-year" onclick="changeCalendarYear(-1)" class="btn btn-sm btn-circle btn-ghost">
-                                    ←
+                            <!-- Year Navigation -->
+                            <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                                <button id="prev-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(-1)" title="Previous year">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
                                 </button>
-                                <span id="calendar-year" class="text-sm font-semibold min-w-[3rem] text-center">2025</span>
-                                <button id="calendar-next-year" onclick="changeCalendarYear(1)" class="btn btn-sm btn-circle btn-ghost">
-                                    →
+                                <span id="calendar-year" class="text-sm font-bold text-text-header min-w-[60px] text-center">2025</span>
+                                <button id="next-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(1)" title="Next year">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -1940,6 +1957,10 @@ table{overflow:visible!important}
                                 updateYearlyCharts(submissions);
                             }
                         }
+                        // Regenerate activity calendar with new theme colors
+                        if (typeof generateActivityCalendar === 'function') {
+                            generateActivityCalendar();
+                        }
                     });
                 }
             } catch(_) {}
@@ -2461,13 +2482,13 @@ table{overflow:visible!important}
             
             // Disable next button if viewing current year
             var currentYear = getPhilippineDate().getFullYear();
-            var nextBtn = document.getElementById('calendar-next-year');
+            var nextBtn = document.getElementById('next-year-btn');
             if (nextBtn) {
                 nextBtn.disabled = (currentCalendarYear >= currentYear);
                 if (nextBtn.disabled) {
-                    nextBtn.classList.add('btn-disabled');
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 } else {
-                    nextBtn.classList.remove('btn-disabled');
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             }
             
@@ -2537,11 +2558,24 @@ table{overflow:visible!important}
             
             // Get color based on activity level (purple palette)
             function getColor(level) {
-                if (level === 0) return '#E5E7EB';
-                if (level <= 2) return '#E5D4FF';
-                if (level <= 4) return '#C9A9FF';
-                if (level <= 6) return '#A475FF';
-                return '#6D28D9';
+                // Detect dark theme
+                const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+                
+                if (isDarkTheme) {
+                    // Dark theme - purple palette (5 levels: 0-4)
+                    if (level === 0) return '#2c354aff'; // No activity
+                    if (level === 1) return '#411b7a'; // 1-2 updates
+                    if (level === 2) return '#5A3590'; // 3-4 updates
+                    if (level === 3) return '#804ED6'; // 5-6 updates
+                    return '#A770FF'; // 7+ updates (level 4)
+                } else {
+                    // Light theme - original colors (5 levels: 0-4)
+                    if (level === 0) return '#E5E7EB'; // No activity
+                    if (level === 1) return '#E5D4FF'; // 1-2 updates
+                    if (level === 2) return '#C9A9FF'; // 3-4 updates
+                    if (level === 3) return '#A475FF'; // 5-6 updates
+                    return '#6D28D9'; // 7+ updates (level 4)
+                }
             }
             
             // Use Philippines timezone (UTC+8)
@@ -2640,7 +2674,9 @@ table{overflow:visible!important}
                         // Set color - use gray for future dates or dates not in this month, otherwise use activity color
                         var color;
                         if (isFuture || !isInYear || !isInThisMonth) {
-                            color = '#E5E7EB'; // Gray for future/out of range dates
+                            // Use theme-aware gray color for future/out of range dates
+                            const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+                             color = isDarkTheme ? '#303d54ff' : '#E5E7EB';
                         } else {
                             color = getColor(level);
                         }
