@@ -2449,6 +2449,15 @@ table{overflow:visible!important}
             if (yearlyApprovedChart) yearlyApprovedChart.destroy();
             if (yearlyRejectedChart) yearlyRejectedChart.destroy();
             
+            // Detect current theme
+            const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDarkTheme ? '#ffffff' : '#2B3674';
+            const gridColor = isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)';
+            const borderColor = isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.12)';
+            const tooltipBg = isDarkTheme ? '#1f2937' : '#ffffff';
+            const tooltipText = isDarkTheme ? '#ffffff' : '#111827';
+            const tooltipBorder = isDarkTheme ? '#374151' : '#e5e7eb';
+            
             // Create approved chart (green)
             yearlyApprovedChart = new Chart(approvedCtx, {
                 type: 'bar',
@@ -2469,10 +2478,10 @@ table{overflow:visible!important}
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: '#ffffff',
-                            titleColor: '#111827',
-                            bodyColor: '#111827',
-                            borderColor: '#e5e7eb',
+                            backgroundColor: tooltipBg,
+                            titleColor: tooltipText,
+                            bodyColor: tooltipText,
+                            borderColor: tooltipBorder,
                             borderWidth: 1
                         }
                     },
@@ -2480,19 +2489,19 @@ table{overflow:visible!important}
                         y: {
                             beginAtZero: true,
                             ticks: { 
-                                color: '#2B3674',
+                                color: textColor,
                                 stepSize: 1
                             },
                             grid: { 
-                                color: 'rgba(0,0,0,0.06)',
-                                borderColor: 'rgba(0,0,0,0.12)'
+                                color: gridColor,
+                                borderColor: borderColor
                             }
                         },
                         x: {
-                            ticks: { color: '#2B3674' },
+                            ticks: { color: textColor },
                             grid: { 
-                                color: 'rgba(0,0,0,0.06)',
-                                borderColor: 'rgba(0,0,0,0.12)'
+                                color: gridColor,
+                                borderColor: borderColor
                             }
                         }
                     }
@@ -2519,10 +2528,10 @@ table{overflow:visible!important}
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: '#ffffff',
-                            titleColor: '#111827',
-                            bodyColor: '#111827',
-                            borderColor: '#e5e7eb',
+                            backgroundColor: tooltipBg,
+                            titleColor: tooltipText,
+                            bodyColor: tooltipText,
+                            borderColor: tooltipBorder,
                             borderWidth: 1
                         }
                     },
@@ -2530,19 +2539,19 @@ table{overflow:visible!important}
                         y: {
                             beginAtZero: true,
                             ticks: { 
-                                color: '#2B3674',
+                                color: textColor,
                                 stepSize: 1
                             },
                             grid: { 
-                                color: 'rgba(0,0,0,0.06)',
-                                borderColor: 'rgba(0,0,0,0.12)'
+                                color: gridColor,
+                                borderColor: borderColor
                             }
                         },
                         x: {
-                            ticks: { color: '#2B3674' },
+                            ticks: { color: textColor },
                             grid: { 
-                                color: 'rgba(0,0,0,0.06)',
-                                borderColor: 'rgba(0,0,0,0.12)'
+                                color: gridColor,
+                                borderColor: borderColor
                             }
                         }
                     }
