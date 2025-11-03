@@ -1472,7 +1472,7 @@
             <div class="divider my-4"></div>
             
             <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <p class="text-sm text-gray-900 dark:text-black whitespace-pre-wrap" id="rejection-reason-text">
+                <p class="text-sm text-gray-900 dark:text-red-200 whitespace-pre-wrap" id="rejection-reason-text">
                     <!-- Rejection reason will be injected here -->
                 </p>
             </div>
@@ -1583,6 +1583,7 @@
                         <option value="1">Incorrect Student Number</option>
                         <option value="2">Inaccessible PLV Email</option>
                         <option value="3">Incorrect/Misspelled Name</option>
+                        <option value="4">Reactivate Account</option>
                         <option value="5">Submitted Record Linked to Wrong Academic Year</option>
                         <option value="99">Others (Specify below)</option>
                     </select>
@@ -2915,8 +2916,8 @@
                                 View reason
                             </button>
                             <div class="reason-content hidden mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                                <p class="text-xs font-semibold text-red-700 dark:text-red mb-1">Rejection Reason:</p>
-                                <p class="text-sm text-gray-900 dark:text-black whitespace-pre-wrap">${notif.rejection_reason}</p>
+                                <p class="text-xs font-semibold text-red-700 dark:text-red-300 mb-1">Rejection Reason:</p>
+                                <p class="text-sm text-gray-900 dark:text-red-200 whitespace-pre-wrap">${notif.rejection_reason}</p>
                             </div>
                         `;
                     } else {

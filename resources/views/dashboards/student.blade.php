@@ -1287,7 +1287,7 @@
                         <div class="collapse-content">
                             <p class="text-text-muted mb-3">The Support Tickets system allows you to request assistance from administrators for various account-related issues. Here's how it works:</p>
                             <ul class="list-disc list-inside space-y-2 text-white">
-                                <li><strong>Submit a Ticket:</strong> Click "Submit New Ticket" on the Support Tickets page, select your issue type (Incorrect Student Number, Inaccessible PLV Email, Incorrect/Misspelled Name, Submitted Record Linked to Wrong Academic Year, or Others), and provide details about your concern.</li>
+                                <li><strong>Submit a Ticket:</strong> Click "Submit New Ticket" on the Support Tickets page, select your issue type (Incorrect Student Number, Inaccessible PLV Email, Incorrect/Misspelled Name, Reactivate Account, Submitted Record Linked to Wrong Academic Year, or Others), and provide details about your concern.</li>
                                 <li><strong>Daily Limit:</strong> You can submit up to 2 support tickets per day to ensure fair access to support services.</li>
                                 <li><strong>Track Your Tickets:</strong> View all your submitted tickets in the Support Tickets table, showing Ticket ID, Student Name, Issue Type, Details, Status, and Action buttons.</li>
                                 <li><strong>Status Updates:</strong> Tickets have three statuses - <span class="text-yellow-700 font-semibold">Pending</span> (waiting for admin review), <span class="text-green-700 font-semibold">Resolved</span> (admin has addressed your issue), or <span class="text-gray-500 font-semibold">Closed</span> (ticket completed).</li>
@@ -1580,6 +1580,7 @@
                         <option value="1">Incorrect Student Number</option>
                         <option value="2">Inaccessible PLV Email</option>
                         <option value="3">Incorrect/Misspelled Name</option>
+                        <option value="4">Reactivate Account</option>
                         <option value="5">Submitted Record Linked to Wrong Academic Year</option>
                         <option value="99">Others (Specify below)</option>
                     </select>
