@@ -3067,6 +3067,83 @@ table{overflow:visible!important}
             document.getElementById('reject_modal').showModal();
         }
 
+        // Variables for delete functionality
+        var recordToDelete = null;
+
+        // Open delete modal (first confirmation)
+        function openDeleteModal(recordId, studentId, eventName, event) {
+            if (event) event.stopPropagation();
+            
+            // Store the record ID for later use
+            recordToDelete = recordId;
+            
+            // Update modal content with record details
+            document.getElementById('delete-modal-1-student-id').textContent = studentId;
+            document.getElementById('delete-modal-1-event-name').textContent = eventName;
+            
+            // Show first modal
+            document.getElementById('delete_record_modal_1').showModal();
+        }
+
+        // Show second delete modal (final warning)
+        function showSecondDeleteModal() {
+            // Close first modal
+            document.getElementById('delete_record_modal_1').close();
+            
+            // Small delay before opening second modal for better UX
+            setTimeout(function() {
+                document.getElementById('delete_record_modal_2').showModal();
+            }, 150);
+        }
+
+        // Confirm and execute record deletion
+        async function confirmDeleteRecord() {
+            if (!recordToDelete) {
+                showToast('No record selected for deletion', 'error');
+                return;
+            }
+
+            // Close the modal
+            document.getElementById('delete_record_modal_2').close();
+
+            // Show loading state
+            showToast('Deleting record...', 'info');
+
+            try {
+                // Ensure CSRF cookie exists
+                await ensureCsrfCookie();
+
+                // Make DELETE request to API
+                const response = await fetch(`${BASE_PATH}/super-admin/api/submissions/${recordToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast('Record deleted successfully', 'success');
+                    
+                    // Refresh the submissions table
+                    await loadSubmissions();
+                    
+                    // Reset the recordToDelete
+                    recordToDelete = null;
+                } else {
+                    showToast(data.message || 'Failed to delete record', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting record:', error);
+                showToast('An error occurred while deleting the record', 'error');
+            }
+        }
+
         // Open details modal
         function openDetailsModal(r) {
             activeRow = r;
