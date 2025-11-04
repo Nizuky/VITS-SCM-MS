@@ -548,46 +548,49 @@ body {
                         <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr id="table-header-row" style="background-color: #f9fafb !important;">
-                                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="studentid-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
                                             Student Name
                                             <span id="studentname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Organization">
-                                            <div class="flex flex-col items-center">
-                                                <span>Organization/</span>
-                                                <span>Supervisor</span>
-                                            </div>
+                                            Organization
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
-                                    </th> 
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    </th>
+                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                        <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Supervisor">
+                                            Supervisor
+                                            <span id="supervisor-sort-indicator">⇅</span>
+                                        </button>
+                                    </th>
+                                    <th class="text-center" style="width: 120px; height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 250px; height: 60px;">
                                         <div class="flex items-center justify-center gap-1 font-bold">
                                             <span>Action</span>
                                         </div>
@@ -597,7 +600,7 @@ body {
                             <tbody id="submission-table-body">
                                 <!-- Data will be loaded dynamically from database -->
                                 <tr id="loading-row">
-                                    <td colspan="7" class="text-center py-8">
+                                    <td colspan="8" class="text-center py-8">
                                         <span class="loading loading-spinner loading-lg text-primary-purple"></span>
                                         <p class="mt-2 text-text-muted">Loading submissions...</p>
                                     </td>
@@ -641,44 +644,48 @@ body {
                      <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
                         <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
-                                <tr>
-                                    <th class="w-[10%] text-center">
-                                        <button id="student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">
+                                <tr style="background-color: #f9fafb !important;">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
+                                        <button id="student-id-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="student-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">
-                                        <button id="full-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Full Name">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
+                                        <button id="full-name-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Full Name">
                                             Full Name
                                             <span id="full-name-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[22%] text-center">
-                                        <button id="email-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Email">
+                                    <th class="text-center" style="width: 250px; height: 60px;">
+                                        <button id="email-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Email">
                                             Email
                                             <span id="email-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
-                                        <button id="email-verified-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Email Verified">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                        <button id="email-verified-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Email Verified">
                                             Email Verified
                                             <span id="email-verified-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
-                                        <button id="approved-hours-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Approved Hours">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                        <button id="approved-hours-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Approved Hours">
                                             Approved Hours
                                             <span id="approved-hours-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center">
-                                        <button id="status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Status">
+                                    <th class="text-center" style="width: 120px; height: 60px;">
+                                        <button id="status-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                             Status
                                             <span id="status-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[11%] text-center font-bold">Action</th>
+                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                        <div class="flex items-center justify-center gap-1 font-bold">
+                                            <span>Action</span>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="students-table-body">
@@ -803,42 +810,46 @@ body {
                     </button>
                 </div>
                 
-                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
                     <div class="mb-4">
                         <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered w-full max-w-md rounded-lg" />
                     </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="table table-zebra w-full">
-                            <thead class="bg-gray-50 text-gray-600">
-                                <tr>
-                                    <th class="text-center">
+                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);">
+                        <table class="table table-xs table-pin-rows">
+                            <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
+                                <tr style="background-color: #f9fafb !important;">
+                                    <th class="text-center" style="width: 50px; height: 60px;">
                                         <button id="ticket-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Ticket ID">
                                             Ticket ID
                                             <span id="ticket-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
                                         <button id="ticket-student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="ticket-student-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
                                         <button id="ticket-student-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student Name">
                                             Student Name
                                             <span id="ticket-student-name-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
-                                        <button id="ticket-issue-type-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Issue Type">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                        <button id="ticket-issue-type-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Issue Type">
                                             Issue Type
                                             <span id="ticket-issue-type-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center font-bold">Details</th>
-                                    <th class="text-center">
-                                        <button id="ticket-status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Status">
+                                    <th class="text-center" style="width: 120px; height: 60px;">
+                                        <div class="flex items-center justify-center gap-1 font-bold">
+                                            <span>Details</span>
+                                        </div>
+                                    </th>
+                                    <th class="text-center" style="width: 250px; height: 60px;">
+                                        <button id="ticket-status-sort" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                             Status
                                             <span id="ticket-status-sort-icon" class="text-xs">⇅</span>
                                         </button>
@@ -3008,7 +3019,7 @@ body {
             
             // Only show loading state on initial load or explicit refresh
             if (showLoading && !lastSubmissionsData) {
-                tbody.innerHTML = '<tr id="loading-row"><td colspan="7" class="text-center py-8">' +
+                tbody.innerHTML = '<tr id="loading-row"><td colspan="8" class="text-center py-8">' +
                     '<span class="loading loading-spinner loading-lg text-primary-purple"></span>' +
                     '<p class="mt-2 text-text-muted">Loading submissions...</p></td></tr>';
             }
@@ -3076,7 +3087,7 @@ body {
                 
                 // Only show error if we have no cached data AND it's the first load
                 if (!lastSubmissionsData && showLoading) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">' +
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-red-500">' +
                         'Failed to load submissions. Please refresh the page.</td></tr>';
                 }
                 // If we have cached data, silently keep using it - no toast notification
@@ -3089,7 +3100,7 @@ body {
             var tbody = document.getElementById('submission-table-body');
             
             if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-text-muted">' +
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-text-muted">' +
                     'No submissions found.</td></tr>';
                 return;
             }
@@ -3204,17 +3215,13 @@ body {
                         'data-rejection-reason="' + rejectionReason + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
-                        '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
-                        '<td class="w-[16%] text-center">' + (record.event_name || '—') + '</td>' +
-                        '<td class="w-[15%] text-center">' + 
-                            '<div class="flex flex-col items-center">' +
-                                '<span class="font-medium">' + (record.organization || '—') + '</span>' +
-                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
-                            '</div>' +
-                        '</td>' +
-                        '<td class="w-[10%] text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
-                        '<td class="w-[10%] text-center">' + dateStr + '</td>';                // Action column logic: 
+                        '<td class="text-center" style="width: 130px;">' + (record.student_id || '—') + '</td>' +
+                        '<td class="text-center" style="width: 200px;">' + (record.student_name || '—') + '</td>' +
+                        '<td class="text-center" style="width: 200px;">' + (record.event_name || '—') + '</td>' +
+                        '<td class="text-center" style="width: 150px;">' + (record.organization || '—') + '</td>' +
+                        '<td class="text-center" style="width: 150px;">' + (record.supervisor_name || '—') + '</td>' +
+                        '<td class="text-center" style="width: 120px;">' + (record.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="text-center" style="width: 130px;">' + dateStr + '</td>';                // Action column logic: 
                 // - Pending tab: show Verify/Reject buttons for Pending records
                 // - For Approval tab: show Approve/Reject buttons for Verified records  
                 // - Archived tab: show status badge for Approved/Rejected/Verified records
