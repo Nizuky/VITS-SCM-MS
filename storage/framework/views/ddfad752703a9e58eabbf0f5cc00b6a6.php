@@ -232,7 +232,7 @@ table{overflow:visible!important}
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
+         <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Profile Section -->
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">

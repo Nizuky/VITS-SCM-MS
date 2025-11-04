@@ -232,7 +232,7 @@ table{overflow:visible!important}
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
+         <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Profile Section -->
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
@@ -619,10 +619,10 @@ table{overflow:visible!important}
                 </div>
 
                 <!-- Students Table -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm content-area-auto">
-                    <div class="overflow-x-auto">
-                        <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600">
+               <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
+                        <table class="table table-xs table-pin-rows">
+                            <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr>
                                     <th class="w-[10%] text-center">
                                         <button id="student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">

@@ -583,7 +583,7 @@
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
     @endphp
     <div class="flex p-4 gap-4 min-h-screen"> 
-        <aside class="flex flex-col w-64 bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden">
+        <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
                     <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
@@ -914,54 +914,54 @@
                         </button>
                     </div>
                 </div>
-
+                <!-- Record Status Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-y-auto flex-1" style="max-height: calc(110vh - 280px);"> 
-                        <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
-                                <tr>
-                                    <th class="w-10 text-center" style="height: 60px; max-height: 60px;">
+                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
+                            <table class="table table-xs table-pin-rows">
+                            <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
+                                <tr style="background-color: #f9fafb !important;">
+                                    <th class="text-center" style="width: 50px; height: 60px;">
                                         <button id="delete-selected" class="btn btn-ghost btn-xs" title="Delete selected (Pending only)">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[18%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
                                         <button id="venue-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Venue">
                                             Venue
                                             <span id="venue-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Organization">
                                             Organization
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[12%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 150px; height: 60px;">
                                         <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Supervisor">
                                             Supervisor
                                             <span id="supervisor-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[10%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 120px; height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center w-[14%]" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 250px; height: 60px;">
                                         <div class="flex items-center justify-center gap-1 font-bold">
                                             <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                                 <span>Status</span>
