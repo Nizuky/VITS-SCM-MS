@@ -526,10 +526,10 @@ table{overflow:visible!important}
 
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-x-auto overflow-y-auto flex-1">
-                        <table class="table table-fixed w-full">
-                            <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10" style="height: 60px; max-height: 60px;">
-                                <tr id="table-header-row">
+                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);">
+                        <table class="table table-xs table-pin-rows">
+                            <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
+                                <tr id="table-header-row" style="background-color: #f9fafb !important;">
                                     <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                             Student ID
