@@ -196,6 +196,24 @@ table{overflow:visible!important}
 [data-theme="dark"] .activity-legend-2{background-color:#5A3590}
 [data-theme="dark"] .activity-legend-3{background-color:#804ED6}
 [data-theme="dark"] .activity-legend-4{background-color:#A770FF}
+
+/* Prevent page-level horizontal scroll while allowing table scroll */
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Ensure main content wrapper doesn't cause horizontal scroll */
+#page-container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Table container: horizontal scroll only when needed */
+.overflow-x-auto {
+    width: 100%;
+    overflow-x: auto;
+}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>

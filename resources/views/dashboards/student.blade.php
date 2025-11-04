@@ -559,6 +559,24 @@
         [data-theme="dark"] .badge.text-green-800{color:#fff!important}
         [data-theme="dark"] .badge.text-gray-800{color:#fff!important}
         [data-theme="dark"] .badge.text-blue-800{color:#fff!important}
+        
+        /* Prevent page-level horizontal scroll while allowing table scroll */
+        body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        /* Ensure main content wrapper doesn't cause horizontal scroll */
+        #page-container {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Table container: horizontal scroll only when needed */
+        .overflow-x-auto {
+            width: 100%;
+            overflow-x: auto;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -916,7 +934,7 @@
                 </div>
                 <!-- Record Status Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
+                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);">
                             <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr style="background-color: #f9fafb !important;">
