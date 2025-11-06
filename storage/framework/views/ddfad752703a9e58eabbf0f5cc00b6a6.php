@@ -247,7 +247,7 @@ body {
         $initials = 'SA';
 ?>
 
-    <div class="flex p-4 gap-4 min-h-screen">
+    <div class="flex p-4 gap-4 min-h-screen min">
         <!-- Sidebar -->
          <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Profile Section -->
@@ -266,7 +266,7 @@ body {
             <!-- Main Navigation -->
             <ul class="menu p-0 my-4 flex-grow">
                 <li>
-                    <a class="py-3" id="nav-dashboard" onclick="showPage('dashboard')">
+                    <a class="py-3 pl-2" id="nav-dashboard" onclick="showPage('dashboard')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                         </svg>
@@ -274,7 +274,7 @@ body {
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" id="nav-submission" onclick="showPage('submission')">
+                    <a class="py-3 pl-2" id="nav-submission" onclick="showPage('submission')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -282,7 +282,7 @@ body {
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" id="nav-students" onclick="showPage('students')">
+                    <a class="py-3 pl-2" id="nav-students" onclick="showPage('students')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
@@ -505,7 +505,8 @@ body {
             <!-- Submission Page -->
             <div id="submission-page" class="page-content hidden">
                 <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
-                
+                <br>
+
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
                         <!-- Tabs -->
                         <!-- 
@@ -519,7 +520,7 @@ body {
                             - DB Status "Verified" → Shows in "For Approval" tab (these are admin's archived verified records)
                             - DB Status "Approved"/"Rejected" → Shows in "Archived" tab (super admin's final decisions)
                         -->
-                        <div class="flex space-x-2 custom-tab-wrapper">
+                        <div class="flex space-x-1 custom-tab-wrapper">
                             <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('pending',this)">Pending</a>
                             <a role="tab" class="custom-tab" onclick="filterSubmissions('for-approval',this)">For Approval</a>
                             <a role="tab" class="custom-tab" onclick="filterSubmissions('archived',this)">Archived</a>
@@ -629,8 +630,8 @@ body {
                     
                     <!-- Refresh Button -->
                     <button id="refresh-students-btn" onclick="refreshStudents()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh students list">
-                        <svg id="refresh-students-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
                         Refresh
                     </button>
@@ -795,9 +796,9 @@ body {
                         <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
                         <p class="text-sm text-gray-600 mt-2">Review and resolve student support requests</p>
                     </div>
-                    <button onclick="refreshSupportTickets()" id="refresh-support-tickets-btn" class="btn btn-outline btn-primary rounded-lg" title="Refresh support tickets">
-                        <svg id="refresh-support-tickets-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <button onclick="refreshSupportTickets()" id="refresh-support-tickets-btn"class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh support tickets">
+                       <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
                         Refresh
                     </button>

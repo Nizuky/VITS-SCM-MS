@@ -266,7 +266,7 @@ body {
             <!-- Main Navigation -->
             <ul class="menu p-0 my-4 flex-grow">
                 <li>
-                    <a class="py-3" id="nav-dashboard" onclick="showPage('dashboard')">
+                    <a class="py-3 pl-2" id="nav-dashboard" onclick="showPage('dashboard')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                         </svg>
@@ -274,7 +274,7 @@ body {
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" id="nav-submission" onclick="showPage('submission')">
+                    <a class="py-3 pl-2" id="nav-submission" onclick="showPage('submission')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -484,12 +484,13 @@ body {
             <!-- Submission Page -->
             <div id="submission-page" class="page-content hidden">
                 <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
+                <br>
                 
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
                     <!-- Tabs -->
-                    <div class="flex space-x-2 custom-tab-wrapper">
-                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('Pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('Archived',this)">Archived</a>
+                    <div class="flex space-x-2 custom-tab-wrapper w-full md:w-auto" style="min-width: 220px;">
+                        <a role="tab" class="custom-tab custom-tab-active whitespace-nowrap" onclick="filterSubmissions('Pending',this)">Pending</a>
+                        <a role="tab" class="custom-tab whitespace-nowrap" onclick="filterSubmissions('Archived',this)">Archived</a>
                     </div>
                     
                     <!-- Search -->

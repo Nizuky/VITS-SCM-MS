@@ -625,13 +625,13 @@
 
             <ul class="menu p-0 my-4 flex-grow">
                 <li>
-                    <a class="py-3" id="nav-dashboard" onclick="showPage('dashboard')">
+                    <a class="py-3 pl-2" id="nav-dashboard" onclick="showPage('dashboard')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                         Dashboard
                     </a>
                 </li>
                 <li>
-                    <a class="py-3" id="nav-record-status" onclick="showPage('record-status')">
+                    <a class="py-3 pl-2" id="nav-record-status" onclick="showPage('record-status')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         Record Status
                     </a>
@@ -676,8 +676,8 @@
         </aside>
 
         <main class="flex-1 flex flex-col gap-6" id="page-container">
-            <div class="flex justify-between items-center p-4">
-                <div id="main-greeting" class="text-white"> 
+            <div class="flex justify-between items-center p-4 page-content hidden">
+                <div id="main-greeting" class="text-white">
                     <h4 class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
                 </div>
                 
@@ -902,7 +902,11 @@
             </div>
 
             <div id="record-status-page" class="page-content flex flex-col flex-1-dynamic">
-                <div class="flex justify-between items-center px-4 mb-6">
+                <div class="p-4">
+                    <h4 class="text-4xl font-bold text-primary-purple">Record Status</h4>
+                </div>
+
+                <div class="flex justify-between pl-4 items-center mb-6">
                     <button class="btn btn-primary-purple rounded-lg border-0" onclick="document.getElementById('add_record_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -936,51 +940,51 @@
                 <!-- Record Status Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
                      <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px);">
-                            <table class="table table-xs table-pin-rows">
+                        <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr style="background-color: #f9fafb !important;">
-                                    <th class="text-center" style="width: 50px; height: 60px;">
+                                    <th class="text-center" style="min-width: 50px; width: 50px; height: 60px;">
                                         <button id="delete-selected" class="btn btn-ghost btn-xs" title="Delete selected (Pending only)">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 130px; height: 60px;">
+                                    <th class="text-center" style="min-width: 80px; width: 80px; height: 60px; white-space: nowrap;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 200px; height: 60px;">
+                                    <th class="text-center" style="min-width: 110px; width: 110px; height: 60px; white-space: nowrap;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                    <th class="text-center" style="min-width: 100px; width: 100px; height: 60px; white-space: nowrap;">
                                         <button id="venue-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Venue">
                                             Venue
                                             <span id="venue-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                    <th class="text-center" style="min-width: 140px; width: 140px; height: 60px; white-space: nowrap;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Organization">
                                             Organization
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 150px; height: 60px;">
+                                    <th class="text-center" style="min-width: 120px; width: 120px; height: 60px; white-space: nowrap;">
                                         <button id="supervisor-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Supervisor">
                                             Supervisor
                                             <span id="supervisor-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 120px; height: 60px;">
+                                    <th class="text-center" style="min-width: 50px; width: 50px; height: 60px; white-space: nowrap;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center" style="width: 250px; height: 60px;">
+                                    <th class="text-center" style="min-width: 180px; width: 180px; height: 60px;">
                                         <div class="flex items-center justify-center gap-1 font-bold">
                                             <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                                 <span>Status</span>
@@ -3377,14 +3381,14 @@
                     let statusHtml = renderStatusBadge(rec.status, rec);
                     
                     row.innerHTML = `
-                        <td class="text-center"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
-                        <td class="text-center">${formattedDate}</td>
-                        <td class="text-center">${rec.event_name}</td>
-                        <td class="text-center">${rec.venue}</td>
-                        <td class="text-center">${rec.organization}</td>
-                        <td class="text-center">${rec.supervisor_name || '-'}</td>
-                        <td class="text-center">${rec.hours_rendered} hours</td>
-                        <td class="text-center">${statusHtml}</td>
+                        <td class="text-center" style="min-width: 50px; width: 50px;"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
+                        <td class="text-center" style="min-width: 80px; width: 80px; white-space: nowrap;">${formattedDate}</td>
+                        <td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">${rec.event_name}</td>
+                        <td class="text-center" style="min-width: 100px; width: 100px; white-space: nowrap;">${rec.venue}</td>
+                        <td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">${rec.organization}</td>
+                        <td class="text-center" style="min-width: 120px; width: 120px; white-space: nowrap;">${rec.supervisor_name || '-'}</td>
+                        <td class="text-center" style="min-width: 50px; width: 50px; white-space: nowrap;">${rec.hours_rendered} hours</td>
+                        <td class="text-center" style="min-width: 180px; width: 180px;">${statusHtml}</td>
                     `;
                     tableBody.appendChild(row);
                 });
