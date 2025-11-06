@@ -676,9 +676,9 @@
         </aside>
 
         <main class="flex-1 flex flex-col gap-6" id="page-container">
-            <div class="flex justify-between items-center p-4 page-content hidden">
-                <div id="main-greeting" class="text-white">
-                    <h4 class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
+            <div class="flex justify-between items-center p-4">
+                <div id="main-greeting">
+                    <h4 id="page-title" class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
@@ -894,17 +894,11 @@
                         </div>
 
                         <div class="divider my-0"></div>
-
-        
                     </div>
                 </div>
             </div>
 
             <div id="record-status-page" class="page-content flex flex-col flex-1-dynamic">
-                <div class="p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Record Status</h4>
-                </div>
-
                 <div class="flex flex-col md:flex-row justify-between px-4 items-start md:items-center mb-6 gap-4">
                     <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('add_record_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1016,8 +1010,7 @@
             </div>
 
             <div id="profile-page" class="page-content hidden flex-col">
-                <div class="p-4 flex items-center justify-between">
-                    <h4 class="text-4xl font-bold text-primary-purple">Profile Information</h4>
+                <div class="p-4 flex items-center justify-end">
                     <label class="label cursor-pointer flex items-center gap-3">
                         <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
                         <input id="theme-toggle" type="checkbox" class="toggle toggle-primary" />
@@ -1026,24 +1019,24 @@
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
                     <div id="profile-view" class="space-y-6">
-                        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Full Name</p>
-                                <p class="font-semibold text-lg text-text-header">{{ auth()->user()->name }}</p>
+                                <p class="font-semibold text-lg text-text-header break-words">{{ auth()->user()->name }}</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Student Number</p>
                                 <p class="font-semibold text-lg text-text-header">{{ auth()->user()->student_id ?? '—' }}</p>
                             </div>
-                            <div>
+                            <div class="col-span-1 md:col-span-2">
                                 <p class="text-gray-500 text-sm mb-1">Email Address</p>
-                                <p class="font-semibold text-lg text-text-header">{{ auth()->user()->email }}</p>
+                                <p class="font-semibold text-lg text-text-header break-all">{{ auth()->user()->email }}</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Account Type</p>
                                 <p class="font-semibold text-lg text-text-header">Student</p>
                             </div>
-                            <div class="col-span-2">
+                            <div>
                                 <p class="text-gray-500 text-sm mb-1">Password</p>
                                 <p class="font-semibold text-lg text-text-header">••••••••••</p>
                             </div>
@@ -1128,10 +1121,6 @@
 
             <!-- Support Tickets Page -->
             <div id="support-page" class="page-content hidden flex flex-col">
-                <div class="p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
-                </div>
-                
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-4 mb-6 gap-4">
                     <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('submit_ticket_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1204,9 +1193,6 @@
 
             <!-- FAQs Page -->
             <div id="faqs-page" class="page-content hidden flex flex-col">
-                <div class="p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Frequently Asked Questions</h4>
-                </div>
                 <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto space-y-4">
                     <!-- FAQ 1 -->
                     <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">
@@ -1818,10 +1804,20 @@
                 a.classList.remove('bg-primary-purple', 'active-nav', 'rounded-lg');
             });
             document.querySelectorAll('.page-content').forEach(p => { p.classList.add('hidden'); });
-            const greetingElement = document.getElementById('main-greeting');
-            const notificationContainer = document.getElementById('notification-dropdown-container');
-            if (pageId === 'profile' || pageId === 'faqs' || pageId === 'support') { greetingElement.classList.add('hidden'); notificationContainer.classList.add('hidden'); }
-            else { greetingElement.classList.remove('hidden'); notificationContainer.classList.remove('hidden'); }
+            
+            // Update page title dynamically
+            const pageTitle = document.getElementById('page-title');
+            const pageTitles = {
+                'dashboard': 'Student Dashboard',
+                'record-status': 'Record Status',
+                'support': 'Support Tickets',
+                'faqs': 'Frequently Asked Questions',
+                'profile': 'Profile Information'
+            };
+            if (pageTitle && pageTitles[pageId]) {
+                pageTitle.textContent = pageTitles[pageId];
+            }
+            
             const newPage = document.getElementById(pageId + '-page'); if (newPage) newPage.classList.remove('hidden');
             const navLink = document.getElementById('nav-' + pageId); if (navLink) navLink.classList.add('bg-primary-purple', 'active-nav', 'rounded-lg');
             
