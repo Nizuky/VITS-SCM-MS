@@ -330,32 +330,32 @@ body {
                         <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
                         
                         <!-- Left text content -->
-                        <div class="relative z-10 ml-2 pl-10">
-                            <h2 class="text-3xl font-semibold text-white">
+                        <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2">
+                            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-white">
                                 Welcome, 
                                 <span class="text-white font-bold">
                                     <?php echo e(Str::of(auth('admin')->user()->name)->explode(' ')->first()); ?>
 
                                 </span>
                             </h2>
-                            <br>
-                            <p class="text-white text-base mt-1">
-                                Manage student submissions and <br>
+                            <br class="hidden md:block">
+                            <p class="text-white text-xs sm:text-sm md:text-base mt-1">
+                                Manage student submissions and <br class="hidden sm:block">
                                 monitor social contract compliance.
                             </p>
-                            <p class="text-white font-bold text-base mt-1">
+                            <p class="text-white font-bold text-xs sm:text-sm md:text-base mt-1">
                                 Empowering ka-VITS through efficient administration!
                             </p>
                         </div>
                         
                         <!-- Pending Requests Donut -->
-                        <div class="flex flex-col items-center ml-auto mr-8">
-                            <h2 class="text-xl font-bold text-white mb-4">Pending Requests</h2>
-                            <div class="relative w-40 h-40">
+                        <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 md:mr-8 p-4">
+                            <h2 class="text-sm sm:text-base md:text-xl font-bold text-white mb-2 md:mb-4">Pending Requests</h2>
+                            <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
                                 <canvas id="pendingRequestsChart"></canvas>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-3xl font-bold text-white" id="pending-requests-label">0</span>
-                                    <p class="text-sm text-white">Requests</p>
+                                    <span class="text-xl sm:text-2xl md:text-3xl font-bold text-white" id="pending-requests-label">0</span>
+                                    <p class="text-xs sm:text-sm text-white">Requests</p>
                                 </div>
                             </div>
                         </div>
@@ -422,13 +422,13 @@ body {
                 </div>
 
                 <!-- Activity Calendar -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-4">
+                <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <div>
-                            <h2 class="text-xl font-bold text-text-header">Contract Update Activity</h2>
-                            <p class="text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
+                            <h2 class="text-base sm:text-lg md:text-xl font-bold text-text-header">Contract Update Activity</h2>
+                            <p class="text-xs sm:text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
                         </div>
-                       <div class="flex items-center gap-4">
+                       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
                             <div class="flex items-center gap-3 text-xs">
                                 <span class="text-text-muted">Less</span>
                                 <div class="flex gap-1">
@@ -489,9 +489,9 @@ body {
                 
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
                     <!-- Tabs -->
-                    <div class="flex space-x-2 custom-tab-wrapper">
-                        <a role="tab" class="custom-tab custom-tab-active" onclick="filterSubmissions('Pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab" onclick="filterSubmissions('Archived',this)">Archived</a>
+                    <div class="flex space-x-2 custom-tab-wrapper w-full md:w-auto" style="min-width: 220px;">
+                        <a role="tab" class="custom-tab custom-tab-active whitespace-nowrap" onclick="filterSubmissions('Pending',this)">Pending</a>
+                        <a role="tab" class="custom-tab whitespace-nowrap" onclick="filterSubmissions('Archived',this)">Archived</a>
                     </div>
                     
                     <!-- Search -->
@@ -2098,6 +2098,11 @@ body {
             loadSubmissions(); // Load initial submissions data
             initPendingRequestsChart();
             
+            // Add resize listener to scroll calendar to right
+            window.addEventListener('resize', function() {
+                scrollCalendarToRight();
+            });
+            
             // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
                 document.getElementById('hours-sort-indicator').textContent = '⇅';
@@ -2776,6 +2781,24 @@ body {
             html += '</div>'; // End overflow container
             html += '</div>'; // End main flex container
             container.innerHTML = html;
+            
+            // Scroll to the right after rendering
+            scrollCalendarToRight();
+        }
+        
+        // Scroll calendar to the rightmost position
+        function scrollCalendarToRight() {
+            var container = document.getElementById('activity-calendar');
+            if (container) {
+                // Find the inner overflow container
+                var innerContainer = container.querySelector('.overflow-x-auto');
+                var targetContainer = innerContainer || container;
+                
+                // Use setTimeout to ensure DOM is fully rendered
+                setTimeout(function() {
+                    targetContainer.scrollLeft = targetContainer.scrollWidth;
+                }, 100);
+            }
         }
 
         // Change calendar year

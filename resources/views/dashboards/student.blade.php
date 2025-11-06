@@ -776,36 +776,36 @@
                            <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
 
                             <!-- Left text content -->
-                            <div class="relative z-10 ml-2 pl-10">
-                                <h2 class="text-3xl font-semibold text-white0">
+                            <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2">
+                                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-white">
                                     Good Day, 
                                     <span class="text-white font-bold">
                                         {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
                                     </span>
                                 </h2>
-                                <br>
-                                <p class="text-white text-base mt-1">
-                                    Here you can manage your social <br>
+                                <br class="hidden md:block">
+                                <p class="text-white text-xs sm:text-sm md:text-base mt-1">
+                                    Here you can manage your social <br class="hidden sm:block">
                                     contract and track your progress.
                                 </p>
-                                <p class="text-white font-bold text-base mt-1">
+                                <p class="text-white font-bold text-xs sm:text-sm md:text-base mt-1">
                                     We make it easier for you ka-VITS!
                                 </p>
                             </div>
                             <!-- Pending hours donut -->
-                            <div class="flex flex-col items-center ml-auto">
-                                <h2 class="text-xl font-bold text-white mb-4">Pending Hours</h2>
-                                <div class="relative w-40 h-40">
+                            <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 p-4">
+                                <h2 class="text-sm sm:text-base md:text-xl font-bold text-white mb-2 md:mb-4">Pending Hours</h2>
+                                <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
                                     <canvas id="pendingHoursChart"></canvas>
                                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span class="text-3xl font-bold text-white" id="pending-hours-label">0%</span>
-                                        <p class="text-sm text-white" id="pending-amount">0h of 160h</p>
+                                        <span class="text-xl sm:text-2xl md:text-3xl font-bold text-white" id="pending-hours-label">0%</span>
+                                        <p class="text-xs sm:text-sm text-white" id="pending-amount">0h of 160h</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="absolute top-0 right-0 w-[300px] h-full pointer-events-none"></div>
                             <!-- Optional space for balance -->
-                            <div class="w-[120px]"></div>
+                            <div class="w-0 sm:w-[60px] md:w-[120px]"></div>
                         </div>
                     </div>
                 </div>
@@ -905,35 +905,37 @@
                     <h4 class="text-4xl font-bold text-primary-purple">Record Status</h4>
                 </div>
 
-                <div class="flex justify-between pl-4 items-center mb-6">
-                    <button class="btn btn-primary-purple rounded-lg border-0" onclick="document.getElementById('add_record_modal').showModal()">
+                <div class="flex flex-col md:flex-row justify-between px-4 items-start md:items-center mb-6 gap-4">
+                    <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('add_record_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        Add New Record
+                        <span class="whitespace-nowrap">Add New Record</span>
                     </button>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
                         <!-- Export PDF Button -->
                         <button id="export-pdf-btn" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg border-0" type="button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                 <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
                             </svg>
-                            Export PDF
+                            <span class="whitespace-nowrap">Export PDF</span>
                         </button>
                         
-                        <label class="input input-bordered flex items-center gap-2 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" /></svg>
-                            <input id="record-search" type="text" class="grow" placeholder="Search by event, venue, or organization" />
-                        </label>
-                        
-                        <!-- Refresh Button -->
-                        <button id="refresh-records-btn" onclick="refreshRecords()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh records">
-                            <svg id="refresh-records-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                            <span class="hidden md:inline">Refresh</span>
-                        </button>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <label class="input input-bordered flex items-center gap-2 rounded-lg flex-1 sm:flex-initial">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" /></svg>
+                                <input id="record-search" type="text" class="grow" placeholder="Search by event, venue, or organization" />
+                            </label>
+                            
+                            <!-- Refresh Button -->
+                            <button id="refresh-records-btn" onclick="refreshRecords()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh records">
+                                <svg id="refresh-records-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                <span class="hidden lg:inline">Refresh</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <!-- Record Status Table -->
@@ -1130,23 +1132,28 @@
                     <h4 class="text-4xl font-bold text-primary-purple">Support Tickets</h4>
                 </div>
                 
-                <div class="flex justify-between items-center px-4 mb-6">
-                    <button class="btn btn-primary-purple rounded-lg border-0" onclick="document.getElementById('submit_ticket_modal').showModal()">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-4 mb-6 gap-4">
+                    <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('submit_ticket_modal').showModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        Submit New Ticket
+                        <span class="whitespace-nowrap">Submit New Ticket</span>
                     </button>
-                    <div class="flex items-center gap-4">
-                        <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, type, or details..." class="input input-bordered rounded-lg" />
-                        
-                        <!-- Refresh Button -->
-                        <button id="refresh-tickets-btn" onclick="refreshTickets()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh tickets">
-                            <svg id="refresh-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                            <span class="hidden md:inline">Refresh</span>
-                        </button>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <label class="input input-bordered flex items-center gap-2 rounded-lg flex-1 sm:flex-initial">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" /></svg>
+                                <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, type, or details..." class="grow" />
+                            </label>
+                            
+                            <!-- Refresh Button -->
+                            <button id="refresh-tickets-btn" onclick="refreshTickets()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh tickets">
+                                <svg id="refresh-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                <span class="hidden lg:inline">Refresh</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
