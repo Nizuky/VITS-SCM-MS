@@ -189,6 +189,32 @@ body {
     width: 100%;
     overflow-x: auto;
 }
+
+/* Force scrollbars to be visible */
+.overflow-x-auto.overflow-y-auto {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent; /* thumb track */
+}
+
+/* For Webkit browsers (Chrome, Safari, Edge) */
+.overflow-x-auto.overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.overflow-x-auto.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+}
+
+.overflow-x-auto.overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 4px;
+}
+
+.overflow-x-auto.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(107, 114, 128, 0.7);
+}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -486,7 +512,7 @@ body {
 
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px);">
+                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px);">
                         <table class="table table-xs table-pin-rows" style="min-width: 1100px;">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr style="background-color: #f9fafb !important;">
@@ -554,15 +580,7 @@ body {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody id="submission-table-body">
-                                <!-- Data will be loaded dynamically from database -->
-                                <tr id="loading-row">
-                                    <td colspan="7" class="text-center py-8">
-                                        <span class="loading loading-spinner loading-lg text-primary-purple"></span>
-                                        <p class="mt-2 text-text-muted">Loading submissions...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="submission-table-body"></tbody>
                         </table>
                     </div>
                 </div>
