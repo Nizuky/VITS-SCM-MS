@@ -486,47 +486,47 @@ body {
 
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                     <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
-                        <table class="table table-xs table-pin-rows" style="min-width: 1200px;">
+                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px);">
+                        <table class="table table-xs table-pin-rows" style="min-width: 1100px;">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr style="background-color: #f9fafb !important;">
-                                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 130px; height: 60px;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="studentid-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 180px; height: 60px;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
                                             Student Name
                                             <span id="studentname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
-                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col font-bold" title="Sort by Organization">
+                                    <th class="text-center" style="width: 200px; height: 60px;">
+                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col font-bold" title="Sort by Organization/Supervisor">
                                             <span>Organization/Supervisor</span>
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 100px; height: 60px;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="width: 120px; height: 60px;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[22%] text-center" id="action-status-header" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" id="action-status-header" style="width: 170px; height: 60px;">
                                         <div class="flex items-center justify-center gap-1 font-bold">
                                             <span id="action-label">Action</span>
                                         </div>

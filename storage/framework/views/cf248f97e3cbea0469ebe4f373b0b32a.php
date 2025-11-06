@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -59,7 +59,7 @@
         <!-- Toastify Library -->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        @php
+        <?php
             $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
             $iconUrl = null;
             $iconMTime = null;
@@ -83,10 +83,10 @@
             if ($iconUrl && $iconMTime) {
                 $iconUrl .= '?v=' . $iconMTime;
             }
-        @endphp
-        <link rel="icon" href="{{ $iconUrl }}" sizes="any">
-        <link rel="icon" href="{{ $iconUrl }}" type="image/png">
-        <link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
+        ?>
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -125,7 +125,7 @@
         /* Page background image */
         .bg-custom {
             background-color: #EDF1FA; /* fallback */
-            background-image: url('{{ asset('vits_bg_white.png') }}');
+            background-image: url('<?php echo e(asset('vits_bg_white.png')); ?>');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -419,7 +419,7 @@
                 /* Dark theme: card/background overrides */
         [data-theme="dark"] .bg-custom {
             background-color: #0b0f19; /* deeper fallback */
-            background-image: url('{{ asset('storage/vits_bg_black.png') }}');
+            background-image: url('<?php echo e(asset('storage/vits_bg_black.png')); ?>');
         }
          /* Tables in dark mode */
         [data-theme="dark"] .table thead,
@@ -578,11 +578,11 @@
             overflow-x: auto;
         }
     </style>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 <body class="min-h-screen bg-custom">
-    @include('partials.auto_logout')
-    @php
+    <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php
         // Combined: compute base path and user initials for header/avatar
         $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
 
@@ -599,27 +599,27 @@
         // Get the first super admin's name for PDF signature
         $superAdmin = \App\Models\SuperAdmin::first();
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
-    @endphp
+    ?>
     <div class="flex p-4 gap-4 min-h-screen"> 
         <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
             <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
                 <div class="avatar placeholder mb-3">
-                    <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
-                        <span class="text-3xl font-bold leading-none">{{ $initials }}</span>
+                    <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" title="<?php echo e(auth()->user()->name); ?>" aria-label="<?php echo e(auth()->user()->name); ?>">
+                        <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 class="font-bold text-lg">{{ auth()->user()->name }}</h2>
-                <p class="text-sm text-gray-500">Student Number: {{ auth()->user()->student_id ?? '—' }}</p>
-                @php
+                <h2 class="font-bold text-lg"><?php echo e(auth()->user()->name); ?></h2>
+                <p class="text-sm text-gray-500">Student Number: <?php echo e(auth()->user()->student_id ?? '—'); ?></p>
+                <?php
                     $accountStatus = auth()->user()->status ?? 'active';
                     $isActive = strtolower($accountStatus) === 'active';
-                @endphp
+                ?>
                 <div class="mt-2">
-                    @if($isActive)
+                    <?php if($isActive): ?>
                         <span class="badge badge-success badge-sm text-white font-semibold">Active</span>
-                    @else
+                    <?php else: ?>
                         <span class="badge badge-error badge-sm text-white font-semibold">Inactive</span>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -664,8 +664,8 @@
                     </a>
                 </li>
                 <li>
-                    <form id="logout-form-visible" action="{{ route('logout') }}" method="POST" class="m-0 p-0 pl-2 pr-0" novalidate>
-                        @csrf
+                    <form id="logout-form-visible" action="<?php echo e(route('logout')); ?>" method="POST" class="m-0 p-0 pl-2 pr-0" novalidate>
+                        <?php echo csrf_field(); ?>
                         <button id="logout-button-visible" type="button" class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             Log Out
@@ -712,8 +712,8 @@
             <div id="dashboard-page" class="page-content hidden flex-col flex-1-dynamic">
 
                 <!-- Inactive Account Warning Banner -->
-                @if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at)
-                    @php
+                <?php if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at): ?>
+                    <?php
                         $inactiveSince = \Carbon\Carbon::parse(auth()->user()->inactive_at);
                         $deletionDate = $inactiveSince->copy()->addDays(7);
                         $now = now();
@@ -722,7 +722,7 @@
                         $totalHours = $now->diffInHours($deletionDate, false);
                         $daysRemaining = max(0, (int) ceil($totalHours / 24));
                         $hoursRemaining = max(0, (int) $totalHours);
-                    @endphp
+                    ?>
                     <div class="alert alert-error shadow-lg mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-800 rounded-lg" role="alert">
                         <div class="flex items-start w-full">
                             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6 text-red-600 dark:text-red-00" fill="none" viewBox="0 0 24 24">
@@ -734,13 +734,13 @@
                                     <p class="font-semibold mb-2" style="color: #790000ff;">⚠️ Your account has been deactivated by an administrator.</p>
                                     <div class="bg-red-100 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-3 rounded-md mb-2">
                                         <p class="text-base font-bold dark:text-red-200" style="color: #790000ff;">
-                                            @if($daysRemaining > 0)
-                                                <span class="text-2xl">{{ $daysRemaining }}</span> day{{ $daysRemaining != 1 ? 's' : '' }} remaining
-                                            @else
-                                                <span class="text-2xl">{{ $hoursRemaining }}</span> hour{{ $hoursRemaining != 1 ? 's' : '' }} remaining
-                                            @endif
+                                            <?php if($daysRemaining > 0): ?>
+                                                <span class="text-2xl"><?php echo e($daysRemaining); ?></span> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> remaining
+                                            <?php else: ?>
+                                                <span class="text-2xl"><?php echo e($hoursRemaining); ?></span> hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> remaining
+                                            <?php endif; ?>
                                         </p>
-                                        <p class="text-sm dark:text-red-300" style="color: #790000ff;">Your account will be permanently deleted on <strong>{{ $deletionDate->format('F d, Y \a\t g:i A') }}</strong></p>
+                                        <p class="text-sm dark:text-red-300" style="color: #790000ff;">Your account will be permanently deleted on <strong><?php echo e($deletionDate->format('F d, Y \a\t g:i A')); ?></strong></p>
                                     </div>
                                     <p class="text-sm dark:text-red-400" style="color: #790000ff;">
                                         <strong>What this means:</strong> You currently have limited access to the system. 
@@ -754,7 +754,7 @@
                             </div>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
 
                 <!-- Personalized greeting and summary cards -->
                 <!-- Outer wrapper (for background and overlay effect) -->
@@ -764,7 +764,7 @@
                         sd
                         <!-- Image overlay (on top of everything) -->
                         <div class="absolute right-150 bottom-0 z-20">
-                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
+                            <img src="<?php echo e(asset('storage/images/PLVgirl.png')); ?>" class="w-[270px] h-auto object-contain drop-shadow-lg" />
                         </div>
 
                         <!-- Main card container (centered & behind) -->
@@ -780,7 +780,8 @@
                                 <h2 class="text-3xl font-semibold text-white0">
                                     Good Day, 
                                     <span class="text-white font-bold">
-                                        {{ Str::of(auth()->user()->name)->explode(' ')->first() }}
+                                        <?php echo e(Str::of(auth()->user()->name)->explode(' ')->first()); ?>
+
                                     </span>
                                 </h2>
                                 <br>
@@ -1023,15 +1024,15 @@
                         <div class="grid grid-cols-2 gap-x-12 gap-y-6">
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Full Name</p>
-                                <p class="font-semibold text-lg text-text-header">{{ auth()->user()->name }}</p>
+                                <p class="font-semibold text-lg text-text-header"><?php echo e(auth()->user()->name); ?></p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Student Number</p>
-                                <p class="font-semibold text-lg text-text-header">{{ auth()->user()->student_id ?? '—' }}</p>
+                                <p class="font-semibold text-lg text-text-header"><?php echo e(auth()->user()->student_id ?? '—'); ?></p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Email Address</p>
-                                <p class="font-semibold text-lg text-text-header">{{ auth()->user()->email }}</p>
+                                <p class="font-semibold text-lg text-text-header"><?php echo e(auth()->user()->email); ?></p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm mb-1">Account Type</p>
@@ -1054,16 +1055,16 @@
                         <form id="profile-info-form" class="grid grid-cols-2 gap-x-12 gap-y-4">
                             <label class="form-control w-full">
                                 <div class="label"><span class="label-text font-semibold">Full Name</span></div>
-                                <input id="edit-full-name" type="text" value="{{ auth()->user()->name }}" class="input input-bordered w-full rounded-lg" required />
+                                <input id="edit-full-name" type="text" value="<?php echo e(auth()->user()->name); ?>" class="input input-bordered w-full rounded-lg" required />
                                 <div class="label"><span class="label-text-alt text-gray-500">Surname, First Name Middle Initial</span></div>
                             </label>
                             <label class="form-control w-full">
                                 <div class="label"><span class="label-text">Student Number</span></div>
-                                <input type="text" value="{{ auth()->user()->student_id ?? '' }}" class="input input-bordered w-full rounded-lg bg-gray-100" readonly />
+                                <input type="text" value="<?php echo e(auth()->user()->student_id ?? ''); ?>" class="input input-bordered w-full rounded-lg bg-gray-100" readonly />
                             </label>
                             <label class="form-control w-full">
                                 <div class="label"><span class="label-text">Email Address</span></div>
-                                <input type="email" value="{{ auth()->user()->email }}" class="input input-bordered w-full rounded-lg bg-gray-100" readonly />
+                                <input type="email" value="<?php echo e(auth()->user()->email); ?>" class="input input-bordered w-full rounded-lg bg-gray-100" readonly />
                             </label>
                             <label class="form-control w-full">
                                 <div class="label"><span class="label-text">Account Type</span></div>
@@ -1551,8 +1552,8 @@
             
             <div id="all-notifications-list" class="space-y-2 overflow-y-auto max-h-[500px]">
                 <!-- Inactive Account Warning (Always at top if account is inactive) -->
-                @if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at)
-                    @php
+                <?php if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at): ?>
+                    <?php
                         $inactiveSince = \Carbon\Carbon::parse(auth()->user()->inactive_at);
                         $deletionDate = $inactiveSince->copy()->addDays(7);
                         $now = now();
@@ -1561,7 +1562,7 @@
                         $totalHours = $now->diffInHours($deletionDate, false);
                         $daysRemaining = max(0, (int) ceil($totalHours / 24));
                         $hoursRemaining = max(0, (int) $totalHours);
-                    @endphp
+                    ?>
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm sticky top-0 z-10">
                         <div class="flex items-start gap-3">
                             <div class="flex-shrink-0">
@@ -1574,19 +1575,21 @@
                                 <p class="text-xs text-red-700 mt-1">
                                     Your account will be deleted in 
                                     <strong class="text-red-900">
-                                        @if($daysRemaining > 0)
-                                            {{ $daysRemaining }} day{{ $daysRemaining != 1 ? 's' : '' }}
-                                        @else
-                                            {{ $hoursRemaining }} hour{{ $hoursRemaining != 1 ? 's' : '' }}
-                                        @endif
+                                        <?php if($daysRemaining > 0): ?>
+                                            <?php echo e($daysRemaining); ?> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?>
+
+                                        <?php else: ?>
+                                            <?php echo e($hoursRemaining); ?> hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?>
+
+                                        <?php endif; ?>
                                     </strong>
-                                    ({{ $deletionDate->format('M d, Y') }})
+                                    (<?php echo e($deletionDate->format('M d, Y')); ?>)
                                 </p>
                                 <p class="text-xs text-red-600 mt-1">Contact your administrator immediately to reactivate your account.</p>
                             </div>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
                 
                 <!-- All notifications will be loaded here -->
                 <div class="flex items-center justify-center py-8">
@@ -1960,8 +1963,8 @@
 
         // ==================== GLOBAL HELPERS ====================
         // Define these globally so they can be used by all functions
-        const BASE_PATH = @json($BASE_PATH);
-        const SUPER_ADMIN_NAME = @json($superAdminName);
+        const BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
+        const SUPER_ADMIN_NAME = <?php echo json_encode($superAdminName, 15, 512) ?>;
         
         // ==================== CSRF TOKEN SETUP ====================
         // Simple helper to get CSRF token from meta tag
@@ -3534,7 +3537,7 @@
                     try {
                         // Check if user wants to update name
                         const newName = (document.getElementById('edit-full-name')?.value || '').trim();
-                        const originalName = '{{ auth()->user()->name }}';
+                        const originalName = '<?php echo e(auth()->user()->name); ?>';
                         const nameChanged = newName && newName !== originalName;
                         
                         // Check if user wants to change password
@@ -4236,10 +4239,10 @@
                             body: new URLSearchParams({'_token': csrf}).toString(),
                             keepalive: true
                         }).finally(() => {
-                            try { window.location.replace(@json(url('/'))); } catch(_) { window.location.href = '/'; }
+                            try { window.location.replace(<?php echo json_encode(url('/'), 15, 512) ?>); } catch(_) { window.location.href = '/'; }
                         });
                     } catch (err) {
-                        try { window.location.replace(@json(url('/'))); } catch(_) { window.location.href = '/'; }
+                        try { window.location.replace(<?php echo json_encode(url('/'), 15, 512) ?>); } catch(_) { window.location.href = '/'; }
                     }
                 }, { passive: true });
             } catch (_) {}
@@ -4504,7 +4507,7 @@
         // Load logo on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Try to load PLV logo (optional - PDF will work without it)
-            imageToBase64('{{ asset("C:\Users\janar\Herd\scms\storage\app\public\VITS_logo.png") }}', function(base64) {
+            imageToBase64('<?php echo e(asset("C:\Users\janar\Herd\scms\storage\app\public\VITS_logo.png")); ?>', function(base64) {
                 if (base64) {
                     logoBase64 = base64;
                     console.log('PLV logo loaded for PDF export');
@@ -4756,8 +4759,8 @@
                     // Student info
                     doc.setFontSize(10);
                     doc.setFont('helvetica', 'normal');
-                    const studentName = '{{ Auth::user()->name ?? "Student Name" }}';
-                    const studentId = '{{ Auth::user()->student_id ?? "N/A" }}';
+                    const studentName = '<?php echo e(Auth::user()->name ?? "Student Name"); ?>';
+                    const studentId = '<?php echo e(Auth::user()->student_id ?? "N/A"); ?>';
                     doc.text(`Student Name: ${studentName}`, 14, 45);
                     doc.text(`Student ID: ${studentId}`, 14, 50);
                     doc.text(`Year Level: ${yearLevel}`, 14, 55);
@@ -4882,7 +4885,7 @@
     </script>
 
     <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
-    <script src="{{ asset('js/session-keeper.js') }}"></script>
+    <script src="<?php echo e(asset('js/session-keeper.js')); ?>"></script>
     <script>
         // Initialize Session Keeper for Student Dashboard
         if (window.SessionKeeper) {
@@ -4928,4 +4931,4 @@
         setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/student.blade.php ENDPATH**/ ?>
