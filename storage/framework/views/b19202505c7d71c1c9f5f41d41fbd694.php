@@ -214,6 +214,34 @@ body {
 .overflow-x-auto.overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background-color: rgba(107, 114, 128, 0.7);
 }
+
+/* Utility class to control the collapsed state on desktop */
+        .sidebar-collapsed {
+            min-width: 80px !important;
+            width: 80px !important;
+            max-width: 80px !important;
+            padding-left: 0.5rem !important; /* Adjust padding for icons */
+            padding-right: 0.5rem !important;
+        }
+        .sidebar-collapsed #profile-text {
+            display: none;
+        }
+        .sidebar-collapsed .nav-text {
+            display: none;
+        }
+        .sidebar-collapsed #collapse-toggle {
+            transform: rotate(180deg);
+        }
+        /* Ensure only icons are left-aligned in collapsed state */
+        .sidebar-collapsed .menu a {
+            justify-content: center;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        /* Adjust profile section on collapse */
+        .sidebar-collapsed .border-b.border-gray-200 {
+            padding: 0.5rem 0.25rem !important;
+        }
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -247,75 +275,109 @@ body {
         $initials = 'AD';
 ?>
 
-    <div class="flex p-4 gap-4 min-h-screen">
-        <!-- Sidebar -->
-         <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
-            <!-- Profile Section -->
-            <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
-                <div class="avatar placeholder mb-3">
-                    <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" 
-                         title="<?php echo e($fullName); ?>" 
-                         aria-label="<?php echo e($fullName); ?>">
-                        <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
-                    </div>
-                </div>
-                <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
-                <p class="text-sm text-gray-500">Administrator</p>
+    <div class="drawer lg:drawer-open min-h-screen">
+        <input id="my-drawer-2" type="checkbox" class="drawer-toggle" checked />
+        
+        <div class="drawer-content flex flex-col bg-gray-50 p-4">
+            
+            <div class="w-full flex justify-end p-2 lg:hidden">
+                <label for="my-drawer-2" class="btn btn-ghost btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                    </svg>
+                </label>
             </div>
 
-            <!-- Main Navigation -->
-            <ul class="menu p-0 my-4 flex-grow">
-                <li>
-                    <a class="py-3" id="nav-dashboard" onclick="showPage('dashboard')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
-                        </svg>
-                        Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a class="py-3" id="nav-submission" onclick="showPage('submission')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Submission
-                    </a>
-                </li>
-            </ul>
+            <main class="flex-1 flex flex-col gap-6" id="page-container">
+                <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
+                    </div>
+                
+                <div id="submission-page" class="page-content hidden">
+                    </div>
+                
+                <div id="settings-page" class="page-content hidden">
+                    </div>
+            </main>
+        </div>
 
-            <!-- Bottom Navigation -->
-            <ul class="menu p-0">
-                <li>
-                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0" 
-                       id="nav-settings" 
-                       onclick="showPage('settings')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        Settings
-                    </a>
-                </li>
-                <li>
-                    <form id="logout-form-visible" 
-                          action="<?php echo e(route('admin.logout')); ?>" 
-                          method="POST" 
-                          class="m-0 p-0 pl-2 pr-0" 
-                          novalidate>
-                        <?php echo csrf_field(); ?>
-                        <button id="logout-button-visible" 
-                                type="button" 
-                                class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
+        <div class="drawer-side z-[9999]">
+            <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+            
+            <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-xl self-start h-full transition-all duration-300 ease-in-out" 
+                style="max-width: 200px;"
+                id="sidebar-container">
+                
+                <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
+                    <div class="avatar placeholder mb-3">
+                        <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" 
+                            title="<?php echo e($fullName); ?>" 
+                            aria-label="<?php echo e($fullName); ?>">
+                            <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
+                        </div>
+                    </div>
+                    <div id="profile-text">
+                        <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
+                        <p class="text-sm text-gray-500">Administrator</p>
+                    </div>
+                </div>
+
+                <ul class="menu p-0 my-4 flex-grow">
+                    <li>
+                        <a class="py-3" id="nav-dashboard" onclick="showPage('dashboard')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                             </svg>
-                            Log Out
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </aside>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="py-3" id="nav-submission" onclick="showPage('submission')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span class="nav-text">Submission</span>
+                        </a>
+                    </li>
+                </ul>
 
+                <ul class="menu p-0">
+                    <li>
+                        <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0" 
+                        id="nav-settings" 
+                        onclick="showPage('settings')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <span class="nav-text">Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <form id="logout-form-visible" 
+                            action="<?php echo e(route('admin.logout')); ?>" 
+                            method="POST" 
+                            class="m-0 p-0 pl-2 pr-0" 
+                            novalidate>
+                            <?php echo csrf_field(); ?>
+                            <button id="logout-button-visible" 
+                                    type="button" 
+                                    class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span class="nav-text">Log Out</span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </aside>
+
+            <button id="collapse-toggle" class="absolute top-4 -right-3 z-[10000] p-1 rounded-full bg-primary-purple text-white shadow-lg transition-transform duration-300" onclick="toggleSidebarCollapse()">
+                <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </button>
+        </div>
         <!-- Main Content -->
         <main class="flex-1 flex flex-col gap-6" id="page-container">
             
@@ -908,8 +970,46 @@ body {
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
 
+    
+
     <!-- Scripts -->
     <script>
+
+         // ** JavaScript for Collapsing the Sidebar **
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar-container');
+            const mainWrapper = document.querySelector('.drawer-content');
+            const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+            
+            // Adjust the main content margin to push it over when expanded (if needed, though drawer usually handles it)
+            // For a more controlled desktop collapse:
+            if (isCollapsed) {
+                // Adjust the profile picture size if desired for a smaller look
+                sidebar.querySelector('.avatar div').classList.remove('w-24', 'h-24');
+                sidebar.querySelector('.avatar div').classList.add('w-12', 'h-12');
+                sidebar.querySelector('.avatar span').classList.remove('text-3xl');
+                sidebar.querySelector('.avatar span').classList.add('text-xl');
+                
+                // Change button icon to Chevron Right
+                document.getElementById('collapse-icon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />';
+            } else {
+                // Restore profile picture size
+                sidebar.querySelector('.avatar div').classList.remove('w-12', 'h-12');
+                sidebar.querySelector('.avatar div').classList.add('w-24', 'h-24');
+                sidebar.querySelector('.avatar span').classList.remove('text-xl');
+                sidebar.querySelector('.avatar span').classList.add('text-3xl');
+                
+                // Change button icon to Chevron Left
+                document.getElementById('collapse-icon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />';
+            }
+        }
+        
+        // Auto-collapse on smaller screens (optional, but good practice)
+        window.onload = function() {
+            if (window.innerWidth < 1024) { // 1024px is the 'lg' breakpoint
+                document.getElementById('my-drawer-2').checked = false;
+            }
+        }
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
