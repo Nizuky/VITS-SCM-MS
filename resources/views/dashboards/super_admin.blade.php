@@ -159,7 +159,6 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
 thead{overflow:visible!important}
 table{overflow:visible!important}
-#submission-page .overflow-x-auto{overflow:visible!important}
 #table-header-row{transition:none!important}
 #table-header-row th{transition:none!important}
 .table thead tr{height:60px!important;max-height:60px!important}
@@ -503,7 +502,7 @@ body {
             </div>
             
             <!-- Submission Page -->
-            <div id="submission-page" class="page-content hidden flex-col flex-1-dynamic">
+            <div id="submission-page" class="page-content hidden">
                 <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
                 
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
@@ -544,50 +543,50 @@ body {
 
                 <!-- Submission Table -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);">
+                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px); max-width: calc(110vw - 280px);">
                         <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr id="table-header-row" style="background-color: #f9fafb !important;">
-                                    <th class="w-[12%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 70px; width: 70px; white-space: nowrap;">
                                         <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="studentid-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 140px; width: 140px; white-space: nowrap;">
                                         <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
                                             Student Name
                                             <span id="studentname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[16%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 110px; width: 110px; white-space: nowrap;">
                                         <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                             Event Name
                                             <span id="eventname-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[15%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 140px; width: 140px;">
                                         <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Organization">
                                             <div class="flex flex-col items-center">
-                                                <span>Organization/</span>
-                                                <span>Supervisor</span>
+                                                <span style="white-space: nowrap;">Organization/</span>
+                                                <span style="white-space: nowrap;">Supervisor</span>
                                             </div>
                                             <span id="organization-sort-indicator">⇅</span>
                                         </button>
                                     </th> 
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 50px; width: 50px; white-space: nowrap;">
                                         <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                             Hours
                                             <span id="hours-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 80px; width: 80px; white-space: nowrap;">
                                         <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                             Date
                                             <span id="date-sort-indicator">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[22%] text-center" style="height: 60px; max-height: 60px;">
+                                    <th class="text-center" style="height: 60px; max-height: 60px; min-width: 180px; width: 180px;">
                                         <div class="flex items-center justify-center gap-1 font-bold">
                                             <span>Action</span>
                                         </div>
@@ -637,48 +636,48 @@ body {
                 </div>
 
                 <!-- Students Table -->
-               <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+               <div id="students-table-container" class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
                      <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px);"> 
                         <table class="table table-xs table-pin-rows">
                             <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                                 <tr>
-                                    <th class="w-[10%] text-center">
+                                    <th class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">
                                         <button id="student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="student-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[18%] text-center">
+                                    <th class="text-center" style="min-width: 160px; width: 160px; white-space: nowrap;">
                                         <button id="full-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Full Name">
                                             Full Name
                                             <span id="full-name-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[22%] text-center">
+                                    <th class="text-center" style="min-width: 200px; width: 200px; white-space: nowrap;">
                                         <button id="email-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Email">
                                             Email
                                             <span id="email-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
+                                    <th class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">
                                         <button id="email-verified-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Email Verified">
                                             Email Verified
                                             <span id="email-verified-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[12%] text-center">
+                                    <th class="text-center" style="min-width: 120px; width: 120px; white-space: nowrap;">
                                         <button id="approved-hours-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Approved Hours">
                                             Approved Hours
                                             <span id="approved-hours-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[10%] text-center">
+                                    <th class="text-center" style="min-width: 80px; width: 80px; white-space: nowrap;">
                                         <button id="status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Status">
                                             Status
                                             <span id="status-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="w-[11%] text-center font-bold">Action</th>
+                                    <th class="text-center font-bold" style="min-width: 100px; width: 100px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="students-table-body">
@@ -812,32 +811,32 @@ body {
                         <table class="table table-zebra w-full">
                             <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <th class="text-center">
+                                    <th class="text-center" style="min-width: 100px; width: 100px; white-space: nowrap;">
                                         <button id="ticket-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Ticket ID">
                                             Ticket ID
                                             <span id="ticket-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
+                                    <th class="text-center" style="min-width: 100px; width: 100px; white-space: nowrap;">
                                         <button id="ticket-student-id-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student ID">
                                             Student ID
                                             <span id="ticket-student-id-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
+                                    <th class="text-center" style="min-width: 150px; width: 150px; white-space: nowrap;">
                                         <button id="ticket-student-name-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Student Name">
                                             Student Name
                                             <span id="ticket-student-name-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center">
+                                    <th class="text-center" style="min-width: 120px; width: 120px; white-space: nowrap;">
                                         <button id="ticket-issue-type-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Issue Type">
                                             Issue Type
                                             <span id="ticket-issue-type-sort-icon" class="text-xs">⇅</span>
                                         </button>
                                     </th>
-                                    <th class="text-center font-bold">Details</th>
-                                    <th class="text-center">
+                                    <th class="text-center font-bold" style="min-width: 200px; width: 200px;">Details</th>
+                                    <th class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">
                                         <button id="ticket-status-sort" class="btn btn-ghost btn-xs gap-1 hover:bg-gray-200 font-bold" title="Sort by Status">
                                             Status
                                             <span id="ticket-status-sort-icon" class="text-xs">⇅</span>
@@ -2326,12 +2325,12 @@ body {
                 const shortDetails = (ticket.details || '').substring(0, 100) + (ticket.details && ticket.details.length > 100 ? '...' : '');
                 
                 tr.innerHTML = `
-                    <td class="font-medium text-text-header">${ticket.id}</td>
-                    <td class="text-text-header">${ticket.student_id || 'N/A'}</td>
-                    <td class="text-text-header">${ticket.student_name || 'N/A'}</td>
-                    <td class="text-text-header">${ticket.type}</td>
-                    <td class="text-text-muted text-sm" title="${ticket.details}">${shortDetails}</td>
-                    <td>
+                    <td class="font-medium text-text-header" style="min-width: 80px; width: 80px; white-space: nowrap;">${ticket.id}</td>
+                    <td class="text-text-header" style="min-width: 90px; width: 90px; white-space: nowrap;">${ticket.student_id || 'N/A'}</td>
+                    <td class="text-text-header" style="min-width: 150px; width: 150px; white-space: nowrap;">${ticket.student_name || 'N/A'}</td>
+                    <td class="text-text-header" style="min-width: 120px; width: 120px; white-space: nowrap;">${ticket.type}</td>
+                    <td class="text-text-muted text-sm" style="min-width: 200px; width: 200px;" title="${ticket.details}">${shortDetails}</td>
+                    <td style="min-width: 90px; width: 90px;">
                         <div class="flex flex-col gap-1">
                             ${statusBadges[ticket.status] || ticket.status}
                             <span class="text-xs text-gray-500">${ticket.date}</span>
@@ -3204,32 +3203,32 @@ body {
                         'data-rejection-reason="' + rejectionReason + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="w-[12%] text-center">' + (record.student_id || '—') + '</td>' +
-                        '<td class="w-[15%] text-center">' + (record.student_name || '—') + '</td>' +
-                        '<td class="w-[16%] text-center">' + (record.event_name || '—') + '</td>' +
-                        '<td class="w-[15%] text-center">' + 
+                        '<td class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">' + (record.student_id || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 160px; width: 160px; white-space: nowrap;">' + (record.student_name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 130px; width: 130px; white-space: nowrap;">' + (record.event_name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 160px; width: 160px;">' + 
                             '<div class="flex flex-col items-center">' +
                                 '<span class="font-medium">' + (record.organization || '—') + '</span>' +
                                 '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
                             '</div>' +
                         '</td>' +
-                        '<td class="w-[10%] text-center">' + (record.hours_rendered || 0) + ' hours</td>' +
-                        '<td class="w-[10%] text-center">' + dateStr + '</td>';                // Action column logic: 
+                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.hours_rendered || 0) + ' hours</td>' +
+                        '<td class="text-center" style="min-width: 100px; width: 100px; white-space: nowrap;">' + dateStr + '</td>';                // Action column logic: 
                 // - Pending tab: show Verify/Reject buttons for Pending records
                 // - For Approval tab: show Approve/Reject buttons for Verified records  
                 // - Archived tab: show status badge for Approved/Rejected/Verified records
-                html += '<td class="text-center">';
+                html += '<td class="text-center" style="min-width: 200px; width: 200px;">';
                 
                 if (isPending) {
                     // Pending records always show action buttons
-                    html += '<div class="space-x-2">' +
+                    html += '<div class="flex justify-center items-center space-x-2">' +
                             '<button class="btn btn-action btn-action-verify" onclick="openVerifyModal(this,event)">Verify</button>' +
                             '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
                             '</div>';
                 } else if (isVerified) {
                     // Verified records: Show both action buttons AND status badge (will be filtered by tab)
                     // Action buttons (hidden in Archived tab via CSS class)
-                    html += '<div class="space-x-2 for-approval-actions">' +
+                    html += '<div class="flex justify-center items-center space-x-2 for-approval-actions">' +
                             '<button class="btn btn-action btn-action-approve" onclick="openApproveModal(this,event)">Approve</button>' +
                             '<button class="btn btn-action btn-action-reject" onclick="openRejectModal(this,event)">Reject</button>' +
                             '</div>';
@@ -4371,13 +4370,13 @@ body {
                 var hoursDisplay = '<span class="font-semibold text-primary-purple">' + approvedHours + ' hours</span>';
                 
                 html += '<tr class="hover cursor-pointer" onclick="openStudentEditModal(' + student.id + ')">' +
-                        '<td class="text-center">' + (student.student_id || '—') + '</td>' +
-                        '<td class="text-center">' + (student.name || '—') + '</td>' +
-                        '<td class="text-center">' + (student.email || '—') + '</td>' +
-                        '<td class="text-center">' + verifiedBadge + '</td>' +
-                        '<td class="text-center">' + hoursDisplay + '</td>' +
-                        '<td class="text-center">' + statusBadge + '</td>' +
-                        '<td class="text-center">' +
+                        '<td class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">' + (student.student_id || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 160px; width: 160px; white-space: nowrap;">' + (student.name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 200px; width: 200px; white-space: nowrap;">' + (student.email || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + verifiedBadge + '</td>' +
+                        '<td class="text-center" style="min-width: 120px; width: 120px; white-space: nowrap;">' + hoursDisplay + '</td>' +
+                        '<td class="text-center" style="min-width: 80px; width: 80px;">' + statusBadge + '</td>' +
+                        '<td class="text-center" style="min-width: 100px; width: 100px;">' +
                         '<button class="btn btn-sm bg-primary-purple hover:bg-primary-purple-hover text-white" onclick="event.stopPropagation(); openStudentEditModal(' + student.id + ')">Edit</button>' +
                         '</td></tr>';
             });
