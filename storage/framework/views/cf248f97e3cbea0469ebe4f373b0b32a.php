@@ -1506,8 +1506,8 @@
             
             <div class="divider my-4"></div>
             
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <p class="text-sm text-gray-900 dark:text-red-200 whitespace-pre-wrap" id="rejection-reason-text">
+            <div class="bg-red-100 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 rounded-lg p-4">
+                <p class="text-base whitespace-pre-wrap font-bold leading-relaxed" id="rejection-reason-text" style="color: #991b1b;">
                     <!-- Rejection reason will be injected here -->
                 </p>
             </div>
@@ -3038,9 +3038,9 @@
                                 </svg>
                                 View reason
                             </button>
-                            <div class="reason-content hidden mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                                <p class="text-xs font-semibold text-red-700 dark:text-red-300 mb-1">Rejection Reason:</p>
-                                <p class="text-sm text-gray-900 dark:text-red-200 whitespace-pre-wrap">${notif.rejection_reason}</p>
+                            <div class="reason-content hidden mt-2 p-3 bg-red-100 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 rounded-lg">
+                                <p class="text-xs font-bold mb-1" style="color: #7f1d1d;">Rejection Reason:</p>
+                                <p class="text-sm whitespace-pre-wrap font-bold leading-relaxed" style="color: #991b1b;">${notif.rejection_reason}</p>
                             </div>
                         `;
                     } else {
