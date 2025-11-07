@@ -281,6 +281,14 @@ body {
                         Submission
                     </a>
                 </li>
+                <li>
+                    <a class="py-3 pl-2" id="nav-data-management" onclick="showPage('data-management')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Data Management
+                    </a>
+                </li>
             </ul>
 
             <!-- Bottom Navigation -->
@@ -581,6 +589,83 @@ body {
                                 </tr>
                             </thead>
                             <tbody id="submission-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management Page -->
+            <div id="data-management-page" class="page-content hidden flex flex-col">
+                <div class="p-4">
+                    <h4 class="text-4xl font-bold text-primary-purple">Data Management</h4>
+                    <p class="text-sm text-text-muted mt-2">Manage rejected records and inactive accounts</p>
+                </div>
+
+                <!-- Rejected Records Section -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-text-header">Rejected Records</h2>
+                            <p class="text-sm text-text-muted">Records rejected more than 7 days ago are eligible for deletion</p>
+                        </div>
+                        <button id="delete-all-eligible-records-btn" class="btn btn-error text-white rounded-lg" onclick="deleteAllEligibleRecords()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Delete All Eligible Records
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-center">Student Name</th>
+                                    <th class="text-center">Event Name</th>
+                                    <th class="text-center">Rejected Date</th>
+                                    <th class="text-center">Days Since Rejection</th>
+                                    <th class="text-center">Deletion Eligible</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rejected-records-table">
+                                <tr><td colspan="6" class="text-center text-gray-500 py-4">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inactive Accounts Section -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-text-header">Inactive Accounts</h2>
+                            <p class="text-sm text-text-muted">Accounts inactive for more than 7 days are eligible for deletion</p>
+                        </div>
+                        <button id="delete-all-eligible-accounts-btn" class="btn btn-error text-white rounded-lg" onclick="deleteAllEligibleAccounts()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Delete All Eligible Accounts
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-center">Student Name</th>
+                                    <th class="text-center">Student Number</th>
+                                    <th class="text-center">Email</th>
+                                    <th class="text-center">Inactive Since</th>
+                                    <th class="text-center">Days Inactive</th>
+                                    <th class="text-center">Time Until Deletion</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inactive-accounts-table">
+                                <tr><td colspan="7" class="text-center text-gray-500 py-4">Loading...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -1803,6 +1888,11 @@ body {
                     }
                 }, 100);
             }
+            
+            // Load data management when showing data management page
+            if (p === 'data-management') {
+                loadDataManagement();
+            }
         }
 
         // Global variable to track current status filter
@@ -3005,6 +3095,236 @@ body {
         // Update chart with new data
         function updatePendingRequestsChart(pendingCount) {
             initPendingRequestsChart(pendingCount);
+        }
+
+        // ====== DATA MANAGEMENT FUNCTIONS ======
+        
+        function loadDataManagement() {
+            loadRejectedRecords();
+            loadInactiveAccounts();
+        }
+
+        async function loadRejectedRecords() {
+            try {
+                const response = await fetch('{{ route("admin.data-management.rejected-records") }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                const tbody = document.getElementById('rejected-records-table');
+                if (!data.records || data.records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">No rejected records found</td></tr>';
+                    document.getElementById('delete-all-eligible-records-btn').disabled = true;
+                    return;
+                }
+                
+                let eligibleCount = 0;
+                tbody.innerHTML = data.records.map(record => {
+                    const isEligible = record.days_since_rejection >= 7;
+                    if (isEligible) eligibleCount++;
+                    
+                    return `
+                        <tr class="${isEligible ? 'bg-red-50' : ''}">
+                            <td class="text-center">${record.student_name}</td>
+                            <td class="text-center">${record.event_name}</td>
+                            <td class="text-center">${record.rejected_at}</td>
+                            <td class="text-center">
+                                <span class="font-bold ${isEligible ? 'text-red-600' : 'text-gray-600'}">
+                                    ${record.days_since_rejection} days
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                ${isEligible 
+                                    ? '<span class="badge badge-error text-white">Yes</span>' 
+                                    : `<span class="badge badge-warning">In ${7 - record.days_since_rejection} days</span>`
+                                }
+                            </td>
+                            <td class="text-center">
+                                ${isEligible 
+                                    ? `<button onclick="deleteRecord(${record.id})" class="btn btn-sm btn-error text-white">Delete</button>`
+                                    : '<span class="text-gray-400">Not eligible</span>'
+                                }
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                document.getElementById('delete-all-eligible-records-btn').disabled = eligibleCount === 0;
+            } catch (error) {
+                console.error('Error loading rejected records:', error);
+                showToast('Failed to load rejected records', 'error');
+            }
+        }
+
+        async function loadInactiveAccounts() {
+            try {
+                const response = await fetch('{{ route("admin.data-management.inactive-accounts") }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                const tbody = document.getElementById('inactive-accounts-table');
+                if (!data.accounts || data.accounts.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500 py-4">No inactive accounts found</td></tr>';
+                    document.getElementById('delete-all-eligible-accounts-btn').disabled = true;
+                    return;
+                }
+                
+                let eligibleCount = 0;
+                tbody.innerHTML = data.accounts.map(account => {
+                    const isEligible = account.days_inactive >= 7;
+                    if (isEligible) eligibleCount++;
+                    
+                    return `
+                        <tr class="${isEligible ? 'bg-red-50' : ''}">
+                            <td class="text-center">${account.name}</td>
+                            <td class="text-center">${account.student_id || '—'}</td>
+                            <td class="text-center">${account.email}</td>
+                            <td class="text-center">${account.inactive_at}</td>
+                            <td class="text-center">
+                                <span class="font-bold ${isEligible ? 'text-red-600' : 'text-gray-600'}">
+                                    ${account.days_inactive} days
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                ${isEligible 
+                                    ? '<span class="text-red-600 font-semibold">Ready for deletion</span>' 
+                                    : `<span class="text-yellow-600">${account.time_until_deletion}</span>`
+                                }
+                            </td>
+                            <td class="text-center">
+                                ${isEligible 
+                                    ? `<button onclick="deleteAccount(${account.id})" class="btn btn-sm btn-error text-white">Delete</button>`
+                                    : '<span class="text-gray-400">Not eligible</span>'
+                                }
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                document.getElementById('delete-all-eligible-accounts-btn').disabled = eligibleCount === 0;
+            } catch (error) {
+                console.error('Error loading inactive accounts:', error);
+                showToast('Failed to load inactive accounts', 'error');
+            }
+        }
+
+        async function deleteRecord(recordId) {
+            if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`{{ url('/admin/data-management/records') }}/${recordId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Record deleted successfully', 'success');
+                    loadRejectedRecords();
+                } else {
+                    showToast(data.message || 'Failed to delete record', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting record:', error);
+                showToast('Failed to delete record', 'error');
+            }
+        }
+
+        async function deleteAccount(accountId) {
+            if (!confirm('Are you sure you want to delete this account? This will permanently remove the user and all their data. This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`{{ url('/admin/data-management/accounts') }}/${accountId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Account deleted successfully', 'success');
+                    loadInactiveAccounts();
+                } else {
+                    showToast(data.message || 'Failed to delete account', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                showToast('Failed to delete account', 'error');
+            }
+        }
+
+        async function deleteAllEligibleRecords() {
+            if (!confirm('Are you sure you want to delete ALL rejected records that are older than 7 days? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('{{ route("admin.data-management.delete-all-records") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`${data.count} record(s) deleted successfully`, 'success');
+                    loadRejectedRecords();
+                } else {
+                    showToast(data.message || 'Failed to delete records', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting records:', error);
+                showToast('Failed to delete records', 'error');
+            }
+        }
+
+        async function deleteAllEligibleAccounts() {
+            if (!confirm('Are you sure you want to delete ALL inactive accounts that have been inactive for more than 7 days? This will permanently remove these users and all their data. This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('{{ route("admin.data-management.delete-all-accounts") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`${data.count} account(s) deleted successfully`, 'success');
+                    loadInactiveAccounts();
+                } else {
+                    showToast(data.message || 'Failed to delete accounts', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting accounts:', error);
+                showToast('Failed to delete accounts', 'error');
+            }
         }
     </script>
 

@@ -191,6 +191,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('settings/update-name', [App\Http\Controllers\Admin\SettingsController::class, 'updateName'])->name('settings.updateName');
             Route::post('settings/request-password-change', [App\Http\Controllers\Admin\SettingsController::class, 'requestPasswordChange'])->name('settings.requestPasswordChange');
         });
+
+        // Data Management routes
+        Route::prefix('data-management')->name('data-management.')->group(function () {
+            Route::get('rejected-records', [App\Http\Controllers\Admin\DataManagementController::class, 'getRejectedRecords'])->name('rejected-records');
+            Route::get('inactive-accounts', [App\Http\Controllers\Admin\DataManagementController::class, 'getInactiveAccounts'])->name('inactive-accounts');
+            Route::delete('records/{id}', [App\Http\Controllers\Admin\DataManagementController::class, 'deleteRecord'])->name('delete-record');
+            Route::delete('accounts/{id}', [App\Http\Controllers\Admin\DataManagementController::class, 'deleteAccount'])->name('delete-account');
+            Route::post('delete-all-records', [App\Http\Controllers\Admin\DataManagementController::class, 'deleteAllEligibleRecords'])->name('delete-all-records');
+            Route::post('delete-all-accounts', [App\Http\Controllers\Admin\DataManagementController::class, 'deleteAllEligibleAccounts'])->name('delete-all-accounts');
+        });
     });
 });
 

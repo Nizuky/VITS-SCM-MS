@@ -26,11 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Run once daily to delete rejected records older than 7 days
-        $schedule->command('scms:delete-old-rejected')->daily();
-        
-        // Run daily at midnight to delete inactive accounts after 7 days
-        $schedule->command('users:delete-inactive')->dailyAt('00:00');
+        // No automatic deletions - Super Admin manages deletions manually
     }
 
     /**
