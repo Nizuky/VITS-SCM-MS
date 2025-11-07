@@ -2428,7 +2428,7 @@
             const statusSortToggle = document.getElementById('status-sort-toggle');
             const statusSortIndicator = document.getElementById('status-sort-indicator');
             
-            // Normalize API date to YYYY-MM-DD and format to DD-MM-YYYY without timezone shifts
+            // Normalize API date to YYYY-MM-DD and format to MM-DD-YYYY without timezone shifts
             function normalizeDateString(dateVal) {
                 if (!dateVal) return '';
                 let s = String(dateVal);
@@ -2441,8 +2441,8 @@
                 const parts = s.split('-');
                 if (parts.length === 3) {
                     const [y, m, d] = parts;
-                    // Return DD-MM-YYYY format directly without timezone conversion
-                    return `${d.padStart(2,'0')}-${m.padStart(2,'0')}-${y}`;
+                    // Return MM-DD-YYYY format (Month-Day-Year)
+                    return `${m.padStart(2,'0')}-${d.padStart(2,'0')}-${y}`;
                 }
                 // If not in expected format, return as-is
                 return s;
@@ -4723,17 +4723,14 @@
                 try {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
-
-                    // Add watermark (VITS white logo) in the background center
-                    const watermarkPath = '/storage/vits_whites.png';
-                    try {
-                        // Add watermark - centered, large, and semi-transparent
-                        doc.setGState(new doc.GState({ opacity: 0.1 })); // 10% opacity for watermark
-                        doc.addImage(watermarkPath, 'PNG', 30, 85, 150, 150); // 150x150, centered on page
-                        doc.setGState(new doc.GState({ opacity: 1.0 })); // Reset opacity back to 100%
-                    } catch (err) {
-                        console.warn('Could not load watermark:', err);
-                    }
+                    
+                    // IMPORTANT: Set opacity to full before anything else
+                    doc.setGState(new doc.GState({ opacity: 1.0 }));
+                    
+                    // Set default drawing color to black for all elements
+                    doc.setDrawColor(0, 0, 0);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont('helvetica', 'normal');
 
                     // Add VITS logo on the left
                     const vitsLogoPath = '/storage/VITS_logo.png';
@@ -4749,7 +4746,8 @@
                         doc.addImage(logoBase64, 'PNG', 175, 10, 20, 20);
                     }
 
-                    // Header text
+                    // Header text - explicitly set black
+                    doc.setTextColor(0, 0, 0);
                     doc.setFontSize(12);
                     doc.setFont('helvetica', 'bold');
                     doc.text('Pamantasan ng Lungsod ng Valenzuela', 105, 15, { align: 'center' });
@@ -4795,7 +4793,13 @@
                     const totalHours = filteredRecords.reduce((sum, r) => sum + (parseFloat(r.hours_rendered) || 0), 0);
 
                     // Add table with the exact columns from the image
-                   doc.autoTable({
+                    // RESET EVERYTHING before table
+                    doc.setGState(new doc.GState({ opacity: 1.0 }));
+                    doc.setTextColor(0, 0, 0);
+                    doc.setDrawColor(0, 0, 0);
+                    doc.setFont('helvetica', 'normal');
+                    
+                    doc.autoTable({
                         startY: 70,
                         head: [['Date', 'Venue', 'Name of Organizing Committee\n/Activity', 'Printed Name and Signature of\nSupervisor', 'Hours\nRendered']],
                         body: tableData,
@@ -4805,23 +4809,35 @@
                             fontSize: 9, 
                             cellPadding: 3,
                             valign: 'middle',
-                            halign: 'center'
+                            halign: 'center',
+                            textColor: 0,           // Try single value black
+                            lineColor: 0,           // Try single value black
+                            lineWidth: 0.1,
+                            fontStyle: 'normal'
                         },
                         headStyles: { 
                             fillColor: [109, 40, 217],  // Purple header
-                            textColor: 255, 
+                            textColor: 255,             // White text (single value)
                             fontStyle: 'bold',
                             halign: 'center',
-                            valign: 'middle'
+                            valign: 'middle',
+                            lineColor: 0,
+                            lineWidth: 0.1
                         },
                         bodyStyles: {
-                            fillColor: null // ✅ transparent background for all body cells
+                            fillColor: 255,         // White background
+                            textColor: 0,           // BLACK text (single value)
+                            lineColor: 0,           // BLACK borders
+                            lineWidth: 0.1,
+                            fontStyle: 'normal'
                         },
                         footStyles: { 
-                            fillColor: null,  // ✅ transparent footer background
-                            textColor: 0, 
+                            fillColor: 255,         // White background
+                            textColor: 0,           // BLACK text (single value)
+                            lineColor: 0,           // BLACK borders
                             fontStyle: 'bold',
-                            halign: 'right'
+                            halign: 'right',
+                            lineWidth: 0.1
                         },
                         columnStyles: {
                             0: { cellWidth: 25, halign: 'center' },  // Date
@@ -4834,6 +4850,7 @@
 
                     // Signature section
                     const finalY = doc.lastAutoTable.finalY + 20;
+                    doc.setTextColor(0, 0, 0);  // Ensure black text
                     doc.setFontSize(10);
                     doc.text('Prepared by:', 14, finalY);
                     doc.text('_______________________', 14, finalY + 15);
@@ -4850,9 +4867,20 @@
 
                     // Footer
                     doc.setFontSize(8);
-                    doc.setTextColor(128);
+                    doc.setTextColor(128, 128, 128);  // Gray for footer
                     const phDate = getPhilippineDate();
                     doc.text(`Generated on: ${phDate.toLocaleString('en-US', { timeZone: 'Asia/Manila' })}`, 105, 285, { align: 'center' });
+
+                    // Add watermark LAST (on top of content with transparency)
+                    const watermarkPath = '/storage/vits_white.png';  // Fixed: vits_white.png not vits_whites.png
+                    try {
+                        doc.setGState(new doc.GState({ opacity: 0.1 })); // 10% opacity watermark
+                        doc.addImage(watermarkPath, 'PNG', 30, 85, 150, 150); // Centered, large
+                        doc.setGState(new doc.GState({ opacity: 1.0 })); // Reset
+                        console.log('Watermark added successfully');
+                    } catch (err) {
+                        console.error('Could not load watermark:', err);
+                    }
 
                     // Save PDF
                     const fileName = `Social_Contract_${studentId}_${schoolYear}.pdf`;
