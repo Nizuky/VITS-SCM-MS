@@ -17,18 +17,20 @@ class DataManagementController extends Controller
     public function getRejectedRecords()
     {
         try {
-            $records = SocialContractRecord::with('user')
+            // Fetch rejected records; SocialContractRecord does not have a direct user relation
+            // so we eager load the socialContract and its student for proper student name resolution.
+            $records = SocialContractRecord::with(['socialContract.student'])
                 ->where('status', 'Rejected')
                 ->whereNotNull('rejected_at')
                 ->orderBy('rejected_at', 'asc')
                 ->get()
                 ->map(function ($record) {
                     $rejectedAt = Carbon::parse($record->rejected_at);
-                    $daysSince = now()->diffInDays($rejectedAt);
-                    
+                    // Whole-number, non-negative days since rejection
+                    $daysSince = max(0, now()->diffInDays($rejectedAt, false));
                     return [
                         'id' => $record->id,
-                        'student_name' => $record->user->name ?? 'Unknown',
+                        'student_name' => optional($record->socialContract->student)->name ?? 'Unknown',
                         'event_name' => $record->event_name,
                         'rejected_at' => $rejectedAt->format('M d, Y'),
                         'days_since_rejection' => $daysSince,
@@ -61,11 +63,17 @@ class DataManagementController extends Controller
                 ->get()
                 ->map(function ($user) {
                     $inactiveSince = Carbon::parse($user->inactive_at);
-                    $daysInactive = now()->diffInDays($inactiveSince);
+                    // Ensure whole number days, never negative.
+                    $daysInactive = max(0, now()->diffInDays($inactiveSince, false));
                     $deletionDate = $inactiveSince->copy()->addDays(7);
                     $hoursUntilDeletion = max(0, now()->diffInHours($deletionDate, false));
-                    $daysUntilDeletion = max(0, (int) ceil($hoursUntilDeletion / 24));
-                    
+                    $daysUntilDeletion = (int) floor($hoursUntilDeletion / 24);
+                    $timeUntilDeletion = 'Ready for deletion';
+                    if ($daysInactive < 7) {
+                        $timeUntilDeletion = $daysUntilDeletion > 0
+                            ? $daysUntilDeletion . ' day(s) remaining'
+                            : $hoursUntilDeletion . ' hour(s) remaining';
+                    }
                     return [
                         'id' => $user->id,
                         'name' => $user->name,
@@ -74,11 +82,7 @@ class DataManagementController extends Controller
                         'inactive_at' => $inactiveSince->format('M d, Y'),
                         'days_inactive' => $daysInactive,
                         'eligible_for_deletion' => $daysInactive >= 7,
-                        'time_until_deletion' => $daysInactive >= 7 
-                            ? 'Ready for deletion' 
-                            : ($daysUntilDeletion > 0 
-                                ? "{$daysUntilDeletion} day(s) remaining" 
-                                : "{$hoursUntilDeletion} hour(s) remaining")
+                        'time_until_deletion' => $timeUntilDeletion,
                     ];
                 });
 
