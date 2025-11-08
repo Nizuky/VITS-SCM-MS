@@ -27,7 +27,9 @@ class DataManagementController extends Controller
                 ->map(function ($record) {
                     $rejectedAt = Carbon::parse($record->rejected_at);
                     // Whole-number, non-negative days since rejection
-                    $daysSince = max(0, now()->diffInDays($rejectedAt, false));
+                    $daysSince = (int) abs(now()->diffInDays($rejectedAt, false));
+                    $daysRemaining = max(0, 7 - $daysSince);
+                    
                     return [
                         'id' => $record->id,
                         'student_name' => optional($record->socialContract->student)->name ?? 'Unknown',
@@ -35,6 +37,8 @@ class DataManagementController extends Controller
                         'rejected_at' => $rejectedAt->format('M d, Y'),
                         'days_since_rejection' => $daysSince,
                         'eligible_for_deletion' => $daysSince >= 7,
+                        'days_remaining' => $daysRemaining,
+                        'deletion_status' => $daysSince >= 7 ? 'Ready' : "In {$daysRemaining} day(s)",
                     ];
                 });
 
@@ -64,16 +68,21 @@ class DataManagementController extends Controller
                 ->map(function ($user) {
                     $inactiveSince = Carbon::parse($user->inactive_at);
                     // Ensure whole number days, never negative.
-                    $daysInactive = max(0, now()->diffInDays($inactiveSince, false));
+                    $daysInactive = (int) abs(now()->diffInDays($inactiveSince, false));
                     $deletionDate = $inactiveSince->copy()->addDays(7);
-                    $hoursUntilDeletion = max(0, now()->diffInHours($deletionDate, false));
-                    $daysUntilDeletion = (int) floor($hoursUntilDeletion / 24);
-                    $timeUntilDeletion = 'Ready for deletion';
+                    $daysRemaining = max(0, 7 - $daysInactive);
+                    
+                    // Calculate hours until deletion only if not yet eligible
+                    $timeUntilDeletion = 'Ready';
                     if ($daysInactive < 7) {
-                        $timeUntilDeletion = $daysUntilDeletion > 0
-                            ? $daysUntilDeletion . ' day(s) remaining'
-                            : $hoursUntilDeletion . ' hour(s) remaining';
+                        $hoursRemaining = max(0, (int) abs(now()->diffInHours($deletionDate, false)));
+                        if ($daysRemaining > 0) {
+                            $timeUntilDeletion = "In {$daysRemaining} day(s)";
+                        } else {
+                            $timeUntilDeletion = "In {$hoursRemaining} hour(s)";
+                        }
                     }
+                    
                     return [
                         'id' => $user->id,
                         'name' => $user->name,

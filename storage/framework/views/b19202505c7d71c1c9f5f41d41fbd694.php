@@ -3162,8 +3162,8 @@ body {
                             </td>
                             <td class="text-center">
                                 ${isEligible 
-                                    ? '<span class="badge badge-error text-white">Yes</span>' 
-                                    : `<span class="badge badge-warning">In ${7 - record.days_since_rejection} days</span>`
+                                    ? '<span class="badge badge-error text-white">Ready</span>' 
+                                    : `<span class="badge badge-warning">${record.deletion_status}</span>`
                                 }
                             </td>
                             <td class="text-center">
@@ -3218,8 +3218,8 @@ body {
                             </td>
                             <td class="text-center">
                                 ${isEligible 
-                                    ? '<span class="text-red-600 font-semibold">Ready for deletion</span>' 
-                                    : `<span class="text-yellow-600">${account.time_until_deletion}</span>`
+                                    ? '<span class="badge badge-error text-white">Ready</span>' 
+                                    : `<span class="badge badge-warning">${account.time_until_deletion}</span>`
                                 }
                             </td>
                             <td class="text-center">
