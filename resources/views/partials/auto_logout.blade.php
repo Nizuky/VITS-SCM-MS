@@ -4,7 +4,8 @@
     // Determine Remember Me via BOTH sources:
     // 1) Session flag set during login (immediate, reliable for this session)
     // 2) Recaller cookie set by Laravel (persists across browser restarts)
-    $rememberCookieName = \Illuminate\Support\Facades\Auth::guard('web')->getRecallerName();
+    $guard = \Illuminate\Support\Facades\Auth::guard('web');
+    $rememberCookieName = $guard instanceof \Illuminate\Auth\SessionGuard ? $guard->getRecallerName() : 'remember_web_' . sha1(static::class);
     $isRememberedCookie = request()->cookies->has($rememberCookieName);
     $isRememberedSession = (bool) session('remembered', null);
     $isRemembered = $isRememberedCookie || $isRememberedSession;
