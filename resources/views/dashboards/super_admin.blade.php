@@ -213,6 +213,18 @@ body {
     width: 100%;
     overflow-x: auto;
 }
+
+/* Student view modal info boxes - Light mode */
+.student-info-box {
+    background-color: #f9fafb !important;
+    color: #111827 !important;
+}
+
+/* Student view modal info boxes - Dark mode */
+[data-theme="dark"] .student-info-box {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
 </style>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -1004,11 +1016,11 @@ body {
     <!-- Approve Modal -->
     <dialog id="approve_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg">Approve Submission</h3>
-            <p class="py-4">Are you sure you want to approve this submission?</p>
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg mb-4" role="alert">
-                <p class="font-bold">Important Notice</p>
-                <p>Once approved, this record will now appear on the Students page and this action cannot be undone.</p>
+            <h3 class="font-bold text-lg dark:text-white" style="color: #000000;">Approve Submission</h3>
+            <p class="py-4 dark:text-gray-300" style="color: #3d3d3dff;">Are you sure you want to approve this submission?</p>
+            <div class="bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-600 p-4 rounded-r-lg mb-4" role="alert">
+                <p class="font-bold"  style="color: #9f5700ff;">Important Notice</p>
+                <p class="dark:text-yellow-200" style="color: #9f5700ff;">Once approved, this record will now appear on the Students page and this action cannot be undone.</p>
             </div>
             <div class="modal-action">
                 <form method="dialog" class="flex gap-2">
@@ -1237,45 +1249,45 @@ body {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text font-semibold text-gray-600">Full Name</span>
+                            <span class="label-text font-semibold">Full Name</span>
                         </label>
-                        <p id="view-student-name" class="text-base font-medium px-3 py-2 bg-gray-50 rounded-lg">—</p>
+                        <p id="view-student-name" class="text-base font-medium px-3 py-2 student-info-box rounded-lg">—</p>
                     </div>
                     
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text font-semibold text-gray-600">Student ID</span>
+                            <span class="label-text font-semibold">Student ID</span>
                         </label>
-                        <p id="view-student-id" class="text-base font-medium px-3 py-2 bg-gray-50 rounded-lg">—</p>
+                        <p id="view-student-id" class="text-base font-medium px-3 py-2 student-info-box rounded-lg">—</p>
                     </div>
                 </div>
                 
                 <div class="form-control w-full">
                     <label class="label">
-                        <span class="label-text font-semibold text-gray-600">Email Address</span>
+                        <span class="label-text font-semibold">Email Address</span>
                     </label>
-                    <p id="view-student-email" class="text-base font-medium px-3 py-2 bg-gray-50 rounded-lg">—</p>
+                    <p id="view-student-email" class="text-base font-medium px-3 py-2 student-info-box rounded-lg">—</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text font-semibold text-gray-600">Email Verified</span>
+                            <span class="label-text font-semibold">Email Verified</span>
                         </label>
                         <div id="view-student-email-verified" class="px-3 py-2">—</div>
                     </div>
 
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text font-semibold text-gray-600">Approved Hours</span>
+                            <span class="label-text font-semibold">Approved Hours</span>
                         </label>
-                        <p id="view-student-approved-hours" class="text-base font-semibold text-primary-purple px-3 py-2 bg-gray-50 rounded-lg">—</p>
+                        <p id="view-student-approved-hours" class="text-base font-semibold text-primary-purple px-3 py-2 student-info-box rounded-lg">—</p>
                     </div>
                 </div>
                 
                 <div class="form-control w-full">
                     <label class="label">
-                        <span class="label-text font-semibold text-gray-600">Account Status</span>
+                        <span class="label-text font-semibold">Account Status</span>
                     </label>
                     <div id="view-student-status" class="px-3 py-2">—</div>
                 </div>

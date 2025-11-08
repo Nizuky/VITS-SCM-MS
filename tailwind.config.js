@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+	// Configure dark mode to use data-theme attribute instead of .dark class
+	darkMode: ['selector', '[data-theme="dark"]'],
+	
 	content: [
 		'./resources/**/*.blade.php',
 		'./resources/**/*.js',

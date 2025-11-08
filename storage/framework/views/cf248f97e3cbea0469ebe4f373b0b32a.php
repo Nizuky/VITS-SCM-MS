@@ -1521,6 +1521,157 @@
         </form>
     </dialog>
 
+    <!-- Delete Pending Records Confirmation Modal -->
+    <dialog id="delete_pending_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete Pending Records</h3>
+                    <p class="text-sm text-gray-600">Are you sure you want to delete?</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-red-800 mb-1">Warning</p>
+                        <p class="text-sm text-red-700">You are about to delete <span id="delete-count-text" class="font-bold">0</span> pending record(s). This action cannot be undone.</p>
+                        <p class="text-xs text-red-600 mt-2" id="non-pending-warning" style="display: none;">Note: Non-pending records have been excluded from deletion.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('delete_pending_modal').close()">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeletePending()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Records
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Delete Ticket Confirmation Modal -->
+    <dialog id="delete_ticket_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete Support Ticket</h3>
+                    <p class="text-sm text-gray-600">Are you sure you want to delete this ticket?</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-yellow-800 mb-1">Warning</p>
+                        <p class="text-sm text-yellow-700">This action cannot be undone. The ticket and all its details will be permanently removed.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('delete_ticket_modal').close()">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteTicket()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Ticket
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Mark Ticket as Done Confirmation Modal -->
+    <dialog id="mark_done_ticket_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Mark Ticket as Done</h3>
+                    <p class="text-sm text-gray-600">Confirm ticket resolution</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-800 mb-1">Information</p>
+                        <p class="text-sm text-blue-700">Marking this ticket as done will remove it from your ticket list. Only mark as done if your issue has been fully resolved.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('mark_done_ticket_modal').close()">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-blue-600 hover:bg-blue-700 text-white" onclick="confirmMarkTicketDone()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Mark as Done
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- All Notifications Modal -->
     <dialog id="all_notifications_modal" class="modal">
         <div class="modal-box max-w-2xl max-h-[80vh]">
@@ -2157,9 +2308,22 @@
          * Delete a pending ticket
          */
         async function deleteTicket(ticketId) {
-            if (!confirm('Are you sure you want to delete this ticket?')) {
-                return;
-            }
+            // Store ticket ID globally for confirmation
+            window.ticketIdToDelete = ticketId;
+            
+            // Show modal
+            document.getElementById('delete_ticket_modal').showModal();
+        }
+
+        /**
+         * Confirm deletion from modal
+         */
+        async function confirmDeleteTicket() {
+            const ticketId = window.ticketIdToDelete;
+            if (!ticketId) return;
+
+            // Close modal
+            document.getElementById('delete_ticket_modal').close();
 
             try {
                 await ensureCsrfCookie();
@@ -2193,9 +2357,22 @@
          * Mark a resolved ticket as done
          */
         async function markTicketDone(ticketId) {
-            if (!confirm('Mark this ticket as done? This will remove it from your list.')) {
-                return;
-            }
+            // Store ticket ID globally for confirmation
+            window.ticketIdToMarkDone = ticketId;
+            
+            // Show modal
+            document.getElementById('mark_done_ticket_modal').showModal();
+        }
+
+        /**
+         * Confirm mark as done from modal
+         */
+        async function confirmMarkTicketDone() {
+            const ticketId = window.ticketIdToMarkDone;
+            if (!ticketId) return;
+
+            // Close modal
+            document.getElementById('mark_done_ticket_modal').close();
 
             try {
                 await ensureCsrfCookie();
@@ -3662,10 +3839,6 @@
                 });
             }
             document.getElementById('delete-selected').addEventListener('click', async () => {
-                // Ensure fresh CSRF token before deletion
-                await ensureCsrfCookie();
-                const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                
                 // Get all checked rows
                 const checkedRows = Array.from(document.querySelectorAll('#record-table-body tr'))
                     .filter(tr => tr.querySelector('.record-checkbox')?.checked);
@@ -3684,19 +3857,40 @@
                     return;
                 }
                 
-                if (nonPendingSelected) {
-                    showToast('Only pending records can be deleted. Non-pending records have been excluded.', 'warning');
-                }
-                
                 if (!pendingIds.length) {
                     showToast('No pending records selected. Only pending records can be deleted.', 'error');
                     return;
                 }
                 
-                // Confirm deletion
-                if (!confirm(`Are you sure you want to delete ${pendingIds.length} pending record(s)?`)) {
-                    return;
+                // Store pending IDs globally for confirmation
+                window.pendingIdsToDelete = pendingIds;
+                
+                // Update modal text
+                document.getElementById('delete-count-text').textContent = pendingIds.length;
+                
+                // Show/hide non-pending warning
+                const warningEl = document.getElementById('non-pending-warning');
+                if (nonPendingSelected) {
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.style.display = 'none';
                 }
+                
+                // Show modal
+                document.getElementById('delete_pending_modal').showModal();
+            });
+
+            // Confirm deletion from modal
+            async function confirmDeletePending() {
+                const pendingIds = window.pendingIdsToDelete || [];
+                if (!pendingIds.length) return;
+
+                // Close modal
+                document.getElementById('delete_pending_modal').close();
+
+                // Ensure fresh CSRF token before deletion
+                await ensureCsrfCookie();
+                const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 
                 Promise.all(pendingIds.map(id => fetch(`${BASE_PATH}/api/social-contract/records/${id}`, {
                     method: 'DELETE',
@@ -3740,7 +3934,7 @@
                         showToast('Failed to delete records. Please try again.', 'error');
                     }
                 });
-            });
+            }
         }
         // Floating portal for the status filter menu (avoid overflow clipping)
         function setupStatusFilterPortal() {
