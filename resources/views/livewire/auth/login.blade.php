@@ -47,13 +47,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
             // Ensure no stale remember cookie keeps the user logged in after browser close
             try {
-                $recaller = Auth::guard('web')->getRecallerName();
-                // Ensure we forget the cookie with the same path/domain as it was set
-                Cookie::queue(Cookie::forget(
-                    $recaller,
-                    config('session.path', '/'),
-                    config('session.domain')
-                ));
+                $guard = Auth::guard('web');
+                if (method_exists($guard, 'getRecallerName')) {
+                    $recaller = $guard->getRecallerName();
+                    // Ensure we forget the cookie with the same path/domain as it was set
+                    Cookie::queue(Cookie::forget(
+                        $recaller,
+                        config('session.path', '/'),
+                        config('session.domain')
+                    ));
+                }
             } catch (\Throwable $e) { /* ignore */ }
 
             $this->redirect(route('verification.prompt'), navigate: true);
@@ -74,12 +77,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // If remember is NOT checked, proactively clear any stale recaller cookie before new login
         if (! $this->remember) {
             try {
-                $recaller = Auth::guard('web')->getRecallerName();
-                Cookie::queue(Cookie::forget(
-                    $recaller,
-                    config('session.path', '/'),
-                    config('session.domain')
-                ));
+                $guard = Auth::guard('web');
+                if (method_exists($guard, 'getRecallerName')) {
+                    $recaller = $guard->getRecallerName();
+                    Cookie::queue(Cookie::forget(
+                        $recaller,
+                        config('session.path', '/'),
+                        config('session.domain')
+                    ));
+                }
             } catch (\Throwable $e) { /* ignore */ }
         }
 
@@ -88,12 +94,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // If remember is NOT checked, ensure any existing remember cookie is cleared
         if (! $this->remember) {
             try {
-                $recaller = Auth::guard('web')->getRecallerName();
-                Cookie::queue(Cookie::forget(
-                    $recaller,
-                    config('session.path', '/'),
-                    config('session.domain')
-                ));
+                $guard = Auth::guard('web');
+                if (method_exists($guard, 'getRecallerName')) {
+                    $recaller = $guard->getRecallerName();
+                    Cookie::queue(Cookie::forget(
+                        $recaller,
+                        config('session.path', '/'),
+                        config('session.domain')
+                    ));
+                }
             } catch (\Throwable $e) { /* ignore */ }
         }
         
@@ -117,9 +126,24 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // Try to retrieve the user by email
         $credentials = ['email' => $this->email];
 
-        $user = $guard->getProvider()->retrieveByCredentials(array_merge($credentials, ['password' => $this->password]));
+        // Check if guard has getProvider method (SessionGuard does, Guard interface doesn't)
+        if (method_exists($guard, 'getProvider')) {
+            $provider = $guard->getProvider();
+            $user = $provider->retrieveByCredentials(array_merge($credentials, ['password' => $this->password]));
 
-        if (! $user || ! $guard->getProvider()->validateCredentials($user, ['password' => $this->password])) {
+            if (! $user || ! $provider->validateCredentials($user, ['password' => $this->password])) {
+                RateLimiter::hit($this->throttleKey());
+
+                throw ValidationException::withMessages([
+                    'email' => __('auth.failed'),
+                ]);
+            }
+
+            return $user;
+        }
+
+        // Fallback: attempt authentication directly
+        if (! Auth::guard('web')->attempt(['email' => $this->email, 'password' => $this->password], false)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -127,7 +151,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             ]);
         }
 
-        return $user;
+        return Auth::guard('web')->user();
     }
 
     /**

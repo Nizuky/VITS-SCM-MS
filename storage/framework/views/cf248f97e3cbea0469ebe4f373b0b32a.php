@@ -105,6 +105,12 @@
         .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn-primary-purple svg { stroke: #ffffff !important; }
+        /* Also support bg-primary-purple variant */
+        .btn.bg-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+        .btn.bg-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+        .btn.bg-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
+        .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
+        .btn.bg-primary-purple svg { stroke: #ffffff !important; }
     /* Success button overrid   e: keep consistent across themes and over DaisyUI */
         .btn.bg-success-green,
         .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
@@ -200,6 +206,20 @@
         [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
         [data-theme="dark"] .btn.bg-success-green:focus,
         [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
+        /* Preserve primary-purple button styling in dark mode */
+        [data-theme="dark"] .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+        [data-theme="dark"] .btn-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
+        [data-theme="dark"] .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn-primary-purple svg { stroke: #ffffff !important; }
+        [data-theme="dark"] .btn-primary-purple span { color: #ffffff !important; }
+        /* Also support bg-primary-purple variant in dark mode */
+        [data-theme="dark"] .btn.bg-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
+        [data-theme="dark"] .btn.bg-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
+        [data-theme="dark"] .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-primary-purple svg { stroke: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-primary-purple span { color: #ffffff !important; }
     </style>
     <style>
         /* Custom Progress Stepper Styles - Horizontal inline */
@@ -556,6 +576,24 @@
         [data-theme="dark"] .mark-done-info-icon { color: #93c5fd !important; }
         [data-theme="dark"] .mark-done-info-label { color: #93c5fd !important; }
         [data-theme="dark"] .mark-done-info-text { color: #bfdbfe !important; }
+        
+        /* Status Records Modal - Dark Mode Styles */
+        [data-theme="dark"] .status-modal-empty-icon { color: #6b7280 !important; }
+        [data-theme="dark"] .status-modal-empty-title { color: #d1d5db !important; }
+        [data-theme="dark"] .status-modal-empty-subtitle { color: #9ca3af !important; }
+        
+        /* All Notifications Modal - Dark Mode Styles */
+        [data-theme="dark"] .notif-inactive-warning { background-color: rgba(153, 27, 27, 0.2) !important; border-color: #991b1b !important; }
+        [data-theme="dark"] .notif-inactive-icon { color: #fca5a5 !important; }
+        [data-theme="dark"] .notif-inactive-title { color: #fca5a5 !important; }
+        [data-theme="dark"] .notif-inactive-text { color: #fecaca !important; }
+        [data-theme="dark"] .notif-inactive-strong { color: #fef2f2 !important; }
+        [data-theme="dark"] .notif-inactive-note { color: #fca5a5 !important; }
+        
+        /* Ticket Details Modal - Dark Mode Styles */
+        [data-theme="dark"] .ticket-detail-label { color: #d1d5db !important; }
+        [data-theme="dark"] .ticket-detail-value { color: #ffffff !important; }
+        [data-theme="dark"] .ticket-detail-date { color: #d1d5db !important; }
         
         /* Status filter dropdown styles */
         #status-filter-dropdown .btn{color:#707EAE;min-height:auto;height:auto;padding:0.25rem 0.5rem}
@@ -1493,11 +1531,11 @@
             
             <!-- Empty State -->
             <div id="status-modal-empty" class="hidden text-center py-12">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4 status-modal-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <p class="text-gray-500 text-lg font-semibold">No records found</p>
-                <p class="text-gray-400 text-sm mt-2">There are no records with this status yet.</p>
+                <p class="text-gray-500 text-lg font-semibold status-modal-empty-title">No records found</p>
+                <p class="text-gray-400 text-sm mt-2 status-modal-empty-subtitle">There are no records with this status yet.</p>
             </div>
             
             <!-- Summary Footer -->
@@ -1743,18 +1781,18 @@
                         $daysRemaining = max(0, (int) ceil($totalHours / 24));
                         $hoursRemaining = max(0, (int) $totalHours);
                     ?>
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm sticky top-0 z-10">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm sticky top-0 z-10 notif-inactive-warning">
                         <div class="flex items-start gap-3">
                             <div class="flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 notif-inactive-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h4 class="font-bold text-red-800 text-sm">⚠️ Account Inactive - Deletion Scheduled</h4>
-                                <p class="text-xs text-red-700 mt-1">
+                                <h4 class="font-bold text-red-800 text-sm notif-inactive-title">⚠️ Account Inactive - Deletion Scheduled</h4>
+                                <p class="text-xs text-red-700 mt-1 notif-inactive-text">
                                     Your account will be deleted in 
-                                    <strong class="text-red-900">
+                                    <strong class="text-red-900 notif-inactive-strong">
                                         <?php if($daysRemaining > 0): ?>
                                             <?php echo e($daysRemaining); ?> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?>
 
@@ -1765,7 +1803,7 @@
                                     </strong>
                                     (<?php echo e($deletionDate->format('M d, Y')); ?>)
                                 </p>
-                                <p class="text-xs text-red-600 mt-1">Contact your administrator immediately to reactivate your account.</p>
+                                <p class="text-xs text-red-600 mt-1 notif-inactive-note">Contact your administrator immediately to reactivate your account.</p>
                             </div>
                         </div>
                     </div>
@@ -1865,38 +1903,38 @@
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p class="text-sm font-semibold text-gray-600">Ticket ID</p>
-                        <p id="modal-ticket-id" class="text-lg font-bold text-gray-900"></p>
+                        <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Ticket ID</p>
+                        <p id="modal-ticket-id" class="text-lg font-bold text-gray-900 ticket-detail-value"></p>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-600">Status</p>
+                        <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Status</p>
                         <div id="modal-ticket-status" class="inline-block mt-1"></div>
                     </div>
                 </div>
                 
                 <div>
-                    <p class="text-sm font-semibold text-gray-600">Student Name</p>
-                    <p id="modal-ticket-student" class="text-base text-gray-900"></p>
+                    <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Student Name</p>
+                    <p id="modal-ticket-student" class="text-base text-gray-900 ticket-detail-value"></p>
                 </div>
                 
                 <div>
-                    <p class="text-sm font-semibold text-gray-600">Issue Type</p>
-                    <p id="modal-ticket-type" class="text-base text-gray-900"></p>
+                    <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Issue Type</p>
+                    <p id="modal-ticket-type" class="text-base text-gray-900 ticket-detail-value"></p>
                 </div>
                 
                 <div>
-                    <p class="text-sm font-semibold text-gray-600">Details</p>
-                    <p id="modal-ticket-details" class="text-base text-gray-900 whitespace-pre-wrap"></p>
+                    <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Details</p>
+                    <p id="modal-ticket-details" class="text-base text-gray-900 whitespace-pre-wrap ticket-detail-value"></p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div>
-                        <p class="text-sm font-semibold text-gray-600">Submitted</p>
-                        <p id="modal-ticket-submitted" class="text-sm text-gray-700"></p>
+                        <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Submitted</p>
+                        <p id="modal-ticket-submitted" class="text-sm text-gray-700 ticket-detail-date"></p>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-600">Last Updated</p>
-                        <p id="modal-ticket-updated" class="text-sm text-gray-700"></p>
+                        <p class="text-sm font-semibold text-gray-600 ticket-detail-label">Last Updated</p>
+                        <p id="modal-ticket-updated" class="text-sm text-gray-700 ticket-detail-date"></p>
                     </div>
                 </div>
             </div>
