@@ -143,6 +143,17 @@
         .bg-gradient-verified { background-image: linear-gradient(to bottom, #D1FAE5, #5EEAD4); }
         .bg-gradient-pending { background-image: linear-gradient(to bottom, #FFF4DE, #FFE0A2); }
         .bg-gradient-rejected { background-image: linear-gradient(to bottom, #FFE2E5, #FFB7BE); }
+        /* Microsoft Edge and cross-browser fixes for responsive text */
+        #personalized-greeting h2,
+        #personalized-greeting p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            -ms-word-wrap: break-word;
+        }
+        #personalized-greeting {
+            -ms-flex-wrap: nowrap;
+            flex-wrap: nowrap;
+        }
         /* Notification bell dot: force consistent color and visibility */
         .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border: 2px solid #ffffff !important; border-radius: 9999px; box-sizing: content-box; }
     </style>
@@ -841,13 +852,14 @@
                         <div 
                             id="personalized-greeting" 
                             class="absolute bottom-0 bg-gradient-primary-purple flex items-center rounded-2xl h-[190px] w-[90%] max-w-[800px] shadow-lg z-0 mx-auto left-0 right-0"
+                            style="display: flex; flex-wrap: nowrap; justify-content: space-between;"
                         >
                             <!-- Purple curved accent -->
                            <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
 
                             <!-- Left text content -->
-                            <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2">
-                                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-white">
+                            <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2" style="max-width: 55%; flex-shrink: 1; flex-grow: 0;">
+                                <h2 class="font-semibold text-white" style="font-size: clamp(1.25rem, 3vw, 1.875rem); line-height: 1.2;">
                                     Good Day, 
                                     <span class="text-white font-bold">
                                         <?php echo e(Str::of(auth()->user()->name)->explode(' ')->first()); ?>
@@ -855,22 +867,22 @@
                                     </span>
                                 </h2>
                                 <br class="hidden md:block">
-                                <p class="text-white text-xs sm:text-sm md:text-base mt-1">
+                                <p class="text-white mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
                                     Here you can manage your social <br class="hidden sm:block">
                                     contract and track your progress.
                                 </p>
-                                <p class="text-white font-bold text-xs sm:text-sm md:text-base mt-1">
+                                <p class="text-white font-bold mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
                                     We make it easier for you ka-VITS!
                                 </p>
                             </div>
                             <!-- Pending hours donut -->
-                            <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 p-4">
-                                <h2 class="text-sm sm:text-base md:text-xl font-bold text-white mb-2 md:mb-4">Pending Hours</h2>
+                            <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 p-4" style="flex-shrink: 0;">
+                                <h2 class="font-bold text-white mb-2 md:mb-4" style="font-size: clamp(0.875rem, 2vw, 1.25rem);">Pending Hours</h2>
                                 <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
                                     <canvas id="pendingHoursChart"></canvas>
                                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span class="text-xl sm:text-2xl md:text-3xl font-bold text-white" id="pending-hours-label">0%</span>
-                                        <p class="text-xs sm:text-sm text-white" id="pending-amount">0h of 160h</p>
+                                        <span class="font-bold text-white" id="pending-hours-label" style="font-size: clamp(1.25rem, 3vw, 1.875rem);">0%</span>
+                                        <p class="text-white" id="pending-amount" style="font-size: clamp(0.75rem, 1.5vw, 0.875rem);">0h of 160h</p>
                                     </div>
                                 </div>
                             </div>

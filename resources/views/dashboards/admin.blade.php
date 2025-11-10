@@ -95,6 +95,8 @@ body{font-family:'Inter',sans-serif}
 .bg-gradient-pending{background-image:linear-gradient(to bottom,#FFF4DE,#FFE0A2)}
 .bg-gradient-accepted{background-image:linear-gradient(to bottom,#e1fff8ff,#2ce0e0ff)}
 .bg-gradient-rejected{background-image:linear-gradient(to bottom,#FFE2E5,#FFB7BE)}
+.bg-gradient-primary-purple h2,.bg-gradient-primary-purple p{word-wrap:break-word;overflow-wrap:break-word;-ms-word-wrap:break-word}
+.bg-gradient-primary-purple{-ms-flex-wrap:nowrap;flex-wrap:nowrap}
 .custom-tab-wrapper{background-color:white;border-radius:0.5rem;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);padding:0.5rem}
 .custom-tab{font-weight:600;color:#707EAE;padding:0.5rem 1.25rem;border-bottom:3px solid transparent;transition:all 0.2s ease-in-out;cursor:pointer}
 .custom-tab:hover{color:#6D28D9}
@@ -354,36 +356,36 @@ body {
                 
                 <!-- Welcome Greeting Card -->
                 <div class="relative rounded-2xl bg-transparent p-2 mb-6 h-[190px]">
-                    <div class="bg-gradient-primary-purple flex items-center rounded-2xl h-[190px] w-full shadow-lg relative overflow-hidden">
+                    <div class="bg-gradient-primary-purple flex items-center rounded-2xl h-[190px] w-full shadow-lg relative overflow-hidden" style="display: flex; flex-wrap: nowrap; justify-content: space-between;">
                         <!-- Purple curved accent -->
                         <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
                         
                         <!-- Left text content -->
-                        <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2">
-                            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-white">
+                        <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2" style="max-width: 55%; flex-shrink: 1; flex-grow: 0;">
+                            <h2 class="font-semibold text-white" style="font-size: clamp(1.25rem, 3vw, 1.875rem); line-height: 1.2;">
                                 Welcome, 
                                 <span class="text-white font-bold">
                                     {{ Str::of(auth('admin')->user()->name)->explode(' ')->first() }}
                                 </span>
                             </h2>
                             <br class="hidden md:block">
-                            <p class="text-white text-xs sm:text-sm md:text-base mt-1">
+                            <p class="text-white mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
                                 Manage student submissions and <br class="hidden sm:block">
                                 monitor social contract compliance.
                             </p>
-                            <p class="text-white font-bold text-xs sm:text-sm md:text-base mt-1">
+                            <p class="text-white font-bold mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
                                 Empowering ka-VITS through efficient administration!
                             </p>
                         </div>
                         
                         <!-- Pending Requests Donut -->
-                        <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 md:mr-8 p-4">
-                            <h2 class="text-sm sm:text-base md:text-xl font-bold text-white mb-2 md:mb-4">Pending Requests</h2>
+                        <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 md:mr-8 p-4" style="flex-shrink: 0;">
+                            <h2 class="font-bold text-white mb-2 md:mb-4" style="font-size: clamp(0.875rem, 2vw, 1.25rem);">Pending Requests</h2>
                             <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
                                 <canvas id="pendingRequestsChart"></canvas>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-xl sm:text-2xl md:text-3xl font-bold text-white" id="pending-requests-label">0</span>
-                                    <p class="text-xs sm:text-sm text-white">Requests</p>
+                                    <span class="font-bold text-white" id="pending-requests-label" style="font-size: clamp(1.25rem, 3vw, 1.875rem);">0</span>
+                                    <p class="text-white" style="font-size: clamp(0.75rem, 1.5vw, 0.875rem);">Requests</p>
                                 </div>
                             </div>
                         </div>
