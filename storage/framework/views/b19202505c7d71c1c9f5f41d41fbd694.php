@@ -352,6 +352,53 @@ body {
 .overflow-x-auto.overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background-color: rgba(107, 114, 128, 0.7);
 }
+
+/* Collapsible sidebar styles */
+#sidebar {
+    transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
+}
+
+#sidebar.collapsed {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
+#sidebar.collapsed .menu-text,
+#sidebar.collapsed #admin-name,
+#sidebar.collapsed #admin-role,
+#sidebar.collapsed #collapse-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#sidebar.collapsed #avatar-container {
+    width: 48px;
+    height: 48px;
+}
+
+#sidebar.collapsed #avatar-circle {
+    width: 48px !important;
+    height: 48px !important;
+}
+
+#sidebar.collapsed #avatar-initials {
+    font-size: 1.25rem;
+}
+
+#sidebar.collapsed #menu-list a,
+#sidebar.collapsed ul.menu a,
+#sidebar.collapsed ul.menu button {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#sidebar.collapsed #collapse-icon {
+    transform: rotate(180deg);
+}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -387,79 +434,87 @@ body {
 
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
-         <aside class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden" style="width: 200px; min-width: 200px; max-width: 200px;">
+         <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Profile Section -->
-            <div class="flex flex-col items-center text-center p-4 border-b border-gray-200">
-                <div class="avatar placeholder mb-3">
-                    <div class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none" 
+            <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
+                <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
+                    <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" 
                          title="<?php echo e($fullName); ?>" 
                          aria-label="<?php echo e($fullName); ?>">
-                        <span class="text-3xl font-bold leading-none"><?php echo e($initials); ?></span>
+                        <span id="avatar-initials" class="text-3xl font-bold leading-none transition-all duration-300"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 class="font-bold text-lg"><?php echo e($fullName); ?></h2>
-                <p class="text-sm text-gray-500">Administrator</p>
+                <h2 id="admin-name" class="font-bold text-lg transition-opacity duration-300"><?php echo e($fullName); ?></h2>
+                <p id="admin-role" class="text-sm text-gray-500 transition-opacity duration-300">Administrator</p>
             </div>
 
             <!-- Main Navigation -->
-            <ul class="menu p-0 my-4 flex-grow">
+            <ul id="menu-list" class="menu p-0 my-4 flex-grow transition-all duration-300">
                 <li>
-                    <a class="py-3 pl-2" id="nav-dashboard" onclick="showPage('dashboard')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <a class="py-3 pl-2 transition-all duration-300" id="nav-dashboard" onclick="showPage('dashboard')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                         </svg>
-                        Dashboard
+                        <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a class="py-3 pl-2" id="nav-submission" onclick="showPage('submission')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <a class="py-3 pl-2 transition-all duration-300" id="nav-submission" onclick="showPage('submission')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        Submission
+                        <span class="menu-text">Submission</span>
                     </a>
                 </li>
                 <li>
-                    <a class="py-3 pl-2" id="nav-data-management" onclick="showPage('data-management')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <a class="py-3 pl-2 transition-all duration-300" id="nav-data-management" onclick="showPage('data-management')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
-                        Data Management
+                        <span class="menu-text">Data Management</span>
                     </a>
                 </li>
             </ul>
 
             <!-- Bottom Navigation -->
-            <ul class="menu p-0">
+            <ul class="menu p-0 transition-all duration-300">
                 <li>
-                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0" 
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" 
                        id="nav-settings" 
                        onclick="showPage('settings')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/>
                             <circle cx="12" cy="12" r="3"/>
                         </svg>
-                        Settings
+                        <span class="menu-text">Settings</span>
                     </a>
                 </li>
                 <li>
                     <form id="logout-form-visible" 
                           action="<?php echo e(route('admin.logout')); ?>" 
                           method="POST" 
-                          class="m-0 p-0 pl-2 pr-0" 
+                          class="m-0 p-0 w-full flex" 
                           novalidate>
                         <?php echo csrf_field(); ?>
                         <button id="logout-button-visible" 
                                 type="button" 
-                                class="py-3 px-0 w-full text-left flex items-center gap-2 min-h-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                             </svg>
-                            Log Out
+                            <span class="menu-text">Log Out</span>
                         </button>
                     </form>
                 </li>
             </ul>
+            
+            <!-- Collapse button -->
+            <button id="collapse-btn" class="btn btn-ghost btn-sm w-full mt-2">
+                <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
+                <span id="collapse-text">Hide</span>
+            </button>
         </aside>
 
         <!-- Main Content -->
@@ -2882,6 +2937,30 @@ body {
         // Run both periodically (works alongside SessionKeeper)
         setInterval(refreshCsrf, 30 * 60 * 1000); // 30 minutes
         setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
+        
+        // Sidebar collapse functionality
+        (function() {
+            const sidebar = document.getElementById('sidebar');
+            const collapseBtn = document.getElementById('collapse-btn');
+            const collapseText = document.getElementById('collapse-text');
+            
+            // Load saved state from localStorage
+            const savedState = localStorage.getItem('scms_admin_sidebar_collapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+                collapseText.textContent = 'Show';
+            }
+            
+            // Toggle collapse on button click
+            collapseBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
+                
+                // Save state to localStorage
+                localStorage.setItem('scms_admin_sidebar_collapsed', isCollapsed);
+            });
+        })();
     </script>
 </body>
 </html>
