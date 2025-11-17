@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -463,877 +463,18 @@ body {
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col gap-6" id="page-container">
+        <main class="flex-1 flex flex-col gap-6 min-w-0" id="page-container">
             
-            <!-- Dashboard Overview Page -->
-            <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
-                <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Admin Dashboard</h1>
-                
-                <!-- Welcome Greeting Card -->
-                <div class="relative rounded-2xl bg-transparent p-2 mb-6 h-[190px]">
-                    <div class="bg-gradient-primary-purple flex items-center rounded-2xl h-[190px] w-full shadow-lg relative overflow-hidden" style="display: flex; flex-wrap: nowrap; justify-content: space-between;">
-                        <!-- Purple curved accent -->
-                        <div class="absolute top-0 left-0 w-[120px] h-[120px] bg-gradient-to-r from-primary-purple to-transparent rounded-br-full opacity-70"></div>
-                        
-                        <!-- Left text content -->
-                        <div class="relative z-10 ml-2 pl-4 sm:pl-6 md:pl-10 pr-2" style="max-width: 55%; flex-shrink: 1; flex-grow: 0;">
-                            <h2 class="font-semibold text-white" style="font-size: clamp(1.25rem, 3vw, 1.875rem); line-height: 1.2;">
-                                Welcome, 
-                                <span class="text-white font-bold">
-                                    {{ Str::of(auth('admin')->user()->name)->explode(' ')->first() }}
-                                </span>
-                            </h2>
-                            <br class="hidden md:block">
-                            <p class="text-white mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
-                                Manage student submissions and <br class="hidden sm:block">
-                                monitor social contract compliance.
-                            </p>
-                            <p class="text-white font-bold mt-1" style="font-size: clamp(0.75rem, 1.5vw, 1rem); line-height: 1.4;">
-                                Empowering ka-VITS through efficient administration!
-                            </p>
-                        </div>
-                        
-                        <!-- Pending Requests Donut -->
-                        <div class="flex flex-col items-center ml-auto mr-2 sm:mr-4 md:mr-8 p-4" style="flex-shrink: 0;">
-                            <h2 class="font-bold text-white mb-2 md:mb-4" style="font-size: clamp(0.875rem, 2vw, 1.25rem);">Pending Requests</h2>
-                            <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
-                                <canvas id="pendingRequestsChart"></canvas>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="font-bold text-white" id="pending-requests-label" style="font-size: clamp(1.25rem, 3vw, 1.875rem);">0</span>
-                                    <p class="text-white" style="font-size: clamp(0.75rem, 1.5vw, 0.875rem);">Requests</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Statistics Cards -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h2 class="text-xl font-bold text-text-header mb-1">Monthly Summary</h2>
-                            <p class="text-sm text-text-muted">Contract requests overview for this month</p>
-                        </div>
-                        <button onclick="loadDashboardStats(); generateActivityCalendar();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                            <span class="hidden md:inline">Refresh</span>
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Pending Requests -->
-                        <div class="bg-gradient-pending p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Pending')">
-                            <div class="bg-white p-2 rounded-full w-min">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-text-header"><span id="pending-requests-count">0</span> Requests</h3>
-                                <p class="text-yellow-800 font-semibold">Pending</p>
-                                <p class="text-xs text-text-muted mt-1">Awaiting review</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Accepted Requests -->
-                        <div class="bg-gradient-accepted p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Verified')">
-                            <div class="bg-white p-2 rounded-full w-min">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-text-header"><span id="accepted-requests-count">0</span> Requests</h3>
-                                <p class="text-[#0e4848ff] font-semibold">Verified This Month</p>
-                                <p class="text-xs text-text-muted mt-1">Successfully verified</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Rejected Requests -->
-                        <div class="bg-gradient-rejected p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Rejected')">
-                            <div class="bg-white p-2 rounded-full w-min">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-text-header"><span id="rejected-requests-count">0</span> Requests</h3>
-                                <p class="text-red-800 font-semibold">Rejected This Month</p>
-                                <p class="text-xs text-text-muted mt-1">Requires corrections</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Calendar -->
-                <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                        <div>
-                            <h2 class="text-base sm:text-lg md:text-xl font-bold text-text-header">Contract Update Activity</h2>
-                            <p class="text-xs sm:text-sm text-text-muted">Days when contracts were reviewed and updated (updates tracked in real-time)</p>
-                        </div>
-                       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
-                            <div class="flex items-center gap-3 text-xs">
-                                <span class="text-text-muted">Less</span>
-                                <div class="flex gap-1">
-                                    <div class="w-3 h-3 rounded-sm activity-legend-0" title="No activity"></div>
-                                    <div class="w-3 h-3 rounded-sm activity-legend-1" title="1-2 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm activity-legend-2" title="3-4 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm activity-legend-3" title="5-6 updates"></div>
-                                    <div class="w-3 h-3 rounded-sm activity-legend-4" title="7+ updates"></div>
-                                </div>
-                                <span class="text-text-muted">More</span>
-                            </div>
-                            <!-- Year Navigation -->
-                            <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                                <button id="prev-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(-1)" title="Previous year">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
-                                <span id="calendar-year" class="text-sm font-bold text-text-header min-w-[60px] text-center">2025</span>
-                                <button id="next-year-btn" class="btn btn-ghost btn-xs" onclick="changeCalendarYear(1)" title="Next year">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="activity-calendar" class="overflow-x-auto pb-2">
-                        <!-- Calendar will be dynamically generated by JavaScript -->
-                        <!-- Data source: loadActivityData() function calls API endpoint -->
-                    </div>
-                </div>
-
-                <!-- Yearly Approved and Rejected Records Charts -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                    <!-- Yearly Approved Records -->
-                    <div class="bg-white rounded-2xl p-6 shadow-sm">
-                        <h2 class="text-xl font-bold text-text-header mb-4">Yearly Approved Records</h2>
-                        <div class="relative" style="height: 300px;">
-                            <canvas id="yearlyApprovedChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Yearly Rejected Records -->
-                    <div class="bg-white rounded-2xl p-6 shadow-sm">
-                        <h2 class="text-xl font-bold text-text-header mb-4">Yearly Rejected Records</h2>
-                        <div class="relative" style="height: 300px;">
-                            <canvas id="yearlyRejectedChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Submission Page -->
-            <div id="submission-page" class="page-content hidden">
-                <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
-                <br>
-                
-                <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
-                    <!-- Tabs -->
-                    <div class="flex space-x-2 custom-tab-wrapper w-full md:w-auto" style="min-width: 220px;">
-                        <a role="tab" class="custom-tab custom-tab-active whitespace-nowrap" onclick="filterSubmissions('Pending',this)">Pending</a>
-                        <a role="tab" class="custom-tab whitespace-nowrap" onclick="filterSubmissions('Archived',this)">Archived</a>
-                    </div>
-                    
-                    <!-- Search -->
-                    <label class="input input-bordered flex items-center gap-2 rounded-lg bg-white h-10 w-full md:w-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70">
-                            <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd"/>
-                        </svg>
-                        <input type="text" class="grow bg-transparent" placeholder="Search" id="search-input">
-                    </label>
-                    
-                    <!-- Refresh Button -->
-                    <button id="refresh-submissions-btn" onclick="refreshSubmissions()" class="btn btn-ghost btn-sm h-10 gap-2" title="Refresh submissions">
-                        <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
-                        <span class="hidden md:inline">Refresh</span>
-                    </button>
-                </div>
-
-                <!-- Submission Table -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-                    <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(110vh - 280px); max-width: calc(110vw - 280px);">
-                        <table class="table table-xs table-pin-rows">
-                            <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
-                                <tr style="background-color: #f9fafb !important;">
-                                    <th class="text-center" style="min-width: 90px; width: 90px; height: 60px; white-space: nowrap;">
-                                        <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
-                                            Student ID
-                                            <span id="studentid-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="min-width: 140px; width: 140px; height: 60px; white-space: nowrap;">
-                                        <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
-                                            Student Name
-                                            <span id="studentname-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="min-width: 110px; width: 110px; height: 60px; white-space: nowrap;">
-                                        <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
-                                            Event Name
-                                            <span id="eventname-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="min-width: 140px; width: 140px; height: 60px;">
-                                        <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col font-bold" title="Sort by Organization/Supervisor">
-                                            <span style="white-space: nowrap;">Organization/Supervisor</span>
-                                            <span id="organization-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="min-width: 80px; width: 80px; height: 60px; white-space: nowrap;">
-                                        <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
-                                            Hours
-                                            <span id="hours-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" style="min-width: 80px; width: 80px; height: 60px; white-space: nowrap;">
-                                        <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
-                                            Date
-                                            <span id="date-sort-indicator">⇅</span>
-                                        </button>
-                                    </th>
-                                    <th class="text-center" id="action-status-header" style="min-width: 180px; width: 180px; height: 60px;">
-                                        <div class="flex items-center justify-center gap-1 font-bold">
-                                            <span id="action-label">Action</span>
-                                        </div>
-                                        <div class="hidden flex items-center justify-center gap-1 font-bold" id="status-header-wrapper">
-                                            <div class="flex items-center justify-center gap-1">
-                                                <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
-                                                    Status
-                                                    <span id="status-sort-indicator">⇅</span>
-                                                </button>
-                                                <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
-                                                    <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1.5A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
-                                                        </svg>
-                                                    </div>
-                                                    <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow bg-base-100 rounded-box w-32">
-                                                        <li><a onclick="filterTableByStatus('All', event)">All</a></li>
-                                                        <li><a onclick="filterTableByStatus('Verified', event)">Verified</a></li>
-                                                        <li><a onclick="filterTableByStatus('Approved', event)">Approved</a></li>
-                                                        <li><a onclick="filterTableByStatus('Rejected', event)">Rejected</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="submission-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Management Page -->
-            <div id="data-management-page" class="page-content hidden flex flex-col">
-                <div class="p-4">
-                    <h4 class="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-purple">Data Management</h4>
-                    <p class="text-xs md:text-sm text-text-muted mt-2">Manage rejected records and inactive accounts</p>
-                </div>
-
-                <!-- Rejected Records Section -->
-                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm mb-6">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                        <div>
-                            <h2 class="text-lg md:text-xl font-bold text-text-header">Rejected Records</h2>
-                            <p class="text-xs md:text-sm text-text-muted">Records rejected more than 7 days ago are eligible for deletion</p>
-                        </div>
-                        <button id="delete-all-eligible-records-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="document.getElementById('confirm_delete_all_records_modal').showModal()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            <span class="hidden sm:inline">Delete All Eligible Records</span>
-                            <span class="sm:hidden">Delete All</span>
-                        </button>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="table table-zebra w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="text-center">Student Name</th>
-                                    <th class="text-center">Event Name</th>
-                                    <th class="text-center">Rejected Date</th>
-                                    <th class="text-center">Days Since Rejection</th>
-                                    <th class="text-center">Deletion Eligible</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rejected-records-table">
-                                <tr><td colspan="6" class="text-center text-gray-500 py-4">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Inactive Accounts Section -->
-                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                        <div>
-                            <h2 class="text-lg md:text-xl font-bold text-text-header">Inactive Accounts</h2>
-                            <p class="text-xs md:text-sm text-text-muted">Accounts inactive for more than 7 days are eligible for deletion</p>
-                        </div>
-                        <button id="delete-all-eligible-accounts-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="document.getElementById('confirm_delete_all_accounts_modal').showModal()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            <span class="hidden sm:inline">Delete All Eligible Accounts</span>
-                            <span class="sm:hidden">Delete All</span>
-                        </button>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="table table-zebra w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="text-center">Student Name</th>
-                                    <th class="text-center">Student Number</th>
-                                    <th class="text-center">Email</th>
-                                    <th class="text-center">Inactive Since</th>
-                                    <th class="text-center">Days Inactive</th>
-                                    <th class="text-center">Time Until Deletion</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inactive-accounts-table">
-                                <tr><td colspan="7" class="text-center text-gray-500 py-4">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page -->
-            <div id="settings-page" class="page-content hidden">
-                <div class="flex items-center justify-between p-4">
-                    <h4 class="text-4xl font-bold text-primary-purple">Settings</h4>
-                    <label class="label cursor-pointer flex items-center gap-3">
-                        <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
-                        <input id="theme-toggle" type="checkbox" class="toggle toggle-primary">
-                    </label>
-                </div>
-                
-                <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-                    <!-- Change Name Section -->
-                    <div class="border-b border-gray-200 pb-6">
-                        <h2 class="text-xl font-bold text-text-header mb-4">Change Name</h2>
-                        <form id="name-change-form" class="space-y-4 max-w-md">
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">Full Name</span>
-                                </div>
-                                <input id="admin-name" type="text" value="{{ auth()->guard('admin')->user()->name }}" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
-                            </label>
-                            
-                            <div class="pt-4 flex justify-end">
-                                <button type="button" id="save-name-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
-                                    Update Name
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Change Password Section -->
-                    <div>
-                        <h2 class="text-xl font-bold text-text-header mb-4">Change Password</h2>
-                        <p class="text-sm text-text-muted mb-4">A verification email will be sent to <strong>{{ auth()->guard('admin')->user()->email }}</strong> to confirm your password change.</p>
-                        
-                        <form id="password-change-form" class="space-y-4 max-w-md">
-                        <!-- Current Password -->
-                        <label class="form-control w-full">
-                            <div class="label">
-                                <span class="label-text font-semibold">Current Password</span>
-                            </div>
-                            <label class="input input-bordered flex items-center gap-2 rounded-lg">
-                                <input id="current-password" type="password" placeholder="" class="grow" required>
-                                <button type="button" class="btn btn-ghost btn-xs" onclick="togglePasswordVisibility('current-password')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                                    </svg>
-                                </button>
-                            </label>
-                        </label>
-
-                        <!-- New Password -->
-                        <label class="form-control w-full">
-                            <div class="label">
-                                <span class="label-text font-semibold">New Password</span>
-                            </div>
-                            <label class="input input-bordered flex items-center gap-2 rounded-lg">
-                                <input id="new-password" type="password" placeholder="" class="grow" required>
-                                <button type="button" class="btn btn-ghost btn-xs" onclick="togglePasswordVisibility('new-password')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                                    </svg>
-                                </button>
-                            </label>
-                        </label>
-
-                        <!-- Confirm Password -->
-                        <label class="form-control w-full">
-                            <div class="label">
-                                <span class="label-text font-semibold">Confirm Password</span>
-                            </div>
-                            <label class="input input-bordered flex items-center gap-2 rounded-lg">
-                                <input id="confirm-password" type="password" placeholder="" class="grow" required>
-                                <button type="button" class="btn btn-ghost btn-xs" onclick="togglePasswordVisibility('confirm-password')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                                    </svg>
-                                </button>
-                            </label>
-                        </label>
-
-                        <div class="pt-4 flex justify-end">
-                            <button type="button" id="save-password-button" class="btn bg-success-green hover:bg-success-green-hover text-white rounded-lg">
-                                Request Password Change
-                            </button>
-                        </div>
-                    </form>
-                    </div>
-                </div>
-            </div>
+            <!-- Include Page Partials -->
+            @include('partials.admin.dashboard-page')
+            @include('partials.admin.submission-page')
+            @include('partials.admin.data-management-page')
+            @include('partials.admin.settings-page')
         </main>
     </div>
 
-    <!-- Modals -->
-    <!-- Activity Details Modal -->
-    <!-- Activity Details Modal -->
-    <dialog id="activity_details_modal" class="modal">
-        <div class="modal-box w-11/12 max-w-2xl">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date-header"></span></h3>
-            
-            <div id="activity-details-content" class="space-y-3">
-                <!-- Activity details will be loaded here -->
-            </div>
-            
-            <div id="activity-loading" class="text-center py-8">
-                <span class="loading loading-spinner loading-lg text-primary-purple"></span>
-                <p class="mt-2 text-text-muted">Loading activities...</p>
-            </div>
-            
-            <div id="activity-no-data" class="text-center py-8 hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <p class="mt-4 text-text-muted">No activity recorded on this date</p>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-    
-    <!-- Verify Modal -->
-    <dialog id="verify_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Verify Submission</h3>
-            <p class="py-4">Are you sure you want to verify this submission?</p>
-            <div class="modal-action">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn">Cancel</button>
-                    <button id="confirm-verify-btn" class="btn bg-success-green hover:bg-success-green-hover text-white">
-                        Yes, verify
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Reject Modal -->
-    <dialog id="reject_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg text-text-header">Reject Submission</h3>
-            <p class="py-4 text-text-body">Please select or provide a reason for rejecting this submission. The student will be notified.</p>
-            
-            <label class="form-control w-full mb-4">
-                <div class="label">
-                    <span class="label-text font-semibold">Rejection Reason</span>
-                </div>
-                <select id="rejection-reason-select" class="select select-bordered w-full">
-                    <option disabled selected value="">Select a reason</option>
-                    <option value="Incorrect or Invalid Information&#10;The provided details do not match official PLV records or contain false information.">
-                        Incorrect or Invalid Information
-                    </option>
-                    <option value="Duplicate Submission&#10;The same form or request has already been submitted and is recorded in the system.">
-                        Duplicate Submission
-                    </option>
-                    <option value="Late Submission&#10;The form was filed beyond the official deadline or submission period.">
-                        Late Submission
-                    </option>
-                    <option value="Others">Others</option>
-                </select>
-            </label>
-            
-            <label id="other-reason-label" class="form-control w-full hidden">
-                <div class="label">
-                    <span class="label-text font-semibold">Specify Reason</span>
-                </div>
-                <textarea 
-                    id="reject-reason-textarea" 
-                    class="textarea textarea-bordered h-24 resize-none focus:outline-none focus:border-primary-purple" 
-                    placeholder="Please specify the reason for rejection..."
-                ></textarea>
-            </label>
-            
-            <div class="modal-action mt-6">
-                <form method="dialog" class="flex gap-2">
-                    <button class="btn btn-ghost" onclick="resetRejectModal()">Cancel</button>
-                    <button id="confirm-reject-btn" type="button" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
-                        Yes, reject
-                    </button>
-                </form>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Submission Details Modal -->
-    <dialog id="submission_details_modal" class="modal">
-        <div class="modal-box w-11/12 max-w-2xl p-6 relative">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <h3 class="font-bold text-lg text-text-header mb-6">Social Contract Record</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div class="col-span-full">
-                    <label class="details-label">Event name</label>
-                    <input type="text" id="details-event-name" class="details-input" readonly>
-                </div>
-                
-                <div class="col-span-full">
-                    <label class="details-label">Supervisor name</label>
-                    <input type="text" id="details-supervisor-name" class="details-input" readonly>
-                </div>
-                
-                <div class="col-span-full">
-                    <label class="details-label">Venue</label>
-                    <input type="text" id="details-venue" class="details-input" readonly>
-                </div>
-                
-                <div>
-                    <label class="details-label">Date</label>
-                    <div class="relative">
-                        <input type="text" id="details-date" class="details-input pr-10" readonly>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="details-label">Hours Rendered</label>
-                    <input type="text" id="details-hours-rendered" class="details-input" readonly>
-                </div>
-                
-                <div class="col-span-full">
-                    <label class="details-label">Name of Organizing Committee</label>
-                    <input type="text" id="details-organizing-committee" class="details-input" readonly>
-                </div>
-            </div>
-            
-            <div id="details-status-section" class="mt-6">
-                <label class="details-label">Status</label>
-                <div class="flex items-center gap-3">
-                    <div id="details-status-badge" class="status-badge"></div>
-                    <span id="details-action-date" class="text-sm text-gray-500"></span>
-                </div>
-            </div>
-            
-            <div id="details-reason-container" class="hidden mt-4 border-t pt-4">
-                <label class="details-label">Reason for Rejection</label>
-                <p class="font-medium whitespace-pre-line bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3 rounded-lg" style="color: #1a1a1a;" id="details-reason-text"></p>
-            </div>
-            
-            <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
-        </div>
-    </dialog>
-
-    <!-- Confirm Delete Single Record Modal -->
-    <dialog id="confirm_delete_record_modal" class="modal">
-        <div class="modal-box max-w-md">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <div class="flex items-center gap-3 mb-4">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-xl text-gray-900">Delete Record</h3>
-                    <p class="text-sm text-gray-600">Confirm deletion</p>
-                </div>
-            </div>
-            
-            <div class="divider my-4"></div>
-            
-            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg mb-4">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-yellow-800 mb-1">Warning</p>
-                        <p class="text-sm text-yellow-700">Are you sure you want to delete this rejected record? This action cannot be undone.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-action">
-                <form method="dialog" class="inline">
-                    <button type="button" class="btn btn-ghost">Cancel</button>
-                </form>
-                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteRecord()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete Record
-                </button>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <!-- Confirm Delete Single Account Modal -->
-    <dialog id="confirm_delete_account_modal" class="modal">
-        <div class="modal-box max-w-md">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <div class="flex items-center gap-3 mb-4">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-xl text-gray-900">Delete Account</h3>
-                    <p class="text-sm text-gray-600">Permanently remove user</p>
-                </div>
-            </div>
-            
-            <div class="divider my-4"></div>
-            
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-red-800 mb-1">Critical Warning</p>
-                        <p class="text-sm text-red-700">Are you sure you want to delete this inactive account? This will permanently remove the user and all their data including social contract records.</p>
-                        <p class="text-xs text-red-600 mt-2"><strong>This action cannot be undone.</strong></p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-action">
-                <form method="dialog" class="inline">
-                    <button type="button" class="btn btn-ghost">Cancel</button>
-                </form>
-                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAccount()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete Account
-                </button>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <!-- Confirm Delete All Records Modal -->
-    <dialog id="confirm_delete_all_records_modal" class="modal">
-        <div class="modal-box max-w-md">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <div class="flex items-center gap-3 mb-4">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-xl text-gray-900">Delete All Eligible Records</h3>
-                    <p class="text-sm text-gray-600">This action cannot be undone</p>
-                </div>
-            </div>
-            
-            <div class="divider my-4"></div>
-            
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-red-800 mb-1">Warning</p>
-                        <p class="text-sm text-red-700">You are about to permanently delete <strong>all rejected records</strong> that are older than 7 days. This will remove them from the system permanently.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-action">
-                <form method="dialog" class="inline">
-                    <button type="button" class="btn btn-ghost">Cancel</button>
-                </form>
-                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAllRecords()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete All Records
-                </button>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <!-- Confirm Delete All Accounts Modal -->
-    <dialog id="confirm_delete_all_accounts_modal" class="modal">
-        <div class="modal-box max-w-md">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <div class="flex items-center gap-3 mb-4">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-xl text-gray-900">Delete All Eligible Accounts</h3>
-                    <p class="text-sm text-gray-600">This will permanently remove users</p>
-                </div>
-            </div>
-            
-            <div class="divider my-4"></div>
-            
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-red-800 mb-1">Critical Warning</p>
-                        <p class="text-sm text-red-700">You are about to permanently delete <strong>all inactive accounts</strong> that have been inactive for more than 7 days. This will remove all user data including their social contract records.</p>
-                        <p class="text-xs text-red-600 mt-2"><strong>This action cannot be undone.</strong></p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-action">
-                <form method="dialog" class="inline">
-                    <button type="button" class="btn btn-ghost">Cancel</button>
-                </form>
-                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAllAccounts()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete All Accounts
-                </button>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <!-- Status Records Modal -->
-    <dialog id="status_records_modal" class="modal">
-        <div class="modal-box w-11/12 max-w-5xl">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
-            </form>
-            
-            <div class="flex items-center gap-3 mb-6">
-                <div id="status-modal-icon" class="bg-white p-3 rounded-full">
-                    <!-- Icon will be injected here -->
-                </div>
-                <div>
-                    <h3 class="font-bold text-2xl text-text-header" id="status-modal-title">Records</h3>
-                    <p class="text-sm text-text-muted" id="status-modal-subtitle">Showing all records with this status this week</p>
-                </div>
-            </div>
-            
-            <div class="divider my-4"></div>
-            
-            <!-- Records Table -->
-            <div class="overflow-x-auto">
-                <table class="table table-zebra w-full">
-                    <thead>
-                        <tr class="bg-base-200">
-                            <th class="text-center">Student ID</th>
-                            <th class="text-center">Student Name</th>
-                            <th class="text-center">Date</th>
-                            <th class="text-center">Event Name</th>
-                            <th class="text-center">Venue</th>
-                            <th class="text-center">Hours</th>
-                            <th class="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="status-modal-table-body">
-                        <!-- Records will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div id="status-modal-empty" class="hidden text-center py-12">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <p class="text-gray-500 text-lg font-semibold">No records found</p>
-                <p id="status-modal-empty-text" class="text-gray-400 text-sm mt-2">There are no records with this status.</p>
-            </div>
-            
-            <!-- Summary Footer -->
-            <div class="bg-base-200 rounded-lg p-4 mt-6 flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-text-muted">Total Records</p>
-                    <p class="text-xl font-bold text-text-header" id="status-modal-total">0</p>
-                </div>
-                <div>
-                    <p class="text-sm text-text-muted">Total Hours</p>
-                    <p class="text-xl font-bold text-text-header" id="status-modal-hours">0 hours</p>
-                </div>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <!-- Toast Container -->
-    <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
+    <!-- Include Modals -->
+    @include('partials.admin.modals')
 
     <!-- Scripts -->
     <script>
@@ -1859,7 +1000,7 @@ body {
                 var dataStatus = isPending ? 'Pending' : 'Archived';
                 var dataArchiveStatus = isPending ? '' : status;
                 
-                var dateStr = record.date ? formatDate(record.date) : '—';
+                var dateStr = record.date ? formatDate(record.date) : 'â€”';
                 
                 // Get action date based on status - use the actual timestamp fields
                 var actionDateStr = '';
@@ -1890,13 +1031,13 @@ body {
                         'data-action-date="' + actionDateStr + '" ' +
                         'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || '—') + '</td>' +
-                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || '—') + '</td>' +
-                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || 'â€”') + '</td>' +
+                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || 'â€”') + '</td>' +
+                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || 'â€”') + '</td>' +
                         '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + 
                             '<div class="flex flex-col items-center">' +
-                                '<span class="font-medium">' + (record.organization || '—') + '</span>' +
-                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
+                                '<span class="font-medium">' + (record.organization || 'â€”') + '</span>' +
+                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || 'â€”') + '</span>' +
                             '</div>' +
                         '</td>' +
                         '<td class="text-center" style="min-width: 50px; width: 50px; white-space: nowrap;">' + (record.hours_rendered || 0) + ' hours</td>' +
@@ -2536,14 +1677,14 @@ body {
             
             // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
-                document.getElementById('hours-sort-indicator').textContent = '⇅';
-                document.getElementById('studentid-sort-indicator').textContent = '⇅';
-                document.getElementById('date-sort-indicator').textContent = '⇅';
-                document.getElementById('studentname-sort-indicator').textContent = '⇅';
-                document.getElementById('eventname-sort-indicator').textContent = '⇅';
-                document.getElementById('organization-sort-indicator').textContent = '⇅';
+                document.getElementById('hours-sort-indicator').textContent = 'â‡…';
+                document.getElementById('studentid-sort-indicator').textContent = 'â‡…';
+                document.getElementById('date-sort-indicator').textContent = 'â‡…';
+                document.getElementById('studentname-sort-indicator').textContent = 'â‡…';
+                document.getElementById('eventname-sort-indicator').textContent = 'â‡…';
+                document.getElementById('organization-sort-indicator').textContent = 'â‡…';
                 var statusIndicator = document.getElementById('status-sort-indicator');
-                if (statusIndicator) statusIndicator.textContent = '⇅';
+                if (statusIndicator) statusIndicator.textContent = 'â‡…';
             }
             
             // Hours sort toggle event listener
@@ -2555,7 +1696,7 @@ body {
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -2569,7 +1710,7 @@ body {
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '↑' : '↓';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -2583,7 +1724,7 @@ body {
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'date');
                 });
             }
@@ -2597,7 +1738,7 @@ body {
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '↑' : '↓';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'studentname');
                 });
             }
@@ -2611,7 +1752,7 @@ body {
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '↑' : '↓';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'eventname');
                 });
             }
@@ -2625,7 +1766,7 @@ body {
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'organization');
                 });
             }
@@ -2639,7 +1780,7 @@ body {
                     currentSortBy = 'status';
                     statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '↑' : '↓';
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? 'â†‘' : 'â†“';
                     renderSubmissions(allSubmissions, 'status');
                 });
             }
@@ -3526,7 +2667,7 @@ body {
                     return `
                         <tr class="${isEligible ? 'bg-red-50' : ''}">
                             <td class="text-center">${account.name}</td>
-                            <td class="text-center">${account.student_id || '—'}</td>
+                            <td class="text-center">${account.student_id || 'â€”'}</td>
                             <td class="text-center">${account.email}</td>
                             <td class="text-center">${account.inactive_at}</td>
                             <td class="text-center">
