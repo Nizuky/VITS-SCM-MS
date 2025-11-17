@@ -10,17 +10,17 @@
         ?>
          <h2 class="mb-4" style="font-weight: bold; text-align: center; font-size: 20px;">Admin Password Reset</h2>
 
-        <p class="text-white mb-4">The password reset link will be sent to the shared admin email on file. Enter the shared email to request a reset.</p>
+        <p>The password reset link will be sent to the shared admin email on file. Enter the shared email to request a reset.</p>
 
         <form method="POST" action="<?php echo e(route('admin.password.email')); ?>">
             <?php echo csrf_field(); ?>
             <div class="mb-3">
-                <label class="block mb-1 text-white">Email</label>
+                <label class="block mb-1">Email</label>
                 <input name="email" type="email" required class="w-full p-2 border rounded" value="<?php echo e(old('email', $defaultEmail)); ?>" />
             </div>
 
             <div class="mb-3">
-                <label class="block mb-1 text-white">Admin name</label>
+                <label class="block mb-1">Admin name</label>
                 <input name="name" list="admin-names" type="text" required class="w-full p-2 border rounded" value="<?php echo e(old('name')); ?>" />
                 <?php if(count($knownNames) > 0): ?>
                     <datalist id="admin-names">
