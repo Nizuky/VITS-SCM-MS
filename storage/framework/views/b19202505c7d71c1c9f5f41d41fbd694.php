@@ -239,6 +239,76 @@ table{overflow:visible!important}
     color:#9ca3af!important;
 }
 
+/* Delete confirmation modals - dark mode */
+[data-theme="dark"] #confirm_delete_all_records_modal .modal-box,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .modal-box,
+[data-theme="dark"] #confirm_delete_record_modal .modal-box,
+[data-theme="dark"] #confirm_delete_account_modal .modal-box{
+    background-color:#1f2937!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal h3,
+[data-theme="dark"] #confirm_delete_all_accounts_modal h3,
+[data-theme="dark"] #confirm_delete_record_modal h3,
+[data-theme="dark"] #confirm_delete_account_modal h3{
+    color:#ffffff!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal p,
+[data-theme="dark"] #confirm_delete_all_accounts_modal p,
+[data-theme="dark"] #confirm_delete_record_modal p,
+[data-theme="dark"] #confirm_delete_account_modal p{
+    color:#d1d5db!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .text-gray-600,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .text-gray-600,
+[data-theme="dark"] #confirm_delete_record_modal .text-gray-600,
+[data-theme="dark"] #confirm_delete_account_modal .text-gray-600{
+    color:#9ca3af!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .bg-red-100,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .bg-red-100,
+[data-theme="dark"] #confirm_delete_record_modal .bg-red-100,
+[data-theme="dark"] #confirm_delete_account_modal .bg-red-100{
+    background-color:rgba(153, 27, 27, 0.3)!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .bg-red-50,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .bg-red-50,
+[data-theme="dark"] #confirm_delete_record_modal .bg-red-50,
+[data-theme="dark"] #confirm_delete_account_modal .bg-red-50{
+    background-color:rgba(153, 27, 27, 0.2)!important;
+    border-color:#991b1b!important;
+}
+[data-theme="dark"] #confirm_delete_record_modal .bg-yellow-50{
+    background-color:rgba(161, 98, 7, 0.2)!important;
+    border-color:#ca8a04!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .text-red-600,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .text-red-600,
+[data-theme="dark"] #confirm_delete_record_modal .text-red-600,
+[data-theme="dark"] #confirm_delete_account_modal .text-red-600{
+    color:#fca5a5!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .text-red-800,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .text-red-800,
+[data-theme="dark"] #confirm_delete_record_modal .text-red-800,
+[data-theme="dark"] #confirm_delete_account_modal .text-red-800{
+    color:#fca5a5!important;
+}
+[data-theme="dark"] #confirm_delete_all_records_modal .text-red-700,
+[data-theme="dark"] #confirm_delete_all_accounts_modal .text-red-700,
+[data-theme="dark"] #confirm_delete_record_modal .text-red-700,
+[data-theme="dark"] #confirm_delete_account_modal .text-red-700{
+    color:#fecaca!important;
+}
+[data-theme="dark"] #confirm_delete_record_modal .text-yellow-600{
+    color:#fbbf24!important;
+}
+[data-theme="dark"] #confirm_delete_record_modal .text-yellow-800{
+    color:#fbbf24!important;
+}
+[data-theme="dark"] #confirm_delete_record_modal .text-yellow-700{
+    color:#fde68a!important;
+}
+
 /* Prevent page-level horizontal scroll while allowing table scroll */
 body {
     max-width: 100vw;
@@ -677,7 +747,7 @@ body {
                             <h2 class="text-lg md:text-xl font-bold text-text-header">Rejected Records</h2>
                             <p class="text-xs md:text-sm text-text-muted">Records rejected more than 7 days ago are eligible for deletion</p>
                         </div>
-                        <button id="delete-all-eligible-records-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="deleteAllEligibleRecords()">
+                        <button id="delete-all-eligible-records-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="document.getElementById('confirm_delete_all_records_modal').showModal()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
@@ -712,7 +782,7 @@ body {
                             <h2 class="text-lg md:text-xl font-bold text-text-header">Inactive Accounts</h2>
                             <p class="text-xs md:text-sm text-text-muted">Accounts inactive for more than 7 days are eligible for deletion</p>
                         </div>
-                        <button id="delete-all-eligible-accounts-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="deleteAllEligibleAccounts()">
+                        <button id="delete-all-eligible-accounts-btn" class="btn btn-error text-white rounded-lg text-xs md:text-sm whitespace-nowrap" onclick="document.getElementById('confirm_delete_all_accounts_modal').showModal()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
@@ -994,6 +1064,208 @@ body {
             
             <div id="details-action-buttons" class="mt-6 flex gap-2"></div>
         </div>
+    </dialog>
+
+    <!-- Confirm Delete Single Record Modal -->
+    <dialog id="confirm_delete_record_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete Record</h3>
+                    <p class="text-sm text-gray-600">Confirm deletion</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-yellow-800 mb-1">Warning</p>
+                        <p class="text-sm text-yellow-700">Are you sure you want to delete this rejected record? This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteRecord()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Record
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Confirm Delete Single Account Modal -->
+    <dialog id="confirm_delete_account_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete Account</h3>
+                    <p class="text-sm text-gray-600">Permanently remove user</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-red-800 mb-1">Critical Warning</p>
+                        <p class="text-sm text-red-700">Are you sure you want to delete this inactive account? This will permanently remove the user and all their data including social contract records.</p>
+                        <p class="text-xs text-red-600 mt-2"><strong>This action cannot be undone.</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAccount()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Account
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Confirm Delete All Records Modal -->
+    <dialog id="confirm_delete_all_records_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete All Eligible Records</h3>
+                    <p class="text-sm text-gray-600">This action cannot be undone</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-red-800 mb-1">Warning</p>
+                        <p class="text-sm text-red-700">You are about to permanently delete <strong>all rejected records</strong> that are older than 7 days. This will remove them from the system permanently.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAllRecords()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete All Records
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Confirm Delete All Accounts Modal -->
+    <dialog id="confirm_delete_all_accounts_modal" class="modal">
+        <div class="modal-box max-w-md">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            </form>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-gray-900">Delete All Eligible Accounts</h3>
+                    <p class="text-sm text-gray-600">This will permanently remove users</p>
+                </div>
+            </div>
+            
+            <div class="divider my-4"></div>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-red-800 mb-1">Critical Warning</p>
+                        <p class="text-sm text-red-700">You are about to permanently delete <strong>all inactive accounts</strong> that have been inactive for more than 7 days. This will remove all user data including their social contract records.</p>
+                        <p class="text-xs text-red-600 mt-2"><strong>This action cannot be undone.</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <form method="dialog" class="inline">
+                    <button type="button" class="btn btn-ghost">Cancel</button>
+                </form>
+                <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white" onclick="confirmDeleteAllAccounts()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete All Accounts
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
     </dialog>
 
     <!-- Status Records Modal -->
@@ -3215,7 +3487,7 @@ body {
                             </td>
                             <td class="text-center">
                                 ${isEligible 
-                                    ? `<button onclick="deleteRecord(${record.id})" class="btn btn-sm btn-error text-white">Delete</button>`
+                                    ? `<button onclick="showDeleteRecordModal(${record.id})" class="btn btn-sm btn-error text-white">Delete</button>`
                                     : '<span class="text-gray-400">Not eligible</span>'
                                 }
                             </td>
@@ -3271,7 +3543,7 @@ body {
                             </td>
                             <td class="text-center">
                                 ${isEligible 
-                                    ? `<button onclick="deleteAccount(${account.id})" class="btn btn-sm btn-error text-white">Delete</button>`
+                                    ? `<button onclick="showDeleteAccountModal(${account.id})" class="btn btn-sm btn-error text-white">Delete</button>`
                                     : '<span class="text-gray-400">Not eligible</span>'
                                 }
                             </td>
@@ -3286,11 +3558,36 @@ body {
             }
         }
 
-        async function deleteRecord(recordId) {
-            if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
-                return;
+        let pendingRecordId = null;
+        let pendingAccountId = null;
+
+        function showDeleteRecordModal(recordId) {
+            pendingRecordId = recordId;
+            document.getElementById('confirm_delete_record_modal').showModal();
+        }
+
+        function showDeleteAccountModal(accountId) {
+            pendingAccountId = accountId;
+            document.getElementById('confirm_delete_account_modal').showModal();
+        }
+
+        function confirmDeleteRecord() {
+            document.getElementById('confirm_delete_record_modal').close();
+            if (pendingRecordId) {
+                deleteRecord(pendingRecordId);
+                pendingRecordId = null;
             }
-            
+        }
+
+        function confirmDeleteAccount() {
+            document.getElementById('confirm_delete_account_modal').close();
+            if (pendingAccountId) {
+                deleteAccount(pendingAccountId);
+                pendingAccountId = null;
+            }
+        }
+
+        async function deleteRecord(recordId) {
             try {
                 const response = await fetch(`<?php echo e(url('/admin/data-management/records')); ?>/${recordId}`, {
                     method: 'DELETE',
@@ -3315,10 +3612,6 @@ body {
         }
 
         async function deleteAccount(accountId) {
-            if (!confirm('Are you sure you want to delete this account? This will permanently remove the user and all their data. This action cannot be undone.')) {
-                return;
-            }
-            
             try {
                 const response = await fetch(`<?php echo e(url('/admin/data-management/accounts')); ?>/${accountId}`, {
                     method: 'DELETE',
@@ -3342,11 +3635,12 @@ body {
             }
         }
 
+        function confirmDeleteAllRecords() {
+            document.getElementById('confirm_delete_all_records_modal').close();
+            deleteAllEligibleRecords();
+        }
+
         async function deleteAllEligibleRecords() {
-            if (!confirm('Are you sure you want to delete ALL rejected records that are older than 7 days? This action cannot be undone.')) {
-                return;
-            }
-            
             try {
                 const response = await fetch('<?php echo e(route("admin.data-management.delete-all-records")); ?>', {
                     method: 'POST',
@@ -3370,11 +3664,12 @@ body {
             }
         }
 
+        function confirmDeleteAllAccounts() {
+            document.getElementById('confirm_delete_all_accounts_modal').close();
+            deleteAllEligibleAccounts();
+        }
+
         async function deleteAllEligibleAccounts() {
-            if (!confirm('Are you sure you want to delete ALL inactive accounts that have been inactive for more than 7 days? This will permanently remove these users and all their data. This action cannot be undone.')) {
-                return;
-            }
-            
             try {
                 const response = await fetch('<?php echo e(route("admin.data-management.delete-all-accounts")); ?>', {
                     method: 'POST',
