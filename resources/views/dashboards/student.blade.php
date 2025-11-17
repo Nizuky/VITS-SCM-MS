@@ -842,12 +842,6 @@
                 <div class="relative rounded-2xl bg-transparent p-2 mb-10 h-[250px]">
                     <!-- Inner gray container -->
                     <div class="absolute inset-x-0 bottom-0 rounded-2xl bg-transparent text-white mb-2 p-2 h-[250px] flex justify-center items-end overflow-hidden z-10">
-                        sd
-                        <!-- Image overlay (on top of everything) -->
-                        <div class="absolute right-150 bottom-0 z-20">
-                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
-                        </div>
-
                         <!-- Main card container (centered & behind) -->
                         <div 
                             id="personalized-greeting" 
@@ -888,6 +882,11 @@
                             <div class="absolute top-0 right-0 w-[300px] h-full pointer-events-none"></div>
                             <!-- Optional space for balance -->
                             <div class="w-0 sm:w-[60px] md:w-[120px]"></div>
+                        </div>
+                        
+                        <!-- Fixed image (not overlay) - hidden on smaller screens -->
+                        <div class="hidden xl:flex justify-end items-end">
+                            <img src="{{ asset('storage/images/PLVgirl.png') }}" class="w-[270px] h-auto object-contain drop-shadow-lg" />
                         </div>
                     </div>
                 </div>
