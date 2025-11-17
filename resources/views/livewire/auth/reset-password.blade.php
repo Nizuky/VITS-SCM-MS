@@ -166,6 +166,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
         </div>
     </form>
 </div>
+<style>
+/* Force white text for reset-password page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>
 
 <script>
 // Optional: if the server indicated auto=1 and the inputs were prefilled, auto-click the submit button.

@@ -55,3 +55,10 @@
         <x-return-to-welcome />
     </div>
 </x-layouts.auth.simple>
+<style>
+/* Force white text for admin-forgot-password page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>

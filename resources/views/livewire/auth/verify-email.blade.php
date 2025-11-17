@@ -70,3 +70,10 @@ new #[Layout('components.layouts.auth')] class extends Component {
     
     <x-return-to-welcome />
 </div>
+<style>
+/* Force white text for verify-email page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a, button {
+    color: #ffffff !important;
+}
+</style>

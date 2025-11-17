@@ -195,7 +195,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <form method="POST" wire:submit="login" class="space-y-4">
         <!-- Email Address -->
         <div>
-            <label class="block text-sm font-medium mb-2 text-white">{{ __('Email address') }}</label>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('PLV Email address') }}</label>
             <input
                 wire:model="email"
                 type="email"
@@ -300,5 +300,19 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     /* Optional: ensure label next to checkbox inherits readable color */
     .scms-login label { color: inherit; }
+    
+    /* Force white text for login page */
+    .scms-login h1, 
+    .scms-login h2, 
+    .scms-login h3, 
+    .scms-login h4, 
+    .scms-login h5, 
+    .scms-login h6,
+    .scms-login p,
+    .scms-login label,
+    .scms-login span,
+    .scms-login a {
+        color: #ffffff !important;
+    }
     </style>
 </div>

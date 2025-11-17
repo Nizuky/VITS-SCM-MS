@@ -12,7 +12,7 @@
             @csrf
             <div>
                 <label class="block text-sm font-medium mb-2 text-white">Email</label>
-                <input name="email" type="email" required class="w-full" />
+                <flux:input name="email" type="email" required placeholder="admin@plv.edu.ph" />
             </div>
 
             <button type="submit" class="w-full scms-primary-btn">
@@ -23,3 +23,10 @@
         <x-return-to-welcome />
     </div>
 </x-layouts.auth.simple>
+<style>
+/* Force white text for super-admin-forgot-password page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>

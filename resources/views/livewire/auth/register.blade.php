@@ -49,6 +49,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <style>
+    /* Force white text for register page */
+    h1, h2, h3, h4, h5, h6,
+    p, label, span, a {
+        color: #ffffff !important;
+    }
+    </style>
+    
     <div class="text-center space-y-2 mb-6">
         <h1 class="text-2xl font-bold text-white">{{ __('Student Sign up') }}</h1>
         <p class="text-sm text-white/80">{{ __('Enter your details below to create your account') }}</p>
@@ -57,7 +65,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" status="{{ session('status') }}" />
 
-    <form method="POST" wire:submit="register" class="space-y-4">
+    <form method="POST" wire:submit.prevent="register" class="space-y-4">
         <!-- Name -->
         <div>
             <label class="block text-sm font-medium mb-2 text-white">{{ __('Name') }}</label>
@@ -70,6 +78,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="{{ __('Full name') }}"
                 class="w-full"
             />
+            @error('name')
+                <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
+                    {{ $message }}
+                </p>
+            @enderror
             <p class="mt-1 text-xs text-white/70">
                 Format: Surname, First Name Middle Initial
             </p>
@@ -83,21 +96,35 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 type="text"
                 required
                 placeholder="00-0000"
+                pattern="\d{2}-\d{4}"
+                title="Format: 00-0000"
                 class="w-full"
             />
+            @error('student_id')
+                <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <!-- Email Address -->
         <div>
-            <label class="block text-sm font-medium mb-2 text-white">{{ __('Email address') }}</label>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('PLV Email address') }}</label>
             <input
                 wire:model="email"
                 type="email"
                 required
                 autocomplete="email"
                 placeholder="name@plv.edu.ph"
+                pattern="[^@\s]+@plv\.edu\.ph"
+                title="Please use your PLV institutional email (@plv.edu.ph)"
                 class="w-full"
             />
+            @error('email')
+                <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <!-- Password -->
@@ -111,6 +138,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="{{ __('Password') }}"
                 class="w-full"
             />
+            @error('password')
+                <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <!-- Confirm Password -->
@@ -124,6 +156,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="{{ __('Confirm password') }}"
                 class="w-full"
             />
+            @error('password_confirmation')
+                <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <div class="flex items-center justify-end">

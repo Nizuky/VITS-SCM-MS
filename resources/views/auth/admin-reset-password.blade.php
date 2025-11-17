@@ -1,29 +1,50 @@
 @component('components.layouts.auth.simple')
-    <div class="container max-w-md mx-auto p-6">
-        <h2 class="mb-4" style="font-weight: bold; text-align: center; font-size: 20px;">Reset Admin Password</h2>
-        <form method="POST" action="{{ route('admin.password.update') }}">
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+        <div class="text-center space-y-2 mb-6">
+            <h1 class="text-2xl font-bold text-white">{{ __('Reset Admin Password') }}</h1>
+            <p class="text-sm text-white/80">{{ __('Enter your details below to reset your password') }}</p>
+        </div>
+
+        <form method="POST" action="{{ route('admin.password.update') }}" class="space-y-4">
             @csrf
             <input type="hidden" name="token" value="{{ $token }}" />
-            <div class="mb-3">
-                <label class="block mb-1">Admin name</label>
-                <input name="name" type="text" required class="w-full p-2 border rounded" value="{{ old('name') }}" />
-            </div>
-            <div class="mb-3">
-                <label class="block mb-1">Email</label>
-                <input name="email" type="email" required class="w-full p-2 border rounded" value="{{ old('email', $email ?? '') }}" />
+            
+            <!-- Admin Name -->
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">{{ __('Admin name') }}</label>
+                <input name="name" type="text" required value="{{ old('name') }}" placeholder="{{ __('Admin name') }}" />
             </div>
 
-            <div class="mb-3">
-                <label class="block mb-1">New Password</label>
-                <input name="password" type="password" required class="w-full p-2 border rounded" />
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">{{ __('Email') }}</label>
+                <input name="email" type="email" required value="{{ old('email', $email ?? '') }}" placeholder="admin@plv.edu.ph" />
             </div>
 
-            <div class="mb-3">
-                <label class="block mb-1">Confirm Password</label>
-                <input name="password_confirmation" type="password" required class="w-full p-2 border rounded" />
+            <!-- New Password -->
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">{{ __('New Password') }}</label>
+                <input name="password" type="password" required placeholder="{{ __('Password') }}" />
             </div>
-            <button class="btn btn-primary-purple rounded">Reset Password</button>
+
+            <!-- Confirm Password -->
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">{{ __('Confirm password') }}</label>
+                <input name="password_confirmation" type="password" required placeholder="{{ __('Confirm password') }}" />
+            </div>
+
+            <div class="flex items-center justify-end">
+                <button type="submit" class="w-full scms-primary-btn">{{ __('Reset Password') }}</button>
+            </div>
         </form>
-         <x-return-to-welcome />
+        
+        <x-return-to-welcome />
     </div>
 @endcomponent
+
+<style>
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>

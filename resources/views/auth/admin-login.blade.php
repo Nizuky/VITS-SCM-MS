@@ -10,7 +10,7 @@
                 <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">{{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">{{ session('error') }}</div>
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
             @endif
 
             <div>
@@ -65,6 +65,13 @@
         <x-return-to-welcome />
     </div>
 </x-layouts.auth.simple>
+<style>
+/* Force white text for admin-login page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>
 
 <script>
 (function(){
@@ -122,18 +129,14 @@
         }).catch(err => {
             setLoading(false);
             // show error banner
-            let msg = 'Invalid credentials.';
-            if (err && err.message) msg = err.message;
-            // if server returned validation errors, try to extract a helpful message
-            if (err && err.errors) {
-                const firstKey = Object.keys(err.errors)[0];
-                if (firstKey) msg = err.errors[firstKey][0];
-            }
+            let msg = 'Invalid information';
+            
             let existing = document.querySelector('.admin-error-banner');
             if (!existing){
                 const d = document.createElement('div');
-                d.className = 'admin-error-banner mb-3 p-3 rounded text-sm';
-                d.style.background = '#fff3f2'; d.style.borderLeft = '4px solid #ef4444'; d.style.color = '#7f1d1d';
+                d.className = 'admin-error-banner mb-3 p-3 rounded text-sm text-white';
+                d.style.background = 'rgba(239, 68, 68, 0.2)';
+                d.style.borderLeft = '4px solid #ef4444';
                 d.textContent = msg;
                 form.insertBefore(d, form.firstChild);
             } else {
