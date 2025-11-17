@@ -100,19 +100,77 @@
         .page-content:not(.hidden) { display: flex !important; }
         .content-area-auto { height: auto; max-height: 100%; }
         
-        /* Collapsed sidebar - center ALL menu items perfectly */
-        #sidebar.collapsed .menu a,
-        #sidebar.collapsed .menu button {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            justify-content: center !important;
-            text-align: center !important;
-            gap: 0 !important;
+        /* Collapsible sidebar styles */
+        #sidebar {
+            transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
         }
-        
-        /* Hide text when collapsed */
-        #sidebar.collapsed .menu-text {
-            display: none !important;
+
+        #sidebar.collapsed {
+            width: 80px !important;
+            min-width: 80px !important;
+            max-width: 80px !important;
+        }
+
+        #sidebar.collapsed .menu-text,
+        #sidebar.collapsed #collapse-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        #sidebar.collapsed #user-name,
+        #sidebar.collapsed #student-number,
+        #sidebar.collapsed #status-badge {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* Avatar section when collapsed - match the image spacing */
+        #sidebar.collapsed #avatar-section {
+            padding: 1rem 0.5rem;
+            min-height: 160px;
+        }
+
+        #sidebar.collapsed #avatar-container {
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        #sidebar.collapsed #avatar-circle {
+            width: 48px !important;
+            height: 48px !important;
+            ring-width: 2px;
+        }
+
+        #sidebar.collapsed #avatar-initials {
+            font-size: 1.25rem;
+        }
+
+        /* Menu items when collapsed - centered with proper spacing */
+        #sidebar.collapsed #menu-list {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #sidebar.collapsed #menu-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        #sidebar.collapsed #menu-list a,
+        #sidebar.collapsed ul.menu a,
+        #sidebar.collapsed ul.menu button {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        #sidebar.collapsed #collapse-btn {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        #sidebar.collapsed #collapse-icon {
+            transform: rotate(180deg);
         }
         /* Strong button color override to avoid DaisyUI theme side-effects */
         .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
@@ -697,7 +755,9 @@
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
     @endphp
     <div class="flex p-4 gap-4 min-h-screen"> 
+        <!-- Sidebar -->
         <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px;">
+             <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
                     <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
@@ -719,6 +779,7 @@
                 </div>
             </div>
 
+            <!-- Main Navigation -->
             <ul id="menu-list" class="menu p-0 my-4 flex-grow transition-all duration-300">
                 <li>
                     <a class="py-3 pl-2 transition-all duration-300" id="nav-dashboard" onclick="showPage('dashboard')">
@@ -734,6 +795,7 @@
                 </li>
             </ul>
 
+            <!-- Bottom Navigation -->
             <ul class="menu p-0 transition-all duration-300">
                 <li>
                     <a class="py-3 pl-2 transition-all duration-300" id="nav-support" onclick="showPage('support')">

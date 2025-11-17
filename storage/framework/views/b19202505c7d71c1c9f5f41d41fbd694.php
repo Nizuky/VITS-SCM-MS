@@ -374,26 +374,45 @@ body {
     white-space: nowrap;
 }
 
+/* Avatar section when collapsed - match the image spacing */
+#sidebar.collapsed #avatar-section {
+    padding: 1rem 0.5rem;
+}
+
 #sidebar.collapsed #avatar-container {
-    width: 48px;
-    height: 48px;
+    margin-bottom: 0;
 }
 
 #sidebar.collapsed #avatar-circle {
     width: 48px !important;
     height: 48px !important;
+    ring-width: 2px;
 }
 
 #sidebar.collapsed #avatar-initials {
     font-size: 1.25rem;
 }
 
+/* Menu items when collapsed - centered with proper spacing */
+#sidebar.collapsed #menu-list {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#sidebar.collapsed #menu-list li {
+    margin-bottom: 0.5rem;
+}
+
 #sidebar.collapsed #menu-list a,
 #sidebar.collapsed ul.menu a,
 #sidebar.collapsed ul.menu button {
     justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0.75rem 0;
+}
+
+#sidebar.collapsed #collapse-btn {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 #sidebar.collapsed #collapse-icon {
