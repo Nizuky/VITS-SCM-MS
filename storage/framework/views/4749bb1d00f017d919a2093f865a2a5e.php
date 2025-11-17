@@ -87,9 +87,9 @@
                 window.addEventListener('scroll', function(){ if (!ticking) { window.requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
             })();
         </script>
-        <?php app('livewire')->forceAssetInjection(); ?>
-<?php echo app('flux')->scripts(); ?>
-
+        <?php if(class_exists('Flux\\Flux')): ?>
+            @fluxScripts
+        <?php endif; ?>
         <script>
             // On auth pages (login/register/etc), clear any pending logout flags so they don't affect login
             (function(){

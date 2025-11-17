@@ -12,5 +12,13 @@
       "Database\\Factories\\": "database/factories/",
       "Database\\Seeders\\": "database/seeders/"
     }
+  },
+  "require": {
+    "robsontenorio/mary": "^2.4",
+    "laravel/framework": "*",
+    "laravel/fortify": "*",
+    "livewire/livewire": "^3.6",
+    "symfony/var-dumper": "*",
+    "livewire/volt": "^1.9"
   }
 }

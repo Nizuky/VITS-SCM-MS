@@ -62,73 +62,33 @@ use Livewire\Volt\Component;
 
     <form method="POST" wire:submit="login" class="flex flex-col gap-6">
         <!-- Email Address -->
-        <?php if (isset($component)) { $__componentOriginal26c546557cdc09040c8dd00b2090afd0 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal26c546557cdc09040c8dd00b2090afd0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::input.index','data' => ['wire:model' => 'email','label' => __('Email address'),'type' => 'email','required' => true,'autofocus' => true,'autocomplete' => 'email','placeholder' => 'name@plv.edu.ph']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::input'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'email','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Email address')),'type' => 'email','required' => true,'autofocus' => true,'autocomplete' => 'email','placeholder' => 'name@plv.edu.ph']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal26c546557cdc09040c8dd00b2090afd0)): ?>
-<?php $attributes = $__attributesOriginal26c546557cdc09040c8dd00b2090afd0; ?>
-<?php unset($__attributesOriginal26c546557cdc09040c8dd00b2090afd0); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal26c546557cdc09040c8dd00b2090afd0)): ?>
-<?php $component = $__componentOriginal26c546557cdc09040c8dd00b2090afd0; ?>
-<?php unset($__componentOriginal26c546557cdc09040c8dd00b2090afd0); ?>
-<?php endif; ?>
+        <flux:input
+            wire:model="email"
+            :label="__('Email address')"
+            type="email"
+            required
+            autofocus
+            autocomplete="email"
+            placeholder="name@plv.edu.ph"
+        />
 
         <!-- Password -->
         <div class="relative">
-            <?php if (isset($component)) { $__componentOriginal26c546557cdc09040c8dd00b2090afd0 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal26c546557cdc09040c8dd00b2090afd0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::input.index','data' => ['wire:model' => 'password','label' => __('Password'),'type' => 'password','required' => true,'autocomplete' => 'current-password','placeholder' => __('Password'),'viewable' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::input'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'password','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Password')),'type' => 'password','required' => true,'autocomplete' => 'current-password','placeholder' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('Password')),'viewable' => true]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal26c546557cdc09040c8dd00b2090afd0)): ?>
-<?php $attributes = $__attributesOriginal26c546557cdc09040c8dd00b2090afd0; ?>
-<?php unset($__attributesOriginal26c546557cdc09040c8dd00b2090afd0); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal26c546557cdc09040c8dd00b2090afd0)): ?>
-<?php $component = $__componentOriginal26c546557cdc09040c8dd00b2090afd0; ?>
-<?php unset($__componentOriginal26c546557cdc09040c8dd00b2090afd0); ?>
-<?php endif; ?>
+            <flux:input
+                wire:model="password"
+                :label="__('Password')"
+                type="password"
+                required
+                autocomplete="current-password"
+                :placeholder="__('Password')"
+                viewable
+            />
 
             <!--[if BLOCK]><![endif]--><?php if(Route::has('password.request')): ?>
-                <?php if (isset($component)) { $__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::link','data' => ['class' => 'absolute top-0 text-sm end-0','href' => route('password.request'),'wire:navigate' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::link'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'absolute top-0 text-sm end-0','href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('password.request')),'wire:navigate' => true]); ?>
+                <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
                     <?php echo e(__('Forgot your password?')); ?>
 
-                 <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477)): ?>
-<?php $attributes = $__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477; ?>
-<?php unset($__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477)): ?>
-<?php $component = $__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477; ?>
-<?php unset($__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477); ?>
-<?php endif; ?>
+                </flux:link>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </div>
 
@@ -141,53 +101,17 @@ use Livewire\Volt\Component;
         </div>
 
         <div class="flex items-center justify-end">
-            <?php if (isset($component)) { $__componentOriginalc04b147acd0e65cc1a77f86fb0e81580 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::button.index','data' => ['variant' => 'primary','type' => 'submit','class' => 'w-full scms-primary-btn','dataTest' => 'login-button']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['variant' => 'primary','type' => 'submit','class' => 'w-full scms-primary-btn','data-test' => 'login-button']); ?>
+            <flux:button variant="primary" type="submit" class="w-full scms-primary-btn" data-test="login-button">
                 <?php echo e(__('Log in')); ?>
 
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580)): ?>
-<?php $attributes = $__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580; ?>
-<?php unset($__attributesOriginalc04b147acd0e65cc1a77f86fb0e81580); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalc04b147acd0e65cc1a77f86fb0e81580)): ?>
-<?php $component = $__componentOriginalc04b147acd0e65cc1a77f86fb0e81580; ?>
-<?php unset($__componentOriginalc04b147acd0e65cc1a77f86fb0e81580); ?>
-<?php endif; ?>
+            </flux:button>
         </div>
     </form>
 
     <!--[if BLOCK]><![endif]--><?php if(Route::has('register')): ?>
         <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
             <span><?php echo e(__('Don\'t have an account?')); ?></span>
-            <?php if (isset($component)) { $__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'e60dd9d2c3a62d619c9acb38f20d5aa5::link','data' => ['href' => route('register'),'wire:navigate' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('flux::link'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('register')),'wire:navigate' => true]); ?><?php echo e(__('Sign up')); ?> <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477)): ?>
-<?php $attributes = $__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477; ?>
-<?php unset($__attributesOriginal54ddb5b70b37b1e1cf0f2f95e4c53477); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477)): ?>
-<?php $component = $__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477; ?>
-<?php unset($__componentOriginal54ddb5b70b37b1e1cf0f2f95e4c53477); ?>
-<?php endif; ?>
+            <flux:link :href="route('register')" wire:navigate><?php echo e(__('Sign up')); ?></flux:link>
         </div>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     <style>
