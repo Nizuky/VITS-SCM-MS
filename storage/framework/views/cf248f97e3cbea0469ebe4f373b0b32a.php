@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -59,7 +59,7 @@
         <!-- Toastify Library -->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        @php
+        <?php
             $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
             $iconUrl = null;
             $iconMTime = null;
@@ -83,10 +83,10 @@
             if ($iconUrl && $iconMTime) {
                 $iconUrl .= '?v=' . $iconMTime;
             }
-        @endphp
-        <link rel="icon" href="{{ $iconUrl }}" sizes="any">
-        <link rel="icon" href="{{ $iconUrl }}" type="image/png">
-        <link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
+        ?>
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -146,7 +146,7 @@
         /* Page background image */
         .bg-custom {
             background-color: #EDF1FA; /* fallback */
-            background-image: url('{{ asset('vits_bg_white.png') }}');
+            background-image: url('<?php echo e(asset('vits_bg_white.png')); ?>');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -465,7 +465,7 @@
                 /* Dark theme: card/background overrides */
         [data-theme="dark"] .bg-custom {
             background-color: #0b0f19; /* deeper fallback */
-            background-image: url('{{ asset('storage/vits_bg_black.png') }}');
+            background-image: url('<?php echo e(asset('storage/vits_bg_black.png')); ?>');
         }
          /* Tables in dark mode */
         [data-theme="dark"] .table thead,
@@ -674,11 +674,11 @@
             overflow-x: auto;
         }
     </style>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 <body class="min-h-screen bg-custom">
-    @include('partials.auto_logout')
-    @php
+    <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php
         // Combined: compute base path and user initials for header/avatar
         $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
 
@@ -695,27 +695,27 @@
         // Get the first super admin's name for PDF signature
         $superAdmin = \App\Models\SuperAdmin::first();
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
-    @endphp
+    ?>
     <div class="flex p-4 gap-4 min-h-screen"> 
         <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px;">
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
-                    <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
-                        <span id="avatar-initials" class="text-3xl font-bold leading-none transition-all duration-300">{{ $initials }}</span>
+                    <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" title="<?php echo e(auth()->user()->name); ?>" aria-label="<?php echo e(auth()->user()->name); ?>">
+                        <span id="avatar-initials" class="text-3xl font-bold leading-none transition-all duration-300"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 id="user-name" class="font-bold text-lg transition-opacity duration-300">{{ auth()->user()->name }}</h2>
-                <p id="student-number" class="text-sm text-gray-500 transition-opacity duration-300">Student Number: {{ auth()->user()->student_id ?? '—' }}</p>
-                @php
+                <h2 id="user-name" class="font-bold text-lg transition-opacity duration-300"><?php echo e(auth()->user()->name); ?></h2>
+                <p id="student-number" class="text-sm text-gray-500 transition-opacity duration-300">Student Number: <?php echo e(auth()->user()->student_id ?? '—'); ?></p>
+                <?php
                     $accountStatus = auth()->user()->status ?? 'active';
                     $isActive = strtolower($accountStatus) === 'active';
-                @endphp
+                ?>
                 <div id="status-badge" class="mt-2 transition-opacity duration-300">
-                    @if($isActive)
+                    <?php if($isActive): ?>
                         <span class="badge badge-success badge-sm text-white font-semibold">Active</span>
-                    @else
+                    <?php else: ?>
                         <span class="badge badge-error badge-sm text-white font-semibold">Inactive</span>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -760,8 +760,8 @@
                     </a>
                 </li>
                 <li>
-                    <form id="logout-form-visible" action="{{ route('logout') }}" method="POST" class="m-0 p-0 w-full flex" novalidate>
-                        @csrf
+                    <form id="logout-form-visible" action="<?php echo e(route('logout')); ?>" method="POST" class="m-0 p-0 w-full flex" novalidate>
+                        <?php echo csrf_field(); ?>
                         <button id="logout-button-visible" type="button" class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             <span class="menu-text">Log Out</span>
@@ -813,19 +813,19 @@
             </div>
            
             <!-- Dashboard overview page with summary cards and charts -->
-            @include('partials.student.dashboard-page')
+            <?php echo $__env->make('partials.student.dashboard-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.student.record-status-page')
+            <?php echo $__env->make('partials.student.record-status-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.student.profile-page')
+            <?php echo $__env->make('partials.student.profile-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.student.support-page')
+            <?php echo $__env->make('partials.student.support-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.student.faqs-page')
+            <?php echo $__env->make('partials.student.faqs-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </main>
     </div>
 
-    @include('partials.student.modals')
+    <?php echo $__env->make('partials.student.modals', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- DaisyUI toast root (bottom-right) -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
@@ -1036,8 +1036,8 @@
 
         // ==================== GLOBAL HELPERS ====================
         // Define these globally so they can be used by all functions
-        const BASE_PATH = @json($BASE_PATH);
-        const SUPER_ADMIN_NAME = @json($superAdminName);
+        const BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
+        const SUPER_ADMIN_NAME = <?php echo json_encode($superAdminName, 15, 512) ?>;
         
         // ==================== CSRF TOKEN SETUP ====================
         // Simple helper to get CSRF token from meta tag
@@ -2636,7 +2636,7 @@
                     try {
                         // Check if user wants to update name
                         const newName = (document.getElementById('edit-full-name')?.value || '').trim();
-                        const originalName = '{{ auth()->user()->name }}';
+                        const originalName = '<?php echo e(auth()->user()->name); ?>';
                         const nameChanged = newName && newName !== originalName;
                         
                         // Check if user wants to change password
@@ -3355,10 +3355,10 @@
                             body: new URLSearchParams({'_token': csrf}).toString(),
                             keepalive: true
                         }).finally(() => {
-                            try { window.location.replace(@json(url('/'))); } catch(_) { window.location.href = '/'; }
+                            try { window.location.replace(<?php echo json_encode(url('/'), 15, 512) ?>); } catch(_) { window.location.href = '/'; }
                         });
                     } catch (err) {
-                        try { window.location.replace(@json(url('/'))); } catch(_) { window.location.href = '/'; }
+                        try { window.location.replace(<?php echo json_encode(url('/'), 15, 512) ?>); } catch(_) { window.location.href = '/'; }
                     }
                 }, { passive: true });
             } catch (_) {}
@@ -3623,7 +3623,7 @@
         // Load logo on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Try to load PLV logo (optional - PDF will work without it)
-            imageToBase64('{{ asset("storage/VITS_logo.png") }}', function(base64) {
+            imageToBase64('<?php echo e(asset("storage/VITS_logo.png")); ?>', function(base64) {
                 if (base64) {
                     logoBase64 = base64;
                     console.log('PLV logo loaded for PDF export');
@@ -3842,7 +3842,7 @@
                     doc.setFont('helvetica', 'normal');
 
                     // Add VITS logo on the left
-                    const vitsLogoPath = '{{ asset("storage/VITS_logo.png") }}';
+                    const vitsLogoPath = '<?php echo e(asset("storage/VITS_logo.png")); ?>';
                     try {
                         // Left logo (VITS)
                         doc.addImage(vitsLogoPath, 'PNG', 14, 10, 20, 20);
@@ -3873,8 +3873,8 @@
                     // Student info
                     doc.setFontSize(10);
                     doc.setFont('helvetica', 'normal');
-                    const studentName = '{{ Auth::user()->name ?? "Student Name" }}';
-                    const studentId = '{{ Auth::user()->student_id ?? "N/A" }}';
+                    const studentName = '<?php echo e(Auth::user()->name ?? "Student Name"); ?>';
+                    const studentId = '<?php echo e(Auth::user()->student_id ?? "N/A"); ?>';
                     doc.text(`Student Name: ${studentName}`, 14, 45);
                     doc.text(`Student ID: ${studentId}`, 14, 50);
                     doc.text(`Year Level: ${yearLevel}`, 14, 55);
@@ -4029,7 +4029,7 @@
     </script>
 
     <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
-    <script src="{{ asset('js/session-keeper.js') }}"></script>
+    <script src="<?php echo e(asset('js/session-keeper.js')); ?>"></script>
     <script>
         // Initialize Session Keeper for Student Dashboard
         if (window.SessionKeeper) {
@@ -4151,4 +4151,4 @@
         })();
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/student.blade.php ENDPATH**/ ?>
