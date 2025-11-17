@@ -112,6 +112,9 @@
         }
 
         #sidebar.collapsed .menu-text,
+        #sidebar.collapsed #user-name,
+        #sidebar.collapsed #student-number,
+        #sidebar.collapsed #status-badge,
         #sidebar.collapsed #collapse-text {
             opacity: 0;
             width: 0;
@@ -119,22 +122,13 @@
             white-space: nowrap;
         }
 
-        #sidebar.collapsed #user-name,
-        #sidebar.collapsed #student-number,
-        #sidebar.collapsed #status-badge {
-            opacity: 0 !important;
-            visibility: hidden !important;
-        }
-
         /* Avatar section when collapsed - match the image spacing */
         #sidebar.collapsed #avatar-section {
             padding: 1rem 0.5rem;
-            min-height: 160px;
         }
 
         #sidebar.collapsed #avatar-container {
-            margin-top: 1rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0;
         }
 
         #sidebar.collapsed #avatar-circle {
@@ -756,8 +750,8 @@
     @endphp
     <div class="flex p-4 gap-4 min-h-screen"> 
         <!-- Sidebar -->
-        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px;">
-             <!-- Profile Section -->
+        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
+            <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
                     <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
@@ -4137,79 +4131,30 @@
         setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
     </script>
 
-    <!-- Simple Sidebar Collapse Script -->
+    <!-- Sidebar Collapse Script -->
     <script>
+        // Sidebar collapse functionality
         (function() {
             const sidebar = document.getElementById('sidebar');
             const collapseBtn = document.getElementById('collapse-btn');
             const collapseText = document.getElementById('collapse-text');
-            const collapseIcon = document.getElementById('collapse-icon');
-            const avatarSection = document.getElementById('avatar-section');
-            const avatarCircle = document.getElementById('avatar-circle');
-            const avatarInitials = document.getElementById('avatar-initials');
-            const userName = document.getElementById('user-name');
-            const studentNumber = document.getElementById('student-number');
-            const statusBadge = document.getElementById('status-badge');
-            let isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-
-            function updateSidebar() {
-                if (isCollapsed) {
-                    // Add collapsed class to trigger CSS rules
-                    sidebar.classList.add('collapsed');
-                    
-                    // Collapse sidebar
-                    sidebar.style.width = '70px';
-                    sidebar.style.padding = '0.5rem';
-                    
-                    // Resize avatar to smaller size
-                    avatarSection.style.padding = '0.5rem';
-                    avatarCircle.classList.remove('w-24', 'h-24', 'ring-offset-2');
-                    avatarCircle.classList.add('w-12', 'h-12', 'ring-offset-1');
-                    avatarInitials.classList.remove('text-3xl');
-                    avatarInitials.classList.add('text-base');
-                    
-                    // Hide text elements
-                    userName.style.display = 'none';
-                    studentNumber.style.display = 'none';
-                    statusBadge.style.display = 'none';
-                    
-                    // Hide collapse button text
-                    collapseText.textContent = '';
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
-                } else {
-                    // Remove collapsed class
-                    sidebar.classList.remove('collapsed');
-                    
-                    // Expand sidebar
-                    sidebar.style.width = '200px';
-                    sidebar.style.padding = '1rem';
-                    
-                    // Restore avatar to original size
-                    avatarSection.style.padding = '1rem';
-                    avatarCircle.classList.remove('w-12', 'h-12', 'ring-offset-1');
-                    avatarCircle.classList.add('w-24', 'h-24', 'ring-offset-2');
-                    avatarInitials.classList.remove('text-base');
-                    avatarInitials.classList.add('text-3xl');
-                    
-                    // Show text elements
-                    userName.style.display = '';
-                    studentNumber.style.display = '';
-                    statusBadge.style.display = '';
-                    
-                    // Restore collapse button text
-                    collapseText.textContent = 'Hide';
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
-                }
+            
+            // Load saved state from localStorage
+            const savedState = localStorage.getItem('scms_student_sidebar_collapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+                collapseText.textContent = 'Show';
             }
-
-            collapseBtn.addEventListener('click', () => {
-                isCollapsed = !isCollapsed;
-                localStorage.setItem('sidebar_collapsed', isCollapsed);
-                updateSidebar();
+            
+            // Toggle collapse on button click
+            collapseBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
+                
+                // Save state to localStorage
+                localStorage.setItem('scms_student_sidebar_collapsed', isCollapsed);
             });
-
-            // Apply saved state on load
-            updateSidebar();
         })();
     </script>
 </body>
