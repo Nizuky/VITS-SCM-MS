@@ -194,6 +194,51 @@ table{overflow:visible!important}
 [data-theme="dark"] .activity-legend-3{background-color:#804ED6}
 [data-theme="dark"] .activity-legend-4{background-color:#A770FF}
 
+/* Dark mode for Data Management section - comprehensive fixes */
+/* Card backgrounds */
+[data-theme="dark"] #data-management-page > div > .bg-white{background-color:#1f2937!important}
+
+/* All text elements */
+[data-theme="dark"] #data-management-page h2,
+[data-theme="dark"] #data-management-page h4,
+[data-theme="dark"] #data-management-page p,
+[data-theme="dark"] #data-management-page th,
+[data-theme="dark"] #data-management-page td,
+[data-theme="dark"] #data-management-page span,
+[data-theme="dark"] #data-management-page .text-text-header,
+[data-theme="dark"] #data-management-page .text-text-muted{
+    color:#ffffff!important;
+}
+
+/* Table headers with darker background */
+[data-theme="dark"] #data-management-page .table thead,
+[data-theme="dark"] #data-management-page .table thead tr,
+[data-theme="dark"] #data-management-page .table thead th,
+[data-theme="dark"] #data-management-page .bg-gray-50{
+    background-color:#374151!important;
+    color:#ffffff!important;
+}
+
+/* Table body rows - fix zebra striping for dark mode */
+[data-theme="dark"] #data-management-page .table-zebra tbody tr{
+    background-color:#1f2937!important;
+}
+[data-theme="dark"] #data-management-page .table-zebra tbody tr:nth-child(even){
+    background-color:#374151!important;
+}
+[data-theme="dark"] #data-management-page tbody tr{
+    background-color:#1f2937!important;
+}
+[data-theme="dark"] #data-management-page tbody td{
+    background-color:transparent!important;
+    border-color:#4b5563!important;
+}
+
+/* Subtle text */
+[data-theme="dark"] #data-management-page .text-gray-500{
+    color:#9ca3af!important;
+}
+
 /* Prevent page-level horizontal scroll while allowing table scroll */
 body {
     max-width: 100vw;
