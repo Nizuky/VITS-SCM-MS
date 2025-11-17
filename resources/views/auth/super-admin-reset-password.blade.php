@@ -1,28 +1,33 @@
-@component('components.layouts.auth.simple')
-    <div class="container max-w-md mx-auto p-6">
-        <h2 class="mb-4">Reset Super Admin Password</h2>
+<x-layouts.auth.simple>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+        <div class="text-center space-y-2 mb-6">
+            <h1 class="text-2xl font-bold text-white">Reset Super Admin Password</h1>
+        </div>
 
-        <form method="POST" action="{{ route('superadmin.password.update') }}">
+        <form method="POST" action="{{ route('superadmin.password.update') }}" class="space-y-4">
             @csrf
             <input type="hidden" name="token" value="{{ $token }}" />
-            <div class="mb-3">
-                <label class="block mb-1">Email</label>
-                <input name="email" type="email" value="janarafael.sanandres@gmail.com" required class="w-full p-2 border rounded" />
+            
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">Email</label>
+                <input name="email" type="email" value="janarafael.sanandres@gmail.com" required readonly class="w-full" />
             </div>
 
-            <div class="mb-3">
-                <label class="block mb-1">New Password</label>
-                <input name="password" type="password" required class="w-full p-2 border rounded" />
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">New Password</label>
+                <input name="password" type="password" required class="w-full" />
             </div>
 
-            <div class="mb-3">
-                <label class="block mb-1">Confirm Password</label>
-                <input name="password_confirmation" type="password" required class="w-full p-2 border rounded" />
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">Confirm Password</label>
+                <input name="password_confirmation" type="password" required class="w-full" />
             </div>
 
-            <x-return-to-welcome />
-
-            <button class="px-4 py-2 bg-green-600 text-white rounded">Reset Password</button>
+            <button type="submit" class="w-full scms-primary-btn">
+                Reset Password
+            </button>
         </form>
+
+        <x-return-to-welcome />
     </div>
-@endcomponent
+</x-layouts.auth.simple>

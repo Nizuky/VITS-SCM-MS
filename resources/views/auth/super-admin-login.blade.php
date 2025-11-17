@@ -1,59 +1,55 @@
-@vite('resources/css/app.css')
-@component('components.layouts.auth.simple')
-    <div class="container max-w-md mx-auto p-6">
-       <h2 class="mb-4" style="font-weight: bold; text-align: center; font-size: 20px;">Super Admin Login</h2>
+<x-layouts.auth.simple>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+        <div class="text-center space-y-2 mb-6">
+            <h1 class="text-2xl font-bold text-white">Super Admin Login</h1>
+        </div>
 
-        <form id="superadmin-login-form" method="POST" action="{{ route('superadmin.login.submit') }}">
+        <form id="superadmin-login-form" method="POST" action="{{ route('superadmin.login.submit') }}" class="space-y-4">
             @csrf
             @if(session('success'))
-                <div class="mb-3 p-3 rounded text-sm" style="background:#ecfdf5; border-left:4px solid #10b981; color:#065f46;">{{ session('success') }}</div>
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">{{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="mb-3 p-3 rounded text-sm" style="background:#fff3f2; border-left:4px solid #ef4444; color:#7f1d1d;">{{ session('error') }}</div>
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">{{ session('error') }}</div>
             @endif
-            <div class="mb-3">
-                <label for="name" class="block mb-1 font-semibold text-sm">Admin name</label>
+
+            <div>
+                <label for="name" class="block text-sm font-medium mb-2 text-white">Admin name</label>
                 <input
                     type="text"
                     id="name"
                     name="name"
-                    class="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring"
                     placeholder="admin name"
                     value="{{ old('name', $defaultAdminName ?? '') }}"
                     required
-                >
+                    class="w-full"
+                />
             </div>
 
-            <div class="mb-3">
-                <label for="password" class="block mb-1 font-semibold text-sm">Password</label>
+            <div>
+                <label for="password" class="block text-sm font-medium mb-2 text-white">Password</label>
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    class="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring"
                     placeholder="Enter password"
                     required
-                >
+                    class="w-full"
+                />
             </div>
 
             <button 
                 id="superadmin-login-btn"
                 type="submit" 
-                class="role-btn w-full mt-4 bg-white text-black text-sm rounded py-2 hover:bg-[#1a00ac] hover:text-white transition"
+                class="w-full scms-primary-btn"
                 aria-busy="false">
                 <span class="btn-text">Login</span>
-                <span class="btn-spinner" style="display:none; margin-left:8px;">
-                    <svg width="18" height="18" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">
-                        <circle cx="25" cy="25" r="20" fill="none" stroke="#1a00ac" stroke-width="4" stroke-linecap="round" stroke-dasharray="31.4 31.4">
-                            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.9s" repeatCount="indefinite" />
-                        </circle>
-                    </svg>
-                </span>
             </button>
         </form>
+
+        <x-return-to-welcome />
     </div>
-    <x-return-to-welcome />
-@endcomponent
+</x-layouts.auth.simple>
 
 <script>
     (function(){

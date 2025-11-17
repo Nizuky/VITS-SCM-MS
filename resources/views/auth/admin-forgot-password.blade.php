@@ -1,5 +1,5 @@
-@component('components.layouts.auth.simple')
-    <div class="container max-w-md mx-auto p-6">
+<x-layouts.auth.simple>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         @php
             $defaultAdmin = App\Models\AdminUser::first();
             $defaultEmail = $defaultAdmin ? $defaultAdmin->email : null;
@@ -8,20 +8,36 @@
                 $knownNames = App\Models\AdminUser::where('email', $defaultEmail)->pluck('name')->unique()->values()->all();
             }
         @endphp
-         <h2 class="mb-4" style="font-weight: bold; text-align: center; font-size: 20px;">Admin Password Reset</h2>
 
-        <p>The password reset link will be sent to the shared admin email on file. Enter the shared email to request a reset.</p>
+        <div class="text-center space-y-2 mb-6">
+            <h1 class="text-2xl font-bold text-white">Admin Password Reset</h1>
+            <p class="text-sm text-white/80">The password reset link will be sent to the shared admin email on file. Enter the shared email to request a reset.</p>
+        </div>
 
-        <form method="POST" action="{{ route('admin.password.email') }}">
+        <form method="POST" action="{{ route('admin.password.email') }}" class="space-y-4">
             @csrf
-            <div class="mb-3">
-                <label class="block mb-1">Email</label>
-                <input name="email" type="email" required class="w-full p-2 border rounded" value="{{ old('email', $defaultEmail) }}" />
+            
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">Email</label>
+                <input
+                    name="email"
+                    type="email"
+                    required
+                    value="{{ old('email', $defaultEmail) }}"
+                    class="w-full"
+                />
             </div>
 
-            <div class="mb-3">
-                <label class="block mb-1">Admin name</label>
-                <input name="name" list="admin-names" type="text" required class="w-full p-2 border rounded" value="{{ old('name') }}" />
+            <div>
+                <label class="block text-sm font-medium mb-2 text-white">Admin name</label>
+                <input
+                    name="name"
+                    list="admin-names"
+                    type="text"
+                    required
+                    value="{{ old('name') }}"
+                    class="w-full"
+                />
                 @if(count($knownNames) > 0)
                     <datalist id="admin-names">
                         @foreach($knownNames as $n)
@@ -31,8 +47,11 @@
                 @endif
             </div>
 
-            <button class="btn btn-primary-purple rounded">Send Reset Link</button>
+            <button type="submit" class="w-full scms-primary-btn">
+                Send Reset Link
+            </button>
         </form>
+        
         <x-return-to-welcome />
     </div>
-@endcomponent
+</x-layouts.auth.simple>

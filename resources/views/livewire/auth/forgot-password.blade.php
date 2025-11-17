@@ -22,30 +22,36 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
+<div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <div class="text-center space-y-2 mb-6">
+        <h1 class="text-2xl font-bold text-white">{{ __('Forgot password') }}</h1>
+        <p class="text-sm text-white/80">{{ __('Enter your email to receive a password reset link') }}</p>
+    </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="text-center" status="{{ session('status') }}" />
 
-    <form method="POST" wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
+    <form method="POST" wire:submit="sendPasswordResetLink" class="space-y-4">
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email Address')"
-            type="email"
-            required
-            autofocus
-            placeholder="name@plv.edu.ph"
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Email Address') }}</label>
+            <input
+                wire:model="email"
+                type="email"
+                required
+                autofocus
+                placeholder="name@plv.edu.ph"
+                class="w-full"
+            />
+        </div>
 
-        <flux:button variant="primary" type="submit" class="w-full scms-primary-btn" data-test="email-password-reset-link-button">
+        <button type="submit" class="w-full scms-primary-btn" data-test="email-password-reset-link-button">
             {{ __('Email password reset link') }}
-        </flux:button>
+        </button>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
+    <div class="text-sm text-center text-white mt-6">
         <span>{{ __('Or, return to') }}</span>
-        <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
+        <a href="{{ route('login') }}" wire:navigate class="font-semibold hover:underline ml-1">{{ __('log in') }}</a>
     </div>
 </div>

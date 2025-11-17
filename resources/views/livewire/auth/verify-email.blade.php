@@ -44,25 +44,29 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="mt-4 flex flex-col gap-6">
-    <flux:text class="text-center">
-        {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
-    </flux:text>
+<div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <div class="text-center space-y-2 mb-6">
+        <h1 class="text-2xl font-bold text-white">{{ __('Verify Email') }}</h1>
+        <p class="text-sm text-white/80">
+            {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
+        </p>
+    </div>
 
     @if (session('status') == 'verification-link-sent')
-        <flux:text class="text-center font-medium !dark:text-green-300 !text-green-500">
+        <div class="mb-4 p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">
             {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </flux:text>
+        </div>
     @endif
 
-    <div class="flex flex-col items-center justify-between space-y-3">
-        <flux:button wire:click="sendVerification" variant="primary" class="w-full scms-primary-btn">
+    <div class="flex flex-col space-y-4">
+        <button wire:click="sendVerification" class="w-full scms-primary-btn">
             {{ __('Resend verification email') }}
-        </flux:button>
+        </button>
         
-        <button type="button" class="btn btn-ghost normal-case text-sm" wire:click="logout" data-test="logout-button">
+        <button type="button" class="text-sm text-white hover:underline" wire:click="logout" data-test="logout-button">
             {{ __('Log out') }}
         </button>
     </div>
+    
     <x-return-to-welcome />
 </div>

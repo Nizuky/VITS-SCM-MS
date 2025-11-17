@@ -48,79 +48,93 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Student Sign up')" :description="__('Enter your details below to create your account')" />
+<div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <div class="text-center space-y-2 mb-6">
+        <h1 class="text-2xl font-bold text-white">{{ __('Student Sign up') }}</h1>
+        <p class="text-sm text-white/80">{{ __('Enter your details below to create your account') }}</p>
+    </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="text-center" status="{{ session('status') }}" />
 
-    <form method="POST" wire:submit="register" class="flex flex-col gap-6">
+    <form method="POST" wire:submit="register" class="space-y-4">
         <!-- Name -->
         <div>
-            <flux:input
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Name') }}</label>
+            <input
                 wire:model="name"
-                :label="__('Name')"
                 type="text"
                 required
                 autofocus
                 autocomplete="name"
-                :placeholder="__('Full name')"
+                placeholder="{{ __('Full name') }}"
+                class="w-full"
             />
-            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <p class="mt-1 text-xs text-white/70">
                 Format: Surname, First Name Middle Initial
             </p>
         </div>
 
         <!-- Student ID -->
-        <flux:input
-            wire:model="student_id"
-            :label="__('Student ID')"
-            type="text"
-            required
-            placeholder="00-0000"
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Student ID') }}</label>
+            <input
+                wire:model="student_id"
+                type="text"
+                required
+                placeholder="00-0000"
+                class="w-full"
+            />
+        </div>
 
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autocomplete="email"
-            placeholder="name@plv.edu.ph"
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Email address') }}</label>
+            <input
+                wire:model="email"
+                type="email"
+                required
+                autocomplete="email"
+                placeholder="name@plv.edu.ph"
+                class="w-full"
+            />
+        </div>
 
         <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Password')"
-            viewable
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Password') }}</label>
+            <input
+                wire:model="password"
+                type="password"
+                required
+                autocomplete="new-password"
+                placeholder="{{ __('Password') }}"
+                class="w-full"
+            />
+        </div>
 
         <!-- Confirm Password -->
-        <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Confirm password')"
-            viewable
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Confirm password') }}</label>
+            <input
+                wire:model="password_confirmation"
+                type="password"
+                required
+                autocomplete="new-password"
+                placeholder="{{ __('Confirm password') }}"
+                class="w-full"
+            />
+        </div>
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full scms-primary-btn" data-test="register-user-button">
+            <button type="submit" class="w-full scms-primary-btn" data-test="register-user-button">
                 {{ __('Sign up') }}
-            </flux:button>
+            </button>
         </div>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
+    <div class="text-sm text-center text-white mt-6">
         <span>{{ __('Already have an account?') }}</span>
-        <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
+        <a href="{{ route('login') }}" wire:navigate class="font-semibold hover:underline ml-1">{{ __('Log in') }}</a>
     </div>
 </div>

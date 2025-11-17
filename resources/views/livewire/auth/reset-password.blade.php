@@ -110,49 +110,59 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
+<div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <div class="text-center space-y-2 mb-6">
+        <h1 class="text-2xl font-bold text-white">{{ __('Reset password') }}</h1>
+        <p class="text-sm text-white/80">{{ __('Please enter your new password below') }}</p>
+    </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="text-center" status="{{ session('status') }}" />
 
-    <form method="POST" wire:submit="resetPassword" class="flex flex-col gap-6">
+    <form method="POST" wire:submit="resetPassword" class="space-y-4">
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email')"
-            type="email"
-            required
-            autocomplete="email"
-            readonly
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Email') }}</label>
+            <input
+                wire:model="email"
+                type="email"
+                required
+                autocomplete="email"
+                readonly
+                class="w-full"
+            />
+        </div>
 
         <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('New Password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('New Password')"
-            viewable
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('New Password') }}</label>
+            <input
+                wire:model="password"
+                type="password"
+                required
+                autocomplete="new-password"
+                placeholder="{{ __('New Password') }}"
+                class="w-full"
+            />
+        </div>
 
         <!-- Confirm Password -->
-        <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Confirm password')"
-            viewable
-        />
+        <div>
+            <label class="block text-sm font-medium mb-2 text-white">{{ __('Confirm password') }}</label>
+            <input
+                wire:model="password_confirmation"
+                type="password"
+                required
+                autocomplete="new-password"
+                placeholder="{{ __('Confirm password') }}"
+                class="w-full"
+            />
+        </div>
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full scms-primary-btn" data-test="reset-password-button">
+            <button type="submit" class="w-full scms-primary-btn" data-test="reset-password-button">
                 {{ __('Reset password') }}
-            </flux:button>
+            </button>
         </div>
     </form>
 </div>
