@@ -1,0 +1,187 @@
+<?php if (isset($component)) { $__componentOriginalce5847ac41e2319cc94841d423efce16 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce5847ac41e2319cc94841d423efce16 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.layouts.auth.simple','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('layouts.auth.simple'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+        <div class="text-center space-y-2 mb-6">
+            <h1 class="text-2xl font-bold text-white"><?php echo e(__('Admin Login')); ?></h1>
+        </div>
+
+        <form id="admin-login-form" method="POST" action="<?php echo e(route('admin.login.submit')); ?>" class="space-y-4">
+            <?php echo csrf_field(); ?>
+            <?php if(session('success')): ?>
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;"><?php echo e(session('success')); ?></div>
+            <?php endif; ?>
+            <?php if(session('error')): ?>
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
+            <?php endif; ?>
+
+            <div>
+                <label for="name" class="block text-sm font-medium mb-2 text-white"><?php echo e(__('Admin name')); ?></label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="admin name"
+                    value="<?php echo e(old('name', $defaultAdminName ?? '')); ?>"
+                    required
+                    class="w-full"
+                />
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label for="password" class="block text-sm font-medium text-white"><?php echo e(__('Password')); ?></label>
+                    <?php
+                        $forgotRoute = null;
+                        if (\Illuminate\Support\Facades\Route::has('admin.password.request')) {
+                            $forgotRoute = route('admin.password.request');
+                        } elseif (\Illuminate\Support\Facades\Route::has('password.request')) {
+                            $forgotRoute = route('password.request');
+                        } else {
+                            $forgotRoute = '#';
+                        }
+                    ?>
+                    <a href="<?php echo e($forgotRoute); ?>" class="text-sm text-white hover:underline">
+                        <?php echo e(__('Forgot your password?')); ?>
+
+                    </a>
+                </div>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                    class="w-full"
+                />
+            </div>
+
+            <button 
+                id="admin-login-btn"
+                type="submit" 
+                class="w-full scms-primary-btn"
+                aria-busy="false">
+                <span class="btn-text"><?php echo e(__('Login')); ?></span>
+            </button>
+        </form>
+
+        <?php if (isset($component)) { $__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4 = $attributes; } ?>
+<?php $component = App\View\Components\ReturnToWelcome::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('return-to-welcome'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\ReturnToWelcome::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4)): ?>
+<?php $attributes = $__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4; ?>
+<?php unset($__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4)): ?>
+<?php $component = $__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4; ?>
+<?php unset($__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4); ?>
+<?php endif; ?>
+    </div>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce5847ac41e2319cc94841d423efce16)): ?>
+<?php $attributes = $__attributesOriginalce5847ac41e2319cc94841d423efce16; ?>
+<?php unset($__attributesOriginalce5847ac41e2319cc94841d423efce16); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce5847ac41e2319cc94841d423efce16)): ?>
+<?php $component = $__componentOriginalce5847ac41e2319cc94841d423efce16; ?>
+<?php unset($__componentOriginalce5847ac41e2319cc94841d423efce16); ?>
+<?php endif; ?>
+<style>
+/* Force white text for admin-login page */
+h1, h2, h3, h4, h5, h6,
+p, label, span, a {
+    color: #ffffff !important;
+}
+</style>
+
+<script>
+(function(){
+    const form = document.getElementById('admin-login-form');
+    const btn = document.getElementById('admin-login-btn');
+    const btnText = btn && btn.querySelector('.btn-text');
+    const spinner = btn && btn.querySelector('.btn-spinner');
+
+    if (!form || !btn) return;
+
+    function setLoading(state){
+        if (state){
+            btn.setAttribute('disabled','disabled');
+            btn.setAttribute('aria-busy','true');
+            if (btnText) btnText.textContent = 'Logging in…';
+            if (spinner) spinner.style.display = 'inline-block';
+        } else {
+            btn.removeAttribute('disabled');
+            btn.setAttribute('aria-busy','false');
+            if (btnText) btnText.textContent = 'Login';
+            if (spinner) spinner.style.display = 'none';
+        }
+    }
+
+        form.addEventListener('submit', function(e){
+        // If JS enabled, intercept and submit via fetch
+            e.preventDefault();
+            // ensure form submits replace current tab when JS is enabled
+            try { form.target = '_self'; } catch (err) {}
+            setLoading(true);
+
+        const data = new FormData(form);
+        const tokenInput = document.querySelector('input[name="_token"]');
+        const token = tokenInput ? tokenInput.value : null;
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: data,
+            // include cookies/session even in edge cases; preserves compatibility
+            credentials: 'include'
+        }).then(async res => {
+            // if session expired or csrf mismatch, Laravel may return 419 or 403
+            if (res.status === 419 || res.status === 403) {
+                // reload to refresh CSRF/session and present a fresh form
+                window.location.reload();
+                return Promise.reject({ message: 'Session expired. Reloading...' });
+            }
+            if (res.ok) return res.json();
+            // try parse json error body, but handle invalid json
+            try { const j = await res.json(); return Promise.reject(j); } catch (e){ return Promise.reject({ message: 'Unexpected server response' }); }
+        }).then(json => {
+            if (json.redirect) window.location.href = json.redirect;
+            else setLoading(false);
+        }).catch(err => {
+            setLoading(false);
+            // show error banner
+            let msg = 'Invalid information';
+            
+            let existing = document.querySelector('.admin-error-banner');
+            if (!existing){
+                const d = document.createElement('div');
+                d.className = 'admin-error-banner mb-3 p-3 rounded text-sm text-white';
+                d.style.background = 'rgba(239, 68, 68, 0.2)';
+                d.style.borderLeft = '4px solid #ef4444';
+                d.textContent = msg;
+                form.insertBefore(d, form.firstChild);
+            } else {
+                existing.textContent = msg;
+            }
+        });
+    });
+})();
+</script>
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views/auth/admin-login.blade.php ENDPATH**/ ?>

@@ -14,6 +14,22 @@
             <p class="text-sm text-white/80">The password reset link will be sent to the shared admin email on file. Enter the shared email to request a reset.</p>
         </div>
 
+        @if (session('status'))
+            <div class="mb-4 p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="mb-4 p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('admin.password.email') }}" class="space-y-4">
             @csrf
             

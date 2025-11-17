@@ -111,6 +111,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+    <style>
+    /* Force white text for reset-password page */
+    h1, h2, h3, h4, h5, h6,
+    p, label, span, a {
+        color: #ffffff !important;
+    }
+    </style>
+    
     <div class="text-center space-y-2 mb-6">
         <h1 class="text-2xl font-bold text-white">{{ __('Reset password') }}</h1>
         <p class="text-sm text-white/80">{{ __('Please enter your new password below') }}</p>
@@ -165,27 +173,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
             </button>
         </div>
     </form>
+    
+    <script>
+    // Optional: if the server indicated auto=1 and the inputs were prefilled, auto-click the submit button.
+    document.addEventListener('DOMContentLoaded', function(){
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('auto') === '1') {
+                // Small delay to allow Livewire rendering
+                setTimeout(() => {
+                    const btn = document.querySelector('[data-test="reset-password-button"]');
+                    if (btn) btn.click();
+                }, 150);
+            }
+        } catch (_) {}
+    });
+    </script>
 </div>
-<style>
-/* Force white text for reset-password page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
-
-<script>
-// Optional: if the server indicated auto=1 and the inputs were prefilled, auto-click the submit button.
-document.addEventListener('DOMContentLoaded', function(){
-    try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('auto') === '1') {
-            // Small delay to allow Livewire rendering
-            setTimeout(() => {
-                const btn = document.querySelector('[data-test="reset-password-button"]');
-                if (btn) btn.click();
-            }, 150);
-        }
-    } catch (_) {}
-});
-</script>
