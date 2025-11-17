@@ -105,6 +105,14 @@
             transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
         }
 
+        .menu-text,
+        #user-name,
+        #student-number,
+        #status-badge,
+        #collapse-text {
+            transition: none !important;
+        }
+
         #sidebar.collapsed {
             width: 80px !important;
             min-width: 80px !important;
@@ -116,15 +124,18 @@
         #sidebar.collapsed #student-number,
         #sidebar.collapsed #status-badge,
         #sidebar.collapsed #collapse-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-            white-space: nowrap;
+            display: none !important;
+        }
+
+        /* Avatar section - maintain consistent height */
+        #avatar-section {
+            min-height: 200px;
         }
 
         /* Avatar section when collapsed - match the image spacing */
         #sidebar.collapsed #avatar-section {
             padding: 1rem 0.5rem;
+            min-height: 200px;
         }
 
         #sidebar.collapsed #avatar-container {
