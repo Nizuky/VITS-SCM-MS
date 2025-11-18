@@ -123,7 +123,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // Use the web guard explicitly for student authentication
         $guard = Auth::guard('web');
         
-        // Try to retrieve the user by email
+        // First, check if user exists in database
+        $user = User::where('email', $this->email)->first();
+        
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            
+            throw ValidationException::withMessages([
+                'email' => 'No account found with this email address.',
+            ]);
+        }
+        
+        // Try to retrieve the user by email and validate password
         $credentials = ['email' => $this->email];
 
         // Check if guard has getProvider method (SessionGuard does, Guard interface doesn't)
@@ -135,7 +146,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 RateLimiter::hit($this->throttleKey());
 
                 throw ValidationException::withMessages([
-                    'email' => __('auth.failed'),
+                    'email' => 'Invalid information',
                 ]);
             }
 
@@ -147,7 +158,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => 'Invalid information',
             ]);
         }
 
@@ -193,6 +204,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" status="{{ session('status') }}" />
 
     <form method="POST" wire:submit="login" class="space-y-4">
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">
+                @foreach ($errors->all() as $error)
+                    {{ $error }}
+                @endforeach
+            </div>
+        @endif
+        
         <!-- Email Address -->
         <div>
             <label class="block text-sm font-medium mb-2 text-white">{{ __('PLV Email address') }}</label>

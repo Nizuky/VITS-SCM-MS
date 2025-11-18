@@ -32,6 +32,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'email.regex' => 'The email field format is invalid. Use plv email account.',
         ]);
 
+        // Capitalize first letter of each word in the name
+        $validated['name'] = mb_convert_case($validated['name'], MB_CASE_TITLE, 'UTF-8');
+        
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));

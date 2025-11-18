@@ -132,6 +132,23 @@ class SocialContractRecordController extends Controller
             ? $user->socialContracts()->whereKey($data['contract_id'])->firstOrFail()
             : $user->currentSocialContract();
 
+        // Check for duplicate record with same date, event name, venue, and organization
+        $existingRecord = $contract->records()
+            ->where('date', $data['date'])
+            ->where('event_name', $data['event_name'])
+            ->where('venue', $data['venue'])
+            ->where('organization', $data['organization'])
+            ->first();
+
+        if ($existingRecord) {
+            return response()->json([
+                'message' => 'This record has already been submitted. A record with the same event name, date, venue, and organization already exists.',
+                'errors' => [
+                    'duplicate' => ['This record has already been submitted.']
+                ]
+            ], 422);
+        }
+
         $record = $contract->records()->create([
             'date' => $data['date'],
             'event_name' => $data['event_name'],

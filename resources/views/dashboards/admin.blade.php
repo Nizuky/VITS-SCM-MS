@@ -2077,60 +2077,105 @@ body {
             
             // Name change handler
             var snb = document.getElementById('save-name-button');
-            snb.addEventListener('click', async function(e) {
-                e.preventDefault();
-                var nameInput = document.getElementById('admin-name');
-                var newName = nameInput.value.trim();
-                
-                if (!newName) {
-                    showToast('Please enter a valid name.', 'error');
-                    return;
-                }
-                
-                try {
-                    snb.disabled = true;
-                    snb.textContent = 'Updating...';
+            if (snb) {
+                snb.addEventListener('click', async function(e) {
+                    e.preventDefault();
                     
-                    var response = await fetch(`${BASE_PATH}/admin/api/settings/update-name`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify({ name: newName })
-                    });
+                    // Re-query the input field each time button is clicked to ensure we get current value
+                    var nameInput = document.getElementById('admin-name-input');
                     
-                    var data = await response.json();
-                    
-                    if (response.ok && data.success) {
-                        showToast(data.message || 'Name updated successfully!', 'success');
-                        // Update the name in the sidebar
-                        location.reload();
-                    } else {
-                        showToast(data.message || 'Failed to update name.', 'error');
+                    if (!nameInput) {
+                        console.error('admin-name input not found');
+                        showToast('Name input field not found.', 'error');
+                        return;
                     }
-                } catch (error) {
-                    console.error('Error updating name:', error);
-                    showToast('Failed to update name. Please try again.', 'error');
-                } finally {
-                    snb.disabled = false;
-                    snb.textContent = 'Update Name';
-                }
-            });
+                    
+                    // Get the actual current value from the input using getAttribute as fallback
+                    var inputValue = nameInput.value || nameInput.getAttribute('value') || '';
+                    console.log('Input element:', nameInput);
+                    console.log('Raw input value:', inputValue, 'Type:', typeof inputValue);
+                    console.log('Input value property:', nameInput.value);
+                    console.log('Input getAttribute:', nameInput.getAttribute('value'));
+                    
+                    if (!inputValue || inputValue.trim() === '') {
+                        showToast('Please enter a name in the field.', 'error');
+                        return;
+                    }
+                    
+                    var newName = String(inputValue).trim();
+                    console.log('Original value:', nameInput.value);
+                    console.log('Trimmed value:', newName);
+                    console.log('Lowercase:', newName.toLowerCase());
+                    console.log('Starts with admin?:', newName.toLowerCase().startsWith('admin'));
+                
+                    // Ensure name starts with "admin" (case-insensitive check)
+                    if (!newName.toLowerCase().startsWith('admin')) {
+                        console.log('Failed: does not start with admin');
+                        showToast('Admin name must start with "admin".', 'error');
+                        return;
+                    }
+                    
+                    // Get the part after "admin" (preserve original input)
+                    var nameSuffix = newName.substring(5);
+                    console.log('Name suffix:', nameSuffix);
+                    console.log('Suffix length:', nameSuffix.length);
+                    
+                    if (nameSuffix.length === 0) {
+                        console.log('Failed: suffix is empty');
+                        showToast('Please add a name after "admin" (e.g., adminJohn).', 'error');
+                        return;
+                    }
+                    
+                    // Keep the name as entered (but ensure it starts with lowercase "admin")
+                    newName = 'admin' + nameSuffix;
+                    console.log('Final name to send:', newName);
+                
+                    try { 
+                        snb.disabled = true;
+                        snb.textContent = 'Updating...';
+                        
+                        var response = await fetch(`${BASE_PATH}/admin/api/settings/update-name`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ name: newName })
+                        });
+                        
+                        var data = await response.json();
+                        
+                        if (response.ok && data.success) {
+                            showToast(data.message || 'Name updated successfully!', 'success');
+                            // Update the name in the sidebar
+                            location.reload();
+                        } else {
+                            showToast(data.message || 'Failed to update name.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error updating name:', error);
+                        showToast('Failed to update name. Please try again.', 'error');
+                    } finally {
+                        snb.disabled = false;
+                        snb.textContent = 'Update Name';
+                    }
+                });
+            }
             
             // Password change handler with email verification
             var spb = document.getElementById('save-password-button');
             var pcf = document.getElementById('password-change-form');
             
-            spb.addEventListener('click', async function(e) {
-                e.preventDefault();
-                
-                if (!pcf.checkValidity()) {
-                    pcf.reportValidity();
-                    return;
-                }
+            if (spb && pcf) {
+                spb.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    
+                    if (!pcf.checkValidity()) {
+                        pcf.reportValidity();
+                        return;
+                    }
                 
                 var currentPassword = document.getElementById('current-password').value;
                 var newPassword = document.getElementById('new-password').value;
@@ -2180,7 +2225,8 @@ body {
                     spb.disabled = false;
                     spb.textContent = 'Request Password Change';
                 }
-            });
+                });
+            }
             
             // Auto-refresh removed - use manual refresh buttons instead
         });
@@ -2803,10 +2849,11 @@ body {
 
         async function deleteRecord(recordId) {
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
                 const response = await fetch(`{{ url('/admin/data-management/records') }}/${recordId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
@@ -2827,10 +2874,11 @@ body {
 
         async function deleteAccount(accountId) {
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
                 const response = await fetch(`{{ url('/admin/data-management/accounts') }}/${accountId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }

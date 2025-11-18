@@ -15,9 +15,10 @@
             <form id="name-change-form" class="space-y-4 max-w-md">
                 <label class="form-control w-full">
                     <div class="label">
-                        <span class="label-text font-semibold">Full Name</span>
+                        <span class="label-text font-semibold">Admin Name</span>
+                        <span class="label-text-alt text-gray-500">Must start with "admin"</span>
                     </div>
-                    <input id="admin-name" type="text" value="{{ auth()->guard('admin')->user()->name }}" placeholder="Enter your full name" class="input input-bordered w-full rounded-lg" required>
+                    <input id="admin-name-input" type="text" value="{{ auth()->guard('admin')->user()->name }}" placeholder="adminYourName" class="input input-bordered w-full rounded-lg" required pattern="^admin.+">
                 </label>
                 
                 <div class="pt-4 flex justify-end">

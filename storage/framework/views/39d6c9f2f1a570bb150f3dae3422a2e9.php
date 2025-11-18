@@ -45,6 +45,16 @@ use Livewire\Volt\Component;
 <?php endif; ?>
 
     <form method="POST" wire:submit="login" class="space-y-4">
+        <!-- Error Messages -->
+        <!--[if BLOCK]><![endif]--><?php if($errors->any()): ?>
+            <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">
+                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php echo e($error); ?>
+
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+            </div>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        
         <!-- Email Address -->
         <div>
             <label class="block text-sm font-medium mb-2 text-white"><?php echo e(__('PLV Email address')); ?></label>

@@ -2672,10 +2672,14 @@
                     hoursInput.value = '0';
                     confirmationModal.close();
                     addRecordModal.close();
+                    showToast('✓ Record submitted successfully! Your record is now pending verification.', 'success');
                 })
                 .catch((err) => {
                     console.error('Failed to save record', err);
-                    if (err && err.status === 422 && err.err && err.err.errors) {
+                    // Check for duplicate record error first (422 with specific message)
+                    if (err && err.status === 422 && err.err && err.err.message && err.err.message.includes('already been submitted')) {
+                        showToast('⚠️ Duplicate Record: This record has already been submitted. Please check your existing records.', 'warning');
+                    } else if (err && err.status === 422 && err.err && err.err.errors) {
                         const messages = Object.values(err.err.errors).flat().join('\n');
                         showToast('Validation error: ' + messages, 'error');
                     } else if (err && err.status === 401) {
@@ -2862,8 +2866,8 @@
                 document.getElementById('delete_pending_modal').showModal();
             });
 
-            // Confirm deletion from modal
-            async function confirmDeletePending() {
+            // Confirm deletion from modal - make it globally accessible
+            window.confirmDeletePending = async function() {
                 const pendingIds = window.pendingIdsToDelete || [];
                 if (!pendingIds.length) return;
 

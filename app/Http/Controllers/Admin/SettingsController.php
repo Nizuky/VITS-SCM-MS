@@ -103,8 +103,32 @@ class SettingsController extends Controller
         // Update the password
         $admin = AdminUser::where('email', $email)->first();
         if ($admin) {
-            $admin->password = $validToken->new_password_hash;
-            $admin->save();
+            \Log::info('Verifying password change', [
+                'email' => $email,
+                'old_password_hash' => $admin->password,
+                'new_password_hash_from_token' => $validToken->new_password_hash,
+                'token_created_at' => $validToken->created_at
+            ]);
+            
+            // Use direct DB update to bypass any Eloquent mutators or observers
+            $updated = DB::table('admin_users')
+                ->where('email', $email)
+                ->update([
+                    'password' => $validToken->new_password_hash,
+                    'updated_at' => now()
+                ]);
+            
+            \Log::info('Password update result', [
+                'rows_affected' => $updated,
+                'email' => $email
+            ]);
+            
+            // Verify the update by re-querying
+            $updatedAdmin = DB::table('admin_users')->where('email', $email)->first();
+            \Log::info('Verified new password', [
+                'new_password_hash_in_db' => $updatedAdmin->password,
+                'matches_expected' => ($updatedAdmin->password === $validToken->new_password_hash)
+            ]);
 
             // Delete all password change tokens for this email
             DB::table('admin_password_change_tokens')
