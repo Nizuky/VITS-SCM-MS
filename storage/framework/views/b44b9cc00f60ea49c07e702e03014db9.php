@@ -59,6 +59,8 @@ use Livewire\Volt\Component;
                 autocomplete="name"
                 placeholder="<?php echo e(__('Full name')); ?>"
                 class="w-full"
+                id="name-input"
+                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() })"
             />
             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

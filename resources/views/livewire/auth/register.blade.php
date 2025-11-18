@@ -80,6 +80,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 autocomplete="name"
                 placeholder="{{ __('Full name') }}"
                 class="w-full"
+                id="name-input"
+                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() })"
             />
             @error('name')
                 <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
