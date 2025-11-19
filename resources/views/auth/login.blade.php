@@ -11,14 +11,24 @@
             <p class="mb-4 text-center text-sm text-white/80">Logging in as: <strong>{{ $role }}</strong></p>
         @endif
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-4">
+        <form id="student-login-form" method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
+            
+            @if(session('status'))
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">{{ session('status') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">{{ $errors->first() }}</div>
+            @endif
+            
             <div>
                 <label class="block text-sm font-medium mb-2 text-white">Email address</label>
                 <input 
                     name="email" 
                     type="email" 
                     required 
+                    autocomplete="email"
+                    value="{{ old('email') }}"
                     placeholder="name@plv.edu.ph"
                     class="w-full"
                 />
@@ -34,6 +44,7 @@
                     name="password" 
                     type="password" 
                     required 
+                    autocomplete="current-password"
                     placeholder="Password"
                     class="w-full"
                 />
@@ -47,8 +58,32 @@
                 <span class="text-white">Remember me</span>
             </label>
 
-            <button type="submit" class="w-full scms-primary-btn">Log in</button>
+            <button id="student-login-btn" type="submit" class="w-full scms-primary-btn" aria-busy="false">
+                <span class="btn-text">Log in</span>
+            </button>
         </form>
+        
+        <script>
+        (function(){
+            const form = document.getElementById('student-login-form');
+            const btn = document.getElementById('student-login-btn');
+            if (!form || !btn) return;
+            
+            let isSubmitting = false;
+            
+            form.addEventListener('submit', function(e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return;
+                }
+                isSubmitting = true;
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                const btnText = btn.querySelector('.btn-text');
+                if (btnText) btnText.textContent = 'Logging in...';
+            });
+        })();
+        </script>
 
         @if (Route::has('register'))
             <div class="text-center mt-6">

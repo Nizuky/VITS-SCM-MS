@@ -124,27 +124,29 @@ Route::post('/api/ping', function (\Illuminate\Http\Request $request) {
 
 // Social Contract records API for the authenticated student
 Route::middleware(['auth:web', 'verified'])->group(function () {
-    // contracts
-    Route::get('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'index'])->name('social-contracts.index');
-    Route::post('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'store'])->name('social-contracts.store');
-    Route::get('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'index'])->name('social-contract.records.index');
-    Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
-    Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
+    // contracts - throttle to prevent abuse (60 requests per minute per user)
+    Route::middleware('throttle:60,1')->group(function () {
+        Route::get('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'index'])->name('social-contracts.index');
+        Route::post('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'store'])->name('social-contracts.store');
+        Route::get('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'index'])->name('social-contract.records.index');
+        Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
+        Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
 
-    // Student notifications
-    Route::get('/api/notifications/recent', [\App\Http\Controllers\StudentNotificationController::class, 'getRecent'])->name('notifications.recent');
-    Route::get('/api/notifications/all', [\App\Http\Controllers\StudentNotificationController::class, 'getAll'])->name('notifications.all');
-    Route::post('/api/notifications/{id}/read', [\App\Http\Controllers\StudentNotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::delete('/api/notifications/{id}', [\App\Http\Controllers\StudentNotificationController::class, 'delete'])->name('notifications.delete');
-    Route::post('/api/notifications/mark-all-read', [\App\Http\Controllers\StudentNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        // Student notifications
+        Route::get('/api/notifications/recent', [\App\Http\Controllers\StudentNotificationController::class, 'getRecent'])->name('notifications.recent');
+        Route::get('/api/notifications/all', [\App\Http\Controllers\StudentNotificationController::class, 'getAll'])->name('notifications.all');
+        Route::post('/api/notifications/{id}/read', [\App\Http\Controllers\StudentNotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::delete('/api/notifications/{id}', [\App\Http\Controllers\StudentNotificationController::class, 'delete'])->name('notifications.delete');
+        Route::post('/api/notifications/mark-all-read', [\App\Http\Controllers\StudentNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
-    // Support tickets
-    Route::get('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('support-tickets.index');
-    Route::post('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('support-tickets.store');
-    Route::get('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'show'])->name('support-tickets.show');
-    Route::delete('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'destroy'])->name('support-tickets.destroy');
-    Route::put('/api/support-tickets/{id}/done', [\App\Http\Controllers\SupportTicketController::class, 'markAsDone'])->name('support-tickets.done');
-    Route::get('/api/support-tickets/check-limit', [\App\Http\Controllers\SupportTicketController::class, 'checkLimit'])->name('support-tickets.check-limit');
+        // Support tickets
+        Route::get('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('support-tickets.index');
+        Route::post('/api/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('support-tickets.store');
+        Route::get('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'show'])->name('support-tickets.show');
+        Route::delete('/api/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'destroy'])->name('support-tickets.destroy');
+        Route::put('/api/support-tickets/{id}/done', [\App\Http\Controllers\SupportTicketController::class, 'markAsDone'])->name('support-tickets.done');
+        Route::get('/api/support-tickets/check-limit', [\App\Http\Controllers\SupportTicketController::class, 'checkLimit'])->name('support-tickets.check-limit');
+    });
 
     // Profile: send password reset link to PLV email with redirect back to profile
     Route::post('/api/profile/send-reset-link', [\App\Http\Controllers\ProfileController::class, 'sendPasswordResetLink'])
@@ -160,10 +162,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Guest-only pages for the admin guard (prevents web-authenticated users from being redirected here)
     Route::middleware('guest:admin')->group(function () {
         Route::get('login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'showLoginForm'])->name('login');
+        // Rate limiting handled in controller with better logic
         Route::post('login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'login'])->name('login.submit');
 
         Route::get('forgot-password', [App\Http\Controllers\Admin\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-        Route::post('forgot-password', [App\Http\Controllers\Admin\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::post('forgot-password', [App\Http\Controllers\Admin\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
+            ->middleware('throttle:3,1')
+            ->name('password.email');
 
         Route::get('reset-password/{token}', [App\Http\Controllers\Admin\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
         Route::post('reset-password', [App\Http\Controllers\Admin\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
@@ -178,8 +183,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             return view('dashboards.admin', compact('BASE_PATH'));
         })->name('dashboard');
 
-        // Admin API routes for managing student submissions
-        Route::prefix('api')->name('api.')->group(function () {
+        // Admin API routes for managing student submissions - throttled to prevent abuse
+        Route::prefix('api')->name('api.')->middleware('throttle:60,1')->group(function () {
             Route::get('dashboard-stats', [App\Http\Controllers\AdminDashboardController::class, 'getDashboardStats'])->name('dashboard-stats');
             Route::get('submissions', [App\Http\Controllers\AdminDashboardController::class, 'getSubmissions'])->name('submissions');
             Route::post('submissions/{id}/verify', [App\Http\Controllers\AdminDashboardController::class, 'verifySubmission'])->name('submissions.verify');

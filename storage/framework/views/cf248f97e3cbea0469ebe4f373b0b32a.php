@@ -1106,77 +1106,211 @@
         const BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         const SUPER_ADMIN_NAME = <?php echo json_encode($superAdminName, 15, 512) ?>;
         
-        // ==================== CSRF TOKEN SETUP ====================
-        // Simple helper to get CSRF token from meta tag
-        function getCsrfToken() {
-            const metaTag = document.querySelector('meta[name="csrf-token"]');
-            return metaTag ? metaTag.getAttribute('content') : '';
+        // Request cache to prevent duplicate API calls
+        const requestCache = new Map();
+        const pendingRequests = new Map();
+        
+        // Debounce helper to prevent rapid-fire requests
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
         
-        // Auto-refresh CSRF token every 5 minutes to prevent expiration
+        // Smart fetch with caching, deduplication, and retry logic
+        async function smartFetch(url, options = {}, cacheTime = 5000) {
+            const cacheKey = url + JSON.stringify(options);
+            
+            // Return cached response if available and not expired
+            if (requestCache.has(cacheKey)) {
+                const cached = requestCache.get(cacheKey);
+                if (Date.now() - cached.timestamp < cacheTime) {
+                    return cached.response;
+                }
+                requestCache.delete(cacheKey);
+            }
+            
+            // Deduplicate concurrent requests to same endpoint
+            if (pendingRequests.has(cacheKey)) {
+                return pendingRequests.get(cacheKey);
+            }
+            
+            // Make request with retry logic
+            const fetchPromise = (async () => {
+                let lastError;
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    try {
+                        const response = await fetch(url, {
+                            ...options,
+                            signal: AbortSignal.timeout(10000) // 10 second timeout
+                        });
+                        
+                        if (!response.ok && response.status >= 500) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        
+                        // Cache successful GET requests
+                        if (!options.method || options.method === 'GET') {
+                            requestCache.set(cacheKey, {
+                                response: response.clone(),
+                                timestamp: Date.now()
+                            });
+                        }
+                        
+                        return response;
+                    } catch (error) {
+                        lastError = error;
+                        // Exponential backoff: wait 500ms, then 1s, then 2s
+                        if (attempt < 2) {
+                            await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
+                        }
+                    }
+                }
+                throw lastError;
+            })();
+            
+            pendingRequests.set(cacheKey, fetchPromise);
+            
+            try {
+                const result = await fetchPromise;
+                return result;
+            } finally {
+                pendingRequests.delete(cacheKey);
+            }
+        }
+        
+        // ==================== CSRF TOKEN SETUP ====================
+        // CSRF token cache to reduce meta tag lookups
+        let csrfTokenCache = null;
+        let csrfTokenExpiry = 0;
+        
+        // Simple helper to get CSRF token from cache or meta tag
+        function getCsrfToken() {
+            // Return cached token if still valid (cache for 1 minute)
+            if (csrfTokenCache && Date.now() < csrfTokenExpiry) {
+                return csrfTokenCache;
+            }
+            
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            const token = metaTag ? metaTag.getAttribute('content') : '';
+            
+            // Cache the token for 1 minute
+            if (token) {
+                csrfTokenCache = token;
+                csrfTokenExpiry = Date.now() + 60000;
+            }
+            
+            return token;
+        }
+        
+        // Auto-refresh CSRF token every 10 minutes (reduced frequency)
         setInterval(async () => {
             try {
-                const response = await fetch(`${BASE_PATH}/api/refresh-csrf`, {
+                const response = await smartFetch(`${BASE_PATH}/api/refresh-csrf`, {
                     method: 'GET',
-                    credentials: 'include'
-                });
+                    credentials: 'include',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                }, 0); // Don't cache this request
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 if (data.token) {
                     // Update meta tag with new token
                     const metaTag = document.querySelector('meta[name="csrf-token"]');
                     if (metaTag) {
                         metaTag.setAttribute('content', data.token);
+                        // Clear cache to force refresh
+                        csrfTokenCache = data.token;
+                        csrfTokenExpiry = Date.now() + 60000;
                     }
                 }
             } catch (e) {
-                console.warn('[CSRF] Failed to auto-refresh token');
+                console.warn('[CSRF] Failed to auto-refresh token:', e.message);
             }
-        }, 5 * 60 * 1000); // Every 5 minutes
+        }, 10 * 60 * 1000); // Every 10 minutes
+        
+        // Cookie cache to reduce document.cookie parsing
+        const cookieCache = new Map();
+        let cookieCacheExpiry = 0;
         
         function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
+            // Refresh cache every 5 seconds
+            if (Date.now() > cookieCacheExpiry) {
+                cookieCache.clear();
+                const cookies = document.cookie.split(';');
+                cookies.forEach(cookie => {
+                    const [key, value] = cookie.trim().split('=');
+                    if (key) cookieCache.set(key, value);
+                });
+                cookieCacheExpiry = Date.now() + 5000;
+            }
+            
+            return cookieCache.get(name) || null;
         }
         
+        // Track last CSRF cookie fetch to prevent rapid requests
+        let lastCsrfFetch = 0;
+        let csrfFetchPromise = null;
+        
         async function ensureCsrfCookie() {
-            try {
-                // Always fetch fresh CSRF cookie to ensure it's valid
-                const response = await fetch(`${BASE_PATH}/api/csrf-cookie`, {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: { 
-                        'Accept': 'application/json', 
-                        'X-Requested-With': 'XMLHttpRequest', 
-                        'Cache-Control': 'no-cache' 
-                    }
-                });
-                
-                // Wait a moment for cookie to be set
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // Update CSRF token in meta tag
-                if (response.ok) {
-                    const xsrfToken = getCookie('XSRF-TOKEN');
-                    if (xsrfToken) {
-                        const csrfToken = decodeURIComponent(xsrfToken);
-                        const metaTag = document.querySelector('meta[name="csrf-token"]');
-                        if (metaTag) {
-                            metaTag.setAttribute('content', csrfToken);
-                        }
-                        console.log('[CSRF] Token refreshed successfully');
-                        return true;
-                    } else {
-                        console.warn('[CSRF] No XSRF-TOKEN cookie found after fetch');
-                    }
-                } else {
-                    console.warn('[CSRF] Failed to fetch CSRF cookie:', response.status);
-                }
-            } catch (e) {
-                console.error('[CSRF] Error fetching CSRF cookie:', e);
+            // Reuse pending request if exists
+            if (csrfFetchPromise) {
+                return csrfFetchPromise;
             }
-            return false;
+            
+            // Check if we have a valid cookie (cached within last 30 seconds)
+            const now = Date.now();
+            if (getCookie('XSRF-TOKEN') && now - lastCsrfFetch < 30000) {
+                return true;
+            }
+            
+            try {
+                csrfFetchPromise = (async () => {
+                    const response = await smartFetch(`${BASE_PATH}/api/csrf-cookie`, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    }, 0); // Don't cache this request
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    // Wait for cookie to be set
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    
+                    // Clear cookie cache to force refresh
+                    cookieCache.clear();
+                    cookieCacheExpiry = 0;
+                    
+                    lastCsrfFetch = Date.now();
+                    
+                    return getCookie('XSRF-TOKEN') ? true : false;
+                })();
+                
+                const result = await csrfFetchPromise;
+                return result;
+            } catch (e) {
+                console.error('[CSRF] Error fetching CSRF cookie:', e.message);
+                return false;
+            } finally {
+                csrfFetchPromise = null;
+            }
         }
 
         // ==================== SUPPORT TICKETS ====================
@@ -1206,20 +1340,24 @@
         }
 
         /**
-         * Load tickets from database
+         * Load tickets from database with optimized caching
          */
         async function loadTickets() {
             try {
-                const response = await fetch(`${BASE_PATH}/api/support-tickets`, {
+                // Use smartFetch with 30 second cache for GET requests
+                const response = await smartFetch(`${BASE_PATH}/api/support-tickets`, {
                     method: 'GET',
+                    credentials: 'same-origin',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                });
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    }
+                }, 30000); // Cache for 30 seconds
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const data = await response.json();
                 
@@ -1228,12 +1366,14 @@
                     renderTicketsTable();
                     updateTicketLimitInfo(data.remaining_tickets);
                 } else {
-                    console.error('Failed to load tickets:', data.message);
-                    showToast('Failed to load tickets', 'error');
+                    throw new Error(data.message || 'Failed to load tickets');
                 }
             } catch (error) {
-                console.error('Error loading tickets:', error);
-                showToast('Error loading tickets', 'error');
+                console.error('Error loading tickets:', error.message || error);
+                showToast('Error loading tickets. Please try again.', 'error');
+                // Show empty state on error
+                allTickets = [];
+                renderTicketsTable();
             }
         }
 
@@ -1308,30 +1448,41 @@
             document.getElementById('delete_ticket_modal').close();
 
             try {
-                await ensureCsrfCookie();
+                // Ensure CSRF cookie before making request
+                const csrfReady = await ensureCsrfCookie();
+                if (!csrfReady) {
+                    console.warn('[Delete] CSRF cookie not ready, proceeding anyway');
+                }
                 
-                const response = await fetch(`${BASE_PATH}/api/support-tickets/${ticketId}`, {
+                // Use smartFetch with no caching for DELETE operations
+                const response = await smartFetch(`${BASE_PATH}/api/support-tickets/${ticketId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-CSRF-TOKEN': getCsrfToken()
                     },
                     credentials: 'same-origin'
-                });
+                }, 0); // No caching for DELETE
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showToast('Ticket deleted successfully', 'success');
+                    showToast(data.message || 'Ticket deleted successfully', 'success');
+                    // Clear cache and reload tickets
+                    requestCache.clear();
                     await loadTickets();
                 } else {
-                    showToast(data.message || 'Failed to delete ticket', 'error');
+                    throw new Error(data.message || 'Failed to delete ticket');
                 }
             } catch (error) {
-                console.error('Error deleting ticket:', error);
-                showToast('Error deleting ticket', 'error');
+                console.error('Error deleting ticket:', error.message || error);
+                showToast('Error deleting ticket. Please try again.', 'error');
             }
         }
 
@@ -1357,30 +1508,41 @@
             document.getElementById('mark_done_ticket_modal').close();
 
             try {
-                await ensureCsrfCookie();
+                // Ensure CSRF cookie before making request
+                const csrfReady = await ensureCsrfCookie();
+                if (!csrfReady) {
+                    console.warn('[MarkDone] CSRF cookie not ready, proceeding anyway');
+                }
                 
-                const response = await fetch(`${BASE_PATH}/api/support-tickets/${ticketId}/done`, {
+                // Use smartFetch with no caching for PUT operations
+                const response = await smartFetch(`${BASE_PATH}/api/support-tickets/${ticketId}/done`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-CSRF-TOKEN': getCsrfToken()
                     },
                     credentials: 'same-origin'
-                });
+                }, 0); // No caching for PUT
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showToast('Ticket marked as done', 'success');
+                    showToast(data.message || 'Ticket marked as done', 'success');
+                    // Clear cache and reload tickets
+                    requestCache.clear();
                     await loadTickets();
                 } else {
-                    showToast(data.message || 'Failed to mark ticket as done', 'error');
+                    throw new Error(data.message || 'Failed to mark ticket as done');
                 }
             } catch (error) {
-                console.error('Error marking ticket as done:', error);
-                showToast('Error marking ticket as done', 'error');
+                console.error('Error marking ticket as done:', error.message || error);
+                showToast('Error processing request. Please try again.', 'error');
             }
         }
 
@@ -3223,6 +3385,12 @@
                     ticketElements.submitTicketButton.textContent = 'Submitting...';
 
                     try {
+                        // Ensure CSRF cookie before submission
+                        const csrfReady = await ensureCsrfCookie();
+                        if (!csrfReady) {
+                            console.warn('[Submit] CSRF cookie not ready, proceeding anyway');
+                        }
+                        
                         const requestBody = {
                             issue_type: selectedIssueText,
                             details: finalDetails
@@ -3233,27 +3401,38 @@
                             requestBody.record_id = ticketElements.ticketRecordId.value;
                         }
                         
-                        const response = await fetch(`${BASE_PATH}/api/support-tickets`, {
+                        // Use smartFetch with no caching for POST operations
+                        const response = await smartFetch(`${BASE_PATH}/api/support-tickets`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': getCsrfToken()
                             },
-                            credentials: 'include',
+                            credentials: 'same-origin',
                             body: JSON.stringify(requestBody)
-                        });
+                        }, 0); // No caching for POST
+
+                        if (!response.ok) {
+                            // Handle rate limiting (429 status)
+                            if (response.status === 429) {
+                                throw new Error('Daily ticket limit reached. Please try again tomorrow.');
+                            }
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
 
                         let data;
                         try {
                             data = await response.json();
                         } catch (jsonError) {
                             console.error('Failed to parse JSON response:', jsonError);
-                            throw new Error('Invalid JSON response from server');
+                            throw new Error('Invalid response from server');
                         }
 
                         if (data.success) {
-                            // Reload tickets to show the new one
+                            // Clear cache and reload tickets to show the new one
+                            requestCache.clear();
                             await loadTickets();
                             
                             // Cleanup
@@ -3266,14 +3445,11 @@
 
                             showToast(data.message || `Ticket #${data.ticket.id} submitted successfully!`, 'success');
                         } else {
-                            console.error('API Error:', data);
-                            const errorMsg = data.message || (data.errors ? JSON.stringify(data.errors) : 'Failed to submit ticket');
-                            showToast(errorMsg, 'error');
+                            throw new Error(data.message || 'Failed to submit ticket');
                         }
                     } catch (error) {
-                        console.error('Caught error:', error);
-                        console.error('Error stack:', error.stack);
-                        showToast('Error submitting ticket. Please try again.', 'error');
+                        console.error('Error submitting ticket:', error.message || error);
+                        showToast(error.message || 'Error submitting ticket. Please try again.', 'error');
                     } finally {
                         ticketElements.submitTicketButton.disabled = false;
                         ticketElements.submitTicketButton.textContent = 'Submit Ticket';

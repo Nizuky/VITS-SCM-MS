@@ -12,8 +12,30 @@ class LoginController extends Controller
 {
     public function __invoke(Request $request)
     {
+        // Rate limiting: 5 attempts per minute per IP
+        $key = 'superadmin-login:' . $request->ip();
+        
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+            
+            \Log::warning('SuperAdmin login rate limit exceeded', [
+                'ip' => $request->ip(),
+                'retry_after' => $seconds
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => "Too many login attempts. Please try again in {$seconds} seconds."
+                ], 429);
+            }
+            
+            return back()->withErrors([
+                'name' => "Too many login attempts. Please try again in {$seconds} seconds."
+            ]);
+        }
+        
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'password' => 'required|string',
         ]);
 
@@ -58,6 +80,9 @@ class LoginController extends Controller
         }
 
         if (! $admin || ! $passwordOk) {
+            // Increment rate limiter on failed attempt
+            \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+            
             // Log failed attempt for debugging
             \Log::warning('SuperAdmin login failed', [
                 'identifier' => $identifier,
@@ -73,6 +98,9 @@ class LoginController extends Controller
                 ->withErrors(['name' => 'Unknown user or invalid password.'])
                 ->with('error', 'Unknown user or invalid password.');
         }
+        
+        // Clear rate limiter on successful login
+        \Illuminate\Support\Facades\RateLimiter::clear($key);
 
         // Login via the 'superadmin' guard
         // IMPORTANT: never use remember_me for super admins - always expire on tab close
@@ -123,10 +151,10 @@ class LoginController extends Controller
     {
         Auth::guard('superadmin')->logout();
 
-    // Remove guard marker and destroy session
-    $request->session()->forget('auth_guard');
-    $request->session()->forget('superadmin_session_active');
-    $request->session()->invalidate();
+        // Remove guard marker and destroy session
+        $request->session()->forget('auth_guard');
+        $request->session()->forget('superadmin_session_active');
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('superadmin.login')->with('success', 'You have been logged out.');

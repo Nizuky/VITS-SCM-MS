@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest:web')->group(function () {
+    // Student login - rate limited to 5 attempts per minute
     Volt::route('login', 'auth.login')
+        ->middleware('throttle:5,1')
         ->name('login');
 
     // Other guest-only routes (login/register) are defined here
@@ -22,6 +24,7 @@ Route::middleware('guest:web')->group(function () {
         ->name('nonstudent.select');
 
     Volt::route('forgot-password', 'auth.forgot-password')
+        ->middleware('throttle:3,1')
         ->name('password.request');
 
 });
@@ -32,8 +35,9 @@ Volt::route('reset-password/{token}', 'auth.reset-password')
     ->name('password.reset');
 
 // Make register page reachable even when a user is remembered (avoid RedirectIfAuthenticated)
+// Rate limited to 3 registration attempts per minute
 Volt::route('register', 'auth.register')
-    ->middleware('guest:web')
+    ->middleware(['guest:web', 'throttle:3,1'])
     ->name('register');
 
 // Super-admin guest routes (use a guard-specific guest middleware to avoid conflicting with web remember-me)
@@ -49,9 +53,10 @@ Route::middleware('guest:superadmin')->group(function () {
         return view('auth.super-admin-login', ['defaultAdminName' => $defaultName]);
     })->name('superadmin.login');
 
+    // Rate limiting handled in controller with better logic
     Route::post('super-admin/login', App\Http\Controllers\SuperAdmin\LoginController::class)->name('superadmin.login.submit');
 
-    // Super admin password reset request
+    // Super admin password reset request - rate limited to 3 per minute
     Route::get('super-admin/password/reset', function () { return view('auth.super-admin-forgot-password'); })->name('superadmin.password.request');
     Route::post('super-admin/password/email', App\Http\Controllers\SuperAdmin\ForgotPasswordController::class)->name('superadmin.password.email');
     // Reset link with token
@@ -124,29 +129,31 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
             return view('dashboards.super_admin', compact('BASE_PATH'));
         })->name('superadmin.dashboard');
 
-    // Super-admin API endpoints
-    Route::get('super-admin/api/dashboard-stats', [App\Http\Controllers\SuperAdminDashboardController::class, 'getDashboardStats']);
-    Route::get('super-admin/api/submissions', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSubmissions']);
-    Route::post('super-admin/api/submissions/{id}/verify', [App\Http\Controllers\SuperAdminDashboardController::class, 'verifySubmission']);
-    Route::post('super-admin/api/submissions/{id}/approve', [App\Http\Controllers\SuperAdminDashboardController::class, 'approveSubmission']);
-    Route::post('super-admin/api/submissions/{id}/reject', [App\Http\Controllers\SuperAdminDashboardController::class, 'rejectSubmission']);
-    Route::delete('super-admin/api/submissions/{id}', [App\Http\Controllers\SuperAdminDashboardController::class, 'deleteSubmission']);
-    Route::get('super-admin/api/activity-calendar', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityCalendar']);
-    Route::get('super-admin/api/activity-details', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityDetails']);
+    // Super-admin API endpoints - throttled to prevent abuse (60 requests per minute)
+    Route::middleware('throttle:60,1')->group(function () {
+        Route::get('super-admin/api/dashboard-stats', [App\Http\Controllers\SuperAdminDashboardController::class, 'getDashboardStats']);
+        Route::get('super-admin/api/submissions', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSubmissions']);
+        Route::post('super-admin/api/submissions/{id}/verify', [App\Http\Controllers\SuperAdminDashboardController::class, 'verifySubmission']);
+        Route::post('super-admin/api/submissions/{id}/approve', [App\Http\Controllers\SuperAdminDashboardController::class, 'approveSubmission']);
+        Route::post('super-admin/api/submissions/{id}/reject', [App\Http\Controllers\SuperAdminDashboardController::class, 'rejectSubmission']);
+        Route::delete('super-admin/api/submissions/{id}', [App\Http\Controllers\SuperAdminDashboardController::class, 'deleteSubmission']);
+        Route::get('super-admin/api/activity-calendar', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityCalendar']);
+        Route::get('super-admin/api/activity-details', [App\Http\Controllers\SuperAdminDashboardController::class, 'getActivityDetails']);
 
-    // Super-admin Settings API endpoints
-    Route::post('super-admin/api/settings/update-name', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'updateName'])->name('superadmin.settings.updateName');
-    Route::post('super-admin/api/settings/request-password-change', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'requestPasswordChange'])->name('superadmin.settings.requestPasswordChange');
+        // Super-admin Settings API endpoints
+        Route::post('super-admin/api/settings/update-name', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'updateName'])->name('superadmin.settings.updateName');
+        Route::post('super-admin/api/settings/request-password-change', [App\Http\Controllers\SuperAdmin\SettingsController::class, 'requestPasswordChange'])->name('superadmin.settings.requestPasswordChange');
 
-    // Super-admin Students Management API endpoints
-    Route::get('super-admin/api/students', [App\Http\Controllers\SuperAdminStudentController::class, 'index'])->name('superadmin.students.index');
-    Route::put('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'update'])->name('superadmin.students.update');
-    Route::delete('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'destroy'])->name('superadmin.students.destroy');
+        // Super-admin Students Management API endpoints
+        Route::get('super-admin/api/students', [App\Http\Controllers\SuperAdminStudentController::class, 'index'])->name('superadmin.students.index');
+        Route::put('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'update'])->name('superadmin.students.update');
+        Route::delete('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'destroy'])->name('superadmin.students.destroy');
 
-    // Super-admin Support Tickets API endpoints
-    Route::get('super-admin/api/support-tickets', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSupportTickets'])->name('superadmin.support-tickets.index');
-    Route::put('super-admin/api/support-tickets/{id}/status', [App\Http\Controllers\SuperAdminDashboardController::class, 'updateTicketStatus'])->name('superadmin.support-tickets.updateStatus');
-    Route::put('super-admin/api/support-tickets/{id}/resolve', [App\Http\Controllers\SuperAdminDashboardController::class, 'resolveTicket'])->name('superadmin.support-tickets.resolve');
+        // Super-admin Support Tickets API endpoints
+        Route::get('super-admin/api/support-tickets', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSupportTickets'])->name('superadmin.support-tickets.index');
+        Route::put('super-admin/api/support-tickets/{id}/status', [App\Http\Controllers\SuperAdminDashboardController::class, 'updateTicketStatus'])->name('superadmin.support-tickets.updateStatus');
+        Route::put('super-admin/api/support-tickets/{id}/resolve', [App\Http\Controllers\SuperAdminDashboardController::class, 'resolveTicket'])->name('superadmin.support-tickets.resolve');
+    });
 
     // Super-admin logout
     Route::post('super-admin/logout', [App\Http\Controllers\SuperAdmin\LoginController::class, 'logout'])

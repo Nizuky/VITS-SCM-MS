@@ -1662,6 +1662,59 @@ body {
         var BASE_PATH = @json($BASE_PATH);
         var recordToDelete = null; // Store record ID for deletion
         
+        // Request cache to prevent duplicate API calls
+        const requestCache = new Map();
+        const pendingRequests = new Map();
+        
+        // Smart fetch with caching, deduplication, and retry logic
+        async function smartFetch(url, options = {}, cacheTime = 5000) {
+            const cacheKey = url + JSON.stringify(options);
+            if (requestCache.has(cacheKey)) {
+                const cached = requestCache.get(cacheKey);
+                if (Date.now() - cached.timestamp < cacheTime) {
+                    return cached.response.clone();
+                }
+                requestCache.delete(cacheKey);
+            }
+            if (pendingRequests.has(cacheKey)) {
+                return pendingRequests.get(cacheKey);
+            }
+            const fetchPromise = (async () => {
+                let lastError;
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    try {
+                        const response = await fetch(url, {
+                            ...options,
+                            signal: AbortSignal.timeout(15000)
+                        });
+                        if (!response.ok && response.status >= 500) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        if (!options.method || options.method === 'GET') {
+                            requestCache.set(cacheKey, {
+                                response: response.clone(),
+                                timestamp: Date.now()
+                            });
+                        }
+                        return response;
+                    } catch (error) {
+                        lastError = error;
+                        if (attempt < 2) {
+                            await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
+                        }
+                    }
+                }
+                throw lastError;
+            })();
+            pendingRequests.set(cacheKey, fetchPromise);
+            try {
+                const result = await fetchPromise;
+                return result;
+            } finally {
+                pendingRequests.delete(cacheKey);
+            }
+        }
+        
         // Helper function to get current date/time in Philippine timezone (Asia/Manila, UTC+8)
         function getPhilippineDate(dateInput = null) {
             if (!dateInput) {
@@ -1680,69 +1733,86 @@ body {
         }
         
         // ==================== CSRF TOKEN SETUP ====================
-        // Simple helper to get CSRF token from meta tag
+        let csrfTokenCache = null;
+        let csrfTokenExpiry = 0;
+        
         function getCsrfToken() {
+            if (csrfTokenCache && Date.now() < csrfTokenExpiry) return csrfTokenCache;
             const metaTag = document.querySelector('meta[name="csrf-token"]');
-            return metaTag ? metaTag.getAttribute('content') : '';
+            const token = metaTag ? metaTag.getAttribute('content') : '';
+            if (token) {
+                csrfTokenCache = token;
+                csrfTokenExpiry = Date.now() + 60000;
+            }
+            return token;
         }
         
-        // Auto-refresh CSRF token every 5 minutes to prevent expiration
         setInterval(async () => {
             try {
-                const response = await fetch(`${BASE_PATH}/api/refresh-csrf`, {
+                const response = await smartFetch(`${BASE_PATH}/api/refresh-csrf`, {
                     method: 'GET',
-                    credentials: 'include'
-                });
+                    credentials: 'include',
+                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}
+                }, 0);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 if (data.token) {
-                    // Update meta tag with new token
                     const metaTag = document.querySelector('meta[name="csrf-token"]');
                     if (metaTag) {
                         metaTag.setAttribute('content', data.token);
+                        csrfTokenCache = data.token;
+                        csrfTokenExpiry = Date.now() + 60000;
                     }
                 }
             } catch (e) {
-                console.warn('[CSRF] Failed to auto-refresh token');
+                console.warn('[CSRF] Failed to auto-refresh token:', e.message);
             }
-        }, 5 * 60 * 1000); // Every 5 minutes
+        }, 10 * 60 * 1000);
         
         // CSRF Cookie Helper Functions
+        const cookieCache = new Map();
+        let cookieCacheExpiry = 0;
+        
         function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
+            if (Date.now() > cookieCacheExpiry) {
+                cookieCache.clear();
+                const cookies = document.cookie.split(';');
+                cookies.forEach(cookie => {
+                    const [key, value] = cookie.trim().split('=');
+                    if (key) cookieCache.set(key, value);
+                });
+                cookieCacheExpiry = Date.now() + 5000;
+            }
+            return cookieCache.get(name) || null;
         }
         
+        let lastCsrfFetch = 0;
+        let csrfFetchPromise = null;
+        
         async function ensureCsrfCookie() {
+            if (csrfFetchPromise) return csrfFetchPromise;
+            const now = Date.now();
+            if (getCookie('XSRF-TOKEN') && now - lastCsrfFetch < 30000) return true;
             try {
-                // Always fetch fresh CSRF cookie to ensure it's valid
-                const response = await fetch(`${BASE_PATH}/api/csrf-cookie`, {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: { 
-                        'Accept': 'application/json', 
-                        'X-Requested-With': 'XMLHttpRequest', 
-                        'Cache-Control': 'no-cache' 
-                    }
-                });
-                
-                // Wait a moment for cookie to be set
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // Update CSRF token in meta tag
-                if (response.ok) {
-                    const xsrfToken = getCookie('XSRF-TOKEN');
-                    if (xsrfToken) {
-                        const csrfToken = decodeURIComponent(xsrfToken);
-                        const metaTag = document.querySelector('meta[name="csrf-token"]');
-                        if (metaTag) {
-                            metaTag.setAttribute('content', csrfToken);
-                        }
-                    }
-                }
+                csrfFetchPromise = (async () => {
+                    const response = await smartFetch(`${BASE_PATH}/api/csrf-cookie`, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}
+                    }, 0);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    cookieCache.clear();
+                    cookieCacheExpiry = 0;
+                    lastCsrfFetch = Date.now();
+                    return getCookie('XSRF-TOKEN') ? true : false;
+                })();
+                return await csrfFetchPromise;
             } catch (e) {
-                console.warn('Could not fetch CSRF cookie:', e);
+                console.error('[CSRF] Error:', e.message);
+                return false;
+            } finally {
+                csrfFetchPromise = null;
             }
         }
         
@@ -2843,18 +2913,15 @@ body {
             // Ensure CSRF cookie exists before making request
             await ensureCsrfCookie();
             
-            fetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
+            smartFetch(`${BASE_PATH}/super-admin/api/dashboard-stats`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
                 credentials: 'same-origin'
-            })
+            }, 30000)
             .then(async function(response) {
                 const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
@@ -3122,22 +3189,16 @@ body {
             // Ensure CSRF cookie exists before making request
             await ensureCsrfCookie();
             
-            // Add timestamp to URL to prevent caching
-            var timestamp = new Date().getTime();
-            
-            // Fetch submissions from API
-            fetch(`${BASE_PATH}/super-admin/api/submissions?_=${timestamp}`, {
+            // Fetch submissions from API with caching
+            smartFetch(`${BASE_PATH}/super-admin/api/submissions`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
-                credentials: 'include'
-            })
+                credentials: 'same-origin'
+            }, 20000)
             .then(async function(response) {
                 const contentType = response.headers.get('content-type') || '';
                 if (!response.ok) {
@@ -4872,6 +4933,7 @@ body {
             showPage(savedPage);
             initThemeToggle();
             initYearlyCharts();
+            loadDashboardStats();  // Load dashboard statistics
             loadSubmissions();
             initPendingRequestsChart();
             generateActivityCalendar();

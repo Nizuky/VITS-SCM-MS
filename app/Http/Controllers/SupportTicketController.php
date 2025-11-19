@@ -37,11 +37,18 @@ class SupportTicketController extends Controller
                 'success' => true,
                 'tickets' => $tickets,
                 'remaining_tickets' => SupportTicket::getRemainingTickets($user->id)
-            ]);
+            ])->header('Cache-Control', 'private, max-age=30')
+              ->header('X-Content-Type-Options', 'nosniff');
         } catch (\Exception $e) {
+            \Log::error('Failed to fetch support tickets', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to fetch tickets: ' . $e->getMessage()
+                'message' => 'Failed to fetch tickets. Please try again.'
             ], 500);
         }
     }
@@ -56,6 +63,11 @@ class SupportTicketController extends Controller
 
             // Check if student can submit more tickets today
             if (!SupportTicket::canSubmitTicket($user->id)) {
+                \Log::warning('Student exceeded daily ticket limit', [
+                    'user_id' => $user->id,
+                    'student_name' => $user->name
+                ]);
+                
                 return response()->json([
                     'success' => false,
                     'message' => 'You have reached the daily limit of 2 tickets. Please try again tomorrow.'
@@ -64,13 +76,17 @@ class SupportTicketController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'issue_type' => 'required|string|max:255',
-                'details' => 'required|string',
+                'details' => 'required|string|max:2000',
+            ], [
+                'issue_type.required' => 'Please select an issue type',
+                'details.required' => 'Please provide issue details',
+                'details.max' => 'Details cannot exceed 2000 characters'
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed',
+                    'message' => 'Validation failed: ' . $validator->errors()->first(),
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -81,6 +97,12 @@ class SupportTicketController extends Controller
                 'issue_type' => $request->issue_type,
                 'details' => $request->details,
                 'status' => 'Pending',
+            ]);
+            
+            \Log::info('Support ticket created', [
+                'ticket_id' => $ticket->id,
+                'user_id' => $user->id,
+                'issue_type' => $request->issue_type
             ]);
 
             return response()->json([
@@ -97,11 +119,17 @@ class SupportTicketController extends Controller
                     'updated_at' => $ticket->updated_at->format('M d, Y g:i A'),
                 ],
                 'remaining_tickets' => SupportTicket::getRemainingTickets($user->id)
-            ], 201);
+            ], 201)->header('X-Content-Type-Options', 'nosniff');
         } catch (\Exception $e) {
+            \Log::error('Failed to create support ticket', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit ticket: ' . $e->getMessage()
+                'message' => 'Failed to submit ticket. Please try again.'
             ], 500);
         }
     }
