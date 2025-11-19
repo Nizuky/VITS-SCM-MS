@@ -1,12 +1,19 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
 	// Configure dark mode to use data-theme attribute instead of .dark class
 	darkMode: ['selector', '[data-theme="dark"]'],
 	
+	// tailwind.config.js - Updated Content
 	content: [
+		// Your existing paths:
 		'./resources/**/*.blade.php',
 		'./resources/**/*.js',
 		'./resources/**/*.vue',
+		
+		// Recommended additions for Laravel:
+		'./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+		'./storage/framework/views/*.php',
 	],
 	theme: {
 		extend: {

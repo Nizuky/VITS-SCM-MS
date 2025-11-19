@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -47,7 +49,7 @@
                 }
             };
         </script>
-        <script src="https://cdn.tailwindcss.com"></script>
+         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
         <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />

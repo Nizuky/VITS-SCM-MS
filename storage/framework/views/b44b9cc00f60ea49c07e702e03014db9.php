@@ -60,7 +60,7 @@ use Livewire\Volt\Component;
                 placeholder="<?php echo e(__('Full name')); ?>"
                 class="w-full"
                 id="name-input"
-                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() })"
+                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() }); generateEmail();"
             />
             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -116,9 +116,10 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                 required
                 autocomplete="email"
                 placeholder="name@plv.edu.ph"
-                pattern="[^@\s]+@plv\.edu\.ph"
-                title="Please use your PLV institutional email (@plv.edu.ph)"
-                class="w-full"
+                id="email-input"
+                readonly
+                class="w-full bg-white/5 cursor-not-allowed"
+                title="Email is auto-generated from your name"
             />
             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -133,6 +134,9 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+            <p class="mt-1 text-xs text-white/70">
+                Auto-generated from your name
+            </p>
         </div>
 
         <!-- Password -->
@@ -199,4 +203,75 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
         <span><?php echo e(__('Already have an account?')); ?></span>
         <a href="<?php echo e(route('login')); ?>" wire:navigate class="font-semibold hover:underline ml-1"><?php echo e(__('Log in')); ?></a>
     </div>
-</div><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/register.blade.php ENDPATH**/ ?>
+</div>
+
+<script>
+function generateEmail() {
+    const nameInput = document.getElementById('name-input');
+    const emailInput = document.getElementById('email-input');
+    
+    if (!nameInput || !emailInput) return;
+    
+    let name = nameInput.value.trim();
+    if (!name) {
+        emailInput.value = '';
+        return;
+    }
+    
+    // Remove dots and extra spaces
+    name = name.replace(/\./g, '').replace(/\s+/g, ' ').trim();
+    
+    let surname = '';
+    let otherNames = [];
+    
+    // Check if there's a comma (Format: Surname, First Name Middle Initial)
+    if (name.includes(',')) {
+        const parts = name.split(',');
+        surname = parts[0].trim();
+        // Get everything after the comma
+        const namesAfterComma = parts.slice(1).join(' ').trim();
+        otherNames = namesAfterComma.split(' ').filter(part => part.length > 0);
+    } else {
+        // No comma, assume first part is surname
+        const parts = name.split(' ').filter(part => part.length > 0);
+        if (parts.length > 0) {
+            surname = parts[0];
+            otherNames = parts.slice(1);
+        }
+    }
+    
+    if (!surname && otherNames.length === 0) {
+        emailInput.value = '';
+        return;
+    }
+    
+    // Combine: firstname + middlename + surname (all lowercase, no spaces)
+    // Exclude middle initials (1-2 characters)
+    let emailPrefix = '';
+    
+    // Add other names first (first name, middle name, etc.) but skip initials (1-2 chars)
+    otherNames.forEach(name => {
+        // Only include names longer than 2 characters (skip initials)
+        if (name.length > 2) {
+            emailPrefix += name.toLowerCase();
+        }
+    });
+    
+    // Add surname last
+    emailPrefix += surname.toLowerCase();
+    
+    // Remove any remaining special characters
+    emailPrefix = emailPrefix.replace(/[^a-z0-9]/g, '');
+    
+    // Set the email
+    emailInput.value = emailPrefix + '@plv.edu.ph';
+    
+    // Trigger Livewire update
+    emailInput.dispatchEvent(new Event('input'));
+}
+
+// Generate email on page load if name exists
+document.addEventListener('DOMContentLoaded', function() {
+    generateEmail();
+});
+</script><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/register.blade.php ENDPATH**/ ?>

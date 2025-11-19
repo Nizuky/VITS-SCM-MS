@@ -81,7 +81,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="{{ __('Full name') }}"
                 class="w-full"
                 id="name-input"
-                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() })"
+                oninput="this.value = this.value.replace(/\b\w/g, function(l){ return l.toUpperCase() }); generateEmail();"
             />
             @error('name')
                 <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
@@ -121,15 +121,19 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 required
                 autocomplete="email"
                 placeholder="name@plv.edu.ph"
-                pattern="[^@\s]+@plv\.edu\.ph"
-                title="Please use your PLV institutional email (@plv.edu.ph)"
-                class="w-full"
+                id="email-input"
+                readonly
+                class="w-full bg-white/5 cursor-not-allowed"
+                title="Email is auto-generated from your name"
             />
             @error('email')
                 <p class="mt-2 text-sm text-white" style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem; border-radius: 0.5rem; border-left: 4px solid #ef4444;">
                     {{ $message }}
                 </p>
             @enderror
+            <p class="mt-1 text-xs text-white/70">
+                Auto-generated from your name
+            </p>
         </div>
 
         <!-- Password -->
@@ -180,3 +184,74 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <a href="{{ route('login') }}" wire:navigate class="font-semibold hover:underline ml-1">{{ __('Log in') }}</a>
     </div>
 </div>
+
+<script>
+function generateEmail() {
+    const nameInput = document.getElementById('name-input');
+    const emailInput = document.getElementById('email-input');
+    
+    if (!nameInput || !emailInput) return;
+    
+    let name = nameInput.value.trim();
+    if (!name) {
+        emailInput.value = '';
+        return;
+    }
+    
+    // Remove dots and extra spaces
+    name = name.replace(/\./g, '').replace(/\s+/g, ' ').trim();
+    
+    let surname = '';
+    let otherNames = [];
+    
+    // Check if there's a comma (Format: Surname, First Name Middle Initial)
+    if (name.includes(',')) {
+        const parts = name.split(',');
+        surname = parts[0].trim();
+        // Get everything after the comma
+        const namesAfterComma = parts.slice(1).join(' ').trim();
+        otherNames = namesAfterComma.split(' ').filter(part => part.length > 0);
+    } else {
+        // No comma, assume first part is surname
+        const parts = name.split(' ').filter(part => part.length > 0);
+        if (parts.length > 0) {
+            surname = parts[0];
+            otherNames = parts.slice(1);
+        }
+    }
+    
+    if (!surname && otherNames.length === 0) {
+        emailInput.value = '';
+        return;
+    }
+    
+    // Combine: firstname + middlename + surname (all lowercase, no spaces)
+    // Exclude middle initials (1-2 characters)
+    let emailPrefix = '';
+    
+    // Add other names first (first name, middle name, etc.) but skip initials (1-2 chars)
+    otherNames.forEach(name => {
+        // Only include names longer than 2 characters (skip initials)
+        if (name.length > 2) {
+            emailPrefix += name.toLowerCase();
+        }
+    });
+    
+    // Add surname last
+    emailPrefix += surname.toLowerCase();
+    
+    // Remove any remaining special characters
+    emailPrefix = emailPrefix.replace(/[^a-z0-9]/g, '');
+    
+    // Set the email
+    emailInput.value = emailPrefix + '@plv.edu.ph';
+    
+    // Trigger Livewire update
+    emailInput.dispatchEvent(new Event('input'));
+}
+
+// Generate email on page load if name exists
+document.addEventListener('DOMContentLoaded', function() {
+    generateEmail();
+});
+</script>
