@@ -183,6 +183,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <span>{{ __('Already have an account?') }}</span>
         <a href="{{ route('login') }}" wire:navigate class="font-semibold hover:underline ml-1">{{ __('Log in') }}</a>
     </div>
+    <x-return-to-welcome />
 </div>
 
 <script>

@@ -13,7 +13,7 @@
         display: inline-block;
         padding: 10px 16px;
         background: transparent;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.5);
         border-radius: 8px;
         font-size: 10px;
         font-weight: 600;
@@ -22,8 +22,9 @@
         cursor: pointer;
     }
     .return-home-btn:hover {
-        background: #1a00ac;
-        color: #ffffff;
+    color: #8c4cf2ff;
+    text-decoration: underline; /* This creates the underline */
+    text-underline-offset: 2px; /* This moves the underline slightly down */
     }
     </style>
 

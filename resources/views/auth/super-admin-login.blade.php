@@ -1,4 +1,4 @@
-<x-layouts.auth.simple>
+<x-layouts.auth.login-register>
     <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         <div class="text-center space-y-2 mb-6">
             <h1 class="text-2xl font-bold text-white">Super Admin Login</h1>
@@ -49,14 +49,7 @@
 
         <x-return-to-welcome />
     </div>
-</x-layouts.auth.simple>
-<style>
-/* Force white text for super-admin-login page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
+</x-layouts.auth.login-register>
 
 <script>
     (function(){

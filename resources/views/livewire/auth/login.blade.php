@@ -231,11 +231,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <div>
             <div class="flex items-center justify-between mb-2">
                 <label class="block text-sm font-medium text-white">{{ __('Password') }}</label>
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" wire:navigate class="text-sm text-white hover:underline">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                @endif
             </div>
             <input
                 wire:model="password"
@@ -245,6 +240,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="{{ __('Password') }}"
                 class="w-full"
             />
+            <div class="flex justify-end mt-1 mb-4">
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" wire:navigate class="text-sm hover:underline">
+                    {{ __('Forgot your password?') }}
+                </a>
+            @endif
+            </div>
         </div>
 
         <!-- Remember Me -->
@@ -265,9 +267,10 @@ new #[Layout('components.layouts.auth')] class extends Component {
     @if (Route::has('register'))
         <div class="text-sm text-center text-white mt-6">
             <span>{{ __('Don\'t have an account?') }}</span>
-            <a href="{{ route('register') }}" wire:navigate class="font-semibold hover:underline ml-1">{{ __('Sign up') }}</a>
+            <a href="{{ route('register') }}" wire:navigate class="font-semibold hover:underline ml-1 hover:text-[#8c4cf2] ">{{ __('Sign up') }}</a>
         </div>
     @endif
+    
     <style>
     /* Scoped overrides for login page */
     .scms-login .scms-primary-btn {
@@ -335,4 +338,5 @@ new #[Layout('components.layouts.auth')] class extends Component {
         color: #ffffff !important;
     }
     </style>
+    <x-return-to-welcome />
 </div>

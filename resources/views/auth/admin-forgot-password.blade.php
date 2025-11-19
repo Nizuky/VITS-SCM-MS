@@ -1,4 +1,4 @@
-<x-layouts.auth.simple>
+<x-layouts.auth.login-register>
     <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         @php
             $defaultAdmin = App\Models\AdminUser::first();
@@ -70,11 +70,4 @@
         
         <x-return-to-welcome />
     </div>
-</x-layouts.auth.simple>
-<style>
-/* Force white text for admin-forgot-password page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
+</x-layouts.auth.login-register>

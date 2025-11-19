@@ -1,4 +1,4 @@
-@component('components.layouts.auth.simple')
+<x-layouts.auth.login-register>
     <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         <div class="text-center space-y-2 mb-6">
             <h1 class="text-2xl font-bold text-white">{{ __('Reset Admin Password') }}</h1>
@@ -40,11 +40,4 @@
         
         <x-return-to-welcome />
     </div>
-@endcomponent
-
-<style>
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
+</x-layouts.auth.login-register>

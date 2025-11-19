@@ -1,7 +1,7 @@
-<?php if (isset($component)) { $__componentOriginalce5847ac41e2319cc94841d423efce16 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalce5847ac41e2319cc94841d423efce16 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.layouts.auth.simple','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('layouts.auth.simple'); ?>
+<?php if (isset($component)) { $__componentOriginaled17748e2d35dfac5d4111319639b524 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaled17748e2d35dfac5d4111319639b524 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.layouts.auth.login-register','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('layouts.auth.login-register'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
@@ -28,10 +28,11 @@
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="admin name"
+                    placeholder="Enter admin name"
                     value="<?php echo e(old('name', $defaultAdminName ?? '')); ?>"
                     required
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
             </div>
 
@@ -48,10 +49,6 @@
                             $forgotRoute = '#';
                         }
                     ?>
-                    <a href="<?php echo e($forgotRoute); ?>" class="text-sm text-white hover:underline">
-                        <?php echo e(__('Forgot your password?')); ?>
-
-                    </a>
                 </div>
                 <input
                     type="password"
@@ -60,7 +57,14 @@
                     placeholder="Enter password"
                     required
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
+                <div class="flex justify-end mt-1 mb-4">
+                         <a href="<?php echo e($forgotRoute); ?>" class="text-sm hover:underline">
+                            <?php echo e(__('Forgot your password?')); ?>
+
+                        </a>
+                    </div>
             </div>
 
             <button 
@@ -95,21 +99,14 @@
     </div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalce5847ac41e2319cc94841d423efce16)): ?>
-<?php $attributes = $__attributesOriginalce5847ac41e2319cc94841d423efce16; ?>
-<?php unset($__attributesOriginalce5847ac41e2319cc94841d423efce16); ?>
+<?php if (isset($__attributesOriginaled17748e2d35dfac5d4111319639b524)): ?>
+<?php $attributes = $__attributesOriginaled17748e2d35dfac5d4111319639b524; ?>
+<?php unset($__attributesOriginaled17748e2d35dfac5d4111319639b524); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalce5847ac41e2319cc94841d423efce16)): ?>
-<?php $component = $__componentOriginalce5847ac41e2319cc94841d423efce16; ?>
-<?php unset($__componentOriginalce5847ac41e2319cc94841d423efce16); ?>
+<?php if (isset($__componentOriginaled17748e2d35dfac5d4111319639b524)): ?>
+<?php $component = $__componentOriginaled17748e2d35dfac5d4111319639b524; ?>
+<?php unset($__componentOriginaled17748e2d35dfac5d4111319639b524); ?>
 <?php endif; ?>
-<style>
-/* Force white text for admin-login page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
 
 <script>
 (function(){
@@ -232,4 +229,19 @@ p, label, span, a {
     });
 })();
 </script>
+
+<style>
+/* Force gray placeholders for admin login inputs */
+#name::placeholder,
+#password::placeholder,
+#name::-webkit-input-placeholder,
+#password::-webkit-input-placeholder,
+#name::-moz-placeholder,
+#password::-moz-placeholder,
+#name:-ms-input-placeholder,
+#password:-ms-input-placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+</style>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/auth/admin-login.blade.php ENDPATH**/ ?>

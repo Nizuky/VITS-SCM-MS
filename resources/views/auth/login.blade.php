@@ -1,5 +1,5 @@
 
-<x-layouts.auth.simple>
+<x-layouts.auth.login-register>
     <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         <div class="text-center space-y-2 mb-6">
             <h1 class="text-2xl font-bold text-white">Student Login</h1>
@@ -31,13 +31,14 @@
                     value="{{ old('email') }}"
                     placeholder="name@plv.edu.ph"
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
             </div>
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-medium text-white">Password</label>
                     @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-sm text-white hover:underline">Forgot your password?</a>
+                        <a href="{{ route('password.request') }}" class="text-sm hover:underline">Forgot your password?</a>
                     @endif
                 </div>
                 <input 
@@ -47,6 +48,7 @@
                     autocomplete="current-password"
                     placeholder="Password"
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
             </div>
             @if ($role)
@@ -88,15 +90,23 @@
         @if (Route::has('register'))
             <div class="text-center mt-6">
                 <span class="text-sm text-white/80">Don't have an account?</span>
-                <a href="{{ route('register') }}" class="text-sm text-white underline hover:opacity-80 ml-1">Sign up</a>
+                <a href="{{ route('register') }}" class="text-sm underline hover:opacity-80 ml-1">Sign up</a>
             </div>
         @endif
     </div>
-</x-layouts.auth.simple>
+</x-layouts.auth.login-register>
+
 <style>
-/* Force white text for auth/login page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
+/* Force gray placeholders for student login inputs */
+input[name="email"]::placeholder,
+input[name="password"]::placeholder,
+input[name="email"]::-webkit-input-placeholder,
+input[name="password"]::-webkit-input-placeholder,
+input[name="email"]::-moz-placeholder,
+input[name="password"]::-moz-placeholder,
+input[name="email"]:-ms-input-placeholder,
+input[name="password"]:-ms-input-placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
 }
 </style>

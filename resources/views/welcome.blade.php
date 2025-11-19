@@ -53,21 +53,20 @@
             @media (prefers-color-scheme: dark) { #site-header { background: rgba(21,21,21,0.86); } }
         </style>
         <style>
-            /* role/action buttons: base and hover transition */
-            .role-btn {
-                background-color: #6D28D9; /* original deep blue */
-                color: #ffffff !important;
-                padding: 6px 10px;
-                border-radius: 12px;
-                display: inline-block;
-                transition: background-color 220ms ease, transform 160ms ease;
-                -webkit-transition: background-color 220ms ease, -webkit-transform 160ms ease;
-                position: relative; /* ensure it can be stacked above the fixed header */
-                z-index: 1101;
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
-            .role-btn:hover {
-                background-color: #8c4cf2ff; /* lighter blue on hover */
-                transform: translateY(-2px);
+            
+            /* Smooth transitions for all interactive elements */
+            button, a {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
         </style>
         <style>
@@ -83,32 +82,37 @@
             @media (prefers-color-scheme: dark) { #site-header { background: #ffffffff; } }
         </style>
     </head>
-    <body class="text-[#1b1b18] flex justify-center min-h-screen">
+    <body style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0 20px 40px;">
         @include('partials.vits_branding')
         <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
         </header>
         
         <!-- Main centered container -->
-        <div class="flex flex-col items-center justify-center w-full p-6 lg:p-8">
-            <div style="background: white; border-radius: 20px; padding: 20px 25px; width: 100%; max-width: 400px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); border-bottom: 6px solid #8c4cf2ff;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+            <div style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 32px 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); margin: 0 auto;">
   
-                <h2 style="color: #6D28D9; font-size: 20px; margin: 0 0 6px 0; font-weight: 800;">Welcome</h2>
-                <h4 style="color: #6D28D9; font-size: 13px; margin: 0 0 12px 0; font-weight: 600;">
+                <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 28px; margin: 0 0 8px 0; font-weight: 800; letter-spacing: -0.02em;">Welcome</h2>
+                <h4 style="color: #6D28D9; font-size: 14px; margin: 0 0 20px 0; font-weight: 600; opacity: 0.9;">
                     Social Contract Report Submission and Monitoring System
                 </h4>
 
-                <p style="font-size: 12px; line-height: 1.5; color: #6D28D9; text-align: justify; margin-bottom: 16px;">
+                <p style="font-size: 13px; line-height: 1.7; color: #4a5568; text-align: justify; margin-bottom: 20px;">
                     This is a secure digital platform designed specifically for the IT students of Pamantasan ng Lungsod ng Valenzuela (PLV). 
                     Through this system, students can log in to safely access their accumulated hours, duty records, and compliance status without 
                     the need for paper forms. Supervisors and administrators are responsible for directly recording attendance, duty details, 
                     and rendered hours, ensuring accuracy, efficiency, and transparency in monitoring student requirements.
                 </p>
 
-                <p style="font-size: 12px; color: #6D28D9; text-align: justify; background: #fff7e6; border-left: 4px solid #ffa500; padding: 8px; border-radius: 6px;">
-                    <span style="font-weight: bold; color: #e69500;">⚠ Important Notice:</span> 
-                    This system is exclusively for <b style="color:#6D28D9;">PLV IT students</b>. Unauthorized access, misuse, or falsification of records 
-                    is strictly prohibited and may lead to disciplinary or legal action.
-                </p>
+                <div style="font-size: 13px; color: #744210; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">⚠️</span>
+                        <div>
+                            <span style="font-weight: 700; color: #92400e; display: block; margin-bottom: 4px;">Important Notice:</span>
+                            This system is exclusively for <strong style="color: #6D28D9;">PLV IT students</strong>. Unauthorized access, misuse, or falsification of records 
+                            is strictly prohibited and may lead to disciplinary or legal action.
+                        </div>
+                    </div>
+                </div>
             </div>
             
             @if (Route::has('login'))
@@ -116,37 +120,41 @@
             @endif
 
             <!-- Pill toggle role selector (below the main card) -->
-            <div class="w-200px max-w-[400px]" style="margin-top: 40px;">
-                <!-- Simplified centered toggle (user-provided HTML adapted to Blade) --> 
-                <div style="background: white; border-radius: 50px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 10px rgba(0,0,0,0.2); gap: 12px; max-width: 100%; overflow: hidden;">
-                    <span style="color: #6D28D9; font-size: 11px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Are you a PLV Information Technology Student?</span>
-                    <div id="toggle" style="display: flex; background: #6D28D9; border-radius: 50px; padding: 4px; align-items: center; flex-shrink: 0;">
-                        <button id="yesBtn" type="button" style="background: #6D28D9; border: none; color: white; border-radius: 50px; padding: 6px 18px; font-size: 13px; cursor: pointer; transition: 0.18s; white-space: nowrap;">Yes</button>
-                        <button id="noBtn" type="button" style="background: transparent; border: none; color: white; border-radius: 50px; padding: 6px 18px; font-size: 13px; cursor: pointer; transition: 0.18s; white-space: nowrap;">No</button>
+            <div style="margin-top: 32px; width: 100%; max-width: 480px;">
+                <!-- Modern toggle with glass morphism --> 
+                <div style="background: rgba(255, 255, 255, 0.95); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; gap: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
+                    <span style="color: #4a5568; font-size: 11px; font-weight: 600; flex: 1; min-width: 0; padding-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Are you a PLV Information Technology Student?</span>
+                    <div id="toggle" style="display: flex; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50px; padding: 4px; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                        <button id="yesBtn" type="button" style="background: rgba(255, 255, 255, 0.3); border: none; color: white; border-radius: 50px; padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">Yes</button>
+                        <button id="noBtn" type="button" style="background: transparent; border: none; color: rgba(255, 255, 255, 0.8); border-radius: 50px; padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap;">No</button>
                     </div>
                 </div>
 
-                <div id="followups" class="mt-4 flex flex-col items-center justify-center text-center w-full">
+                <div id="followups" style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
                         <!-- Student Exists Section -->
-                        <div id="student-exists" class="hidden bg-transparent rounded-xl p-4 shadow mx-auto" 
-                            style="max-width:360px; text-align:center; padding:16px; border-radius:20px; width: 100%;">
-                            <p class="mb-2 font-semibold text-sm" style="color:white;">Do you have an existing account?</p>
-                            <div class="flex flex-wrap gap-2 justify-center mt-2">
-                                <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" class="role-btn text-sm">
+                        <div id="student-exists" class="hidden" 
+                            style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
+                            <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Do you have an existing account?</p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                                <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
                                     Yes — Login
                                 </a>
-                                <a href="#" onclick="event.preventDefault(); clearSessionAndRegister();" class="role-btn text-sm">
+                                <a href="#" onclick="event.preventDefault(); clearSessionAndRegister();" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(245, 87, 108, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245, 87, 108, 0.4)';">
                                     No — Sign up
                                 </a>
                             </div>
                         </div>
                         <!-- Non-Student Select Section -->
-                        <div id="nonstudent-select" class="hidden bg-transparent rounded-xl p-4 shadow mx-auto" 
-                            style="max-width:360px; text-align:center; padding:16px; border-radius:20px; width: 100%;">
-                            <p class="mb-2 font-semibold text-sm" style="color:white;">Select your role (Admin or Super Admin)</p>
-                            <div class="flex flex-wrap gap-2 justify-center mt-2">
-                                <button type="button" onclick="clearSessionAndGoToAdmin()" class="role-btn text-sm">Admin</button>
-                                <button type="button" onclick="clearSessionAndGoToSuperAdmin()" class="role-btn text-sm">Super Admin</button>
+                        <div id="nonstudent-select" class="hidden" 
+                            style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
+                            <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Select your role</p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                                <button type="button" onclick="clearSessionAndGoToAdmin()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
+                                    Admin
+                                </button>
+                                <button type="button" onclick="clearSessionAndGoToSuperAdmin()" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(250, 112, 154, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(250, 112, 154, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(250, 112, 154, 0.4)';">
+                                    Super Admin
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -165,20 +173,36 @@
         const nonstudentReturn = document.getElementById('nonstudent-return');
 
         function resetButtons(){
-          if (yesBtn) yesBtn.style.background = 'transparent';
-          if (noBtn) noBtn.style.background = 'transparent';
+          if (yesBtn) {
+            yesBtn.style.background = 'transparent';
+            yesBtn.style.color = 'rgba(255, 255, 255, 0.8)';
+            yesBtn.style.boxShadow = 'none';
+          }
+          if (noBtn) {
+            noBtn.style.background = 'transparent';
+            noBtn.style.color = 'rgba(255, 255, 255, 0.8)';
+            noBtn.style.boxShadow = 'none';
+          }
         }
 
         function showStudent(){
           resetButtons();
-          if (yesBtn) yesBtn.style.background = '#8c4cf2ff';
+          if (yesBtn) {
+            yesBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+            yesBtn.style.color = 'white';
+            yesBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+          }
           if (studentExists) studentExists.classList.remove('hidden');
           if (nonstudentSelect) nonstudentSelect.classList.add('hidden');
         }
 
         function showNonStudent(){
           resetButtons();
-          if (noBtn) noBtn.style.background = '#8c4cf2ff';
+          if (noBtn) {
+            noBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+            noBtn.style.color = 'white';
+            noBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+          }
           if (nonstudentSelect) nonstudentSelect.classList.remove('hidden');
           if (studentExists) studentExists.classList.add('hidden');
         }

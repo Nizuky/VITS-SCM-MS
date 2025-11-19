@@ -1,5 +1,5 @@
 @vite('resources/css/app.css')
-@component('components.layouts.auth.simple')
+<x-layouts.auth.login-register>
     <div class="container max-w-md mx-auto p-6">
         <h2 class="mb-4 text-white">Register</h2>
 
@@ -110,4 +110,4 @@
         });
     })();
     </script>
-@endcomponent
+</x-layouts.auth.login-register>

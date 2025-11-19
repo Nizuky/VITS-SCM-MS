@@ -73,12 +73,6 @@ use Livewire\Volt\Component;
         <div>
             <div class="flex items-center justify-between mb-2">
                 <label class="block text-sm font-medium text-white"><?php echo e(__('Password')); ?></label>
-                <!--[if BLOCK]><![endif]--><?php if(Route::has('password.request')): ?>
-                    <a href="<?php echo e(route('password.request')); ?>" wire:navigate class="text-sm text-white hover:underline">
-                        <?php echo e(__('Forgot your password?')); ?>
-
-                    </a>
-                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             </div>
             <input
                 wire:model="password"
@@ -88,6 +82,14 @@ use Livewire\Volt\Component;
                 placeholder="<?php echo e(__('Password')); ?>"
                 class="w-full"
             />
+            <div class="flex justify-end mt-1 mb-4">
+            <!--[if BLOCK]><![endif]--><?php if(Route::has('password.request')): ?>
+                <a href="<?php echo e(route('password.request')); ?>" wire:navigate class="text-sm hover:underline">
+                    <?php echo e(__('Forgot your password?')); ?>
+
+                </a>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            </div>
         </div>
 
         <!-- Remember Me -->
@@ -109,9 +111,10 @@ use Livewire\Volt\Component;
     <!--[if BLOCK]><![endif]--><?php if(Route::has('register')): ?>
         <div class="text-sm text-center text-white mt-6">
             <span><?php echo e(__('Don\'t have an account?')); ?></span>
-            <a href="<?php echo e(route('register')); ?>" wire:navigate class="font-semibold hover:underline ml-1"><?php echo e(__('Sign up')); ?></a>
+            <a href="<?php echo e(route('register')); ?>" wire:navigate class="font-semibold hover:underline ml-1 hover:text-[#8c4cf2] "><?php echo e(__('Sign up')); ?></a>
         </div>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    
     <style>
     /* Scoped overrides for login page */
     .scms-login .scms-primary-btn {
@@ -179,4 +182,24 @@ use Livewire\Volt\Component;
         color: #ffffff !important;
     }
     </style>
+    <?php if (isset($component)) { $__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4 = $attributes; } ?>
+<?php $component = App\View\Components\ReturnToWelcome::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('return-to-welcome'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\ReturnToWelcome::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4)): ?>
+<?php $attributes = $__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4; ?>
+<?php unset($__attributesOriginalc9f9db5606acc4a875fc6dea8ae4bcf4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4)): ?>
+<?php $component = $__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4; ?>
+<?php unset($__componentOriginalc9f9db5606acc4a875fc6dea8ae4bcf4); ?>
+<?php endif; ?>
 </div><?php /**PATH C:\Users\janar\Herd\scms\resources\views\livewire/auth/login.blade.php ENDPATH**/ ?>

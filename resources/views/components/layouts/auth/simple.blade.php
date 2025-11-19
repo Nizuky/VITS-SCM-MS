@@ -207,7 +207,6 @@
                 window.addEventListener('scroll', function(){ if (!ticking) { window.requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
             })();
         </script>
-        @fluxScripts
         <script>
             // On auth pages (login/register/etc), clear any pending logout flags so they don't affect login
             (function(){

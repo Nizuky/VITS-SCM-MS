@@ -1,4 +1,4 @@
-<x-layouts.auth.simple>
+<x-layouts.auth.login-register>
     <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         <div class="text-center space-y-2 mb-6">
             <h1 class="text-2xl font-bold text-white">{{ __('Admin Login') }}</h1>
@@ -19,10 +19,11 @@
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="admin name"
+                    placeholder="Enter admin name"
                     value="{{ old('name', $defaultAdminName ?? '') }}"
                     required
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
             </div>
 
@@ -39,9 +40,6 @@
                             $forgotRoute = '#';
                         }
                     @endphp
-                    <a href="{{ $forgotRoute }}" class="text-sm text-white hover:underline">
-                        {{ __('Forgot your password?') }}
-                    </a>
                 </div>
                 <input
                     type="password"
@@ -50,7 +48,13 @@
                     placeholder="Enter password"
                     required
                     class="w-full"
+                    style="color: #ffffff !important;"
                 />
+                <div class="flex justify-end mt-1 mb-4">
+                         <a href="{{ $forgotRoute }}" class="text-sm hover:underline">
+                            {{ __('Forgot your password?') }}
+                        </a>
+                    </div>
             </div>
 
             <button 
@@ -64,14 +68,7 @@
 
         <x-return-to-welcome />
     </div>
-</x-layouts.auth.simple>
-<style>
-/* Force white text for admin-login page */
-h1, h2, h3, h4, h5, h6,
-p, label, span, a {
-    color: #ffffff !important;
-}
-</style>
+</x-layouts.auth.login-register>
 
 <script>
 (function(){
@@ -194,3 +191,18 @@ p, label, span, a {
     });
 })();
 </script>
+
+<style>
+/* Force gray placeholders for admin login inputs */
+#name::placeholder,
+#password::placeholder,
+#name::-webkit-input-placeholder,
+#password::-webkit-input-placeholder,
+#name::-moz-placeholder,
+#password::-moz-placeholder,
+#name:-ms-input-placeholder,
+#password:-ms-input-placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+</style>
