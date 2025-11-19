@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
         <title>VITS Social Contract Monitoring and Management System</title>
-        @php
+        <?php
                 $iconCandidates = [
                     'vits_white.png',
                     'storage/vits_whites.png',
@@ -26,11 +26,11 @@
                 }
                 if (!$iconUrl) { $iconUrl = asset('vits_white.png'); }
                 if ($iconUrl && $iconMTime) { $iconUrl .= '?v=' . $iconMTime; }
-            @endphp
-        <link rel="icon" href="{{ $iconUrl }}" sizes="any">
-        <link rel="icon" href="{{ $iconUrl }}" type="image/png">
-        <link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
-        <link rel="apple-touch-icon" href="{{ $iconUrl }}">
+            ?>
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+        <link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+        <link rel="apple-touch-icon" href="<?php echo e($iconUrl); ?>">
         <style>
             :root { --header-desktop-h: 115px; --header-mobile-h: 72px; }
             #site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-desktop-h); z-index: 1000; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 12px rgba(0,0,0,0.12); background: rgba(255,255,255,0.9); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .32s cubic-bezier(.22,.9,.32,1), background .28s ease, opacity .28s ease; opacity: 0.98; -webkit-backface-visibility: hidden; backface-visibility: hidden; pointer-events: none; }
@@ -81,7 +81,7 @@
         </style>
     </head>
     <body class="text-[#1b1b18] flex justify-center min-h-screen">
-        @include('partials.vits_branding')
+        <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
         </header>
         
@@ -108,9 +108,9 @@
                 </p>
             </div>
             
-            @if (Route::has('login'))
+            <?php if(Route::has('login')): ?>
                 <div class="h-6"></div>
-            @endif
+            <?php endif; ?>
 
             <!-- Pill toggle role selector (below the main card) -->
             <div class="w-200px max-w-[400px]" style="margin-top: 40px;">
@@ -196,7 +196,7 @@
         try {
           // First, logout from all possible guards (web, admin, superadmin)
           const logoutUrls = [
-            '{{ route('logout') }}',
+            '<?php echo e(route('logout')); ?>',
             '/admin/logout',
             '/super-admin/logout'
           ];
@@ -237,7 +237,7 @@
         
         // Redirect to login page with a small delay to ensure logout completes
         setTimeout(function() {
-          window.location.href = '{{ route('login') }}';
+          window.location.href = '<?php echo e(route('login')); ?>';
         }, 100);
       }
 
@@ -246,7 +246,7 @@
         try {
           // Logout from all possible guards (web, admin, superadmin)
           const logoutUrls = [
-            '{{ route('logout') }}',
+            '<?php echo e(route('logout')); ?>',
             '/admin/logout',
             '/super-admin/logout'
           ];
@@ -287,7 +287,7 @@
         
         // Redirect to register page with a small delay to ensure logout completes
         setTimeout(function() {
-          window.location.href = '{{ route('register') }}';
+          window.location.href = '<?php echo e(route('register')); ?>';
         }, 100);
       }
 
@@ -296,7 +296,7 @@
         try {
           // Logout from all guards
           const logoutUrls = [
-            '{{ route('logout') }}',
+            '<?php echo e(route('logout')); ?>',
             '/admin/logout',
             '/super-admin/logout'
           ];
@@ -334,7 +334,7 @@
         
         // Redirect to admin login
         setTimeout(function() {
-          window.location.href = '{{ route('admin.login') }}';
+          window.location.href = '<?php echo e(route('admin.login')); ?>';
         }, 100);
       }
 
@@ -343,7 +343,7 @@
         try {
           // Logout from all guards
           const logoutUrls = [
-            '{{ route('logout') }}',
+            '<?php echo e(route('logout')); ?>',
             '/admin/logout',
             '/super-admin/logout'
           ];
@@ -381,7 +381,7 @@
         
         // Redirect to super admin login
         setTimeout(function() {
-          window.location.href = '{{ route('superadmin.login') }}';
+          window.location.href = '<?php echo e(route('superadmin.login')); ?>';
         }, 100);
       }
 
@@ -442,3 +442,4 @@
             })();
     </script>
 </html>
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views/welcome.blade.php ENDPATH**/ ?>

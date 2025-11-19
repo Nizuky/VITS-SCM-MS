@@ -1,16 +1,57 @@
 <style>
-  :root { --vits-header-h: 115px; }
-  body { padding-top: var(--vits-header-h) !important; }
   #site-header {
-    position: fixed; top: 0; left: 0; width: 100%; height: var(--vits-header-h); z-index: 1000;
+    position: fixed; top: 0; left: 0; right: 0; width: 100%; height: auto; z-index: 1000;
     display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-    background: rgba(255,255,255,0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    background: transparent;
     transition: transform .28s ease, opacity .28s ease;
     opacity: 1; will-change: transform, opacity;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  #site-header img {
+    width: 100vw;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    max-width: 100vw;
+    min-width: 100vw;
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+  body { padding-top: 0 !important; }
+  body::before {
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
   }
   #site-header.header-hidden { transform: translateY(-120%); opacity: 0; pointer-events: none; }
 </style>
+
+<script>
+  // Dynamically adjust body padding based on header height
+  (function(){
+    function adjustPadding() {
+      const header = document.getElementById('site-header');
+      if (header) {
+        const headerHeight = header.offsetHeight;
+        document.body.style.paddingTop = headerHeight + 'px';
+      }
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', adjustPadding);
+    } else {
+      adjustPadding();
+    }
+    
+    window.addEventListener('resize', adjustPadding);
+    window.addEventListener('load', adjustPadding);
+  })();
+</script>
 
 <script>
   (function(){
@@ -95,16 +136,12 @@
     }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setup, { once: true });
-    } else {
-      setup();
-    }
-  })();
+    
+  )();
   </script>
 
 <header id="site-header">
-  <img src="<?php echo e(asset('storage/vits_header.png')); ?>" onerror="this.onerror=null;this.src='<?php echo e(url('assets/vits_header.png')); ?>'" alt="VITS Header" style="width:100%; height:100%; object-fit:cover; display:block;" />
+  <img src="<?php echo e(asset('storage/vits_header.png')); ?>" onerror="this.onerror=null;this.src='<?php echo e(url('assets/vits_header.png')); ?>'" alt="VITS Header" />
 </header>
 
 <script>
