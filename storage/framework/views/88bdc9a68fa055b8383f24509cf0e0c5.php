@@ -102,3 +102,4 @@
         </div>
     </div>
 </div>
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views/partials/admin/submission-page.blade.php ENDPATH**/ ?>
