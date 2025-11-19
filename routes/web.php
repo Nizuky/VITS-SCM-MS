@@ -167,7 +167,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('forgot-password', [App\Http\Controllers\Admin\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('forgot-password', [App\Http\Controllers\Admin\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
-            ->middleware('throttle:3,1')
+            ->middleware('throttle:10,1')
             ->name('password.email');
 
         Route::get('reset-password/{token}', [App\Http\Controllers\Admin\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');

@@ -31,6 +31,9 @@
         <link rel="icon" href="{{ $iconUrl }}" type="image/png">
         <link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
         <link rel="apple-touch-icon" href="{{ $iconUrl }}">
+        
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
         <style>
             :root { --header-desktop-h: 115px; --header-mobile-h: 72px; }
             #site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-desktop-h); z-index: 1000; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 12px rgba(0,0,0,0.12); background: rgba(255,255,255,0.9); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .32s cubic-bezier(.22,.9,.32,1), background .28s ease, opacity .28s ease; opacity: 0.98; -webkit-backface-visibility: hidden; backface-visibility: hidden; pointer-events: none; }

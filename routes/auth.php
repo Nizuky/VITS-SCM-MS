@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest:web')->group(function () {
-    // Student login - rate limited to 5 attempts per minute
+    // Student login - rate limited to 10 attempts per minute
     Volt::route('login', 'auth.login')
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:10,1')
         ->name('login');
 
     // Other guest-only routes (login/register) are defined here
@@ -24,7 +24,7 @@ Route::middleware('guest:web')->group(function () {
         ->name('nonstudent.select');
 
     Volt::route('forgot-password', 'auth.forgot-password')
-        ->middleware('throttle:3,1')
+        ->middleware('throttle:10,1')
         ->name('password.request');
 
 });
@@ -35,9 +35,9 @@ Volt::route('reset-password/{token}', 'auth.reset-password')
     ->name('password.reset');
 
 // Make register page reachable even when a user is remembered (avoid RedirectIfAuthenticated)
-// Rate limited to 3 registration attempts per minute
+// Rate limited to 10 registration attempts per minute
 Volt::route('register', 'auth.register')
-    ->middleware(['guest:web', 'throttle:3,1'])
+    ->middleware(['guest:web', 'throttle:10,1'])
     ->name('register');
 
 // Super-admin guest routes (use a guard-specific guest middleware to avoid conflicting with web remember-me)
