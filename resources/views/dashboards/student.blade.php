@@ -226,7 +226,7 @@
         #personalized-greeting h2,
         #personalized-greeting p {
             word-wrap: break-word;
-            overflow-wrap: break-word;
+            overflow-wrap: break-word; 
             -ms-word-wrap: break-word;
         }
         #personalized-greeting {
@@ -253,7 +253,9 @@
         [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
     </style>
     <style>
-        /* Dark theme: REMOVED overly aggressive white text forcing - let Tailwind/DaisyUI handle it */
+        /* Dark theme: comprehensive text and component styling */
+        [data-theme="dark"] body{color:#fff}
+        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
         [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
@@ -266,6 +268,12 @@
         [data-theme="dark"] .text-badge-verified-text { color: #a3ffbcff !important; }
         [data-theme="dark"] .text-badge-rejected-text { color: #ffc8c8ff !important; }
         [data-theme="dark"] .text-badge-pending-text { color: #ffcd91ff !important; }
+        /* Gradient backgrounds for dark mode */
+        [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
+        [data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
+        [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
+        [data-theme="dark"] .bg-gradient-verified{background-image:linear-gradient(to top,#6D28D9,#5EEAD4)}
+        [data-theme="dark"] .bg-gradient-approved{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
         /* Preserve success-green button styling in dark mode */
         [data-theme="dark"] .btn.bg-success-green,
         [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
@@ -289,6 +297,10 @@
         [data-theme="dark"] .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         [data-theme="dark"] .btn.bg-primary-purple svg { stroke: #ffffff !important; }
         [data-theme="dark"] .btn.bg-primary-purple span { color: #ffffff !important; }
+        [data-theme="dark"] .btn.bg-danger-red,.btn-danger-red{background-color:#CC525D!important;color:#fff!important;border-color:transparent!important}
+        [data-theme="dark"] .btn.bg-danger-red:hover,.btn-danger-red:hover{background-color:#b33e46!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-danger-red:active,.btn-danger-red:active{background-color:#9c2936!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-danger-red:focus,.btn-danger-red:focus{outline:none!important;box-shadow:0 0 0 2px rgba(204,82,93,0.35)!important}
     </style>
     <style>
         /* Custom Progress Stepper Styles - Horizontal inline */
@@ -524,6 +536,16 @@
         [data-theme="dark"] .bg-gradient-verified { background-image: linear-gradient(to top, #6D28D9, #5EEAD4); }
         [data-theme="dark"] .bg-gradient-pending { background-image: linear-gradient(to top, #6D28D9, #FFE0A2); }
         [data-theme="dark"] .bg-gradient-rejected { background-image: linear-gradient(to top, #6D28D9, #FFB7BE); }
+        /* Dark mode toast styling */
+        [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
+        /* Dark mode for custom tab wrapper */
+        [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
+        /* Dark mode for input fields */
+        [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+        /* Status badges in dark mode */
+        [data-theme="dark"] .status-badge.verified{background-color:#14B8A6;color:#fff}
+        [data-theme="dark"] .status-badge.approved{background-color:#4CAF50;color:#fff}
+        [data-theme="dark"] .status-badge.rejected{background-color:#b8000f;color:#fff}
         /* FAQ active/open state: force primary purple background and white text for the title */
         /* Make active/open FAQ whole item purple with white text and subtle shadow */
         .collapse:focus-within,
@@ -680,6 +702,7 @@
         [data-theme="dark"] #status-filter-dropdown .btn:hover svg{fill:#6D28D9}
         thead{overflow:visible!important}
         table{overflow:visible!important}
+        #action-status-header{overflow:visible!important;position:relative}
         .table thead tr{height:60px!important;max-height:60px!important}
         .table thead th{height:60px!important;max-height:60px!important;vertical-align:middle!important}
         /* Support tickets table hover effect - match consistent hover styling */
@@ -697,6 +720,11 @@
         [data-theme="dark"] .badge.text-green-800{color:#fff!important}
         [data-theme="dark"] .badge.text-gray-800{color:#fff!important}
         [data-theme="dark"] .badge.text-blue-800{color:#fff!important}
+        /* Fix modal centering and backdrop */
+        .modal{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
+        .modal-box{margin:0!important;position:relative!important;z-index:1!important}
+        .modal-backdrop{background-color:rgba(0,0,0,0.5)!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;z-index:0!important}
+        .modal::backdrop{background-color:rgba(0,0,0,0.5)!important}
         
         /* Prevent page-level horizontal scroll while allowing table scroll */
         body {
@@ -716,6 +744,7 @@
             overflow-x: auto;
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-custom">
     @include('partials.auto_logout')
