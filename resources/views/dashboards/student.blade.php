@@ -94,6 +94,8 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
+        /* Remove default browser margins/padding */
+        html, body { margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; }
         /* Ensure active nav exactly matches primary purple */
         .active-nav { background-color: #6D28D9; color: #ffffff; border-radius: 0.5rem; }
@@ -767,9 +769,9 @@
         $superAdmin = \App\Models\SuperAdmin::first();
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
     @endphp
-    <div class="flex p-4 gap-4 min-h-screen"> 
+    <div class="flex gap-4 min-h-screen"> 
         <!-- Sidebar -->
-        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
+        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-0 self-start h-screen overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
@@ -854,8 +856,8 @@
             </button>
         </aside>
 
-        <main class="flex-1 flex flex-col gap-6 min-w-0" id="page-container">
-            <div class="flex justify-between items-center p-4">
+        <main class="flex-1 flex flex-col gap-6 min-w-0 py-4" id="page-container">
+            <div class="flex justify-between items-center">
                 <div id="main-greeting">
                     <h4 id="page-title" class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
                 </div>
