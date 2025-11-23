@@ -12,16 +12,9 @@
             // Apply saved theme ASAP to reduce flash
             (function(){
                 try {
-                    // CRITICAL: Remove 'dark' class from login page (Livewire navigation preserves it)
-                    document.documentElement.classList.remove('dark');
-                    
                     var saved = localStorage.getItem('scms_theme');
                     if (saved === 'dark' || saved === 'light') {
                         document.documentElement.setAttribute('data-theme', saved);
-                        // Also set class for DaisyUI compatibility
-                        if (saved === 'dark') {
-                            document.documentElement.classList.add('dark');
-                        }
                     } else {
                         // Default to light theme for student dashboard
                         document.documentElement.setAttribute('data-theme', 'light');
@@ -58,8 +51,6 @@
             };
         </script>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-        <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
         
         <!-- PDF Export Libraries -->
@@ -199,7 +190,7 @@
         .btn.bg-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn.bg-primary-purple svg { stroke: #ffffff !important; }
-    /* Success button overrid   e: keep consistent across themes and over DaisyUI */
+        /* Success button override: keep consistent across themes and over DaisyUI */
         .btn.bg-success-green,
         .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
         .btn.bg-success-green:hover,
@@ -262,28 +253,7 @@
         [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
     </style>
     <style>
-        /* Dark theme: turn typical dark text utilities to white for readability */
-        [data-theme="dark"] body { color: #ffffff; }
-        [data-theme="dark"] .text-black,
-        [data-theme="dark"] .text-gray-900,
-        [data-theme="dark"] .text-gray-800,
-        [data-theme="dark"] .text-gray-700,
-        [data-theme="dark"] .text-gray-600,
-        [data-theme="dark"] .text-gray-500,
-        [data-theme="dark"] .text-text-header,
-        [data-theme="dark"] .text-text-muted,
-        [data-theme="dark"] h1,
-        [data-theme="dark"] h2,
-        [data-theme="dark"] h3,
-        [data-theme="dark"] h4,
-        [data-theme="dark"] h5,
-        [data-theme="dark"] h6,
-        [data-theme="dark"] p,
-        [data-theme="dark"] span,
-        [data-theme="dark"] label,
-        [data-theme="dark"] td,
-        [data-theme="dark"] th,
-        [data-theme="dark"] a { color: #ffffff !important; }
+        /* Dark theme: REMOVED overly aggressive white text forcing - let Tailwind/DaisyUI handle it */
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
         [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
@@ -501,12 +471,11 @@
         [data-theme="dark"] .step-connector {
             background-color: #374151;
         }
-        /* Force connector colors to match light theme variants in dark mode */
         [data-theme="dark"] .step-connector.active {
-            background-color: #3B82F6 !important; /* blue */
+            background-color: #3B82F6 !important;
         }
         [data-theme="dark"] .step-connector.completed {
-            background-color: #4CAF50 !important; /* green */
+            background-color: #4CAF50 !important;
         }
         
         /* Status Modal Animations */
@@ -3539,17 +3508,10 @@
         // Listen for Livewire navigation to ensure theme is applied after login
         document.addEventListener('livewire:navigated', function() {
             try {
-                // CRITICAL: Remove 'dark' class from login page (Livewire navigation preserves it)
-                document.documentElement.classList.remove('dark');
-                
                 // Reapply theme immediately after Livewire navigation
                 var saved = localStorage.getItem('scms_theme');
                 if (saved === 'dark' || saved === 'light') {
                     document.documentElement.setAttribute('data-theme', saved);
-                    // Also set class for DaisyUI compatibility
-                    if (saved === 'dark') {
-                        document.documentElement.classList.add('dark');
-                    }
                 } else {
                     document.documentElement.setAttribute('data-theme', 'light');
                 }

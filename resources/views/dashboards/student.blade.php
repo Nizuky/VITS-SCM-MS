@@ -52,8 +52,6 @@
         </script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-        <!-- Load DaisyUI CSS AFTER Tailwind to preserve component styles -->
-        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css" />
         
         <!-- PDF Export Libraries -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -192,7 +190,7 @@
         .btn.bg-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
         .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
         .btn.bg-primary-purple svg { stroke: #ffffff !important; }
-    /* Success button overrid   e: keep consistent across themes and over DaisyUI */
+        /* Success button override: keep consistent across themes and over DaisyUI */
         .btn.bg-success-green,
         .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
         .btn.bg-success-green:hover,
@@ -473,12 +471,11 @@
         [data-theme="dark"] .step-connector {
             background-color: #374151;
         }
-        /* Force connector colors to match light theme variants in dark mode */
         [data-theme="dark"] .step-connector.active {
-            background-color: #3B82F6 !important; /* blue */
+            background-color: #3B82F6 !important;
         }
         [data-theme="dark"] .step-connector.completed {
-            background-color: #4CAF50 !important; /* green */
+            background-color: #4CAF50 !important;
         }
         
         /* Status Modal Animations */
