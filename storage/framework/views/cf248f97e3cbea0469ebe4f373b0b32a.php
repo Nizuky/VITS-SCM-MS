@@ -234,19 +234,22 @@
             flex-wrap: nowrap;
         }
         /* Notification bell dot: force consistent color and visibility */
-        .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border: 2px solid #ffffff !important; border-radius: 9999px; box-sizing: content-box; }
+        .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border-radius: 9999px; box-sizing: content-box; }
+        [data-theme="dark"] .scms-notif-dot { border: 2px solid #ffffff !important; }
     </style>
     <style>
         /* Toast root tweaks: allow individual toasts to receive pointer events */
         #toast-root { position: fixed; right: 1rem; bottom: 1rem; z-index: 2000; display: flex; flex-direction: column; gap: .75rem; pointer-events: none; }
         #toast-root .alert { pointer-events: auto; }
         /* Refined toast look */
-        .scms-toast { position: relative; display: inline-flex; align-items: center; gap: .5rem; padding: .625rem .875rem; border-radius: 9999px; color: #fff; box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08); border: 1px solid rgba(255,255,255,0.08); max-width: 520px; }
+        .scms-toast { position: relative; display: inline-flex; align-items: center; gap: .5rem; padding: .625rem .875rem; border-radius: 9999px; box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08); border: 1px solid rgba(255,255,255,0.08); max-width: 520px; }
+        [data-theme="dark"] .scms-toast { color: #fff; }
         .scms-toast--success { background: linear-gradient(90deg, #16A34A, #22C55E); }
         .scms-toast--error { background: linear-gradient(90deg, #EF4444, #DC2626); }
         .scms-toast--info { background: linear-gradient(90deg, #6D28D9, #7C3AED); }
         .scms-toast__msg { font-weight: 600; font-size: .925rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .scms-toast__close { margin-left: .25rem; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9999px; background: rgba(255,255,255,0.12); color: #fff; border: 0; cursor: pointer; transition: background .18s ease, transform .12s ease; }
+        .scms-toast__close { margin-left: .25rem; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9999px; background: rgba(255,255,255,0.12); border: 0; cursor: pointer; transition: background .18s ease, transform .12s ease; }
+        [data-theme="dark"] .scms-toast__close { color: #fff; }
         .scms-toast__close:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
         .scms-toast__progress { position: absolute; left: 6px; right: 6px; bottom: 4px; height: 3px; border-radius: 9999px; background: rgba(255,255,255,0.55); transform-origin: left center; }
         @keyframes scms-toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
@@ -546,40 +549,38 @@
         [data-theme="dark"] .status-badge.verified{background-color:#14B8A6;color:#fff}
         [data-theme="dark"] .status-badge.approved{background-color:#4CAF50;color:#fff}
         [data-theme="dark"] .status-badge.rejected{background-color:#b8000f;color:#fff}
-        /* FAQ active/open state: force primary purple background and white text for the title */
-        /* Make active/open FAQ whole item purple with white text and subtle shadow */
-        .collapse:focus-within,
-        .collapse.collapse-open,
-        .collapse.open,
-        .collapse[aria-expanded="true"] {
-            background-color: #5B21B6 !important; /* slightly darker primary */
+        /* FAQ active/open state: force primary purple background in dark mode with white text */
+        [data-theme="dark"] .collapse:focus-within,
+        [data-theme="dark"] .collapse.collapse-open,
+        [data-theme="dark"] .collapse.open,
+        [data-theme="dark"] .collapse[aria-expanded="true"] {
+            background-color: #5B21B6 !important;
             border-color: rgba(91,33,182,0.25) !important;
             box-shadow: 0 6px 18px rgba(91,33,182,0.12) !important;
         }
-        /* Make the expanded content readable on the purple background */
-        .collapse:focus-within .collapse-content,
-        .collapse.collapse-open .collapse-content,
-        .collapse.open .collapse-content,
-        .collapse[aria-expanded="true"] .collapse-content {
+        [data-theme="dark"] .collapse:focus-within .collapse-content,
+        [data-theme="dark"] .collapse.collapse-open .collapse-content,
+        [data-theme="dark"] .collapse.open .collapse-content,
+        [data-theme="dark"] .collapse[aria-expanded="true"] .collapse-content {
             color: #ffffff !important;
         }
-        .collapse:focus-within .collapse-content p,
-        .collapse.collapse-open .collapse-content p,
-        .collapse.open .collapse-content p,
-        .collapse[aria-expanded="true"] .collapse-content p {
+        [data-theme="dark"] .collapse:focus-within .collapse-content p,
+        [data-theme="dark"] .collapse.collapse-open .collapse-content p,
+        [data-theme="dark"] .collapse.open .collapse-content p,
+        [data-theme="dark"] .collapse[aria-expanded="true"] .collapse-content p {
             color: rgba(255,255,255,0.92) !important;
         }
-        .collapse:focus-within .collapse-content a,
-        .collapse.collapse-open .collapse-content a,
-        .collapse.open .collapse-content a,
-        .collapse[aria-expanded="true"] .collapse-content a {
+        [data-theme="dark"] .collapse:focus-within .collapse-content a,
+        [data-theme="dark"] .collapse.collapse-open .collapse-content a,
+        [data-theme="dark"] .collapse.open .collapse-content a,
+        [data-theme="dark"] .collapse[aria-expanded="true"] .collapse-content a {
             color: #ffffff !important;
             text-decoration: underline !important;
         }
-        .collapse:focus-within > .collapse-title,
-        .collapse.collapse-open > .collapse-title,
-        .collapse.open > .collapse-title,
-        .collapse[aria-expanded="true"] > .collapse-title {
+        [data-theme="dark"] .collapse:focus-within > .collapse-title,
+        [data-theme="dark"] .collapse.collapse-open > .collapse-title,
+        [data-theme="dark"] .collapse.open > .collapse-title,
+        [data-theme="dark"] .collapse[aria-expanded="true"] > .collapse-title {
             background-color: transparent !important;
             color: #ffffff !important;
         }
