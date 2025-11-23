@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,9 @@
                     var saved = localStorage.getItem('scms_theme');
                     if (saved === 'dark' || saved === 'light') {
                         document.documentElement.setAttribute('data-theme', saved);
+                    } else {
+                        // Default to light theme for student dashboard
+                        document.documentElement.setAttribute('data-theme', 'light');
                     }
                 } catch(_){ }
             })();
@@ -252,28 +255,7 @@
         [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
     </style>
     <style>
-        /* Dark theme: turn typical dark text utilities to white for readability */
-        [data-theme="dark"] body { color: #ffffff; }
-        [data-theme="dark"] .text-black,
-        [data-theme="dark"] .text-gray-900,
-        [data-theme="dark"] .text-gray-800,
-        [data-theme="dark"] .text-gray-700,
-        [data-theme="dark"] .text-gray-600,
-        [data-theme="dark"] .text-gray-500,
-        [data-theme="dark"] .text-text-header,
-        [data-theme="dark"] .text-text-muted,
-        [data-theme="dark"] h1,
-        [data-theme="dark"] h2,
-        [data-theme="dark"] h3,
-        [data-theme="dark"] h4,
-        [data-theme="dark"] h5,
-        [data-theme="dark"] h6,
-        [data-theme="dark"] p,
-        [data-theme="dark"] span,
-        [data-theme="dark"] label,
-        [data-theme="dark"] td,
-        [data-theme="dark"] th,
-        [data-theme="dark"] a { color: #ffffff !important; }
+        /* Dark theme: REMOVED overly aggressive white text forcing - let Tailwind/DaisyUI handle it */
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
         [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
@@ -737,7 +719,6 @@
             overflow-x: auto;
         }
     </style>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-custom">
     @include('partials.auto_logout')
@@ -3526,6 +3507,21 @@
         }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
         else { boot(); }
+        
+        // Listen for Livewire navigation to ensure theme is applied after login
+        document.addEventListener('livewire:navigated', function() {
+            try {
+                // Reapply theme immediately after Livewire navigation
+                var saved = localStorage.getItem('scms_theme');
+                if (saved === 'dark' || saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+                // Reinitialize theme toggle if needed
+                initThemeToggle();
+            } catch(_) {}
+        });
         
         // Lightweight toast API
         function ensureToastRoot(){

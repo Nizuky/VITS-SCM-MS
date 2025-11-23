@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +12,19 @@
             // Apply saved theme ASAP to reduce flash
             (function(){
                 try {
+                    // CRITICAL: Remove 'dark' class from login page (Livewire navigation preserves it)
+                    document.documentElement.classList.remove('dark');
+                    
                     var saved = localStorage.getItem('scms_theme');
                     if (saved === 'dark' || saved === 'light') {
                         document.documentElement.setAttribute('data-theme', saved);
+                        // Also set class for DaisyUI compatibility
+                        if (saved === 'dark') {
+                            document.documentElement.classList.add('dark');
+                        }
+                    } else {
+                        // Default to light theme for student dashboard
+                        document.documentElement.setAttribute('data-theme', 'light');
                     }
                 } catch(_){ }
             })();
@@ -737,7 +747,6 @@
             overflow-x: auto;
         }
     </style>
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 <body class="min-h-screen bg-custom">
     <?php echo $__env->make('partials.auto_logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -3526,6 +3535,28 @@
         }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
         else { boot(); }
+        
+        // Listen for Livewire navigation to ensure theme is applied after login
+        document.addEventListener('livewire:navigated', function() {
+            try {
+                // CRITICAL: Remove 'dark' class from login page (Livewire navigation preserves it)
+                document.documentElement.classList.remove('dark');
+                
+                // Reapply theme immediately after Livewire navigation
+                var saved = localStorage.getItem('scms_theme');
+                if (saved === 'dark' || saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                    // Also set class for DaisyUI compatibility
+                    if (saved === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    }
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+                // Reinitialize theme toggle if needed
+                initThemeToggle();
+            } catch(_) {}
+        });
         
         // Lightweight toast API
         function ensureToastRoot(){

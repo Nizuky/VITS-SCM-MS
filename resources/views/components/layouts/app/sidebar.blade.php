@@ -160,7 +160,6 @@
         @include('partials.auto_logout')
 
         @if(class_exists('Flux\\Flux'))
-            @fluxScripts
         @endif
     </body>
 </html>

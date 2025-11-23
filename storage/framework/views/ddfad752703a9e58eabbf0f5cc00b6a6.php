@@ -4446,26 +4446,41 @@ body {
     <script>
         // Sidebar collapse functionality
         (function() {
-            const sidebar = document.getElementById('sidebar');
-            const collapseBtn = document.getElementById('collapse-btn');
-            const collapseText = document.getElementById('collapse-text');
-            
-            // Load saved state from localStorage
-            const savedState = localStorage.getItem('scms_superadmin_sidebar_collapsed');
-            if (savedState === 'true') {
-                sidebar.classList.add('collapsed');
-                collapseText.textContent = 'Show';
+            function initSidebarCollapse() {
+                const sidebar = document.getElementById('sidebar');
+                const collapseBtn = document.getElementById('collapse-btn');
+                const collapseText = document.getElementById('collapse-text');
+                
+                // Safety check - ensure elements exist
+                if (!sidebar || !collapseBtn || !collapseText) {
+                    console.warn('Sidebar collapse elements not found');
+                    return;
+                }
+                
+                // Load saved state from localStorage
+                const savedState = localStorage.getItem('scms_superadmin_sidebar_collapsed');
+                if (savedState === 'true') {
+                    sidebar.classList.add('collapsed');
+                    collapseText.textContent = 'Show';
+                }
+                
+                // Toggle collapse on button click
+                collapseBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
+                    
+                    // Save state to localStorage
+                    localStorage.setItem('scms_superadmin_sidebar_collapsed', isCollapsed);
+                });
             }
             
-            // Toggle collapse on button click
-            collapseBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
-                
-                // Save state to localStorage
-                localStorage.setItem('scms_superadmin_sidebar_collapsed', isCollapsed);
-            });
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSidebarCollapse, { once: true });
+            } else {
+                initSidebarCollapse();
+            }
         })();
     </script>
 </body>

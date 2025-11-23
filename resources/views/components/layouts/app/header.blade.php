@@ -141,7 +141,7 @@
         {{ $slot }}
 
         @if(class_exists('Flux\\Flux'))
-            @fluxScripts
+
         @endif
     </body>
 </html>
