@@ -2087,9 +2087,24 @@
                 const emptyState = document.getElementById('status-modal-empty');
                 const totalCount = document.getElementById('status-modal-total');
                 const totalHours = document.getElementById('status-modal-hours');
+                const viewButton = document.getElementById('view-status-records-btn');
                 
                 // Filter records by status
                 const filteredRecords = allRecords.filter(r => r.status === status);
+                
+                // Set up view button click handler
+                if (viewButton) {
+                    viewButton.onclick = function() {
+                        modal.close();
+                        showPage('record-status');
+                        // Apply filter after a short delay to ensure page is loaded
+                        setTimeout(() => {
+                            if (typeof filterTableByStatus === 'function') {
+                                filterTableByStatus(status, null);
+                            }
+                        }, 100);
+                    };
+                }
                 
                 // Update modal header based on status
                 let iconSvg = '';
