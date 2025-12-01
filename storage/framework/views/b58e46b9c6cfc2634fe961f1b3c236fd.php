@@ -581,7 +581,7 @@
                 </select>
             </label>
             <div class="modal-action mt-6">
-                <button type="button" class="btn btn-neutral rounded-lg w-full" onclick="exportToPDF()">Generate PDF</button>
+                <button type="button" class="btn rounded-lg w-full" style="background-color: #6D28D9; color: white; border: none;" onmouseover="this.style.backgroundColor='#5B21B6'" onmouseout="this.style.backgroundColor='#6D28D9'" onclick="exportToPDF()">Generate PDF</button>
             </div>
         </div>
     </div>
