@@ -144,8 +144,8 @@ use Livewire\Volt\Component;
             value = value.split('@')[0];
         }
         
-        // Remove all special characters except letters, numbers, dots, and hyphens
-        value = value.replace(/[^a-zA-Z0-9.-]/g, '');
+        // Remove all characters except letters (no numbers or special characters)
+        value = value.replace(/[^a-zA-Z]/g, '');
         
         // Update display value
         input.value = value;
@@ -168,8 +168,8 @@ use Livewire\Volt\Component;
             username = pastedText.split('@')[0];
         }
         
-        // Remove special characters
-        username = username.replace(/[^a-zA-Z0-9.-]/g, '');
+        // Remove all characters except letters (no numbers or special characters)
+        username = username.replace(/[^a-zA-Z]/g, '');
         
         // Set the cleaned value
         const input = event.target;

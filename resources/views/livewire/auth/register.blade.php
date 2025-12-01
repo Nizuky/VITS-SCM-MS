@@ -140,7 +140,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 </p>
             @enderror
             <p class="mt-1 text-xs text-white/70">
-                Auto-generated from your name (username part is editable)
+                Auto-generated from your name (email part is editable)
             </p>
         </div>
 
@@ -309,8 +309,8 @@ function formatRegisterEmail(input) {
         value = value.split('@')[0];
     }
     
-    // Remove special characters except dots and hyphens
-    value = value.replace(/[^a-zA-Z0-9.-]/g, '');
+    // Remove all characters except letters (no numbers or special characters)
+    value = value.replace(/[^a-zA-Z]/g, '');
     
     input.value = value;
     
@@ -334,8 +334,8 @@ function handleRegisterEmailPaste(event) {
         username = pastedText.split('@')[0];
     }
     
-    // Remove special characters except dots and hyphens
-    username = username.replace(/[^a-zA-Z0-9.-]/g, '');
+    // Remove all characters except letters (no numbers or special characters)
+    username = username.replace(/[^a-zA-Z]/g, '');
     
     input.value = username;
     
