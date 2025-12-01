@@ -2925,42 +2925,200 @@
             }
         }
 
+        // Helper function to ensure session is alive and get fresh CSRF token
+        async function ensureSessionAndGetToken() {
+            try {
+                // Get fresh CSRF token directly - this also validates session
+                const response = await fetch('/refresh-csrf', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.token) {
+                        // Update the meta tag
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) {
+                            metaTag.setAttribute('content', data.token);
+                        }
+                        
+                        // Also update axios default if available
+                        if (window.axios && window.axios.defaults && window.axios.defaults.headers) {
+                            window.axios.defaults.headers.common['X-CSRF-TOKEN'] = data.token;
+                        }
+                        
+                        console.log('Session validated and CSRF token refreshed');
+                        return data.token;
+                    }
+                }
+                
+                console.warn('Failed to get CSRF token from server');
+            } catch (error) {
+                console.error('Failed to ensure session and token:', error);
+            }
+            return null;
+        }
+        
+        // Initialize - get fresh token on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await ensureSessionAndGetToken();
+        });
+
         async function deleteRecord(recordId) {
             try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '<?php echo e(csrf_token()); ?>';
-                const response = await fetch(`<?php echo e(url('/admin/data-management/records')); ?>/${recordId}`, {
+                console.log('=== Starting delete record process ===');
+                console.log('Record ID:', recordId);
+                
+                // Show loading toast
+                showToast('Deleting record...', 'info');
+                
+                // Ensure session is alive and get fresh token
+                let csrfToken = await ensureSessionAndGetToken();
+                
+                // Fallback to meta tag if refresh failed
+                if (!csrfToken) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                }
+                
+                console.log('CSRF Token available:', csrfToken ? 'Yes' : 'No');
+                
+                if (!csrfToken) {
+                    showToast('Security token not found. Refreshing page...', 'error');
+                    setTimeout(() => window.location.reload(), 1500);
+                    return;
+                }
+                
+                const url = `<?php echo e(url('/admin/data-management/records')); ?>/${recordId}`;
+                console.log('Calling DELETE:', url);
+                
+                const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include',
+                    cache: 'no-cache'
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                // Handle authentication errors first
+                if (response.status === 401 || response.status === 403) {
+                    console.error('Authentication failed - redirecting to login');
+                    showToast('Session expired. Redirecting to login...', 'error');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo e(route("admin.login")); ?>';
+                    }, 1500);
+                    return;
+                }
+                
+                // Handle CSRF token mismatch
+                if (response.status === 419) {
+                    console.error('CSRF token mismatch (419) - Session may have expired');
+                    showToast('Session expired. Refreshing page...', 'error');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                    return;
+                }
+                
+                // Handle other errors
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    showToast(`Failed to delete record (Error ${response.status})`, 'error');
+                    return;
+                }
+                
                 const data = await response.json();
+                console.log('Response data:', data);
+                
                 if (data.success) {
                     showToast('Record deleted successfully', 'success');
                     loadRejectedRecords();
+                } else if (data.unauthenticated) {
+                    showToast('Session expired. Refreshing page...', 'error');
+                    setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showToast(data.message || 'Failed to delete record', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting record:', error);
-                showToast('Failed to delete record', 'error');
+                showToast('Network error. Please check your connection.', 'error');
             }
         }
 
         async function deleteAccount(accountId) {
             try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '<?php echo e(csrf_token()); ?>';
+                // Ensure session is alive and get fresh token
+                let csrfToken = await ensureSessionAndGetToken();
+                
+                // Fallback to meta tag if refresh failed
+                if (!csrfToken) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                }
+                
+                if (!csrfToken) {
+                    showToast('Security token not found. Please refresh the page.', 'error');
+                    return;
+                }
+                
                 const response = await fetch(`<?php echo e(url('/admin/data-management/accounts')); ?>/${accountId}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-cache'
                 });
+                
+                if (!response.ok) {
+                    if (response.status === 419) {
+                        // Retry with fresh session and token
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const newToken = await ensureSessionAndGetToken();
+                        if (newToken) {
+                            const retryResponse = await fetch(`<?php echo e(url('/admin/data-management/accounts')); ?>/${accountId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': newToken,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                credentials: 'same-origin',
+                                cache: 'no-cache'
+                            });
+                            if (retryResponse.ok) {
+                                const retryData = await retryResponse.json();
+                                if (retryData.success) {
+                                    showToast('Account deleted successfully', 'success');
+                                    loadInactiveAccounts();
+                                    return;
+                                }
+                            }
+                        }
+                        showToast('Session expired. Please refresh the page.', 'error');
+                        setTimeout(() => window.location.reload(), 2000);
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 if (data.success) {
@@ -2971,7 +3129,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting account:', error);
-                showToast('Failed to delete account', 'error');
+                showToast('Failed to delete account: ' + error.message, 'error');
             }
         }
 
@@ -2982,14 +3140,64 @@
 
         async function deleteAllEligibleRecords() {
             try {
+                // Ensure session is alive and get fresh token
+                let csrfToken = await ensureSessionAndGetToken();
+                
+                // Fallback to meta tag if refresh failed
+                if (!csrfToken) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                }
+                
+                if (!csrfToken) {
+                    showToast('Security token not found. Please refresh the page.', 'error');
+                    return;
+                }
+                
                 const response = await fetch('<?php echo e(route("admin.data-management.delete-all-records")); ?>', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-cache'
                 });
+                
+                if (!response.ok) {
+                    if (response.status === 419) {
+                        // Retry with fresh session and token
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const newToken = await ensureSessionAndGetToken();
+                        if (newToken) {
+                            const retryResponse = await fetch('<?php echo e(route("admin.data-management.delete-all-records")); ?>', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': newToken,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                credentials: 'same-origin',
+                                cache: 'no-cache'
+                            });
+                            if (retryResponse.ok) {
+                                const retryData = await retryResponse.json();
+                                if (retryData.success) {
+                                    showToast(`${retryData.count} record(s) deleted successfully`, 'success');
+                                    loadRejectedRecords();
+                                    return;
+                                }
+                            }
+                        }
+                        showToast('Session expired. Please refresh the page.', 'error');
+                        setTimeout(() => window.location.reload(), 2000);
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 if (data.success) {
@@ -3011,14 +3219,64 @@
 
         async function deleteAllEligibleAccounts() {
             try {
+                // Ensure session is alive and get fresh token
+                let csrfToken = await ensureSessionAndGetToken();
+                
+                // Fallback to meta tag if refresh failed
+                if (!csrfToken) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                }
+                
+                if (!csrfToken) {
+                    showToast('Security token not found. Please refresh the page.', 'error');
+                    return;
+                }
+                
                 const response = await fetch('<?php echo e(route("admin.data-management.delete-all-accounts")); ?>', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-cache'
                 });
+                
+                if (!response.ok) {
+                    if (response.status === 419) {
+                        // Retry with fresh session and token
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const newToken = await ensureSessionAndGetToken();
+                        if (newToken) {
+                            const retryResponse = await fetch('<?php echo e(route("admin.data-management.delete-all-accounts")); ?>', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': newToken,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                credentials: 'same-origin',
+                                cache: 'no-cache'
+                            });
+                            if (retryResponse.ok) {
+                                const retryData = await retryResponse.json();
+                                if (retryData.success) {
+                                    showToast(`${retryData.count} account(s) deleted successfully`, 'success');
+                                    loadInactiveAccounts();
+                                    return;
+                                }
+                            }
+                        }
+                        showToast('Session expired. Please refresh the page.', 'error');
+                        setTimeout(() => window.location.reload(), 2000);
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 if (data.success) {
@@ -3029,7 +3287,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting accounts:', error);
-                showToast('Failed to delete accounts', 'error');
+                showToast('Failed to delete accounts: ' + error.message, 'error');
             }
         }
     </script>
@@ -3059,29 +3317,52 @@
 
     <!-- Additional Keep-Alive Scripts (Fallback & Simplicity) -->
     <script>
-        // Simple CSRF refresh every 30 minutes (fallback)
+        // Aggressive CSRF and session refresh
         async function refreshCsrf() {
             try {
-                const res = await fetch('/refresh-csrf', { credentials: 'same-origin' });
+                const res = await fetch('/refresh-csrf', { 
+                    credentials: 'include',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
                 const data = await res.json();
-                document.querySelector('meta[name="csrf-token"]').content = data.token;
+                const metaTag = document.querySelector('meta[name="csrf-token"]');
+                if (metaTag && data.token) {
+                    metaTag.content = data.token;
+                }
                 
-                if (window.axios) {
+                if (window.axios && data.token) {
                     axios.defaults.headers.common['X-CSRF-TOKEN'] = data.token;
                 }
+                console.log('[Keep-Alive] CSRF token refreshed');
             } catch (e) {
                 console.warn('[Keep-Alive] CSRF refresh failed', e);
             }
         }
 
-        // Simple keep-alive ping every 20 minutes (fallback)
-        function keepAlive() {
-            fetch('/keep-alive', { credentials: 'same-origin' }).catch(() => {});
+        // Aggressive keep-alive ping
+        async function keepAlive() {
+            try {
+                await fetch('/keep-alive', { 
+                    credentials: 'include',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                console.log('[Keep-Alive] Session ping successful');
+            } catch (e) {
+                console.warn('[Keep-Alive] Session ping failed', e);
+            }
         }
 
-        // Run both periodically (works alongside SessionKeeper)
-        setInterval(refreshCsrf, 30 * 60 * 1000); // 30 minutes
-        setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
+        // Run VERY frequently to prevent session expiry
+        setInterval(refreshCsrf, 2 * 60 * 1000); // Every 2 minutes
+        setInterval(keepAlive, 1 * 60 * 1000);   // Every 1 minute
+        
+        // Run immediately on page load
+        refreshCsrf();
+        keepAlive();
         
         // Sidebar collapse functionality
         (function() {

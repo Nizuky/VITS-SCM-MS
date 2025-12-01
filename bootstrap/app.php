@@ -38,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             
             // Admin dashboard routes - all operations
             '/admin/api/*',
+            '/admin/data-management/*',
             
             // Super Admin dashboard routes - all operations
             '/super-admin/api/*',

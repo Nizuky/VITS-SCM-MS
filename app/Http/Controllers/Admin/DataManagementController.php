@@ -124,7 +124,18 @@ class DataManagementController extends Controller
                 ], 400);
             }
             
-            $daysSince = now()->diffInDays(Carbon::parse($record->rejected_at));
+            $rejectedAt = Carbon::parse($record->rejected_at);
+            $daysSince = $rejectedAt->diffInDays(now(), false);
+            
+            // Log for debugging
+            Log::info('Checking record deletion eligibility', [
+                'record_id' => $record->id,
+                'rejected_at' => $rejectedAt->toDateTimeString(),
+                'now' => now()->toDateTimeString(),
+                'days_since' => $daysSince,
+                'eligible' => $daysSince >= 7
+            ]);
+            
             if ($daysSince < 7) {
                 return response()->json([
                     'success' => false,
@@ -170,7 +181,17 @@ class DataManagementController extends Controller
                 ], 400);
             }
             
-            $daysInactive = now()->diffInDays(Carbon::parse($user->inactive_at));
+            $inactiveAt = Carbon::parse($user->inactive_at);
+            $daysInactive = $inactiveAt->diffInDays(now(), false);
+            
+            Log::info('Checking account deletion eligibility', [
+                'user_id' => $user->id,
+                'inactive_at' => $inactiveAt->toDateTimeString(),
+                'now' => now()->toDateTimeString(),
+                'days_inactive' => $daysInactive,
+                'eligible' => $daysInactive >= 7
+            ]);
+            
             if ($daysInactive < 7) {
                 return response()->json([
                     'success' => false,
@@ -210,7 +231,7 @@ class DataManagementController extends Controller
             
             $records = SocialContractRecord::where('status', 'Rejected')
                 ->whereNotNull('rejected_at')
-                ->where('rejected_at', '<', $cutoff)
+                ->where('rejected_at', '<=', $cutoff)
                 ->get();
             
             $count = $records->count();
@@ -249,7 +270,7 @@ class DataManagementController extends Controller
             
             $users = User::where('status', 'inactive')
                 ->whereNotNull('inactive_at')
-                ->where('inactive_at', '<', $cutoff)
+                ->where('inactive_at', '<=', $cutoff)
                 ->get();
             
             $count = $users->count();
