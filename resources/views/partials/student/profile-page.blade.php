@@ -1,11 +1,4 @@
 <div id="profile-page" class="page-content hidden flex-col">
-    <div class="p-4 flex items-center justify-end">
-        <label class="label cursor-pointer flex items-center gap-3">
-            <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
-            <input id="theme-toggle" type="checkbox" class="toggle toggle-primary" />
-        </label>
-    </div>
-
     <div class="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
         <div id="profile-view" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">

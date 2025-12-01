@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,19 +8,17 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
+        <style>
+            /* Force dark background immediately to prevent white flash */
+            html, body {
+                background-color: #0b0f19 !important;
+                color: #fff !important;
+            }
+        </style>
         <script>
-            // Apply saved theme IMMEDIATELY before any CSS loads
-            (function(){
-                try {
-                    var saved = localStorage.getItem('scms_theme');
-                    if (saved === 'dark' || saved === 'light') {
-                        document.documentElement.setAttribute('data-theme', saved);
-                    }
-                    // Note: 'light' is already set as default in the HTML tag above
-                } catch(_){ 
-                    // If script fails, fallback to light theme already set in HTML tag
-                }
-            })();
+            // Force dark theme only for students - set IMMEDIATELY
+            document.documentElement.setAttribute('data-theme', 'dark');
+            try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_){}
         </script>
         <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
         <script>
@@ -209,15 +207,19 @@
         .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
         /* Optional utility for static-looking inputs */
         .static-input { border: none !important; box-shadow: none !important; padding-left: 0 !important; background-color: transparent !important; cursor: default !important; }
-        /* Page background image */
+        /* Page background image - dark theme only for students */
         .bg-custom {
-            background-color: #EDF1FA; /* fallback */
-            background-image: url('{{ asset('vits_bg_white.png') }}');
+            background-color: #0b0f19;
+            background-image: url('{{ asset("storage/vits_bg_black.png") }}');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
+        /* Force dark backgrounds on all white elements immediately */
+        .bg-white { background-color: #1f2937 !important; }
+        .bg-gray-100 { background-color: #374151 !important; }
+        .bg-base-100 { background-color: #111827 !important; }
         .bg-gradient-primary-purple { background-image: linear-gradient(to bottom, #bbacffff, #6D28D9); }
         /* Gradients for summary cards */
         .bg-gradient-approved { background-image: linear-gradient(to bottom, #DCFCE7, #81FFAC); }
@@ -258,56 +260,47 @@
         [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
     </style>
     <style>
-        /* Dark theme: comprehensive text and component styling */
+        /* Dark theme styling - copied from admin.blade.php */
         [data-theme="dark"] body{color:#fff}
-        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] td,[data-theme="dark"] th{color:#fff!important}
-        /* Only force white on p/span/label/a if they don't have specific color classes */
-        [data-theme="dark"] p:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] span:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] label:not([class*="text-"]),[data-theme="dark"] a:not([class*="text-"]){color:#fff!important}
-        /* Preserve status colors in dark mode (do not force white for these) */
-        [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
-        [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
-        [data-theme="dark"] .scms-badge--approved { background-color: #4CAF50 !important; color: #ffffffff!important; }
-        [data-theme="dark"] .scms-badge--rejected { background-color: #b8000fff !important; color: #ffffffff!important; }
-        /* Summary labels and inline status text */
-        [data-theme="dark"] .text-yellow-800 { color: #ffcd91ff !important; }
-        [data-theme="dark"] .text-green-800 { color: #a3ffbcff !important; }
-        [data-theme="dark"] .text-red-800 { color: #ffc8c8ff !important; }
-        [data-theme="dark"] .text-badge-verified-text { color: #a3ffbcff !important; }
-        [data-theme="dark"] .text-badge-rejected-text { color: #ffc8c8ff !important; }
-        [data-theme="dark"] .text-badge-pending-text { color: #ffcd91ff !important; }
-        /* Gradient backgrounds for dark mode */
+        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
+        /* Only apply white to p/span/label if they don't have specific color classes */
+        [data-theme="dark"] p:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]),[data-theme="dark"] span:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]),[data-theme="dark"] label:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]){color:#fff!important}
+        [data-theme="dark"] .scms-badge--pending{background-color:#ff9d26ff!important;color:#ffffffff!important}
+        [data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
+        [data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
+        [data-theme="dark"] .scms-badge--rejected{background-color:#b8000fff!important;color:#ffffffff!important}
         [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
         [data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
         [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
-        [data-theme="dark"] .bg-gradient-verified{background-image:linear-gradient(to top,#6D28D9,#5EEAD4)}
-        [data-theme="dark"] .bg-gradient-approved{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
-        /* Preserve success-green button styling in dark mode */
-        [data-theme="dark"] .btn.bg-success-green,
-        [data-theme="dark"] .btn-success-green { background-color: #4CAF50 !important; color: #ffffff !important; border-color: transparent !important; }
-        [data-theme="dark"] .btn.bg-success-green:hover,
-        [data-theme="dark"] .btn-success-green:hover { background-color: #45a049 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-success-green:active,
-        [data-theme="dark"] .btn-success-green:active { background-color: #3d9341 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-success-green:focus,
-        [data-theme="dark"] .btn-success-green:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(34,197,94,0.45) !important; }
-        /* Preserve primary-purple button styling in dark mode */
-        [data-theme="dark"] .btn-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
-        [data-theme="dark"] .btn-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
-        [data-theme="dark"] .btn-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn-primary-purple svg { stroke: #ffffff !important; }
-        [data-theme="dark"] .btn-primary-purple span { color: #ffffff !important; }
-        /* Also support bg-primary-purple variant in dark mode */
-        [data-theme="dark"] .btn.bg-primary-purple { background-color: #6D28D9 !important; color: #ffffff !important; border-color: transparent !important; }
-        [data-theme="dark"] .btn.bg-primary-purple:hover { background-color: #5B21B6 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-primary-purple:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(109,40,217,0.35) !important; }
-        [data-theme="dark"] .btn.bg-primary-purple:active { background-color: #4C1D95 !important; color: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-primary-purple svg { stroke: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-primary-purple span { color: #ffffff !important; }
-        [data-theme="dark"] .btn.bg-danger-red,.btn-danger-red{background-color:#CC525D!important;color:#fff!important;border-color:transparent!important}
-        [data-theme="dark"] .btn.bg-danger-red:hover,.btn-danger-red:hover{background-color:#b33e46!important;color:#fff!important}
-        [data-theme="dark"] .btn.bg-danger-red:active,.btn-danger-red:active{background-color:#9c2936!important;color:#fff!important}
-        [data-theme="dark"] .btn.bg-danger-red:focus,.btn-danger-red:focus{outline:none!important;box-shadow:0 0 0 2px rgba(204,82,93,0.35)!important}
+        [data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('{{ asset("storage/vits_bg_black.png") }}')}
+        [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
+        [data-theme="dark"] .table th,[data-theme="dark"] .table td{border-color:#374151!important}
+        [data-theme="dark"] .bg-white{background-color:#1f2937!important}
+        [data-theme="dark"] .bg-gray-100{background-color:#374151!important}
+        [data-theme="dark"] .border-gray-200{border-color:#374151!important}
+        [data-theme="dark"] .bg-base-100{background-color:#111827!important}
+        [data-theme="dark"] .scms-toast{border-color:rgba(255,255,255,0.14);box-shadow:0 10px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2)}
+        [data-theme="dark"] .custom-tab-wrapper{background-color:#1f2937}
+        [data-theme="dark"] .details-input{background-color:#374151;border-color:#4b5563;color:#fff}
+        [data-theme="dark"] .status-badge.verified{background-color:#14B8A6;color:#fff}
+        [data-theme="dark"] .status-badge.approved{background-color:#4CAF50;color:#fff}
+        [data-theme="dark"] .status-badge.rejected{background-color:#b8000f;color:#fff}
+        [data-theme="dark"] .btn-primary-purple{background-color:#6D28D9!important;color:#fff!important;border-color:transparent!important}
+        [data-theme="dark"] .btn-primary-purple:hover{background-color:#5B21B6!important;color:#fff!important}
+        [data-theme="dark"] .btn-primary-purple:focus{outline:none!important;box-shadow:0 0 0 2px rgba(109,40,217,0.35)!important}
+        [data-theme="dark"] .btn-primary-purple:active{background-color:#4C1D95!important;color:#fff!important}
+        [data-theme="dark"] .btn-primary-purple svg{stroke:#fff!important}
+        [data-theme="dark"] .btn-primary-purple span{color:#fff!important}
+        [data-theme="dark"] .btn.bg-primary-purple{background-color:#6D28D9!important;color:#fff!important;border-color:transparent!important}
+        [data-theme="dark"] .btn.bg-primary-purple:hover{background-color:#5B21B6!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-primary-purple:focus{outline:none!important;box-shadow:0 0 0 2px rgba(109,40,217,0.35)!important}
+        [data-theme="dark"] .btn.bg-primary-purple:active{background-color:#4C1D95!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-primary-purple svg{stroke:#fff!important}
+        [data-theme="dark"] .btn.bg-primary-purple span{color:#fff!important}
+        [data-theme="dark"] .btn.bg-success-green,[data-theme="dark"] .btn-success-green{background-color:#4CAF50!important;color:#fff!important;border-color:transparent!important}
+        [data-theme="dark"] .btn.bg-success-green:hover,[data-theme="dark"] .btn-success-green:hover{background-color:#45a049!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-success-green:active,[data-theme="dark"] .btn-success-green:active{background-color:#3d9341!important;color:#fff!important}
+        [data-theme="dark"] .btn.bg-success-green:focus,[data-theme="dark"] .btn-success-green:focus{outline:none!important;box-shadow:0 0 0 2px rgba(34,197,94,0.45)!important}
     </style>
     <style>
         /* Custom Progress Stepper Styles - Horizontal inline */
@@ -3172,29 +3165,14 @@
         }
 
         function initThemeToggle(){
-            try {
-                const toggle = document.getElementById('theme-toggle');
-                const label = document.getElementById('theme-label');
-                const applyTheme = (mode) => {
-                    document.documentElement.setAttribute('data-theme', mode);
-                    try { localStorage.setItem('scms_theme', mode); } catch(_) {}
-                    if (label) label.textContent = (mode === 'dark') ? 'Dark theme' : 'Light theme';
-                    if (toggle) toggle.checked = (mode === 'dark');
-                    // Re-render charts to pick up new colors
-                    try { if (typeof renderCharts === 'function') renderCharts(); } catch(_) {}
-                };
-                let saved = 'light';
-                try { saved = (localStorage.getItem('scms_theme') === 'dark') ? 'dark' : 'light'; } catch(_) {}
-                applyTheme(saved);
-                if (toggle) {
-                    toggle.addEventListener('change', () => {
-                        applyTheme(toggle.checked ? 'dark' : 'light');
-                    });
-                }
-            } catch(_) {}
+            // Students only use dark theme - no toggle needed
+            document.documentElement.setAttribute('data-theme', 'dark');
+            try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_) {}
         }
 
         function boot(){ 
+            // Theme is already set synchronously in <head>, no need to check again
+            
             // Restore saved page for student, default to dashboard
             var savedPage = 'dashboard';
             try {
