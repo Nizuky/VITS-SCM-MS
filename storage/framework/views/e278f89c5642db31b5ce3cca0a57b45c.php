@@ -12,37 +12,102 @@
             $daysRemaining = max(0, (int) ceil($totalHours / 24));
             $hoursRemaining = max(0, (int) $totalHours);
         ?>
-        <div class="alert alert-error shadow-lg mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-800 rounded-lg" role="alert">
-            <div class="flex items-start w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6 text-red-600 dark:text-red-00" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div class="ml-3 flex-1">
-                    <h3 class="text-lg font-bold dark:text-red-300" style="color: #790000ff;">Account Inactive - Scheduled for Deletion</h3>
-                    <div class="mt-2 text-sm dark:text-red-400">
-                        <p class="font-semibold mb-2" style="color: #790000ff;">⚠️ Your account has been deactivated by an administrator.</p>
-                        <div class="bg-red-100 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-3 rounded-md mb-2">
-                            <p class="text-base font-bold dark:text-red-200" style="color: #790000ff;">
+        <div class="alert shadow-xl mb-6 bg-red-900/20 border border-red-600 border-l-8 rounded-xl" role="alert">
+            <div class="flex items-start w-full gap-4">
+                <div class="bg-red-600 p-3 rounded-lg flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-orange-500 mb-3">Account Deactivated & Scheduled for Deletion</h3>
+                    
+                    <p class="text-gray-400 mb-4">
+                        <span class="font-semibold">Status:</span> Your account has been deactivated by an administrator. You won't be able to use the system until it is reactivated.
+                    </p>
+                    
+                    <div class="border-t border-b border-gray-600 py-4 mb-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h4 class="text-lg font-bold text-blue-400">
                                 <?php if($daysRemaining > 0): ?>
-                                    <span class="text-2xl"><?php echo e($daysRemaining); ?></span> day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> remaining
+                                    <?php echo e($daysRemaining); ?> Day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> Remaining
                                 <?php else: ?>
-                                    <span class="text-2xl"><?php echo e($hoursRemaining); ?></span> hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> remaining
+                                    <?php echo e($hoursRemaining); ?> Hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> Remaining
                                 <?php endif; ?>
-                            </p>
-                            <p class="text-sm dark:text-red-300" style="color: #790000ff;">Your account will be permanently deleted on <strong><?php echo e($deletionDate->format('F d, Y \a\t g:i A')); ?></strong></p>
+                            </h4>
                         </div>
-                        <p class="text-sm dark:text-red-400" style="color: #790000ff;">
-                            <strong>What this means:</strong> You currently have limited access to the system. 
-                            All your data, including social contract records, will be permanently removed on the deletion date.
+                        <p class="text-orange-400 text-sm">
+                            Your account will be <strong>permanently deleted</strong> on <strong><?php echo e($deletionDate->format('F d, Y')); ?></strong> at <strong><?php echo e($deletionDate->format('g:i A')); ?></strong>
                         </p>
-                        <p class="text-sm mt-2 dark:text-red-400" style="color: #790000ff;">
-                            <strong>Action Required:</strong> Please contact your administrator immediately to reactivate your account 
-                            and prevent permanent deletion.
-                        </p>
+                    </div>
+                    
+                    <div class="flex items-start gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="text-green-400">
+                            <h5 class="font-bold mb-1">Action Required</h5>
+                            <p class="text-gray-400 text-sm">
+                                To reactivate your account and prevent permanent deletion, please contact an administrator immediately.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="showPage('support')" class="btn btn-sm text-white transition-colors" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Contact Administrator</button>
+                        <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-outline btn-sm">View Deactivation Details</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Deactivation Details Modal -->
+        <dialog id="deactivation_details_modal" class="modal">
+            <div class="modal-box bg-gray-800 border border-gray-700">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <h3 class="font-bold text-lg text-orange-500 mb-4">Deactivation Details</h3>
+                <div class="space-y-4">
+                    <div class="alert alert-warning bg-yellow-900/20 border border-yellow-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div>
+                            <h4 class="font-bold text-yellow-400">What This Means</h4>
+                            <p class="text-sm text-gray-300 mt-2">
+                                You have done something against the rules, or you are already graduated. 
+                                All your data, including social contract records, will be permanently removed on the deletion date.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-gray-200 mb-2">Account Information</h5>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• <strong>Status:</strong> Inactive</li>
+                            <li>• <strong>Deactivated:</strong> <?php echo e($inactiveSince->format('F d, Y \a\t g:i A')); ?></li>
+                            <li>• <strong>Deletion Date:</strong> <?php echo e($deletionDate->format('F d, Y \a\t g:i A')); ?></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-sm text-gray-400">
+                        <p>If you believe this is an error or need to recover your account, please contact an administrator before the deletion date.</p>
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <form method="dialog">
+                        <button class="btn btn-sm text-white transition-colors" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Close</button>
+                    </form>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
     <?php endif; ?>
 
     <!-- Personalized greeting and summary cards -->
