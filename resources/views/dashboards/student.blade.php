@@ -258,30 +258,11 @@
         [data-theme="dark"] .scms-toast { border-color: rgba(255,255,255,0.14); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); }
     </style>
     <style>
-        /* Dark theme: comprehensive text and component styling - ONLY apply in dark mode */
+        /* Dark theme: comprehensive text and component styling */
         [data-theme="dark"] body{color:#fff}
-        /* Only apply to utility classes, not elements with explicit color classes */
-        [data-theme="dark"] .text-black:not([class*="text-gray"]):not([class*="text-blue"]):not([class*="text-green"]):not([class*="text-red"]):not([class*="text-yellow"]):not([class*="text-purple"]),
-        [data-theme="dark"] .text-gray-900:not([class*="dark:text-"]),
-        [data-theme="dark"] .text-gray-800:not([class*="dark:text-"]),
-        [data-theme="dark"] .text-gray-700:not([class*="dark:text-"]),
-        [data-theme="dark"] .text-gray-600:not([class*="dark:text-"]),
-        [data-theme="dark"] .text-gray-500:not([class*="dark:text-"]),
-        [data-theme="dark"] .text-text-header,
-        [data-theme="dark"] .text-text-muted,
-        [data-theme="dark"] td,
-        [data-theme="dark"] th{color:#fff!important}
-        /* Only force white on headings and text elements that don't have explicit color classes */
-        [data-theme="dark"] h1:not([class*="text-"]),
-        [data-theme="dark"] h2:not([class*="text-"]),
-        [data-theme="dark"] h3:not([class*="text-"]),
-        [data-theme="dark"] h4:not([class*="text-"]),
-        [data-theme="dark"] h5:not([class*="text-"]),
-        [data-theme="dark"] h6:not([class*="text-"]),
-        [data-theme="dark"] p:not([class*="text-"]):not([class*="bg-"]),
-        [data-theme="dark"] span:not([class*="text-"]):not([class*="bg-"]),
-        [data-theme="dark"] label:not([class*="text-"]),
-        [data-theme="dark"] a:not([class*="text-"]){color:#fff!important}
+        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] td,[data-theme="dark"] th{color:#fff!important}
+        /* Only force white on p/span/label/a if they don't have specific color classes */
+        [data-theme="dark"] p:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] span:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] label:not([class*="text-"]),[data-theme="dark"] a:not([class*="text-"]){color:#fff!important}
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
         [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }

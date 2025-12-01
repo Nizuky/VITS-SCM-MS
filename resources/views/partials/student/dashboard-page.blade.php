@@ -101,20 +101,20 @@
 
 
 
-    <div class="bg-white rounded-3xl p-6 mb-6" style="box-shadow: 0 10px 40px rgba(109, 40, 217, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid rgba(109, 40, 217, 0.05);">
-        <div class="flex justify-between items-start mb-6">
+    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex justify-between items-start mb-4">
             <div>
-                <h2 class="text-2xl font-bold mb-2" style="background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Social Contract Summary</h2>
+                <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
                 <p class="text-sm text-text-muted">Contract Status Overview (Approved, Verified, Pending, Rejected)</p>
             </div>
-            <button onclick="loadRecords();" class="btn btn-ghost btn-sm gap-2 hover:bg-primary-purple hover:text-white transition-all duration-300" title="Refresh dashboard stats" style="border-radius: 12px;">
+            <button onclick="loadRecords();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
                 <span class="hidden md:inline">Refresh</span>
             </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Approved Records -->
             <div class="bg-gradient-approved p-4 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-lg transition-shadow duration-200" onclick="showStatusModal('Approved')">
                 <div class="bg-white p-2 rounded-full w-min">
@@ -122,7 +122,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="approved-count">8</span> Records</h3>
-                    <p class="text-green-800 font-semibold">Approved</p>
+                    <p class="text-green-800 dark:text-green-200 font-semibold">Approved</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="verified-count">0</span> Records</h3>
-                    <p class="text-teal-800 font-semibold">Verified</p>
+                    <p class="text-teal-800 dark:text-teal-200 font-semibold">Verified</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-verified-row">Last update: <span id="summary-last-updated-verified"></span></p>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="pending-count">8</span> Records</h3>
-                    <p class="text-yellow-800 font-semibold">Pending</p>
+                    <p class="text-yellow-800 dark:text-yellow-200 font-semibold">Pending</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-2-row">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
                 </div>
             </div>
@@ -155,7 +155,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Records</h3>
-                    <p class="text-red-800 font-semibold">Rejected</p>
+                    <p class="text-red-800 dark:text-red-200 font-semibold">Rejected</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                 </div>
             </div>
@@ -181,6 +181,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="divider my-0"></div>
         </div>
     </div>
