@@ -939,7 +939,7 @@
         }
     }
     // --- Global showPage func to hide/show pages ---
-    function showPage(pageId) {
+    window.showPage = function showPage(pageId) {
         document.querySelectorAll('aside a').forEach(a => {
             a.classList.remove('bg-primary-purple', 'active-nav', 'rounded-lg');
         });
@@ -967,7 +967,12 @@
         } catch(_) {}
         
         if (pageId === 'profile') { showViewMode(); }
-        if (pageId === 'dashboard' && typeof renderCharts === 'function') { renderCharts(); }
+        if (pageId === 'dashboard' && typeof renderCharts === 'function') { 
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                renderCharts();
+            }, 50);
+        }
         if (pageId === 'support') { loadTickets(); }
     }
     function showEditMode(mode) {
@@ -1103,7 +1108,159 @@
                         }
                     });
                 }
-            } catch (_) {}
+
+                // Status Distribution Chart - Doughnut with gradients and click handler
+                const statusCanvas = document.getElementById('statusDistributionChart');
+                if (statusCanvas) {
+                    if (window.statusDistributionChart) { 
+                        window.statusDistributionChart.destroy(); 
+                    }
+                    
+                    const statusCtx = statusCanvas.getContext('2d');
+                    const approvedCount = parseInt(window.__scms_approvedCount) || 0;
+                    const verifiedCount = parseInt(window.__scms_verifiedCount) || 0;
+                    const pendingCount = parseInt(window.__scms_pendingCount) || 0;
+                    const rejectedCount = parseInt(window.__scms_rejectedCount) || 0;
+                    
+                    console.log('Creating Status Distribution Chart with data:', { approvedCount, verifiedCount, pendingCount, rejectedCount });
+                    
+                    window.statusDistributionChart = new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Approved', 'Verified', 'Pending', 'Rejected'],
+                            datasets: [{
+                                data: [approvedCount, verifiedCount, pendingCount, rejectedCount],
+                                backgroundColor: function(context) {
+                                    const chart = context.chart;
+                                    const {ctx, chartArea} = chart;
+                                    
+                                    if (!chartArea) {
+                                        return ['#10B981', '#14B8A6', '#F59E0B', '#EF4444'][context.dataIndex];
+                                    }
+                                    
+                                    const centerX = (chartArea.left + chartArea.right) / 2;
+                                    const centerY = (chartArea.top + chartArea.bottom) / 2;
+                                    const r = Math.min(
+                                        (chartArea.right - chartArea.left) / 2,
+                                        (chartArea.bottom - chartArea.top) / 2
+                                    );
+                                    
+                                    const gradients = [
+                                        function() {
+                                            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                            gradient.addColorStop(0, '#34D399');
+                                            gradient.addColorStop(1, '#059669');
+                                            return gradient;
+                                        },
+                                        function() {
+                                            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                            gradient.addColorStop(0, '#2DD4BF');
+                                            gradient.addColorStop(1, '#0D9488');
+                                            return gradient;
+                                        },
+                                        function() {
+                                            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                            gradient.addColorStop(0, '#FBBF24');
+                                            gradient.addColorStop(1, '#D97706');
+                                            return gradient;
+                                        },
+                                        function() {
+                                            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                            gradient.addColorStop(0, '#F87171');
+                                            gradient.addColorStop(1, '#DC2626');
+                                            return gradient;
+                                        }
+                                    ];
+                                    
+                                    return gradients[context.dataIndex]();
+                                },
+                                borderWidth: 0,
+                                borderColor: 'transparent',
+                                hoverBorderWidth: 0,
+                                hoverBorderColor: 'transparent',
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '65%',
+                            onClick: (event, elements) => {
+                                console.log('Chart clicked!', elements);
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const labels = ['Approved', 'Verified', 'Pending', 'Rejected'];
+                                    const status = labels[index];
+                                    console.log('🎯 Clicked on status:', status);
+                                    if (typeof window.showPage === 'function') {
+                                        window.showPage('record-status');
+                                        setTimeout(() => {
+                                            if (typeof window.filterTableByStatus === 'function') {
+                                                window.filterTableByStatus(status, null);
+                                                console.log('✅ Filter applied for:', status);
+                                            }
+                                        }, 300);
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        color: axisTextColor,
+                                        padding: 12,
+                                        font: { size: 11, weight: '500' },
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        generateLabels: function(chart) {
+                                            const data = chart.data;
+                                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                            return data.labels.map((label, i) => {
+                                                const value = data.datasets[0].data[i];
+                                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                                return {
+                                                    text: `${label}: ${value} (${percentage}%)`,
+                                                    fillStyle: ['#10B981', '#14B8A6', '#F59E0B', '#EF4444'][i],
+                                                    hidden: false,
+                                                    index: i
+                                                };
+                                            });
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    backgroundColor: '#1F2937',
+                                    titleColor: '#FFFFFF',
+                                    bodyColor: '#FFFFFF',
+                                    borderColor: '#E5E7EB',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    displayColors: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return `${label}: ${value} records (${percentage}%)`;
+                                        },
+                                        afterLabel: function(context) {
+                                            return 'Click to view records';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    console.log('✅ Status Distribution Chart created with click handler');
+                }
+                
+            } catch (err) {
+                console.error('❌ Error creating charts:', err);
+            }
         }
 
         // ==================== GLOBAL HELPERS ====================
@@ -3714,7 +3871,7 @@
             
             return badgeHtml + dateHtml + countdownHtml;
         }
-        function filterTableByStatus(status, event) {
+        window.filterTableByStatus = function filterTableByStatus(status, event) {
             const tableBody = document.getElementById('record-table-body');
             const rows = tableBody.querySelectorAll('tr');
             rows.forEach(row => {
@@ -3800,6 +3957,13 @@
                 if (elVerified) elVerified.textContent = String(counts.Verified);
                 if (elPending) elPending.textContent = String(counts.Pending);
                 if (elRejected) elRejected.textContent = String(counts.Rejected);
+                
+                // Store counts for charts
+                window.__scms_approvedCount = counts.Approved;
+                window.__scms_verifiedCount = counts.Verified;
+                window.__scms_pendingCount = counts.Pending;
+                window.__scms_rejectedCount = counts.Rejected;
+                
                 // Per-status last update text & row visibility
                 const fmt = (d) => d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : '';
                 const approvedText = fmt(lastApproved);
@@ -4340,6 +4504,16 @@
         // Run both periodically (works alongside SessionKeeper)
         setInterval(refreshCsrf, 30 * 60 * 1000); // 30 minutes
         setInterval(keepAlive, 20 * 60 * 1000);   // 20 minutes
+        
+        // Force initial chart render after a short delay
+        setTimeout(function() {
+            console.log('Force rendering charts...');
+            if (typeof renderCharts === 'function') {
+                renderCharts();
+            } else {
+                console.error('renderCharts function not defined!');
+            }
+        }, 500);
     </script>
 
     <!-- Sidebar Collapse Script -->

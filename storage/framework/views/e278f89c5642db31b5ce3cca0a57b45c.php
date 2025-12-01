@@ -170,21 +170,325 @@
                 <canvas id="yearlyRecordsChart"></canvas>
             </div>
         </div>
-        <div class="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center gap-6">
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
             <!-- Approved / Completion donut -->
-            <div class="flex flex-col items-center">
-                <h2 class="text-xl font-bold text-text-header mb-4">Approved Hours Completion</h2>
-                <div class="relative w-40 h-40">
+            <div class="flex flex-col items-center w-full">
+                <h2 class="text-lg font-bold text-white mb-4">Approved Hours Completion</h2>
+                <div class="relative w-48 h-48">
                     <canvas id="hoursCompletionChart"></canvas>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-3xl font-bold text-[#6D28D9]" id="hours-completion-label">0%</span>
-                        <p class="text-sm text-text-muted" id="hours-amount">0h of 160h</p>
+                        <span class="text-3xl font-bold text-white" id="hours-completion-label">0%</span>
+                        <p class="text-sm text-white" id="hours-amount">0h of 160h</p>
                     </div>
                 </div>
             </div>
 
             <div class="divider my-0"></div>
+
+            <!-- Status Distribution Chart -->
+            <div class="flex flex-col items-center w-full flex-1" style="color: #FFFFFF !important;">
+                <h2 class="text-lg font-bold text-white mb-4">Status Distribution</h2>
+                <div class="relative w-full" style="min-height: 220px; height: 220px; color: #FFFFFF !important;">
+                    <canvas id="statusDistributionChart" width="400" height="220" style="cursor: pointer;"></canvas>
+                </div>
+                <p class="text-xs text-white mt-2 text-center">Click any segment to view filtered records</p>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+// Status Distribution Chart with Gradients
+(function() {
+    console.log('🔍 Status Distribution Chart Loading...');
+    
+    function tryCreateChart() {
+        const canvas = document.getElementById('statusDistributionChart');
+        
+        if (!canvas) {
+            console.error('❌ Canvas not found!');
+            return;
+        }
+        
+        if (typeof Chart === 'undefined') {
+            console.error('❌ Chart.js not loaded yet, waiting...');
+            setTimeout(tryCreateChart, 100);
+            return;
+        }
+        
+        // Check if canvas is in the DOM
+        if (!canvas.isConnected) {
+            console.error('❌ Canvas not connected to DOM, waiting...');
+            setTimeout(tryCreateChart, 100);
+            return;
+        }
+        
+        console.log('✅ Chart.js loaded, creating gradient chart...');
+        
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+            console.error('❌ Could not get canvas context');
+            return;
+        }
+        
+        // Get actual counts from window variables
+        const approvedCount = parseInt(window.__scms_approvedCount) || 0;
+        const verifiedCount = parseInt(window.__scms_verifiedCount) || 0;
+        const pendingCount = parseInt(window.__scms_pendingCount) || 0;
+        const rejectedCount = parseInt(window.__scms_rejectedCount) || 0;
+        
+        // Override any global Chart defaults that might be setting dark text
+        if (typeof Chart.defaults !== 'undefined') {
+            Chart.overrides.doughnut = Chart.overrides.doughnut || {};
+            Chart.overrides.doughnut.plugins = Chart.overrides.doughnut.plugins || {};
+            Chart.overrides.doughnut.plugins.legend = Chart.overrides.doughnut.plugins.legend || {};
+            Chart.overrides.doughnut.plugins.legend.labels = {
+                color: '#FFFFFF'
+            };
+        }
+        
+        // Custom plugin to force white legend text on every render
+        const whiteLegendPlugin = {
+            id: 'whiteLegendText',
+            afterUpdate: (chart) => {
+                if (chart.legend && chart.legend.legendItems) {
+                    chart.legend.legendItems.forEach(item => {
+                        item.fontColor = '#FFFFFF';
+                    });
+                }
+                // Force options update
+                if (chart.options.plugins.legend.labels) {
+                    chart.options.plugins.legend.labels.color = '#FFFFFF';
+                }
+            }
+        };
+        
+        try {
+            const chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            plugins: [whiteLegendPlugin],
+            data: {
+                labels: ['Approved', 'Verified', 'Pending', 'Rejected'],
+                datasets: [{
+                    data: [approvedCount, verifiedCount, pendingCount, rejectedCount],
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        
+                        if (!chartArea) {
+                            return ['#10B981', '#14B8A6', '#F59E0B', '#EF4444'][context.dataIndex];
+                        }
+                        
+                        const centerX = (chartArea.left + chartArea.right) / 2;
+                        const centerY = (chartArea.top + chartArea.bottom) / 2;
+                        const r = Math.min(
+                            (chartArea.right - chartArea.left) / 2,
+                            (chartArea.bottom - chartArea.top) / 2
+                        );
+                        
+                        const gradients = [
+                            // Approved (Green)
+                            function() {
+                                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                gradient.addColorStop(0, '#34D399');
+                                gradient.addColorStop(1, '#059669');
+                                return gradient;
+                            },
+                            // Verified (Teal)
+                            function() {
+                                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                gradient.addColorStop(0, '#2DD4BF');
+                                gradient.addColorStop(1, '#0D9488');
+                                return gradient;
+                            },
+                            // Pending (Orange)
+                            function() {
+                                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                gradient.addColorStop(0, '#FBBF24');
+                                gradient.addColorStop(1, '#D97706');
+                                return gradient;
+                            },
+                            // Rejected (Red)
+                            function() {
+                                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+                                gradient.addColorStop(0, '#F87171');
+                                gradient.addColorStop(1, '#DC2626');
+                                return gradient;
+                            }
+                        ];
+                        
+                        return gradients[context.dataIndex]();
+                    },
+                    borderWidth: 0,
+                    borderColor: 'transparent',
+                    hoverBorderWidth: 0,
+                    hoverBorderColor: 'transparent',
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                onClick: (event, elements) => {
+                    console.log('Chart clicked!', elements);
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const labels = ['Approved', 'Verified', 'Pending', 'Rejected'];
+                        const status = labels[index];
+                        
+                        console.log('🎯 Clicked on status:', status);
+                        
+                        // Use window references explicitly
+                        if (typeof window.showPage === 'function') {
+                            console.log('📄 Calling showPage...');
+                            window.showPage('record-status');
+                            
+                            // Wait for page to render, then apply filter
+                            setTimeout(() => {
+                                console.log('🔍 Calling filterTableByStatus...');
+                                if (typeof window.filterTableByStatus === 'function') {
+                                    window.filterTableByStatus(status, null);
+                                    console.log('✅ Filter applied for:', status);
+                                } else {
+                                    console.error('❌ filterTableByStatus not found');
+                                }
+                            }, 200);
+                        } else {
+                            console.error('❌ showPage not found');
+                        }
+                    }
+                },
+                plugins: {
+                    // Disable built-in legend (we'll render a custom HTML legend below)
+                    legend: {
+                        display: true,
+                        labels: {
+                        color: '#FFFFFF' // <--- Set the label text color to white
+                    }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#1F2937',
+                        titleColor: '#FFFFFF',
+                        bodyColor: '#FFFFFF',
+                        borderColor: '#E5E7EB',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${label}: ${value} records (${percentage}%)`;
+                            },
+                            afterLabel: function(context) {
+                                return 'Click to view records';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Store chart instance globally for updates
+        window.statusDistributionChart = chartInstance;
+        
+        // CRITICAL: Force update the legend color after chart is fully rendered
+        // This overrides any parent page settings
+        chartInstance.options.plugins.legend.labels.color = '#FFFFFF';
+        
+        // Also force it in the legend items themselves
+        if (chartInstance.legend && chartInstance.legend.legendItems) {
+            chartInstance.legend.legendItems.forEach(item => {
+                item.fontColor = '#FFFFFF';
+            });
+        }
+        
+        // Trigger a full re-render with the white color
+        chartInstance.update('none');
+        
+        // Force legend text to white with CSS - increased delay
+        setTimeout(() => {
+            const legendItems = canvas.parentElement.parentElement.querySelectorAll('.chartjs-legend li, [id*="legend"] li, canvas + * li, ul li');
+            legendItems.forEach(item => {
+                item.style.setProperty('color', '#FFFFFF', 'important');
+                const spans = item.querySelectorAll('span');
+                spans.forEach(span => span.style.setProperty('color', '#FFFFFF', 'important'));
+            });
+            
+            // Also try to find and style any generated legend elements
+            const allLegendTexts = canvas.parentElement.parentElement.querySelectorAll('ul li span, ul li');
+            allLegendTexts.forEach(el => {
+                el.style.setProperty('color', '#FFFFFF', 'important');
+            });
+        }, 500);
+        
+        console.log('✅ Chart with percentages created successfully!');
+        
+        // Add direct canvas click handler as backup
+        canvas.addEventListener('click', function(evt) {
+            const points = chartInstance.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+            if (points.length) {
+                const firstPoint = points[0];
+                const label = chartInstance.data.labels[firstPoint.index];
+                const value = chartInstance.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
+                
+                console.log('🖱️ Canvas click detected:', label);
+                
+                // Navigate and filter
+                if (window.showPage) {
+                    window.showPage('record-status');
+                    setTimeout(() => {
+                        if (window.filterTableByStatus) {
+                            window.filterTableByStatus(label, null);
+                        }
+                    }, 300);
+                }
+            }
+        });
+        
+        } catch (error) {
+            console.error('❌ Error creating chart:', error);
+        }
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryCreateChart);
+    } else {
+        tryCreateChart();
+    }
+})();
+</script>
+
+<style>
+/* Force white legend text for Chart.js - Most aggressive fix */
+.chartjs-legend,
+.chartjs-legend *,
+.chartjs-legend ul,
+.chartjs-legend ul li,
+.chartjs-legend ul li span {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+/* Target any list items in flex containers (Chart.js legend) */
+div[class*="flex"] > ul > li,
+div[class*="flex"] > ul > li *,
+.flex-col ul li,
+.flex-col ul li * {
+    color: #ffffff !important;
+}
+
+/* Global override for the chart container */
+#statusDistributionChart ~ ul,
+#statusDistributionChart ~ ul *,
+#statusDistributionChart ~ div ul,
+#statusDistributionChart ~ div ul * {
+    color: #ffffff !important;
+}
+</style>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/partials/student/dashboard-page.blade.php ENDPATH**/ ?>
