@@ -86,7 +86,7 @@
     </dialog>
 
     <!-- Activity Details Modal -->
-    <dialog id="semester_details_modal" class="modal">
+    <dialog id="activity_details_modal" class="modal">
         <div class="modal-box w-11/12 max-w-2xl">
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
