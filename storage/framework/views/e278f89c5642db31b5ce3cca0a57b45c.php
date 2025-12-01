@@ -12,53 +12,55 @@
             $daysRemaining = max(0, (int) ceil($totalHours / 24));
             $hoursRemaining = max(0, (int) $totalHours);
         ?>
-        <div class="alert shadow-xl mb-6 bg-red-900/20 border border-red-600 border-l-8 rounded-xl" role="alert">
-            <div class="flex items-start w-full gap-4">
-                <div class="bg-red-600 p-3 rounded-lg flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <div class="alert shadow-xl mb-4 md:mb-6 bg-red-900/20 border border-red-600 border-l-4 md:border-l-8 rounded-lg md:rounded-xl p-3 md:p-4" role="alert">
+            <div class="flex flex-col sm:flex-row items-start w-full gap-3 md:gap-4">
+                <div class="bg-red-600 p-2 md:p-3 rounded-lg flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-7 md:w-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <div class="flex-1">
-                    <h3 class="text-xl font-bold text-orange-500 mb-3">Account Deactivated & Scheduled for Deletion</h3>
+                <div class="flex-1 w-full">
+                    <h3 class="text-lg md:text-xl font-bold text-orange-500 mb-2 md:mb-3">Account Deactivated & Scheduled for Deletion</h3>
                     
-                    <p class="text-gray-400 mb-4">
+                    <p class="text-gray-400 mb-3 md:mb-4 text-sm md:text-base">
                         <span class="font-semibold">Status:</span> Your account has been deactivated by an administrator. You won't be able to use the system until it is reactivated.
                     </p>
                     
-                    <div class="border-t border-b border-gray-600 py-4 mb-4">
-                        <div class="flex items-center gap-3 mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <h4 class="text-lg font-bold text-blue-400">
-                                <?php if($daysRemaining > 0): ?>
-                                    <?php echo e($daysRemaining); ?> Day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> Remaining
-                                <?php else: ?>
-                                    <?php echo e($hoursRemaining); ?> Hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> Remaining
-                                <?php endif; ?>
-                            </h4>
+                    <div class="border-t border-b border-gray-600 py-3 md:py-4 mb-3 md:mb-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h4 class="text-base md:text-lg font-bold text-blue-400">
+                                    <?php if($daysRemaining > 0): ?>
+                                        <?php echo e($daysRemaining); ?> Day<?php echo e($daysRemaining != 1 ? 's' : ''); ?> Remaining
+                                    <?php else: ?>
+                                        <?php echo e($hoursRemaining); ?> Hour<?php echo e($hoursRemaining != 1 ? 's' : ''); ?> Remaining
+                                    <?php endif; ?>
+                                </h4>
+                            </div>
                         </div>
-                        <p class="text-orange-400 text-sm">
+                        <p class="text-orange-400 text-xs md:text-sm">
                             Your account will be <strong>permanently deleted</strong> on <strong><?php echo e($deletionDate->format('F d, Y')); ?></strong> at <strong><?php echo e($deletionDate->format('g:i A')); ?></strong>
                         </p>
                     </div>
                     
-                    <div class="flex items-start gap-2 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="flex items-start gap-2 mb-3 md:mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 text-green-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div class="text-green-400">
-                            <h5 class="font-bold mb-1">Action Required</h5>
-                            <p class="text-gray-400 text-sm">
+                            <h5 class="font-bold mb-1 text-sm md:text-base">Action Required</h5>
+                            <p class="text-gray-400 text-xs md:text-sm">
                                 To reactivate your account and prevent permanent deletion, please contact an administrator immediately.
                             </p>
                         </div>
                     </div>
                     
-                    <div class="flex gap-3 mt-4">
-                        <button onclick="showPage('support')" class="btn btn-sm text-white transition-colors" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Contact Administrator</button>
-                        <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-outline btn-sm">View Deactivation Details</button>
+                    <div class="flex flex-col sm:flex-row gap-2 md:gap-3 mt-3 md:mt-4">
+                        <button onclick="showPage('support')" class="btn btn-sm w-full sm:w-auto text-white transition-colors text-xs md:text-sm" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Contact Administrator</button>
+                        <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-outline btn-sm w-full sm:w-auto text-xs md:text-sm">View Deactivation Details</button>
                     </div>
                 </div>
             </div>
