@@ -122,7 +122,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="approved-count">8</span> Records</h3>
-                    <p class="text-green-800 font-semibold">Approved</p>
+                    <p class="text-green-800 dark:text-green-200 font-semibold">Approved</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="verified-count">0</span> Records</h3>
-                    <p class="text-teal-800 font-semibold">Verified</p>
+                    <p class="text-teal-800 dark:text-teal-200 font-semibold">Verified</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-verified-row">Last update: <span id="summary-last-updated-verified"></span></p>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="pending-count">8</span> Records</h3>
-                    <p class="text-yellow-800 font-semibold">Pending</p>
+                    <p class="text-yellow-800 dark:text-yellow-200 font-semibold">Pending</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-2-row">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
                 </div>
             </div>
@@ -155,7 +155,7 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Records</h3>
-                    <p class="text-red-800 font-semibold">Rejected</p>
+                    <p class="text-red-800 dark:text-red-200 font-semibold">Rejected</p>
                     <p class="text-xs text-text-muted mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                 </div>
             </div>

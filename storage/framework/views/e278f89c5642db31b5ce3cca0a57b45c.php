@@ -105,8 +105,8 @@
     <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <h2 class="text-xl font-bold text-text-header mb-1">Social Contract Summary</h2>
-                <p class="text-sm text-text-muted">Contract Status Overview (Approved, Verified, Pending, Rejected)</p>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-1">Social Contract Summary</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Contract Status Overview (Approved, Verified, Pending, Rejected)</p>
             </div>
             <button onclick="loadRecords();" class="btn btn-ghost btn-sm gap-2" title="Refresh dashboard stats">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -122,9 +122,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-text-header"><span id="approved-count">8</span> Records</h3>
-                    <p class="text-green-800 font-semibold">Approved</p>
-                    <p class="text-xs text-text-muted mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><span id="approved-count">8</span> Records</h3>
+                    <p class="text-green-800 dark:text-green-200 font-semibold">Approved</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="summary-last-updated-row">Last update: <span id="summary-last-updated">oct 18, 2025</span></p>
                 </div>
             </div>
             <!-- Verified Records -->
@@ -133,9 +133,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-text-header"><span id="verified-count">0</span> Records</h3>
-                    <p class="text-teal-800 font-semibold">Verified</p>
-                    <p class="text-xs text-text-muted mt-1" id="summary-last-updated-verified-row">Last update: <span id="summary-last-updated-verified"></span></p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><span id="verified-count">0</span> Records</h3>
+                    <p class="text-teal-800 dark:text-teal-200 font-semibold">Verified</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="summary-last-updated-verified-row">Last update: <span id="summary-last-updated-verified"></span></p>
                 </div>
             </div>
             <!-- Pending Records -->
@@ -144,9 +144,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-text-header"><span id="pending-count">8</span> Records</h3>
-                    <p class="text-yellow-800 font-semibold">Pending</p>
-                    <p class="text-xs text-text-muted mt-1" id="summary-last-updated-2-row">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><span id="pending-count">8</span> Records</h3>
+                    <p class="text-yellow-800 dark:text-yellow-200 font-semibold">Pending</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="summary-last-updated-2-row">Last update: <span id="summary-last-updated-2">oct 18, 2025</span></p>
                 </div>
             </div>
             <!-- Rejected Records -->
@@ -155,9 +155,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-text-header"><span id="rejected-count">0</span> Records</h3>
-                    <p class="text-red-800 font-semibold">Rejected</p>
-                    <p class="text-xs text-text-muted mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><span id="rejected-count">0</span> Records</h3>
+                    <p class="text-red-800 dark:text-red-200 font-semibold">Rejected</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="summary-last-updated-3-row">Last update: <span id="summary-last-updated-3">oct 18, 2025</span></p>
                 </div>
             </div>
         </div>
@@ -165,7 +165,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 flex-1-dynamic">
         <div class="lg:col-span-3 bg-white rounded-2xl p-4 shadow-sm flex flex-col">
-            <h2 class="text-xl font-bold text-text-header mb-4">Yearly Approved Records</h2>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Yearly Approved Records</h2>
             <div class="relative flex-1 w-full">
                 <canvas id="yearlyRecordsChart"></canvas>
             </div>
@@ -173,12 +173,12 @@
         <div class="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center gap-6">
             <!-- Approved / Completion donut -->
             <div class="flex flex-col items-center">
-                <h2 class="text-xl font-bold text-text-header mb-4">Approved Hours Completion</h2>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Approved Hours Completion</h2>
                 <div class="relative w-40 h-40">
                     <canvas id="hoursCompletionChart"></canvas>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <span class="text-3xl font-bold text-[#6D28D9]" id="hours-completion-label">0%</span>
-                        <p class="text-sm text-text-muted" id="hours-amount">0h of 160h</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400" id="hours-amount">0h of 160h</p>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,17 +9,17 @@
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
         <script>
-            // Apply saved theme ASAP to reduce flash
+            // Apply saved theme IMMEDIATELY before any CSS loads
             (function(){
                 try {
                     var saved = localStorage.getItem('scms_theme');
                     if (saved === 'dark' || saved === 'light') {
                         document.documentElement.setAttribute('data-theme', saved);
-                    } else {
-                        // Default to light theme for student dashboard
-                        document.documentElement.setAttribute('data-theme', 'light');
                     }
-                } catch(_){ }
+                    // Note: 'light' is already set as default in the HTML tag above
+                } catch(_){ 
+                    // If script fails, fallback to light theme already set in HTML tag
+                }
             })();
         </script>
         <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
@@ -98,7 +98,7 @@
         html, body { margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; }
         /* Ensure active nav exactly matches primary purple */
-        .active-nav { background-color: #6D28D9; color: #000000ff; border-radius: 0.5rem; }
+        .active-nav { background-color: #6D28D9; color: #ffffff; border-radius: 0.5rem; }
         .flex-1-dynamic { flex: 1 1 auto; min-height: 0; }
         .page-content:not(.hidden) { display: flex !important; }
         .content-area-auto { height: auto; max-height: 100%; }
@@ -260,7 +260,9 @@
     <style>
         /* Dark theme: comprehensive text and component styling */
         [data-theme="dark"] body{color:#fff}
-        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
+        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] td,[data-theme="dark"] th{color:#fff!important}
+        /* Only force white on p/span/label/a if they don't have specific color classes */
+        [data-theme="dark"] p:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] span:not([class*="text-"]):not([class*="bg-"]),[data-theme="dark"] label:not([class*="text-"]),[data-theme="dark"] a:not([class*="text-"]){color:#fff!important}
         /* Preserve status colors in dark mode (do not force white for these) */
         [data-theme="dark"] .scms-badge--pending { background-color: #ff9d26ff !important; color: #ffffffff !important; }
         [data-theme="dark"] .scms-badge--verified { background-color: #14B8A6 !important; color: #ffffffff!important; }
@@ -859,7 +861,7 @@
         <main class="flex-1 flex flex-col gap-6 min-w-0 py-4" id="page-container">
             <div class="flex justify-between items-center">
                 <div id="main-greeting">
-                    <h4 id="page-title" class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
+                    <h4 id="page-title" class="text-4xl font-bold text-[#6D28D9]">Student Dashboard</h4>
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
@@ -871,7 +873,7 @@
                     </div>
                     <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden max-h-[500px] overflow-y-auto">
                         
-                        <li class="p-4 font-bold text-gray-700 dark:text-black border-b sticky top-0 bg-base-100 z-10">Notifications</li>
+                        <li class="p-4 font-bold text-gray-900 dark:text-white border-b sticky top-0 bg-base-100 z-10">Notifications</li>
 
                         <div id="notifications-list">
                             <!-- Notifications will be loaded here dynamically -->
