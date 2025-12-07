@@ -8,22 +8,22 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
-        <div class="text-center space-y-2 mb-6">
-            <h1 class="text-2xl font-bold text-white"><?php echo e(__('Admin Login')); ?></h1>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8">
+        <div class="text-center space-y-2 mb-4 sm:mb-6">
+            <h1 class="text-xl sm:text-2xl font-bold text-white"><?php echo e(__('Admin Login')); ?></h1>
         </div>
 
-        <form id="admin-login-form" method="POST" action="<?php echo e(route('admin.login.submit')); ?>" class="space-y-4">
+        <form id="admin-login-form" method="POST" action="<?php echo e(route('admin.login.submit')); ?>" class="space-y-3 sm:space-y-4">
             <?php echo csrf_field(); ?>
             <?php if(session('success')): ?>
-                <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;"><?php echo e(session('success')); ?></div>
+                <div class="p-2 sm:p-3 rounded text-xs sm:text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;"><?php echo e(session('success')); ?></div>
             <?php endif; ?>
             <?php if(session('error')): ?>
-                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
+                <div class="p-2 sm:p-3 rounded text-xs sm:text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
             <?php endif; ?>
 
             <div>
-                <label for="name" class="block text-sm font-medium mb-2 text-white"><?php echo e(__('Admin name')); ?></label>
+                <label for="name" class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-white"><?php echo e(__('Admin name')); ?></label>
                 <input
                     type="text"
                     id="name"
@@ -37,8 +37,8 @@
             </div>
 
             <div>
-                <div class="flex items-center justify-between mb-2">
-                    <label for="password" class="block text-sm font-medium text-white"><?php echo e(__('Password')); ?></label>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1.5 sm:mb-2 gap-1">
+                    <label for="password" class="block text-xs sm:text-sm font-medium text-white"><?php echo e(__('Password')); ?></label>
                     <?php
                         $forgotRoute = null;
                         if (\Illuminate\Support\Facades\Route::has('admin.password.request')) {
@@ -56,11 +56,11 @@
                     name="password"
                     placeholder="Enter password"
                     required
-                    class="w-full"
+                    class="w-full text-sm sm:text-base"
                     style="color: #ffffff !important;"
                 />
-                <div class="flex justify-end mt-1 mb-4">
-                         <a href="<?php echo e($forgotRoute); ?>" class="text-sm hover:underline">
+                <div class="flex justify-end mt-1 mb-3 sm:mb-4">
+                         <a href="<?php echo e($forgotRoute); ?>" class="text-xs sm:text-sm hover:underline">
                             <?php echo e(__('Forgot your password?')); ?>
 
                         </a>
@@ -70,7 +70,7 @@
             <button 
                 id="admin-login-btn"
                 type="submit" 
-                class="w-full scms-primary-btn"
+                class="w-full scms-primary-btn text-sm sm:text-base py-2.5 sm:py-3"
                 aria-busy="false">
                 <span class="btn-text"><?php echo e(__('Login')); ?></span>
             </button>

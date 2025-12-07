@@ -4,9 +4,20 @@
         <?php echo $__env->make('partials.head', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
         <style>
+            /* ===========================================
+               AUTH LAYOUT - PURE CSS, NO JS DEPENDENCY
+               Content will be centered and visible immediately
+               =========================================== */
             :root { 
                 --header-desktop-h: 115px; 
-                --header-mobile-h: 80px; 
+                --header-mobile-h: 80px;
+                --header-height-actual: 115px;
+            }
+            
+            /* Prevent horizontal scroll globally */
+            html {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
             }
             
             #site-header { 
@@ -34,25 +45,60 @@
                 transform: translateY(-120%); 
             }
 
-            /* desktop default body padding so content isn't covered */
+            /* ===========================================
+               BODY: Minimal styling
+               =========================================== */
             body { 
-                padding-top: var(--header-desktop-h); 
                 background-image: url('<?php echo e(asset('storage/vitsbg.png')); ?>'); 
                 background-repeat: no-repeat; 
                 background-position: center top; 
                 background-size: cover; 
-                background-attachment: fixed; 
+                background-attachment: fixed;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                overflow-x: hidden !important;
+                min-height: 100vh !important;
+                min-height: 100dvh !important;
+            }
+            
+            /* Auth content wrapper - FIXED POSITION for viewport centering */
+            .auth-content-wrapper {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: calc(100% - 24px) !important;
+                max-width: 28rem !important;
+                padding-top: calc(var(--header-desktop-h, 115px) / 2) !important;
+                box-sizing: border-box !important;
+                z-index: 10 !important;
             }
 
-            /* mobile adjustments */
+            /* ===========================================
+               MOBILE: 640px and down
+               =========================================== */
             @media (max-width: 640px) { 
+                :root {
+                    --header-height-actual: var(--header-mobile-h);
+                }
+                
                 #site-header { 
                     height: var(--header-mobile-h); 
                 } 
                 
                 body { 
-                    padding-top: var(--header-mobile-h); 
                     background-attachment: scroll;
+                }
+                
+                .auth-content-wrapper {
+                    position: fixed !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    width: calc(100% - 16px) !important;
+                    max-width: 100% !important;
+                    padding-top: calc(var(--header-mobile-h, 80px) / 2) !important;
                 }
                 
                 #site-header img {
@@ -69,6 +115,45 @@
                 font-weight: 700 !important;
                 text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
                 letter-spacing: -0.02em;
+            }
+            
+            /* ===========================================
+               AUTH PAGE SPECIFIC STYLES
+               Pure CSS centering - no JS dependency
+               =========================================== */
+            body.auth-page {
+                /* Override any conflicting styles */
+                margin: 0 !important;
+                padding: 0 !important;
+                padding-top: var(--header-desktop-h) !important;
+            }
+            
+            @media (max-width: 640px) {
+                body.auth-page {
+                    padding-top: var(--header-mobile-h) !important;
+                }
+            }
+            
+            /* Auth content wrapper - CRITICAL for centering */
+            .auth-content-wrapper {
+                width: 100% !important;
+                max-width: 100vw !important;
+                margin: 0 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+                min-height: calc(100vh - var(--header-desktop-h)) !important;
+                min-height: calc(100dvh - var(--header-desktop-h)) !important;
+            }
+            
+            @media (max-width: 640px) {
+                .auth-content-wrapper {
+                    min-height: calc(100vh - var(--header-mobile-h)) !important;
+                    min-height: calc(100dvh - var(--header-mobile-h)) !important;
+                    padding: 1rem !important;
+                }
             }
             
             /* Primary text - Crisp white */
@@ -332,18 +417,163 @@
                 pointer-events: auto !important;
             }
             
-            /* Mobile optimizations */
+            /* ===========================================
+               COMPREHENSIVE MOBILE RESPONSIVENESS
+               =========================================== */
+            
+            /* Mobile optimizations - Small devices (phones, 640px and down) */
             @media (max-width: 640px) {
+                /* Button full width on mobile */
                 .scms-primary-btn {
                     width: 100%;
                     padding: 0.75rem 1rem;
                     font-size: 1rem;
                 }
                 
+                /* Prevent iOS zoom on input focus */
                 input[type="email"],
                 input[type="password"],
                 input[type="text"] {
-                    font-size: 16px !important; /* Prevents zoom on iOS */
+                    font-size: 16px !important;
+                }
+                
+                /* Auth container adjustments */
+                body > div.flex {
+                    padding: 1rem !important;
+                    padding-top: calc(var(--header-height-mobile, 80px) + 1rem) !important;
+                    gap: 1rem !important;
+                }
+                
+                /* Logo sizing on mobile */
+                body > div.flex > a img {
+                    height: 3rem !important;
+                }
+                
+                /* Auth card - ensure full width and proper sizing */
+                body > div.flex > div[class*="w-full"],
+                body > div.flex > form[class*="w-full"],
+                body > div.flex > div > div[class*="w-full"] {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                    padding: 1rem !important;
+                    border-radius: 1rem !important;
+                }
+                
+                /* Form fields full width */
+                form input,
+                form select,
+                form textarea {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                
+                /* Form buttons */
+                form button[type="submit"],
+                form .scms-primary-btn {
+                    width: 100% !important;
+                    padding: 0.875rem 1rem !important;
+                }
+                
+                /* Heading sizes */
+                h1, .text-2xl, .text-3xl {
+                    font-size: 1.5rem !important;
+                    line-height: 1.25 !important;
+                }
+                
+                h2, .text-xl {
+                    font-size: 1.25rem !important;
+                }
+                
+                /* Description text */
+                p.text-sm, p.text-xs {
+                    font-size: 0.8125rem !important;
+                    line-height: 1.5 !important;
+                }
+                
+                /* Link and button spacing */
+                form a,
+                form .text-sm a {
+                    display: inline-block;
+                    padding: 0.25rem 0;
+                }
+            }
+            
+            /* Extra small devices (small phones, 380px and down) */
+            @media (max-width: 380px) {
+                body > div.flex {
+                    padding: 0.75rem !important;
+                    padding-top: calc(var(--header-height-mobile, 80px) + 0.75rem) !important;
+                }
+                
+                body > div.flex > div[class*="w-full"],
+                body > div.flex > form[class*="w-full"] {
+                    padding: 0.75rem !important;
+                    border-radius: 0.75rem !important;
+                }
+                
+                h1, .text-2xl, .text-3xl {
+                    font-size: 1.25rem !important;
+                }
+                
+                h2, .text-xl {
+                    font-size: 1.125rem !important;
+                }
+                
+                /* Smaller buttons on tiny screens */
+                form button[type="submit"],
+                form .scms-primary-btn {
+                    padding: 0.75rem 0.875rem !important;
+                    font-size: 0.9375rem !important;
+                }
+            }
+            
+            /* Medium devices (tablets, 641px to 1024px) */
+            @media (min-width: 641px) and (max-width: 1024px) {
+                body > div.flex {
+                    padding: 1.5rem !important;
+                    padding-top: calc(var(--header-height, 115px) + 1.5rem) !important;
+                }
+                
+                /* Auth card with max-width on tablets */
+                body > div.flex > div[class*="w-full"],
+                body > div.flex > form[class*="w-full"] {
+                    max-width: 28rem !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                }
+            }
+            
+            /* Ensure no horizontal scroll */
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+            
+            /* Prevent content from overflowing viewport */
+            body > div.flex {
+                max-width: 100vw !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Safe area insets for modern devices (notch, home indicator) */
+            /* Use @@ to escape @supports from Blade parser */
+            @supports(padding: env(safe-area-inset-bottom)) {
+                body > div.flex {
+                    padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+                }
+            }
+            
+            /* Landscape mode on mobile */
+            @media (max-height: 500px) and (orientation: landscape) {
+                body > div.flex {
+                    padding-top: calc(var(--header-height-mobile, 80px) + 0.5rem) !important;
+                    gap: 0.5rem !important;
+                }
+                
+                body > div.flex > a img {
+                    height: 2rem !important;
                 }
             }
 
@@ -355,16 +585,19 @@
             }
         </style>
     </head>
-    <body class="min-h-screen antialiased" style="margin: 0; padding: 0;">
+    <body class="min-h-screen antialiased auth-page">
         <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-        <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-4 sm:p-6 md:p-10">
-            <!-- Logo link to welcome page -->
-            <a href="<?php echo e(route('home')); ?>" class="mb-4">
-                <img src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-16 w-auto" />
-            </a>
+        <div class="auth-content-wrapper" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(100% - 24px); max-width: 28rem; padding-top: 40px; box-sizing: border-box; z-index: 10;">
+            <!-- Inner container for vertical stacking -->
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 28rem; gap: 1rem;">
+                <!-- Logo link to welcome page -->
+                <a href="<?php echo e(route('home')); ?>" class="mb-2 sm:mb-4">
+                    <img src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-12 sm:h-16 w-auto" />
+                </a>
             
-            <?php echo e($slot); ?>
+                <?php echo e($slot); ?>
 
+            </div>
         </div>
         <script>
             // Header show/hide on scroll: hide when scrolling down, show when scrolling up
@@ -398,9 +631,9 @@
                 try { document.cookie = 'scms_force_logout_pending=; Max-Age=0; path=/'; } catch (_) {}
             })();
             
-            // Force enable input interaction after page load
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
+            // Force enable input interaction after page load and on bfcache restoration
+            (function() {
+                function enableInputs() {
                     const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"]');
                     inputs.forEach(function(input) {
                         input.style.pointerEvents = 'auto';
@@ -417,8 +650,23 @@
                             overlays.forEach(o => o.style.pointerEvents = 'auto');
                         }
                     });
-                }, 100);
-            });
+                }
+                
+                // Run on DOMContentLoaded
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(enableInputs, 100);
+                    });
+                } else {
+                    setTimeout(enableInputs, 100);
+                }
+                
+                // CRITICAL: Also run on pageshow for bfcache navigation (back/forward)
+                window.addEventListener('pageshow', function(event) {
+                    // event.persisted is true when page is restored from bfcache
+                    setTimeout(enableInputs, 100);
+                });
+            })();
         </script>
     </body>
 </html>
