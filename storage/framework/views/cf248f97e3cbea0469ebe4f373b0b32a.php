@@ -3230,31 +3230,151 @@
                 }
             }, { passive: false });
 
-            // Ensure notification icon opens mobile dropdown on small screens
-            document.addEventListener('click', function(e) {
+            // (old mobile-only handler removed — replaced by unified document-level handler below)
+
+            // Unified notification toggle and outside-click close for both desktop and mobile
+            (function() {
                 try {
-                    const notifBtn = e.target.closest('[aria-label="Notifications"]');
-                    if (!notifBtn) return;
-                    if (window.innerWidth <= 640) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const mobileDropdown = document.getElementById('mobile-notification-dropdown');
-                        const desktopDropdown = document.getElementById('notification-dropdown-container');
-                        if (desktopDropdown) desktopDropdown.classList.remove('dropdown-open');
+                    const desktopDropdown = document.getElementById('notification-dropdown-container');
+                    const mobileDropdown = document.getElementById('mobile-notification-dropdown');
+
+                    const desktopContent = desktopDropdown ? desktopDropdown.querySelector('.dropdown-content') : null;
+                    const mobileContent = mobileDropdown ? mobileDropdown.querySelector('.dropdown-content') : null;
+
+                    // Helper to close both dropdowns (removes class AND hides content inline)
+                    function closeNotificationDropdowns() {
+                        if (desktopDropdown) {
+                            desktopDropdown.classList.remove('dropdown-open');
+                            if (desktopContent) desktopContent.style.display = 'none';
+                            desktopDropdown.dataset.scmsOpen = 'false';
+                        }
                         if (mobileDropdown) {
-                            mobileDropdown.classList.toggle('dropdown-open');
-                            // ensure mobile notifications list is populated (updateNotificationDropdown handles both lists)
-                            const mobileList = document.getElementById('mobile-notifications-list');
-                            if (mobileList && mobileList.children.length === 0) {
-                                // trigger reload
-                                if (typeof loadRecentNotifications === 'function') loadRecentNotifications();
+                            mobileDropdown.classList.remove('dropdown-open');
+                            if (mobileContent) mobileContent.style.display = 'none';
+                            mobileDropdown.dataset.scmsOpen = 'false';
+                        }
+
+                        // Remove focus from buttons/active element to prevent :focus-within CSS keeping the dropdown visible
+                        try {
+                            if (desktopBtn && typeof desktopBtn.blur === 'function') desktopBtn.blur();
+                            if (mobileBtn && typeof mobileBtn.blur === 'function') mobileBtn.blur();
+                            const active = document.activeElement;
+                            if (active && (desktopDropdown && desktopDropdown.contains(active) || mobileDropdown && mobileDropdown.contains(active))) {
+                                if (typeof active.blur === 'function') active.blur();
                             }
+                        } catch (err) {
+                            // ignore blur errors
                         }
                     }
+
+                    // Helper to open a dropdown explicitly
+                    function openDropdown(container, content) {
+                        if (!container) return;
+                        container.classList.add('dropdown-open');
+                        if (content) content.style.display = 'block';
+                        container.dataset.scmsOpen = 'true';
+                    }
+
+                    // Toggle desktop dropdown when desktop notification button is clicked
+                    const desktopBtn = desktopDropdown ? desktopDropdown.querySelector('[aria-label="Notifications"]') : null;
+                    const mobileBtn = mobileDropdown ? mobileDropdown.querySelector('[aria-label="Notifications"]') : null;
+
+                    function onNotifButtonClick(e, targetIsMobile) {
+                        try {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            // If mobile view or explicitly target mobile, toggle mobile
+                            if (window.innerWidth <= 640 || targetIsMobile) {
+                                if (!mobileDropdown) return;
+                                const isOpen = mobileDropdown.dataset.scmsOpen === 'true';
+                                if (isOpen) {
+                                    mobileDropdown.classList.remove('dropdown-open');
+                                    if (mobileContent) mobileContent.style.display = 'none';
+                                    mobileDropdown.dataset.scmsOpen = 'false';
+                                } else {
+                                    // ensure desktop closed and open mobile
+                                    if (desktopDropdown) {
+                                        desktopDropdown.classList.remove('dropdown-open');
+                                        if (desktopContent) desktopContent.style.display = 'none';
+                                        desktopDropdown.dataset.scmsOpen = 'false';
+                                    }
+                                    openDropdown(mobileDropdown, mobileContent);
+                                    // ensure notifications loaded
+                                    const mobileList = document.getElementById('mobile-notifications-list');
+                                    if (mobileList && mobileList.children.length === 0) {
+                                        if (typeof loadRecentNotifications === 'function') loadRecentNotifications();
+                                    }
+                                }
+                                return;
+                            }
+
+                            // Desktop toggle
+                            if (!desktopDropdown) return;
+                            const isOpen = desktopDropdown.dataset.scmsOpen === 'true';
+                            if (isOpen) {
+                                desktopDropdown.classList.remove('dropdown-open');
+                                if (desktopContent) desktopContent.style.display = 'none';
+                                desktopDropdown.dataset.scmsOpen = 'false';
+                            } else {
+                                // close mobile if open
+                                if (mobileDropdown) {
+                                    mobileDropdown.classList.remove('dropdown-open');
+                                    if (mobileContent) mobileContent.style.display = 'none';
+                                    mobileDropdown.dataset.scmsOpen = 'false';
+                                }
+                                openDropdown(desktopDropdown, desktopContent);
+                                // ensure notifications loaded
+                                const list = document.getElementById('notifications-list');
+                                if (list && list.children.length === 0) {
+                                    if (typeof loadRecentNotifications === 'function') loadRecentNotifications();
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Notification button click handler error', err);
+                        }
+                    }
+
+                    // Use a single document-level click handler so clicks on SVGs/inner elements still toggle reliably
+                    document.addEventListener('click', function(e) {
+                        try {
+                            const btn = e.target.closest('[aria-label="Notifications"]');
+                            if (!btn) return;
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            // Determine whether this is the mobile or desktop button
+                            const isMobileBtn = !!btn.closest('#mobile-notification-dropdown') || window.innerWidth <= 640;
+                            onNotifButtonClick(e, !!isMobileBtn);
+                        } catch (err) {
+                            console.error('Document-level notification click handler error', err);
+                        }
+                    }, { passive: false });
+
+                    // Close dropdowns when clicking/tapping outside of them
+                    document.addEventListener('pointerdown', function(e) {
+                        try {
+                            const target = e.target;
+                            // If click inside desktop dropdown or its button, do nothing
+                            if (desktopDropdown && (desktopDropdown.contains(target) || (desktopBtn && desktopBtn.contains(target)))) return;
+                            // If click inside mobile dropdown or its button, do nothing
+                            if (mobileDropdown && (mobileDropdown.contains(target) || (mobileBtn && mobileBtn.contains(target)))) return;
+
+                            // Otherwise close both
+                            closeNotificationDropdowns();
+                        } catch (err) {
+                            console.error('Outside click handler (notifications) error', err);
+                        }
+                    }, { passive: true });
+
+                    // Also close on Escape key
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') closeNotificationDropdowns();
+                    });
                 } catch (err) {
-                    console.error('Mobile notification open handler error', err);
+                    console.error('Init notification toggle error', err);
                 }
-            }, { passive: false });
+            })();
             
             // Navigate to a specific record
             async function goToRecord(recordId) {
