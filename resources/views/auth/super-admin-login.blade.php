@@ -1,20 +1,20 @@
 <x-layouts.auth.login-register>
-    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8">
-        <div class="text-center space-y-2 mb-6">
-            <h1 class="text-2xl font-bold text-white">Super Admin Login</h1>
+    <div class="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8">
+        <div class="text-center space-y-2 mb-4 sm:mb-6">
+            <h1 class="text-xl sm:text-2xl font-bold text-white">Super Admin Login</h1>
         </div>
 
-        <form id="superadmin-login-form" method="POST" action="{{ route('superadmin.login.submit') }}" class="space-y-4">
+        <form id="superadmin-login-form" method="POST" action="{{ route('superadmin.login.submit') }}" class="space-y-3 sm:space-y-4">
             @csrf
             @if(session('success'))
-                <div class="p-3 rounded text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">{{ session('success') }}</div>
+                <div class="p-2 sm:p-3 rounded text-xs sm:text-sm text-white" style="background:rgba(16, 185, 129, 0.2); border-left:4px solid #10b981;">{{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="p-3 rounded text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
+                <div class="p-2 sm:p-3 rounded text-xs sm:text-sm text-white" style="background:rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444;">Invalid information</div>
             @endif
 
             <div>
-                <label for="name" class="block text-sm font-medium mb-2 text-white">Admin name</label>
+                <label for="name" class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-white">Admin name</label>
                 <input
                     type="text"
                     id="name"
@@ -22,26 +22,26 @@
                     placeholder="admin name"
                     value="{{ old('name', $defaultAdminName ?? '') }}"
                     required
-                    class="w-full"
+                    class="w-full text-sm sm:text-base"
                 />
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium mb-2 text-white">Password</label>
+                <label for="password" class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-white">Password</label>
                 <input
                     type="password"
                     id="password"
                     name="password"
                     placeholder="Enter password"
                     required
-                    class="w-full"
+                    class="w-full text-sm sm:text-base"
                 />
             </div>
 
             <button 
                 id="superadmin-login-btn"
                 type="submit" 
-                class="w-full scms-primary-btn"
+                class="w-full scms-primary-btn text-sm sm:text-base py-2.5 sm:py-3"
                 aria-busy="false">
                 <span class="btn-text">Login</span>
             </button>

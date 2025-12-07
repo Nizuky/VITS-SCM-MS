@@ -68,6 +68,105 @@
             button, a {
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
+            
+            /* Mobile-responsive improvements */
+            @media (max-width: 640px) {
+                body {
+                    padding: 0 12px 30px !important;
+                }
+                
+                .main-card {
+                    padding: 24px 20px !important;
+                    border-radius: 20px !important;
+                    max-width: 100% !important;
+                    margin: 0 auto !important;
+                }
+                
+                .main-card h2 {
+                    font-size: 22px !important;
+                }
+                
+                .main-card h4 {
+                    font-size: 12px !important;
+                }
+                
+                .main-card p {
+                    font-size: 12px !important;
+                    text-align: left !important;
+                }
+                
+                .notice-box {
+                    padding: 12px 14px !important;
+                    font-size: 12px !important;
+                }
+                
+                .notice-box span:first-child {
+                    font-size: 16px !important;
+                }
+                
+                .toggle-container {
+                    flex-direction: column !important;
+                    gap: 12px !important;
+                    padding: 16px !important;
+                    border-radius: 20px !important;
+                }
+                
+                .toggle-container > span {
+                    text-align: center !important;
+                    padding-left: 0 !important;
+                    font-size: 12px !important;
+                }
+                
+                .toggle-buttons {
+                    width: 100% !important;
+                    justify-content: center !important;
+                }
+                
+                .toggle-buttons button {
+                    padding: 10px 28px !important;
+                    font-size: 14px !important;
+                }
+                
+                .followup-section {
+                    padding: 12px 16px !important;
+                }
+                
+                .followup-section p {
+                    font-size: 12px !important;
+                }
+                
+                .action-btn {
+                    padding: 12px 20px !important;
+                    font-size: 13px !important;
+                    min-width: 120px;
+                    text-align: center;
+                }
+                
+                .btn-group {
+                    flex-direction: column !important;
+                    width: 100% !important;
+                    gap: 10px !important;
+                }
+                
+                .btn-group a,
+                .btn-group button {
+                    width: 100% !important;
+                }
+            }
+            
+            @media (max-width: 380px) {
+                .main-card {
+                    padding: 20px 16px !important;
+                }
+                
+                .main-card h2 {
+                    font-size: 20px !important;
+                }
+                
+                .toggle-container {
+                    padding: 14px 12px !important;
+                }
+            }
         </style>
         <style>
             /*! tailwindcss v4.0.14 | MIT License | https://tailwindcss.com */
@@ -89,7 +188,7 @@
         
         <!-- Main centered container -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-            <div style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 32px 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); margin: 0 auto;">
+            <div class="main-card" style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 32px 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); margin: 0 auto;">
   
                 <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 28px; margin: 0 0 8px 0; font-weight: 800; letter-spacing: -0.02em;">Welcome</h2>
                 <h4 style="color: #6D28D9; font-size: 14px; margin: 0 0 20px 0; font-weight: 600; opacity: 0.9;">
@@ -103,7 +202,7 @@
                     and rendered hours, ensuring accuracy, efficiency, and transparency in monitoring student requirements.
                 </p>
 
-                <div style="font-size: 13px; color: #744210; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
+                <div class="notice-box" style="font-size: 13px; color: #744210; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
                     <div style="display: flex; align-items: flex-start; gap: 8px;">
                         <span style="font-size: 18px; flex-shrink: 0;">⚠️</span>
                         <div>
@@ -122,9 +221,9 @@
             <!-- Pill toggle role selector (below the main card) -->
             <div style="margin-top: 32px; width: 100%; max-width: 480px;">
                 <!-- Modern toggle with glass morphism --> 
-                <div style="background: rgba(255, 255, 255, 0.95); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; gap: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
+                <div class="toggle-container" style="background: rgba(255, 255, 255, 0.95); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; gap: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
                     <span style="color: #4a5568; font-size: 11px; font-weight: 600; flex: 1; min-width: 0; padding-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Are you a PLV Information Technology Student?</span>
-                    <div id="toggle" style="display: flex; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50px; padding: 4px; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                    <div id="toggle" class="toggle-buttons" style="display: flex; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50px; padding: 4px; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                         <button id="yesBtn" type="button" style="background: rgba(255, 255, 255, 0.3); border: none; color: white; border-radius: 50px; padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">Yes</button>
                         <button id="noBtn" type="button" style="background: transparent; border: none; color: rgba(255, 255, 255, 0.8); border-radius: 50px; padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap;">No</button>
                     </div>
@@ -132,27 +231,27 @@
 
                 <div id="followups" style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
                         <!-- Student Exists Section -->
-                        <div id="student-exists" class="hidden" 
+                        <div id="student-exists" class="hidden followup-section" 
                             style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
                             <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Do you have an existing account?</p>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-                                <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
+                            <div class="btn-group" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                                <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" class="action-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
                                     Yes — Login
                                 </a>
-                                <a href="#" onclick="event.preventDefault(); clearSessionAndRegister();" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(245, 87, 108, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245, 87, 108, 0.4)';">
+                                <a href="#" onclick="event.preventDefault(); clearSessionAndRegister();" class="action-btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(245, 87, 108, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245, 87, 108, 0.4)';">
                                     No — Sign up
                                 </a>
                             </div>
                         </div>
                         <!-- Non-Student Select Section -->
-                        <div id="nonstudent-select" class="hidden" 
+                        <div id="nonstudent-select" class="hidden followup-section" 
                             style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
                             <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Select your role</p>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-                                <button type="button" onclick="clearSessionAndGoToAdmin()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
+                            <div class="btn-group" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                                <button type="button" onclick="clearSessionAndGoToAdmin()" class="action-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
                                     Admin
                                 </button>
-                                <button type="button" onclick="clearSessionAndGoToSuperAdmin()" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(250, 112, 154, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(250, 112, 154, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(250, 112, 154, 0.4)';">
+                                <button type="button" onclick="clearSessionAndGoToSuperAdmin()" class="action-btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(250, 112, 154, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(250, 112, 154, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(250, 112, 154, 0.4)';">
                                     Super Admin
                                 </button>
                             </div>
