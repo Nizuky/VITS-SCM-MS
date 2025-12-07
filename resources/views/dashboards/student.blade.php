@@ -290,8 +290,16 @@
             }
 
             /* Adjust main content for mobile */
+            .flex.gap-4.min-h-screen.p-4,
             .flex.gap-4.min-h-screen {
                 padding-top: 4.5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* Make page title smaller on mobile */
+            #page-title {
+                font-size: 1.5rem;
             }
 
             /* Mobile close button styling */
@@ -903,7 +911,7 @@
     <!-- Sidebar Backdrop -->
     <div id="sidebar-backdrop"></div>
 
-    <div class="flex gap-4 min-h-screen"> 
+    <div class="flex gap-4 min-h-screen p-4"> 
         <!-- Sidebar -->
         <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-0 self-start h-screen overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Mobile Close Button -->
@@ -997,10 +1005,10 @@
             </button>
         </aside>
 
-        <main class="flex-1 flex flex-col gap-6 min-w-0 py-4" id="page-container">
+        <main class="flex-1 flex flex-col gap-6 min-w-0" id="page-container">
             <div class="flex justify-between items-center">
                 <div id="main-greeting">
-                    <h4 id="page-title" class="text-4xl font-bold text-primary-purple">Student Dashboard</h4>
+                    <h4 id="page-title" class="text-2xl md:text-4xl font-bold text-primary-purple">Student Dashboard</h4>
                 </div>
                 
                 <div class="dropdown dropdown-end" id="notification-dropdown-container">
