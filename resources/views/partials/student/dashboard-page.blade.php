@@ -12,97 +12,109 @@
             $daysRemaining = max(0, (int) ceil($totalHours / 24));
             $hoursRemaining = max(0, (int) $totalHours);
         @endphp
-        <div class="alert shadow-xl mb-4 md:mb-6 bg-red-900/20 border border-red-600 border-l-4 md:border-l-8 rounded-lg md:rounded-xl p-3 md:p-4" role="alert">
-            <div class="flex flex-col sm:flex-row items-start w-full gap-3 md:gap-4">
-                <div class="bg-red-600 p-2 md:p-3 rounded-lg flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-7 md:w-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        
+        <!-- Redesigned Compact Alert Card -->
+        <div class="bg-gradient-to-r from-red-950/90 to-red-900/70 border border-red-500/50 rounded-xl shadow-lg mb-4 overflow-hidden" role="alert">
+            <!-- Header with icon and title -->
+            <div class="flex items-center gap-3 px-4 py-3 bg-red-900/40 border-b border-red-500/30">
+                <div class="bg-red-500 p-1.5 rounded-lg flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <div class="flex-1 w-full">
-                    <h3 class="text-lg md:text-xl font-bold text-orange-500 mb-2 md:mb-3">Account Deactivated & Scheduled for Deletion</h3>
-                    
-                    <p class="text-gray-400 mb-3 md:mb-4 text-sm md:text-base">
-                        <span class="font-semibold">Status:</span> Your account has been deactivated by an administrator. You won't be able to use the system until it is reactivated.
+                <h3 class="font-bold text-white text-sm sm:text-base">Account Deactivated & Scheduled for Deletion</h3>
+            </div>
+            
+            <!-- Content -->
+            <div class="px-4 py-3 space-y-3">
+                <!-- Status message -->
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                    <span class="text-red-400 font-semibold">Status:</span> Your account has been deactivated by an administrator. You won't be able to use the system until it is reactivated.
+                </p>
+                
+                <!-- Time remaining box -->
+                <div class="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-bold text-cyan-400 text-sm">
+                            @if($daysRemaining > 0)
+                                {{ $daysRemaining }} Day{{ $daysRemaining != 1 ? 's' : '' }} Remaining
+                            @else
+                                {{ $hoursRemaining }} Hour{{ $hoursRemaining != 1 ? 's' : '' }} Remaining
+                            @endif
+                        </span>
+                    </div>
+                    <p class="text-orange-300 text-xs leading-relaxed">
+                        Your account will be <strong class="text-orange-200">permanently deleted</strong> on <strong class="text-white">{{ $deletionDate->format('F d, Y') }}</strong> at <strong class="text-white">{{ $deletionDate->format('g:i A') }}</strong>
                     </p>
-                    
-                    <div class="border-t border-b border-gray-600 py-3 md:py-4 mb-3 md:mb-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                            <div class="flex items-center gap-2 sm:gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <h4 class="text-base md:text-lg font-bold text-blue-400">
-                                    @if($daysRemaining > 0)
-                                        {{ $daysRemaining }} Day{{ $daysRemaining != 1 ? 's' : '' }} Remaining
-                                    @else
-                                        {{ $hoursRemaining }} Hour{{ $hoursRemaining != 1 ? 's' : '' }} Remaining
-                                    @endif
-                                </h4>
-                            </div>
-                        </div>
-                        <p class="text-orange-400 text-xs md:text-sm">
-                            Your account will be <strong>permanently deleted</strong> on <strong>{{ $deletionDate->format('F d, Y') }}</strong> at <strong>{{ $deletionDate->format('g:i A') }}</strong>
+                </div>
+                
+                <!-- Action Required -->
+                <div class="flex items-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <span class="font-semibold text-green-400 text-xs sm:text-sm">Action Required</span>
+                        <p class="text-gray-400 text-xs leading-relaxed mt-0.5">
+                            To reactivate your account and prevent permanent deletion, please contact an administrator immediately.
                         </p>
                     </div>
-                    
-                    <div class="flex items-start gap-2 mb-3 md:mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 text-green-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div class="text-green-400">
-                            <h5 class="font-bold mb-1 text-sm md:text-base">Action Required</h5>
-                            <p class="text-gray-400 text-xs md:text-sm">
-                                To reactivate your account and prevent permanent deletion, please contact an administrator immediately.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row gap-2 md:gap-3 mt-3 md:mt-4">
-                        <button onclick="showPage('support')" class="btn btn-sm w-full sm:w-auto text-white transition-colors text-xs md:text-sm" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Contact Administrator</button>
-                        <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-outline btn-sm w-full sm:w-auto text-xs md:text-sm">View Deactivation Details</button>
-                    </div>
                 </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="px-4 py-3 bg-gray-900/30 border-t border-gray-700/50 flex flex-col sm:flex-row gap-2">
+                <button onclick="showPage('support')" class="btn btn-sm flex-1 sm:flex-none text-white border-0 text-xs font-semibold" style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">
+                    Contact Administrator
+                </button>
+                <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-sm btn-outline flex-1 sm:flex-none text-gray-300 border-gray-500 hover:bg-gray-700 hover:border-gray-500 text-xs font-semibold">
+                    View Deactivation Details
+                </button>
             </div>
         </div>
 
         <!-- Deactivation Details Modal -->
         <dialog id="deactivation_details_modal" class="modal">
-            <div class="modal-box bg-gray-800 border border-gray-700">
+            <div class="modal-box bg-gray-800 border border-gray-700 max-w-md">
                 <form method="dialog">
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-400 hover:text-white">✕</button>
                 </form>
-                <h3 class="font-bold text-lg text-orange-500 mb-4">Deactivation Details</h3>
+                <h3 class="font-bold text-lg text-orange-400 mb-4">Deactivation Details</h3>
                 <div class="space-y-4">
-                    <div class="alert alert-warning bg-yellow-900/20 border border-yellow-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div>
-                            <h4 class="font-bold text-yellow-400">What This Means</h4>
-                            <p class="text-sm text-gray-300 mt-2">
-                                You have done something against the rules, or you are already graduated. 
-                                All your data, including social contract records, will be permanently removed on the deletion date.
-                            </p>
+                    <div class="bg-yellow-900/20 border border-yellow-600/50 rounded-lg p-3">
+                        <div class="flex items-start gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                                <h4 class="font-bold text-yellow-400 text-sm">What This Means</h4>
+                                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                                    You have done something against the rules, or you are already graduated. 
+                                    All your data, including social contract records, will be permanently removed on the deletion date.
+                                </p>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="bg-gray-700/50 p-4 rounded-lg">
-                        <h5 class="font-semibold text-gray-200 mb-2">Account Information</h5>
-                        <ul class="text-sm text-gray-400 space-y-1">
-                            <li>• <strong>Status:</strong> Inactive</li>
-                            <li>• <strong>Deactivated:</strong> {{ $inactiveSince->format('F d, Y \a\t g:i A') }}</li>
-                            <li>• <strong>Deletion Date:</strong> {{ $deletionDate->format('F d, Y \a\t g:i A') }}</li>
+                    <div class="bg-gray-700/50 p-3 rounded-lg">
+                        <h5 class="font-semibold text-gray-200 text-sm mb-2">Account Information</h5>
+                        <ul class="text-xs text-gray-400 space-y-1.5">
+                            <li class="flex justify-between"><span>Status:</span> <span class="text-red-400 font-medium">Inactive</span></li>
+                            <li class="flex justify-between"><span>Deactivated:</span> <span class="text-gray-300">{{ $inactiveSince->format('M d, Y g:i A') }}</span></li>
+                            <li class="flex justify-between"><span>Deletion Date:</span> <span class="text-orange-400 font-medium">{{ $deletionDate->format('M d, Y g:i A') }}</span></li>
                         </ul>
                     </div>
                     
-                    <div class="text-sm text-gray-400">
-                        <p>If you believe this is an error or need to recover your account, please contact an administrator before the deletion date.</p>
-                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        If you believe this is an error or need to recover your account, please contact an administrator before the deletion date.
+                    </p>
                 </div>
-                <div class="modal-action">
+                <div class="modal-action mt-4">
                     <form method="dialog">
-                        <button class="btn btn-sm text-white transition-colors" style="background-color: #0f9e43ff;" onmouseover="this.style.backgroundColor='#078334ff'" onmouseout="this.style.backgroundColor='#10ae4aff'">Close</button>
+                        <button class="btn btn-sm text-white border-0" style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">Close</button>
                     </form>
                 </div>
             </div>
