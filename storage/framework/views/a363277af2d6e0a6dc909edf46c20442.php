@@ -1,4 +1,5 @@
 <div id="record-status-page" class="page-content flex flex-col flex-1-dynamic">
+          <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">View the status of your submitted records, track approvals, and manage pending entries.</p>
     <div class="flex flex-col md:flex-row justify-between px-4 items-start md:items-center mb-6 gap-4">
         <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('add_record_modal').showModal()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

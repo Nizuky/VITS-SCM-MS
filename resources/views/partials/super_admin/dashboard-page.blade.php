@@ -1,6 +1,7 @@
 <!-- Dashboard Overview Page -->
 <div id="dashboard-page" class="page-content flex-col flex-1-dynamic">
-    <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Super Admin Dashboard</h1>
+     <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Overview of system activity, pending requests, and high-level metrics for administration.</p>
+  <h1 class="text-4xl font-bold text-primary-purple px-4 mb-6">Super Admin Dashboard</h1>
     
     <!-- Welcome Greeting Card -->
     <div class="relative rounded-2xl bg-transparent p-2 mb-6 h-[190px]">

@@ -1,5 +1,5 @@
 <div id="dashboard-page" class="page-content hidden flex-col flex-1-dynamic">
-
+         <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">     <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">View system summaries, pending requests, and quick actions for administration.</p>
     <!-- Inactive Account Warning Banner -->
     @if(auth()->user()->status === 'inactive' && auth()->user()->inactive_at)
         @php

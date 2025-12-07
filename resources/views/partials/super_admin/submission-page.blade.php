@@ -1,5 +1,6 @@
 <!-- Submission Page -->
 <div id="submission-page" class="page-content hidden">
+    <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Review and process submitted records; approve, reject, or archive as needed.</p>
     <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
     <br>
 

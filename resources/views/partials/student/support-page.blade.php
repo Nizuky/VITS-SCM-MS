@@ -1,4 +1,5 @@
 <div id="support-page" class="page-content hidden flex flex-col">
+              <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">Submit new tickets and review responses from administrators regarding student support requests.</p>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-4 mb-6 gap-4">
         <button class="btn btn-primary-purple rounded-lg border-0 w-full md:w-auto" onclick="document.getElementById('submit_ticket_modal').showModal()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

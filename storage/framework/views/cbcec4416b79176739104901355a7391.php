@@ -1,5 +1,6 @@
 <!-- Settings Page -->
 <div id="settings-page" class="page-content hidden">
+    <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Manage super admin preferences, account information, and security settings.</p>
     <div class="flex items-center justify-between p-4">
         <h4 class="text-4xl font-bold text-primary-purple">Settings</h4>
     </div>
