@@ -29,7 +29,7 @@
 
     <!-- Submission Table -->
     <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
-        <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px); max-width: calc(120vw - 280px);">
+        <div class="overflow-x-auto overflow-y-auto rounded-lg w-full" style="max-height: calc(100vh - 280px);">
             <table class="table table-xs table-pin-rows">
                 <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
                     <tr style="background-color: #f9fafb !important;">

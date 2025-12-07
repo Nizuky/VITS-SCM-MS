@@ -677,7 +677,7 @@ body {
             </ul>
 
             <!-- Theme Toggle -->
-            <ul class="menu p-0 border-t border-gray-200 mt-2">
+            <ul class="menu p-0 pb-2">
                 <li>
                     <label id="theme-toggle-container" class="py-3 pl-2 pr-2 w-full flex items-center gap-2 min-h-0 transition-all duration-300 cursor-pointer">
                         <!-- Sun icon (light mode) -->

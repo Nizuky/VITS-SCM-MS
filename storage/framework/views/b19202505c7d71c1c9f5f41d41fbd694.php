@@ -773,6 +773,8 @@
                         <input id="theme-toggle" type="checkbox" class="toggle toggle-primary toggle-sm ml-auto" />
                     </label>
                 </li>
+                <!-- Small spacer below theme toggle -->
+                <div class="h-2"></div>
             </ul>
             
             <!-- Collapse button -->
