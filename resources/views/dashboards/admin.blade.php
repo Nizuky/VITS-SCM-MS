@@ -9,22 +9,20 @@
     <meta http-equiv="Expires" content="0">
     <title>Admin - Student Contract Management</title>
         <script>
-        (function(){
-            try{
-                var s=localStorage.getItem('scms_admin_theme');
-                console.log('Admin - Loaded theme from localStorage:', s);
-                if(!s){
-                    s='light';a
-                    localStorage.setItem('scms_admin_theme','light');
-                    console.log('Admin - Set default theme to light');
+            // CRITICAL: Apply saved theme IMMEDIATELY before any rendering
+            (function() {
+                try {
+                    var savedTheme = localStorage.getItem('scms_admin_theme');
+                    // Default to light if no saved preference
+                    if (savedTheme !== 'dark' && savedTheme !== 'light') {
+                        savedTheme = 'light';
+                        localStorage.setItem('scms_admin_theme', 'light');
+                    }
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } catch(e) {
+                    document.documentElement.setAttribute('data-theme', 'light');
                 }
-                document.documentElement.setAttribute('data-theme',s);
-                console.log('Admin - Applied theme:', s);
-            }catch(e){
-                console.error('Admin - Error loading theme:', e);
-                document.documentElement.setAttribute('data-theme','light');
-            }
-        })();
+            })();
         </script>
         <script>
         tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{colors:{'background-light':'#EDF1FA','primary-purple':'#6D28D9','primary-purple-hover':'#5B21B6','text-header':'#2B3674','text-muted':'#707EAE','badge-pending-text':'#E29C44','badge-pending-bg':'#FAEAD0','badge-verified-text':'#399552','badge-verified-bg':'#CCEED6','badge-rejected-text':'#CC525D','badge-rejected-bg':'#FFD7DB','success-green':'#4CAF50','success-green-hover':'#45a049','danger-red':'#CC525D','danger-red-hover':'#b33e46'},fontFamily:{sans:['Inter','sans-serif']}}}};
@@ -193,6 +191,68 @@
         [data-theme="dark"] .activity-legend-2{background-color:#5A3590}
         [data-theme="dark"] .activity-legend-3{background-color:#804ED6}
         [data-theme="dark"] .activity-legend-4{background-color:#A770FF}
+
+        /* Sidebar header styles */
+        #sidebar.collapsed #sidebar-header { justify-content: center; padding-bottom: 0.75rem; }
+        #sidebar.collapsed #sidebar-title-text { display: none; }
+        #sidebar.collapsed #sidebar-logo-light,
+        #sidebar.collapsed #sidebar-logo-dark { margin: 0 auto; }
+
+        /* Sidebar header - Light Mode */
+        html:not([data-theme="dark"]) #sidebar-logo-light { display: block; }
+        html:not([data-theme="dark"]) #sidebar-logo-dark { display: none; }
+        html:not([data-theme="dark"]) .sidebar-title-main,
+        html:not([data-theme="dark"]) .sidebar-title-sub { color: #6D28D9 !important; }
+        
+        /* Sidebar header - Dark Mode */
+        [data-theme="dark"] #sidebar-logo-light { display: none !important; }
+        [data-theme="dark"] #sidebar-logo-dark { display: block !important; }
+        [data-theme="dark"] .sidebar-title-main,
+        [data-theme="dark"] .sidebar-title-sub { color: #ffffff !important; }
+        [data-theme="dark"] #sidebar-header { border-color: #374151 !important; }
+
+        /* Theme toggle styles */
+        html:not([data-theme="dark"]) #theme-icon-moon { color: #374151 !important; stroke: #374151 !important; }
+        html:not([data-theme="dark"]) #theme-icon-sun { color: #374151 !important; stroke: #374151 !important; }
+        html:not([data-theme="dark"]) #theme-toggle-container { color: #374151 !important; }
+        html:not([data-theme="dark"]) #theme-label { color: #374151 !important; }
+        html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
+        html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
+
+        /* Mobile Header Bar */
+        #mobile-header {
+            display: none;
+        }
+        
+        /* Mobile hamburger button - now inside header */
+        #mobile-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #mobile-menu-btn svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        /* Mobile Header - Dark Mode */
+        [data-theme="dark"] #mobile-header { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] #mobile-page-title { color: #a78bfa !important; }
+
+        /* Sidebar text colors for light mode */
+        html:not([data-theme="dark"]) #sidebar { background-color: #ffffff; }
+        html:not([data-theme="dark"]) #sidebar h2 { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) #sidebar p { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu-text { color: #374151 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu a { color: #374151 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu a:hover { background-color: #f3f4f6; }
+        html:not([data-theme="dark"]) #sidebar .active-nav { background-color: #6D28D9; color: #fff !important; }
+        html:not([data-theme="dark"]) #sidebar .active-nav .menu-text { color: #fff !important; }
+        html:not([data-theme="dark"]) #sidebar svg { stroke: #374151; }
+        html:not([data-theme="dark"]) #sidebar .active-nav svg { stroke: #fff; }
+        html:not([data-theme="dark"]) #collapse-text { color: #374151 !important; }
+        html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
+        html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }
 
         /* Dark mode for Data Management section - comprehensive fixes */
         /* Card backgrounds */
@@ -419,29 +479,7 @@
             transform: rotate(180deg);
         }
 
-        /* Mobile hamburger button */
-        #mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background-color: #6D28D9;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.2s ease;
-        }
-        #mobile-menu-btn:hover {
-            background-color: #5B21B6;
-        }
-        #mobile-menu-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
+        /* Mobile sidebar overlay/backdrop */
 
         /* Mobile sidebar overlay/backdrop */
         #sidebar-backdrop {
@@ -466,6 +504,28 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+            }
+
+            /* Show mobile header on mobile */
+            #mobile-header {
+                display: flex !important;
+            }
+            
+            /* Hide mobile header when sidebar is open */
+            #mobile-header.hidden-when-open {
+                display: none !important;
+            }
+            
+            /* Add padding to main content to account for mobile header */
+            body {
+                padding-top: 60px;
+            }
+            
+            /* Hide page titles on mobile since they're in the mobile header */
+            .page-content > h1,
+            .page-content > div > h4,
+            .page-content > .flex > h4 {
+                display: none !important;
             }
 
             #sidebar-backdrop {
@@ -526,10 +586,20 @@
                 justify-content: flex-start;
                 padding: 0.75rem 0.5rem;
             }
+            /* Show sidebar header text on mobile even when collapsed */
+            #sidebar.collapsed #sidebar-title-text {
+                display: flex !important;
+            }
 
             /* Adjust main content for mobile */
             .flex.p-4.gap-4.min-h-screen {
                 padding-top: 4.5rem;
+            }
+            
+            /* Ensure no margin on mobile - sidebar is overlay */
+            #page-container {
+                margin-left: 0 !important;
+                width: 100% !important;
             }
 
             /* Mobile close button styling */
@@ -577,12 +647,21 @@
         $initials = 'AD';
 @endphp
 
-    <!-- Mobile Menu Button -->
-    <button id="mobile-menu-btn" aria-label="Open menu">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-    </button>
+    <!-- Mobile Header Bar -->
+    <header id="mobile-header" class="fixed top-0 left-0 right-0 z-[998] bg-white shadow-md px-4 py-3 flex items-center justify-between">
+        <!-- Hamburger Menu Button -->
+        <button id="mobile-menu-btn" class="p-2 rounded-lg bg-primary-purple text-white hover:bg-primary-purple-hover transition-colors" aria-label="Open menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        
+        <!-- Page Title -->
+        <h1 id="mobile-page-title" class="text-lg font-bold text-primary-purple flex-1 text-center">Admin Dashboard</h1>
+        
+        <!-- Spacer for balance (replaces notification button) -->
+        <div class="w-10 h-10"></div>
+    </header>
 
     <!-- Sidebar Backdrop -->
     <div id="sidebar-backdrop"></div>
@@ -596,6 +675,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
+
+            <!-- Logo Header Section -->
+            <div id="sidebar-header" class="flex flex-col items-center gap-2 pb-4 border-b border-gray-200 mb-2 text-center">
+                <img id="sidebar-logo-light" src="{{ asset('storage/vits_purple.png') }}" alt="VITS Logo" class="h-10 w-10 object-contain" />
+                <img id="sidebar-logo-dark" src="{{ asset('storage/vits_white.png') }}" alt="VITS Logo" class="h-10 w-10 object-contain hidden" />
+                <div id="sidebar-title-text" class="flex flex-col leading-tight">
+                    <span class="text-sm font-bold text-primary-purple sidebar-title-main">VITS Social Contract</span>
+                    <span class="text-xs font-semibold text-primary-purple sidebar-title-sub">Management</span>
+                    <span class="text-xs font-semibold text-primary-purple sidebar-title-sub">& Monitoring System</span>
+                </div>
+            </div>
             
             <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
@@ -667,6 +757,21 @@
                             <span class="menu-text">Log Out</span>
                         </button>
                     </form>
+                </li>
+                <!-- Theme Toggle -->
+                <li>
+                    <label id="theme-toggle-container" class="py-3 pl-2 pr-2 w-full flex items-center gap-2 min-h-0 transition-all duration-300 cursor-pointer">
+                        <!-- Sun icon (light mode) -->
+                        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <!-- Moon icon (dark mode) -->
+                        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <span id="theme-label" class="menu-text">Light Mode</span>
+                        <input id="theme-toggle" type="checkbox" class="toggle toggle-primary toggle-sm ml-auto" />
+                    </label>
                 </li>
             </ul>
             
@@ -1621,6 +1726,18 @@
             document.querySelectorAll('.page-content').forEach(function(pg) {
                 pg.classList.add('hidden');
             });
+            
+            // Update page title dynamically (desktop and mobile)
+            var mobilePageTitle = document.getElementById('mobile-page-title');
+            var pageTitles = {
+                'dashboard': 'Admin Dashboard',
+                'submission': 'Submissions',
+                'data-management': 'Data Management',
+                'settings': 'Settings'
+            };
+            if (mobilePageTitle && pageTitles[p]) {
+                mobilePageTitle.textContent = pageTitles[p];
+            }
             
             var np = document.getElementById(p + '-page');
             if (np) np.classList.remove('hidden');
@@ -3545,12 +3662,18 @@
                 sidebar.classList.add('mobile-open');
                 sidebarBackdrop.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                // Hide mobile header when sidebar is open
+                const mobileHeader = document.getElementById('mobile-header');
+                if (mobileHeader) mobileHeader.classList.add('hidden-when-open');
             }
             
             function closeMobileSidebar() {
                 sidebar.classList.remove('mobile-open');
                 sidebarBackdrop.classList.remove('active');
                 document.body.style.overflow = '';
+                // Show mobile header when sidebar is closed
+                const mobileHeader = document.getElementById('mobile-header');
+                if (mobileHeader) mobileHeader.classList.remove('hidden-when-open');
             }
             
             // Mobile menu button click
@@ -3594,6 +3717,60 @@
                     }
                 }
             });
+        })();
+        
+        // Theme toggle functionality
+        (function() {
+            try {
+                var tg = document.getElementById('theme-toggle');
+                var lb = document.getElementById('theme-label');
+                var sunIcon = document.getElementById('theme-icon-sun');
+                var moonIcon = document.getElementById('theme-icon-moon');
+                
+                var applyTheme = function(mode) {
+                    document.documentElement.setAttribute('data-theme', mode);
+                    try {
+                        localStorage.setItem('scms_admin_theme', mode);
+                    } catch(_) {}
+                    
+                    // Update label text
+                    if (lb) lb.textContent = (mode === 'dark') ? 'Dark Mode' : 'Light Mode';
+                    
+                    // Update toggle state
+                    if (tg) tg.checked = (mode === 'dark');
+                    
+                    // Update icons - show sun in dark mode (to switch to light), moon in light mode (to switch to dark)
+                    if (sunIcon && moonIcon) {
+                        if (mode === 'dark') {
+                            sunIcon.classList.remove('hidden');
+                            moonIcon.classList.add('hidden');
+                        } else {
+                            sunIcon.classList.add('hidden');
+                            moonIcon.classList.remove('hidden');
+                        }
+                    }
+                };
+                
+                // Load saved theme or default to light
+                var savedTheme = 'light';
+                try {
+                    savedTheme = localStorage.getItem('scms_admin_theme');
+                    if (savedTheme !== 'dark' && savedTheme !== 'light') {
+                        savedTheme = 'light';
+                    }
+                } catch(_) {}
+                
+                applyTheme(savedTheme);
+                
+                // Handle toggle change
+                if (tg) {
+                    tg.addEventListener('change', function() {
+                        applyTheme(tg.checked ? 'dark' : 'light');
+                    });
+                }
+            } catch(e) {
+                console.error('Theme toggle error:', e);
+            }
         })();
     </script>
 </body>

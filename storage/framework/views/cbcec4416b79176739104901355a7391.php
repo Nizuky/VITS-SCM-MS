@@ -2,10 +2,6 @@
 <div id="settings-page" class="page-content hidden">
     <div class="flex items-center justify-between p-4">
         <h4 class="text-4xl font-bold text-primary-purple">Settings</h4>
-        <label class="label cursor-pointer flex items-center gap-3">
-            <span id="theme-label" class="text-sm text-gray-600">Light theme</span>
-            <input id="theme-toggle" type="checkbox" class="toggle toggle-primary">
-        </label>
     </div>
     
     <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">

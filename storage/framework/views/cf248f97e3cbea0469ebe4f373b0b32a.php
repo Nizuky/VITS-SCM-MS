@@ -240,6 +240,19 @@
             font-size: 1.25rem;
         }
 
+        /* Sidebar header when collapsed */
+        #sidebar.collapsed #sidebar-header {
+            justify-content: center;
+            padding-bottom: 0.75rem;
+        }
+        #sidebar.collapsed #sidebar-title-text {
+            display: none;
+        }
+        #sidebar.collapsed #sidebar-logo-light,
+        #sidebar.collapsed #sidebar-logo-dark {
+            margin: 0 auto;
+        }
+
         /* Menu items when collapsed - centered with proper spacing */
         #sidebar.collapsed #menu-list {
             margin-top: 1.5rem;
@@ -266,24 +279,16 @@
             transform: rotate(180deg);
         }
 
-        /* Mobile hamburger button */
-        #mobile-menu-btn {
+        /* Mobile Header Bar */
+        #mobile-header {
             display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background-color: #6D28D9;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.2s ease;
         }
-        #mobile-menu-btn:hover {
-            background-color: #5B21B6;
+        
+        /* Mobile hamburger button - now inside header */
+        #mobile-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #mobile-menu-btn svg {
             width: 1.5rem;
@@ -313,6 +318,26 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+            }
+            
+            /* Show mobile header on mobile */
+            #mobile-header {
+                display: flex !important;
+            }
+            
+            /* Hide mobile header when sidebar is open */
+            #mobile-header.hidden-when-open {
+                display: none !important;
+            }
+            
+            /* Add padding to main content to account for mobile header */
+            body {
+                padding-top: 60px;
+            }
+            
+            /* Hide page title on mobile since it's in the mobile header */
+            #page-title {
+                display: none !important;
             }
 
             #sidebar-backdrop {
@@ -347,6 +372,11 @@
             #sidebar #collapse-btn {
                 display: none;
             }
+            
+            /* Hide desktop notification dropdown on mobile */
+            #notification-dropdown-container {
+                display: none !important;
+            }
 
             /* Override collapsed state on mobile */
             #sidebar.collapsed {
@@ -374,6 +404,10 @@
             #sidebar.collapsed ul.menu button {
                 justify-content: flex-start;
                 padding: 0.75rem 0.5rem;
+            }
+            /* Show sidebar header text on mobile even when collapsed */
+            #sidebar.collapsed #sidebar-title-text {
+                display: flex !important;
             }
 
             /* Adjust main content for mobile */
@@ -450,6 +484,12 @@
         .bg-base-100 { background-color: #ffffff; }
         
         /* ========== LIGHT MODE SPECIFIC STYLES ========== */
+        /* Sidebar header - Light Mode */
+        html:not([data-theme="dark"]) #sidebar-logo-light { display: block; }
+        html:not([data-theme="dark"]) #sidebar-logo-dark { display: none; }
+        html:not([data-theme="dark"]) .sidebar-title-main,
+        html:not([data-theme="dark"]) .sidebar-title-sub { color: #6D28D9 !important; }
+        
         /* Sidebar text colors for light mode */
         html:not([data-theme="dark"]) #sidebar { background-color: #ffffff; }
         html:not([data-theme="dark"]) #sidebar h2 { color: #1f2937 !important; }
@@ -667,6 +707,16 @@
         /* Dark theme styling - copied from admin.blade.php */
         [data-theme="dark"] body{color:#fff}
         [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
+        /* Sidebar header - Dark Mode */
+        [data-theme="dark"] #sidebar-logo-light { display: none !important; }
+        [data-theme="dark"] #sidebar-logo-dark { display: block !important; }
+        [data-theme="dark"] .sidebar-title-main,
+        [data-theme="dark"] .sidebar-title-sub { color: #ffffff !important; }
+        [data-theme="dark"] #sidebar-header { border-color: #374151 !important; }
+        /* Mobile Header - Dark Mode */
+        [data-theme="dark"] #mobile-header { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] #mobile-page-title { color: #a78bfa !important; }
+        [data-theme="dark"] #mobile-notification-dropdown .btn-ghost svg { color: #a78bfa !important; stroke: #a78bfa !important; }
         [data-theme="dark"] .scms-badge--pending{background-color:#ff9d26ff!important;color:#ffffffff!important}
         [data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
         [data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
@@ -1220,12 +1270,41 @@
         $superAdminName = $superAdmin ? $superAdmin->name : 'Super Administrator';
     ?>
 
-    <!-- Mobile Menu Button -->
-    <button id="mobile-menu-btn" aria-label="Open menu">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-    </button>
+    <!-- Mobile Header Bar -->
+    <header id="mobile-header" class="fixed top-0 left-0 right-0 z-[998] bg-white shadow-md px-4 py-3 flex items-center justify-between">
+        <!-- Hamburger Menu Button -->
+        <button id="mobile-menu-btn" class="p-2 rounded-lg bg-primary-purple text-white hover:bg-primary-purple-hover transition-colors" aria-label="Open menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        
+        <!-- Page Title -->
+        <h1 id="mobile-page-title" class="text-lg font-bold text-primary-purple flex-1 text-center">Student Dashboard</h1>
+        
+        <!-- Notification Button -->
+        <div class="dropdown dropdown-end" id="mobile-notification-dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Notifications" title="Notifications">
+                <div class="indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="mobile-notif-dot" class="indicator-item scms-notif-dot hidden" aria-hidden="true"></span>
+                </div>
+            </div>
+            <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden max-h-[400px] overflow-y-auto">
+                <li class="p-4 font-bold text-gray-700 border-b sticky top-0 bg-base-100 z-10">Notifications</li>
+                <div id="mobile-notifications-list">
+                    <li>
+                        <div class="flex items-center justify-center p-8">
+                            <span class="loading loading-spinner loading-md text-primary-purple"></span>
+                        </div>
+                    </li>
+                </div>
+                <li class="border-t border-gray-100 sticky bottom-0 bg-base-100">
+                    <a class="text-center text-sm py-2 hover:bg-gray-100" id="mobile-see-all-notifications">See All Notifications</a>
+                </li>
+            </ul>
+        </div>
+    </header>
 
     <!-- Sidebar Backdrop -->
     <div id="sidebar-backdrop"></div>
@@ -1239,6 +1318,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
+
+            <!-- Logo Header Section -->
+            <div id="sidebar-header" class="flex flex-col items-center gap-2 pb-4 border-b border-gray-200 mb-2 text-center">
+                <img id="sidebar-logo-light" src="<?php echo e(asset('storage/vits_purple.png')); ?>" alt="VITS Logo" class="h-10 w-10 object-contain" />
+                <img id="sidebar-logo-dark" src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-10 w-10 object-contain hidden" />
+                <div id="sidebar-title-text" class="flex flex-col leading-tight">
+                    <span class="text-sm font-bold text-primary-purple sidebar-title-main">VITS Social Contract</span>
+                    <span class="text-xs font-semibold text-primary-purple sidebar-title-sub">Management</span>
+                    <span class="text-xs font-semibold text-primary-purple sidebar-title-sub">& Monitoring System</span>
+                </div>
+            </div>
 
             <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
@@ -1433,8 +1523,9 @@
         });
         document.querySelectorAll('.page-content').forEach(p => { p.classList.add('hidden'); });
         
-        // Update page title dynamically
+        // Update page title dynamically (desktop and mobile)
         const pageTitle = document.getElementById('page-title');
+        const mobilePageTitle = document.getElementById('mobile-page-title');
         const pageTitles = {
             'dashboard': 'Student Dashboard',
             'record-status': 'Record Status',
@@ -1444,6 +1535,9 @@
         };
         if (pageTitle && pageTitles[pageId]) {
             pageTitle.textContent = pageTitles[pageId];
+        }
+        if (mobilePageTitle && pageTitles[pageId]) {
+            mobilePageTitle.textContent = pageTitles[pageId];
         }
         
         const newPage = document.getElementById(pageId + '-page'); if (newPage) newPage.classList.remove('hidden');
@@ -2923,18 +3017,23 @@
                 }
             }
             
-            // Update notification dropdown with recent notifications
+            // Update notification dropdown with recent notifications (desktop & mobile)
             function updateNotificationDropdown(notifications) {
                 const list = document.getElementById('notifications-list');
+                const mobileList = document.getElementById('mobile-notifications-list');
                 
                 if (!notifications || notifications.length === 0) {
-                    list.innerHTML = `
+                    const emptyHTML = `
                         <li><div class="p-4 text-center text-sm text-gray-500">No notifications yet</div></li>
                     `;
+                    if (list) list.innerHTML = emptyHTML;
+                    if (mobileList) mobileList.innerHTML = emptyHTML;
                     return;
                 }
                 
-                list.innerHTML = notifications.map(notif => createNotificationHTML(notif, false)).join('');
+                const notificationHTML = notifications.map(notif => createNotificationHTML(notif, false)).join('');
+                if (list) list.innerHTML = notificationHTML;
+                if (mobileList) mobileList.innerHTML = notificationHTML;
                 
                 // Add click handlers for rejection reasons
                 notifications.forEach(notif => {
@@ -2953,16 +3052,20 @@
                 });
             }
             
-            // Update notification badge (red dot)
+            // Update notification badge (red dot) - both desktop and mobile
             function updateNotificationBadge(unreadCount) {
                 const badge = document.getElementById('notif-dot');
-                if (badge) {
-                    if (unreadCount > 0) {
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
+                const mobileBadge = document.getElementById('mobile-notif-dot');
+                
+                [badge, mobileBadge].forEach(b => {
+                    if (b) {
+                        if (unreadCount > 0) {
+                            b.classList.remove('hidden');
+                        } else {
+                            b.classList.add('hidden');
+                        }
                     }
-                }
+                });
             }
             
             // Create notification HTML
@@ -3292,6 +3395,14 @@
             document.getElementById('see-all-notifications')?.addEventListener('click', () => {
                 loadAllNotifications();
                 document.getElementById('all_notifications_modal').showModal();
+            });
+            
+            // Mobile "See All Notifications" button
+            document.getElementById('mobile-see-all-notifications')?.addEventListener('click', () => {
+                loadAllNotifications();
+                document.getElementById('all_notifications_modal').showModal();
+                // Close the mobile dropdown
+                document.activeElement?.blur();
             });
             
             document.getElementById('mark-all-read-btn')?.addEventListener('click', () => {
@@ -5134,12 +5245,18 @@
                 sidebar.classList.add('mobile-open');
                 sidebarBackdrop.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                // Hide mobile header when sidebar is open
+                const mobileHeader = document.getElementById('mobile-header');
+                if (mobileHeader) mobileHeader.classList.add('hidden-when-open');
             }
             
             function closeMobileSidebar() {
                 sidebar.classList.remove('mobile-open');
                 sidebarBackdrop.classList.remove('active');
                 document.body.style.overflow = '';
+                // Show mobile header when sidebar is closed
+                const mobileHeader = document.getElementById('mobile-header');
+                if (mobileHeader) mobileHeader.classList.remove('hidden-when-open');
             }
             
             // Mobile menu button click
