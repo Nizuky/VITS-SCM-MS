@@ -595,6 +595,120 @@ body {
         display: none !important;
     }
 }
+
+/* Support Ticket Card Styles (mobile) */
+.ticket-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.ticket-card:active {
+    transform: scale(0.98);
+}
+
+.ticket-card.status-open {
+    border-left-color: #F59E0B;
+}
+
+.ticket-card.status-in-progress {
+    border-left-color: #3B82F6;
+}
+
+.ticket-card.status-resolved {
+    border-left-color: #10B981;
+}
+
+.ticket-card.status-closed {
+    border-left-color: #6B7280;
+}
+
+.ticket-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.ticket-card-id {
+    font-weight: 700;
+    font-size: 14px;
+    color: #6D28D9;
+}
+
+.ticket-card-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1F2937;
+    margin-bottom: 8px;
+}
+
+.ticket-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.ticket-card-row {
+    display: flex;
+    align-items: flex-start;
+    font-size: 14px;
+}
+
+.ticket-card-label {
+    font-weight: 500;
+    color: #6B7280;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.ticket-card-value {
+    color: #374151;
+    word-break: break-word;
+}
+
+.ticket-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.ticket-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Dark theme for ticket cards */
+[data-theme="dark"] .ticket-card {
+    background: #1F2937;
+}
+
+[data-theme="dark"] .ticket-card-id {
+    color: #A78BFA;
+}
+
+[data-theme="dark"] .ticket-card-title {
+    color: #F9FAFB;
+}
+
+[data-theme="dark"] .ticket-card-label {
+    color: #9CA3AF;
+}
+
+[data-theme="dark"] .ticket-card-value {
+    color: #E5E7EB;
+}
+
+[data-theme="dark"] .ticket-card-footer {
+    border-top-color: #374151;
+}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -1649,10 +1763,12 @@ body {
         // Render support tickets table
         function renderTicketsTable(tickets = allTickets) {
             const tbody = document.getElementById('ticket-table-body');
-            if (!tbody) return;
+            const cardsContainer = document.getElementById('ticket-cards-container');
+            if (!tbody && !cardsContainer) return;
 
             if (!tickets || tickets.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
+                if (cardsContainer) cardsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No tickets found.</div>';
                 return;
             }
 
@@ -1662,29 +1778,68 @@ body {
                 'Closed': '<span class="badge bg-gray-100 text-gray-800 border-0">Closed</span>'
             };
 
-            tbody.innerHTML = '';
-            tickets.forEach(ticket => {
-                const tr = document.createElement('tr');
-                tr.className = 'cursor-pointer';
-                tr.onclick = () => showTicketDetails(ticket.id);
-                
-                const shortDetails = (ticket.details || '').substring(0, 100) + (ticket.details && ticket.details.length > 100 ? '...' : '');
-                
-                tr.innerHTML = `
-                    <td class="font-medium text-text-header" style="min-width: 80px; width: 80px; white-space: nowrap;">${ticket.id}</td>
-                    <td class="text-text-header" style="min-width: 90px; width: 90px; white-space: nowrap;">${ticket.student_id || 'N/A'}</td>
-                    <td class="text-text-header" style="min-width: 150px; width: 150px; white-space: nowrap;">${ticket.student_name || 'N/A'}</td>
-                    <td class="text-text-header" style="min-width: 120px; width: 120px; white-space: nowrap;">${ticket.type}</td>
-                    <td class="text-text-muted text-sm" style="min-width: 200px; width: 200px;" title="${ticket.details}">${shortDetails}</td>
-                    <td style="min-width: 90px; width: 90px;">
-                        <div class="flex flex-col gap-1">
-                            ${statusBadges[ticket.status] || ticket.status}
-                            <span class="text-xs text-gray-500">${ticket.date}</span>
+            // Render desktop table if tbody exists
+            if (tbody) {
+                tbody.innerHTML = '';
+                tickets.forEach(ticket => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'cursor-pointer';
+                    tr.onclick = () => showTicketDetails(ticket.id);
+
+                    const shortDetails = (ticket.details || '').substring(0, 100) + (ticket.details && ticket.details.length > 100 ? '...' : '');
+
+                    tr.innerHTML = `
+                        <td class="font-medium text-text-header" style="min-width: 80px; width: 80px; white-space: nowrap;">${ticket.id}</td>
+                        <td class="text-text-header" style="min-width: 90px; width: 90px; white-space: nowrap;">${ticket.student_id || 'N/A'}</td>
+                        <td class="text-text-header" style="min-width: 150px; width: 150px; white-space: nowrap;">${ticket.student_name || 'N/A'}</td>
+                        <td class="text-text-header" style="min-width: 120px; width: 120px; white-space: nowrap;">${ticket.type}</td>
+                        <td class="text-text-muted text-sm" style="min-width: 200px; width: 200px;" title="${ticket.details}">${shortDetails}</td>
+                        <td style="min-width: 90px; width: 90px;">
+                            <div class="flex flex-col gap-1">
+                                ${statusBadges[ticket.status] || ticket.status}
+                                <span class="text-xs text-gray-500">${ticket.date}</span>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Render mobile cards if container exists
+            if (cardsContainer) {
+                cardsContainer.innerHTML = '';
+                tickets.forEach(ticket => {
+                    const shortDetails = (ticket.details || '').split('\n')[0];
+                    let statusClass = '';
+                    switch ((ticket.status || '').toLowerCase()) {
+                        case 'pending': statusClass = 'status-open'; break;
+                        case 'resolved': statusClass = 'status-resolved'; break;
+                        case 'closed': statusClass = 'status-closed'; break;
+                        default: statusClass = 'status-in-progress';
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = `ticket-card ${statusClass}`;
+                    card.onclick = () => showTicketDetails(ticket.id);
+
+                    card.innerHTML = `
+                        <div class="ticket-card-header">
+                            <div class="ticket-card-id">#${ticket.id}</div>
+                            <div class="badge ${ticket.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ticket.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} font-semibold border-0">${ticket.status}</div>
                         </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                        <div class="ticket-card-title">${ticket.type}</div>
+                        <div class="ticket-card-info">
+                            <div class="ticket-card-row"><span class="ticket-card-label">Student ID:</span><span class="ticket-card-value">${ticket.student_id || 'N/A'}</span></div>
+                            <div class="ticket-card-row"><span class="ticket-card-label">Student:</span><span class="ticket-card-value">${ticket.student_name || 'N/A'}</span></div>
+                            <div class="ticket-card-row"><span class="ticket-card-label">Details:</span><span class="ticket-card-value">${shortDetails}</span></div>
+                            <div class="ticket-card-row"><span class="ticket-card-label">Date:</span><span class="ticket-card-value">${ticket.date}</span></div>
+                        </div>
+                        <div class="ticket-card-footer"><div class="ticket-card-actions"></div></div>
+                    `;
+
+                    cardsContainer.appendChild(card);
+                });
+            }
         }
 
         // Support tickets sorting
@@ -1750,6 +1905,34 @@ body {
             
             renderTicketsTable(sortedTickets);
         }
+
+        // Mobile ticket sort handler (maps mobile select to existing sortTickets)
+        (function attachMobileTicketSortHandler(){
+            const mobileSelect = document.getElementById('mobile-admin-ticket-sort-select');
+            if (!mobileSelect) return;
+            mobileSelect.addEventListener('change', (e) => {
+                const value = e.target.value || '';
+                // Expected formats: id-desc, id-asc, student_id-asc, student_name-desc, type-asc, status-desc
+                const [col, dir] = value.split('-');
+                let sortColumn = null;
+
+                switch(col) {
+                    case 'id': sortColumn = 'ticket-id'; break;
+                    case 'student_id': sortColumn = 'ticket-student-id'; break;
+                    case 'student_name': sortColumn = 'ticket-student-name'; break;
+                    case 'type': sortColumn = 'ticket-issue-type'; break;
+                    case 'status': sortColumn = 'ticket-status'; break;
+                    default: sortColumn = null;
+                }
+
+                if (sortColumn) {
+                    // Force the direction to the selected one
+                    ticketsSortColumn = sortColumn;
+                    ticketsSortDirection = dir === 'desc' ? 'desc' : 'asc';
+                    sortTickets(sortColumn);
+                }
+            });
+        })();
 
         // Track the current active tab to avoid unnecessary header updates
         var currentActiveTab = null;
@@ -4979,6 +5162,7 @@ body {
             }
         })();
     </script>
+    <?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>
 </html>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/super_admin.blade.php ENDPATH**/ ?>

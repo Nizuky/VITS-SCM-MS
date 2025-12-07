@@ -3832,6 +3832,7 @@
             }
         })();
     </script>
+    <?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>
 </html>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/dashboards/admin.blade.php ENDPATH**/ ?>

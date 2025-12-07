@@ -24,12 +24,27 @@
         </div>
     </div>
     
-    <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto mx-4">
+    <!-- Mobile Sort Dropdown (visible on mobile only) -->
+    <div class="lg:hidden px-4 mb-4">
+        <select id="mobile-ticket-sort-select" class="select select-bordered select-sm w-full">
+            <option value="id-desc">Ticket ID (Newest First)</option>
+            <option value="id-asc">Ticket ID (Oldest First)</option>
+            <option value="name-asc">Student Name (A-Z)</option>
+            <option value="name-desc">Student Name (Z-A)</option>
+            <option value="type-asc">Issue Type (A-Z)</option>
+            <option value="type-desc">Issue Type (Z-A)</option>
+            <option value="status-asc">Status (A-Z)</option>
+            <option value="status-desc">Status (Z-A)</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 bg-transparent rounded-2xl p-4 shadow-none overflow-y-auto mx-0">
         <div class="mb-4 flex justify-end items-center">
             <div id="ticket-limit-info" class="text-sm text-gray-600"></div>
         </div>
         
-        <div class="overflow-x-auto">
+        <!-- Desktop Table View (hidden on mobile) -->
+        <div class="hidden lg:block overflow-x-auto">
             <table class="table table-zebra w-full">
                 <thead class="bg-gray-50 text-gray-600">
                     <tr>
@@ -65,6 +80,11 @@
                     <tr><td colspan="6" class="text-center text-gray-500 py-4">Loading tickets...</td></tr>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Mobile Card View (visible on mobile only) -->
+        <div class="lg:hidden flex flex-col gap-3" id="ticket-cards-container">
+            <div class="text-center text-gray-500 py-4">Loading tickets...</div>
         </div>
     </div>
 </div>

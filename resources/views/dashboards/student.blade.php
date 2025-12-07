@@ -1634,6 +1634,120 @@
         [data-theme="dark"] .cards-empty-state {
             color: #9CA3AF;
         }
+        
+        /* Support Ticket Card Styles */
+        .ticket-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .ticket-card:active {
+            transform: scale(0.98);
+        }
+        
+        .ticket-card.status-open {
+            border-left-color: #F59E0B;
+        }
+        
+        .ticket-card.status-in-progress {
+            border-left-color: #3B82F6;
+        }
+        
+        .ticket-card.status-resolved {
+            border-left-color: #10B981;
+        }
+        
+        .ticket-card.status-closed {
+            border-left-color: #6B7280;
+        }
+        
+        .ticket-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .ticket-card-id {
+            font-weight: 700;
+            font-size: 14px;
+            color: #6D28D9;
+        }
+        
+        .ticket-card-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+        
+        .ticket-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .ticket-card-row {
+            display: flex;
+            align-items: flex-start;
+            font-size: 14px;
+        }
+        
+        .ticket-card-label {
+            font-weight: 500;
+            color: #6B7280;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+        
+        .ticket-card-value {
+            color: #374151;
+            word-break: break-word;
+        }
+        
+        .ticket-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .ticket-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Dark theme for ticket cards */
+        [data-theme="dark"] .ticket-card {
+            background: #1F2937;
+        }
+        
+        [data-theme="dark"] .ticket-card-id {
+            color: #A78BFA;
+        }
+        
+        [data-theme="dark"] .ticket-card-title {
+            color: #F9FAFB;
+        }
+        
+        [data-theme="dark"] .ticket-card-label {
+            color: #9CA3AF;
+        }
+        
+        [data-theme="dark"] .ticket-card-value {
+            color: #E5E7EB;
+        }
+        
+        [data-theme="dark"] .ticket-card-footer {
+            border-top-color: #374151;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -2688,8 +2802,10 @@
          */
         function renderTicketsTable() {
             const tableBody = document.getElementById('ticket-table-body');
-            if (!tableBody) return;
-            tableBody.innerHTML = ''; 
+            const cardsContainer = document.getElementById('ticket-cards-container');
+            
+            if (tableBody) tableBody.innerHTML = ''; 
+            if (cardsContainer) cardsContainer.innerHTML = '';
 
             // Filter logic for search
             const searchLower = document.getElementById('ticket-search-input')?.value.toLowerCase() || '';
@@ -2703,55 +2819,129 @@
             );
 
             if (filteredTickets.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>`;
+                if (tableBody) tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>`;
+                if (cardsContainer) cardsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No tickets found.</div>';
                 return;
             }
 
-            filteredTickets.forEach(ticket => {
-                let statusBadgeClass = '';
-                switch(ticket.status) {
-                    case 'Pending':
-                        statusBadgeClass = 'bg-yellow-100 text-yellow-800';
-                        break;
-                    case 'Resolved':
-                        statusBadgeClass = 'bg-green-100 text-green-800';
-                        break;
-                    case 'Closed':
-                        statusBadgeClass = 'bg-gray-100 text-gray-800';
-                        break;
-                    default:
-                        statusBadgeClass = 'bg-blue-100 text-blue-800';
-                }
+            // Render desktop table
+            if (tableBody) {
+                filteredTickets.forEach(ticket => {
+                    let statusBadgeClass = '';
+                    switch(ticket.status) {
+                        case 'Pending':
+                            statusBadgeClass = 'bg-yellow-100 text-yellow-800';
+                            break;
+                        case 'Resolved':
+                            statusBadgeClass = 'bg-green-100 text-green-800';
+                            break;
+                        case 'Closed':
+                            statusBadgeClass = 'bg-gray-100 text-gray-800';
+                            break;
+                        default:
+                            statusBadgeClass = 'bg-blue-100 text-blue-800';
+                    }
 
-                const newRow = document.createElement('tr');
-                
-                const shortDetails = ticket.details.split('\n')[0]; // Shows first line of details
-                
-                // Action buttons based on status
-                let actionButton = '';
-                if (ticket.status === 'Pending') {
-                    actionButton = `<button onclick="deleteTicket(${ticket.id})" class="btn btn-sm bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>`;
-                } else if (ticket.status === 'Resolved') {
-                    actionButton = `<button onclick="markTicketDone(${ticket.id})" class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg">Done</button>`;
-                }
-                
-                newRow.innerHTML = `
-                    <td class="font-medium text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.id}</td>
-                    <td class="text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.student_name || 'N/A'}</td>
-                    <td class="text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.type}</td>
-                    <td class="text-text-muted text-sm truncate max-w-xs cursor-pointer" title="${ticket.details}" onclick="showTicketDetails(${ticket.id})">${shortDetails}</td>
-                    <td class="cursor-pointer" onclick="showTicketDetails(${ticket.id})">
-                        <div class="flex flex-col gap-1">
+                    const newRow = document.createElement('tr');
+                    
+                    const shortDetails = ticket.details.split('\n')[0]; // Shows first line of details
+                    
+                    // Action buttons based on status
+                    let actionButton = '';
+                    if (ticket.status === 'Pending') {
+                        actionButton = `<button onclick="deleteTicket(${ticket.id})" class="btn btn-sm bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>`;
+                    } else if (ticket.status === 'Resolved') {
+                        actionButton = `<button onclick="markTicketDone(${ticket.id})" class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg">Done</button>`;
+                    }
+                    
+                    newRow.innerHTML = `
+                        <td class="font-medium text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.id}</td>
+                        <td class="text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.student_name || 'N/A'}</td>
+                        <td class="text-text-header cursor-pointer" onclick="showTicketDetails(${ticket.id})">${ticket.type}</td>
+                        <td class="text-text-muted text-sm truncate max-w-xs cursor-pointer" title="${ticket.details}" onclick="showTicketDetails(${ticket.id})">${shortDetails}</td>
+                        <td class="cursor-pointer" onclick="showTicketDetails(${ticket.id})">
+                            <div class="flex flex-col gap-1">
+                                <div class="badge ${statusBadgeClass} font-semibold border-0">
+                                    ${ticket.status}
+                                </div>
+                                <span class="text-xs text-gray-500">${ticket.date}</span>
+                            </div>
+                        </td>
+                        <td>${actionButton}</td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+            }
+            
+            // Render mobile cards
+            if (cardsContainer) {
+                filteredTickets.forEach(ticket => {
+                    let statusBadgeClass = '';
+                    let statusClass = '';
+                    switch(ticket.status) {
+                        case 'Pending':
+                            statusBadgeClass = 'bg-yellow-100 text-yellow-800';
+                            statusClass = 'status-open';
+                            break;
+                        case 'Resolved':
+                            statusBadgeClass = 'bg-green-100 text-green-800';
+                            statusClass = 'status-resolved';
+                            break;
+                        case 'Closed':
+                            statusBadgeClass = 'bg-gray-100 text-gray-800';
+                            statusClass = 'status-closed';
+                            break;
+                        default:
+                            statusBadgeClass = 'bg-blue-100 text-blue-800';
+                            statusClass = 'status-in-progress';
+                    }
+                    
+                    const shortDetails = ticket.details.split('\n')[0];
+                    
+                    // Action buttons based on status
+                    let actionButtons = '';
+                    if (ticket.status === 'Pending') {
+                        actionButtons = `<button onclick="deleteTicket(${ticket.id}); event.stopPropagation();" class="btn btn-sm bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>`;
+                    } else if (ticket.status === 'Resolved') {
+                        actionButtons = `<button onclick="markTicketDone(${ticket.id}); event.stopPropagation();" class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg">Done</button>`;
+                    }
+                    
+                    const card = document.createElement('div');
+                    card.className = `ticket-card ${statusClass}`;
+                    card.onclick = function() { showTicketDetails(ticket.id); };
+                    
+                    card.innerHTML = `
+                        <div class="ticket-card-header">
+                            <div class="ticket-card-id">#${ticket.id}</div>
                             <div class="badge ${statusBadgeClass} font-semibold border-0">
                                 ${ticket.status}
                             </div>
-                            <span class="text-xs text-gray-500">${ticket.date}</span>
                         </div>
-                    </td>
-                    <td>${actionButton}</td>
-                `;
-                tableBody.appendChild(newRow);
-            });
+                        <div class="ticket-card-title">${ticket.type}</div>
+                        <div class="ticket-card-info">
+                            <div class="ticket-card-row">
+                                <span class="ticket-card-label">Student:</span>
+                                <span class="ticket-card-value">${ticket.student_name || 'N/A'}</span>
+                            </div>
+                            <div class="ticket-card-row">
+                                <span class="ticket-card-label">Details:</span>
+                                <span class="ticket-card-value">${shortDetails}</span>
+                            </div>
+                            <div class="ticket-card-row">
+                                <span class="ticket-card-label">Date:</span>
+                                <span class="ticket-card-value">${ticket.date}</span>
+                            </div>
+                        </div>
+                        <div class="ticket-card-footer">
+                            <div class="ticket-card-actions">
+                                ${actionButtons}
+                            </div>
+                        </div>
+                    `;
+                    
+                    cardsContainer.appendChild(card);
+                });
+            }
         }
 
         // Support tickets sorting for student
@@ -2812,6 +3002,35 @@
             });
             
             renderTicketsTable();
+        }
+        
+        // Mobile ticket sort handler
+        const mobileTicketSortSelect = document.getElementById('mobile-ticket-sort-select');
+        if (mobileTicketSortSelect) {
+            mobileTicketSortSelect.addEventListener('change', (e) => {
+                const value = e.target.value;
+                const [column, direction] = value.split('-');
+                
+                let sortColumn = '';
+                switch(column) {
+                    case 'id':
+                        sortColumn = 'student-ticket-id';
+                        break;
+                    case 'name':
+                        sortColumn = 'student-ticket-name';
+                        break;
+                    case 'type':
+                        sortColumn = 'student-ticket-issue-type';
+                        break;
+                    case 'status':
+                        sortColumn = 'student-ticket-status';
+                        break;
+                }
+                
+                studentTicketsSortColumn = sortColumn;
+                studentTicketsSortDirection = direction;
+                sortStudentTickets(sortColumn);
+            });
         }
 
         // --- Global Records Array (accessible to PDF export functions) ---
