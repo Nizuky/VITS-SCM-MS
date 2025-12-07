@@ -423,25 +423,40 @@
             
             /* Mobile optimizations - Small devices (phones, 640px and down) */
             @media (max-width: 640px) {
-                /* Button full width on mobile */
+                /* Button full width on mobile with compact padding */
                 .scms-primary-btn {
                     width: 100%;
-                    padding: 0.75rem 1rem;
-                    font-size: 1rem;
+                    padding: 0.625rem 0.875rem;
+                    font-size: 0.9375rem;
                 }
                 
-                /* Prevent iOS zoom on input focus */
+                /* Prevent iOS zoom on input focus - COMPACT */
                 input[type="email"],
                 input[type="password"],
                 input[type="text"] {
                     font-size: 16px !important;
+                    padding: 0.625rem 0.875rem !important;
+                }
+                
+                /* Reduce form spacing for mobile */
+                form > div,
+                form .space-y-4 > div,
+                form .space-y-6 > div {
+                    margin-bottom: 0.75rem !important;
+                }
+                
+                /* Compact form container */
+                .auth-content-wrapper > div > div,
+                .auth-card,
+                .bg-white\/10 {
+                    padding: 1rem 1.25rem !important;
                 }
                 
                 /* Auth container adjustments */
                 body > div.flex {
-                    padding: 1rem !important;
-                    padding-top: calc(var(--header-height-mobile, 80px) + 1rem) !important;
-                    gap: 1rem !important;
+                    padding: 0.75rem !important;
+                    padding-top: calc(var(--header-height-mobile, 80px) + 0.75rem) !important;
+                    gap: 0.75rem !important;
                 }
                 
                 /* Logo sizing on mobile */
@@ -587,12 +602,12 @@
     </head>
     <body class="min-h-screen antialiased auth-page">
         <?php echo $__env->make('partials.vits_branding', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-        <div class="auth-content-wrapper" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(100% - 24px); max-width: 28rem; padding-top: 40px; box-sizing: border-box; z-index: 10;">
+        <div class="auth-content-wrapper" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(100% - 20px); max-width: 26rem; padding-top: 30px; box-sizing: border-box; z-index: 10;">
             <!-- Inner container for vertical stacking -->
-            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 28rem; gap: 1rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 26rem; gap: 0.75rem;">
                 <!-- Logo link to welcome page -->
-                <a href="<?php echo e(route('home')); ?>" class="mb-2 sm:mb-4">
-                    <img src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-12 sm:h-16 w-auto" />
+                <a href="<?php echo e(route('home')); ?>" class="mb-1 sm:mb-3">
+                    <img src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-10 sm:h-14 w-auto" />
                 </a>
             
                 <?php echo e($slot); ?>

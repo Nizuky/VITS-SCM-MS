@@ -106,6 +106,7 @@
             
             /* ===========================================
                MOBILE: Small devices (640px and down)
+               OPTIMIZED FOR COMPACTNESS
                =========================================== */
             @media (max-width: 640px) {
                 .welcome-content-wrapper {
@@ -115,89 +116,134 @@
                     transform: translate(-50%, -50%) !important;
                     width: calc(100% - 16px) !important;
                     max-width: 100% !important;
-                    padding-top: calc(var(--header-height-mobile, 80px) / 2) !important;
+                    padding-top: 35px !important; /* Reduced for header */
+                    max-height: calc(100vh - 70px) !important;
+                    max-height: calc(100dvh - 70px) !important;
+                    overflow-y: auto !important;
                 }
                 
-                /* Main card mobile styling */
+                /* Main card - COMPACT mobile styling */
                 .main-card {
-                    padding: 24px 20px !important;
-                    border-radius: 20px !important;
+                    padding: 16px 14px !important;
+                    border-radius: 16px !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0 auto !important;
                     box-sizing: border-box !important;
-                    
-                    /* CRITICAL: Center the card */
-                    margin-left: auto !important;
-                    margin-right: auto !important;
                 }
                 
                 .main-card h2 {
-                    font-size: 22px !important;
+                    font-size: 20px !important;
+                    margin-bottom: 4px !important;
                 }
                 
                 .main-card h4 {
-                    font-size: 12px !important;
+                    font-size: 11px !important;
+                    margin-bottom: 10px !important;
                 }
                 
                 .main-card p {
-                    font-size: 12px !important;
+                    font-size: 11px !important;
+                    line-height: 1.5 !important;
                     text-align: left !important;
+                    margin-bottom: 10px !important;
                 }
                 
-                /* Notice box mobile */
+                /* Notice box - COMPACT */
                 .notice-box {
-                    padding: 12px 14px !important;
-                    font-size: 12px !important;
+                    padding: 10px 12px !important;
+                    font-size: 10px !important;
+                    border-radius: 8px !important;
                 }
                 
                 .notice-box span:first-child {
-                    font-size: 16px !important;
+                    font-size: 14px !important;
                 }
                 
-                /* Toggle container mobile - stack vertically */
+                .notice-box div > span:first-child {
+                    font-size: 10px !important;
+                    margin-bottom: 2px !important;
+                }
+                
+                /* Toggle container - COMPACT horizontal layout */
                 .toggle-container {
-                    flex-direction: column !important;
-                    gap: 12px !important;
-                    padding: 16px !important;
-                    border-radius: 20px !important;
+                    flex-direction: row !important;
+                    flex-wrap: wrap !important;
+                    gap: 8px !important;
+                    padding: 10px 12px !important;
+                    border-radius: 12px !important;
                     width: 100% !important;
-                    max-width: 100% !important;
                     box-sizing: border-box !important;
+                    margin-top: 12px !important;
                 }
                 
                 .toggle-container > span {
                     text-align: center !important;
                     padding-left: 0 !important;
-                    font-size: 12px !important;
+                    font-size: 10px !important;
                     white-space: normal !important;
+                    width: 100% !important;
                 }
                 
-                /* Toggle buttons mobile */
+                /* Toggle buttons - COMPACT */
                 .toggle-buttons {
                     width: 100% !important;
                     justify-content: center !important;
                 }
                 
                 .toggle-buttons button {
-                    padding: 10px 28px !important;
-                    font-size: 14px !important;
+                    padding: 8px 20px !important;
+                    font-size: 12px !important;
                     flex: 1;
                 }
                 
-                /* Followup sections mobile */
+                /* Followup sections - COMPACT */
                 .followup-section {
-                    padding: 12px 16px !important;
+                    padding: 8px 12px !important;
                     width: 100% !important;
                     box-sizing: border-box !important;
+                    margin-top: 8px !important;
                 }
                 
                 .followup-section p {
-                    font-size: 12px !important;
+                    font-size: 11px !important;
+                    margin-bottom: 8px !important;
                 }
                 
-                /* Action buttons mobile */
+                /* Action buttons - COMPACT horizontal layout */
+                .btn-group {
+                    flex-direction: row !important;
+                    width: 100% !important;
+                    gap: 8px !important;
+                }
+                
+                .btn-group a,
+                .btn-group button {
+                    flex: 1 !important;
+                    width: auto !important;
+                    min-width: 0 !important;
+                }
+                
                 .action-btn {
+                    padding: 10px 12px !important;
+                    font-size: 12px !important;
+                    min-width: auto !important;
+                    text-align: center;
+                }
+                
+                /* Followups container - COMPACT */
+                #followups {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    padding: 0 !important;
+                    margin-top: 8px !important;
+                }
+                
+                /* Spacer reduction */
+                .h-6 {
+                    height: 8px !important;
+                }
+            }
                     padding: 12px 20px !important;
                     font-size: 13px !important;
                     min-width: 120px;
@@ -234,37 +280,52 @@
                EXTRA SMALL: Tiny phones (380px and down)
                =========================================== */
             @media (max-width: 380px) {
-                body.welcome-page {
-                    padding: 10px !important;
-                    padding-top: calc(var(--header-height-mobile, 80px) + 10px) !important;
+                .welcome-content-wrapper {
+                    padding-top: 30px !important;
                 }
                 
                 .main-card {
-                    padding: 20px 16px !important;
-                    border-radius: 16px !important;
+                    padding: 12px 10px !important;
+                    border-radius: 12px !important;
                 }
                 
                 .main-card h2 {
-                    font-size: 20px !important;
+                    font-size: 18px !important;
                 }
                 
                 .main-card h4 {
-                    font-size: 11px !important;
+                    font-size: 10px !important;
+                    margin-bottom: 8px !important;
+                }
+                
+                .main-card p {
+                    font-size: 10px !important;
+                    line-height: 1.4 !important;
+                }
+                
+                .notice-box {
+                    padding: 8px 10px !important;
+                    font-size: 9px !important;
                 }
                 
                 .toggle-container {
-                    padding: 14px 12px !important;
-                    border-radius: 16px !important;
+                    padding: 8px 10px !important;
+                    border-radius: 10px !important;
+                    margin-top: 8px !important;
+                }
+                
+                .toggle-container > span {
+                    font-size: 9px !important;
                 }
                 
                 .toggle-buttons button {
-                    padding: 8px 20px !important;
-                    font-size: 13px !important;
+                    padding: 6px 14px !important;
+                    font-size: 11px !important;
                 }
                 
                 .action-btn {
-                    padding: 10px 16px !important;
-                    font-size: 12px !important;
+                    padding: 8px 10px !important;
+                    font-size: 11px !important;
                 }
             }
             
@@ -339,21 +400,21 @@
         <!-- Main centered container - Fixed position for viewport centering -->
         <div class="welcome-content-wrapper" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(100% - 24px); max-width: 480px; padding-top: 40px; box-sizing: border-box; z-index: 10;">
             <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                <div class="main-card" style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 32px 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-sizing: border-box;">
+                <div class="main-card" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 24px 28px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-sizing: border-box;">
   
-                <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 28px; margin: 0 0 8px 0; font-weight: 800; letter-spacing: -0.02em;">Welcome</h2>
-                <h4 style="color: #6D28D9; font-size: 14px; margin: 0 0 20px 0; font-weight: 600; opacity: 0.9;">
+                <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 24px; margin: 0 0 6px 0; font-weight: 800; letter-spacing: -0.02em;">Welcome</h2>
+                <h4 style="color: #6D28D9; font-size: 13px; margin: 0 0 14px 0; font-weight: 600; opacity: 0.9;">
                     Social Contract Report Submission and Monitoring System
                 </h4>
 
-                <p style="font-size: 13px; line-height: 1.7; color: #4a5568; text-align: justify; margin-bottom: 20px;">
+                <p style="font-size: 12px; line-height: 1.6; color: #4a5568; text-align: justify; margin-bottom: 14px;">
                     This is a secure digital platform designed specifically for the IT students of Pamantasan ng Lungsod ng Valenzuela (PLV). 
                     Through this system, students can log in to safely access their accumulated hours, duty records, and compliance status without 
                     the need for paper forms. Supervisors and administrators are responsible for directly recording attendance, duty details, 
                     and rendered hours, ensuring accuracy, efficiency, and transparency in monitoring student requirements.
                 </p>
 
-                <div class="notice-box" style="font-size: 13px; color: #744210; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
+                <div class="notice-box" style="font-size: 12px; color: #744210; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
                     <div style="display: flex; align-items: flex-start; gap: 8px;">
                         <span style="font-size: 18px; flex-shrink: 0;">⚠️</span>
                         <div>
@@ -370,9 +431,9 @@
             <?php endif; ?>
 
             <!-- Pill toggle role selector (below the main card) -->
-            <div class="w-full" style="margin-top: 32px; max-width: 480px; box-sizing: border-box;">
+            <div class="w-full" style="margin-top: 20px; max-width: 480px; box-sizing: border-box;">
                 <!-- Modern toggle with glass morphism --> 
-                <div class="toggle-container" style="background: rgba(255, 255, 255, 0.95); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; gap: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
+                <div class="toggle-container" style="background: rgba(255, 255, 255, 0.95); border-radius: 60px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; gap: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
                     <span style="color: #4a5568; font-size: 11px; font-weight: 600; flex: 1; min-width: 0; padding-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Are you a PLV Information Technology Student?</span>
                     <div id="toggle" class="toggle-buttons" style="display: flex; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50px; padding: 4px; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                         <button id="yesBtn" type="button" style="background: rgba(255, 255, 255, 0.3); border: none; color: white; border-radius: 50px; padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">Yes</button>
@@ -380,7 +441,7 @@
                     </div>
                 </div>
 
-                <div id="followups" style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <div id="followups" style="margin-top: 14px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
                         <!-- Student Exists Section -->
                         <div id="student-exists" class="hidden followup-section" 
                             style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
