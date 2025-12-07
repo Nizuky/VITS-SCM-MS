@@ -314,6 +314,132 @@ body {
 #sidebar.collapsed #collapse-icon {
     transform: rotate(180deg);
 }
+
+/* Mobile hamburger button */
+#mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background-color: #6D28D9;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.2s ease;
+}
+#mobile-menu-btn:hover {
+    background-color: #5B21B6;
+}
+#mobile-menu-btn svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Mobile sidebar overlay/backdrop */
+#sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#sidebar-backdrop.active {
+    opacity: 1;
+}
+
+/* Mobile sidebar styles */
+@media (max-width: 768px) {
+    #mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #sidebar-backdrop {
+        display: block;
+        pointer-events: none;
+        opacity: 0;
+    }
+    #sidebar-backdrop.active {
+        pointer-events: auto;
+        opacity: 1;
+    }
+
+    #sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100vh !important;
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        border-radius: 0 !important;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease !important;
+    }
+
+    #sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* Hide collapse button on mobile */
+    #sidebar #collapse-btn {
+        display: none;
+    }
+
+    /* Override collapsed state on mobile */
+    #sidebar.collapsed {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+    #sidebar.collapsed .menu-text,
+    #sidebar.collapsed #admin-name,
+    #sidebar.collapsed #admin-role {
+        opacity: 1;
+        width: auto;
+    }
+    #sidebar.collapsed #avatar-circle {
+        width: 6rem !important;
+        height: 6rem !important;
+    }
+    #sidebar.collapsed #avatar-initials {
+        font-size: 1.875rem;
+    }
+    #sidebar.collapsed #menu-list a,
+    #sidebar.collapsed ul.menu a,
+    #sidebar.collapsed ul.menu button {
+        justify-content: flex-start;
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Adjust main content for mobile */
+    .flex.p-4.gap-4.min-h-screen {
+        padding-top: 4.5rem;
+    }
+
+    /* Mobile close button styling */
+    #mobile-close-btn {
+        display: flex;
+    }
+}
+
+/* Hide mobile close button on desktop */
+@media (min-width: 769px) {
+    #mobile-close-btn {
+        display: none !important;
+    }
+}
 </style>
 <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -348,9 +474,26 @@ body {
         $initials = 'SA';
 ?>
 
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- Sidebar Backdrop -->
+    <div id="sidebar-backdrop"></div>
+
     <div class="flex p-4 gap-4 min-h-screen">
         <!-- Sidebar -->
          <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-4 self-start h-[calc(100vh-2rem)] overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
+            <!-- Mobile Close Button -->
+            <button id="mobile-close-btn" class="md:hidden absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10" aria-label="Close menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
             <!-- Profile Section -->
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
@@ -4450,6 +4593,9 @@ body {
                 const sidebar = document.getElementById('sidebar');
                 const collapseBtn = document.getElementById('collapse-btn');
                 const collapseText = document.getElementById('collapse-text');
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                const mobileCloseBtn = document.getElementById('mobile-close-btn');
+                const sidebarBackdrop = document.getElementById('sidebar-backdrop');
                 
                 // Safety check - ensure elements exist
                 if (!sidebar || !collapseBtn || !collapseText) {
@@ -4457,21 +4603,89 @@ body {
                     return;
                 }
                 
-                // Load saved state from localStorage
+                // Check if mobile view
+                function isMobile() {
+                    return window.innerWidth <= 768;
+                }
+                
+                // Load saved state from localStorage (only for desktop)
                 const savedState = localStorage.getItem('scms_superadmin_sidebar_collapsed');
-                if (savedState === 'true') {
+                if (savedState === 'true' && !isMobile()) {
                     sidebar.classList.add('collapsed');
                     collapseText.textContent = 'Show';
                 }
                 
-                // Toggle collapse on button click
+                // Toggle collapse on button click (desktop)
                 collapseBtn.addEventListener('click', function() {
+                    if (isMobile()) return; // Don't collapse on mobile
+                    
                     sidebar.classList.toggle('collapsed');
                     const isCollapsed = sidebar.classList.contains('collapsed');
                     collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
                     
                     // Save state to localStorage
                     localStorage.setItem('scms_superadmin_sidebar_collapsed', isCollapsed);
+                });
+                
+                // Mobile menu toggle
+                function openMobileSidebar() {
+                    sidebar.classList.add('mobile-open');
+                    sidebarBackdrop.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+                
+                function closeMobileSidebar() {
+                    sidebar.classList.remove('mobile-open');
+                    sidebarBackdrop.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                
+                // Mobile menu button click
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', function() {
+                        if (sidebar.classList.contains('mobile-open')) {
+                            closeMobileSidebar();
+                        } else {
+                            openMobileSidebar();
+                        }
+                    });
+                }
+                
+                // Mobile close button click
+                if (mobileCloseBtn) {
+                    mobileCloseBtn.addEventListener('click', function() {
+                        closeMobileSidebar();
+                    });
+                }
+                
+                // Close sidebar when clicking backdrop
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.addEventListener('click', function() {
+                        closeMobileSidebar();
+                    });
+                }
+                
+                // Close sidebar when clicking a nav link on mobile
+                const navLinks = sidebar.querySelectorAll('#menu-list a, ul.menu a, ul.menu button');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        if (isMobile()) {
+                            closeMobileSidebar();
+                        }
+                    });
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (!isMobile()) {
+                        // Switching to desktop: close mobile sidebar and restore collapse state
+                        closeMobileSidebar();
+                        const savedState = localStorage.getItem('scms_superadmin_sidebar_collapsed');
+                        if (savedState === 'true') {
+                            sidebar.classList.add('collapsed');
+                            collapseText.textContent = 'Show';
+                        }
+                    }
                 });
             }
             

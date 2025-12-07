@@ -468,7 +468,12 @@
         
         /* Notification dropdown light mode */
         html:not([data-theme="dark"]) .dropdown-content { background-color: #ffffff !important; border: 1px solid #e5e7eb; }
-        html:not([data-theme="dark"]) .dropdown-content li { color: #374151 !important; }
+        html:not([data-theme="dark"]) .dropdown-content li { color: #374151 !important; background-color: #ffffff; }
+        html:not([data-theme="dark"]) .dropdown-content li:hover { background-color: #f3f4f6 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .notification-title { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .notification-message,
+        html:not([data-theme="dark"]) .dropdown-content .notification-message p { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .notification-time { color: #6b7280 !important; }
         html:not([data-theme="dark"]) .dropdown-content p { color: #4b5563 !important; }
         html:not([data-theme="dark"]) .dropdown-content span { color: #6b7280 !important; }
         html:not([data-theme="dark"]) .dropdown-content .font-bold { color: #1f2937 !important; }
@@ -478,15 +483,6 @@
         html:not([data-theme="dark"]) .dropdown-content .text-xs { color: #6b7280 !important; }
         html:not([data-theme="dark"]) .dropdown-content a { color: #374151 !important; }
         html:not([data-theme="dark"]) .dropdown-content a:hover { background-color: #f3f4f6 !important; }
-        html:not([data-theme="dark"]) .dropdown-content svg { stroke: currentColor; }
-        html:not([data-theme="dark"]) .dropdown-content .text-blue-500 svg,
-        html:not([data-theme="dark"]) .dropdown-content .text-blue-500 { color: #3b82f6 !important; }
-        html:not([data-theme="dark"]) .dropdown-content .text-green-500 svg,
-        html:not([data-theme="dark"]) .dropdown-content .text-green-500 { color: #22c55e !important; }
-        html:not([data-theme="dark"]) .dropdown-content .text-red-500 svg,
-        html:not([data-theme="dark"]) .dropdown-content .text-red-500 { color: #ef4444 !important; }
-        html:not([data-theme="dark"]) .dropdown-content .text-orange-500 svg,
-        html:not([data-theme="dark"]) .dropdown-content .text-orange-500 { color: #f97316 !important; }
         html:not([data-theme="dark"]) .dropdown-content .text-primary-purple { color: #6D28D9 !important; }
         
         /* Summary cards status text light mode */
@@ -496,6 +492,18 @@
         html:not([data-theme="dark"]) .bg-gradient-rejected .text-red-800 { color: #991b1b !important; }
         html:not([data-theme="dark"]) .text-text-header { color: #2B3674 !important; }
         html:not([data-theme="dark"]) .text-text-muted { color: #707EAE !important; }
+        
+        /* All Notifications Modal - Light Mode */
+        html:not([data-theme="dark"]) #all_notifications_modal .modal-box { background-color: #ffffff !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal ul { background-color: #ffffff !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal li { background-color: #ffffff !important; border-color: #e5e7eb !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal li:hover { background-color: #f9fafb !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-title { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-message,
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-message p { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-time { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal .text-primary-purple { color: #6D28D9 !important; }
+        html:not([data-theme="dark"]) #all_notifications_modal .border-gray-200 { border-color: #e5e7eb !important; }
         
         /* Modal backgrounds light mode */
         html:not([data-theme="dark"]) .modal-box { background-color: #ffffff !important; }
@@ -522,9 +530,81 @@
         html:not([data-theme="dark"]) #deactivation_details_modal .text-yellow-400 { color: #ca8a04 !important; }
         html:not([data-theme="dark"]) #deactivation_details_modal .text-yellow-500 { color: #eab308 !important; }
         
+        /* Account Deactivation Banner - Light Mode */
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 { background: linear-gradient(to right, #fef2f2, #fee2e2) !important; border-color: #fca5a5 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .bg-red-900\/40 { background-color: #fecaca !important; border-color: #f87171 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 h3.text-white { color: #991b1b !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-gray-300 { color: #374151 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-red-400 { color: #dc2626 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .bg-gray-900\/50 { background-color: #f3f4f6 !important; border-color: #d1d5db !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-cyan-400 { color: #0891b2 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-orange-300 { color: #c2410c !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-orange-200 { color: #9a3412 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-white { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-green-400 { color: #16a34a !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .text-gray-400 { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .bg-gray-900\/30 { background-color: #e5e7eb !important; border-color: #d1d5db !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .btn-outline.text-gray-300 { color: #374151 !important; border-color: #9ca3af !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .btn-outline.text-gray-300:hover { background-color: #f3f4f6 !important; color: #1f2937 !important; }
+        /* Warning icon box: light red background with dark red icon in light mode */
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .bg-red-500 { background-color: #fecaca !important; }
+        html:not([data-theme="dark"]) .bg-gradient-to-r.from-red-950\/90 .bg-red-500 svg.text-white { color: #991b1b !important; stroke: #991b1b !important; }
+        
+        /* Theme toggle - ensure moon icon visible in light mode */
+        html:not([data-theme="dark"]) #theme-icon-moon { color: #374151 !important; stroke: #374151 !important; }
+        html:not([data-theme="dark"]) #theme-icon-sun { color: #374151 !important; stroke: #374151 !important; }
+        html:not([data-theme="dark"]) #theme-toggle-container { color: #374151 !important; }
+        html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
+        html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
+        
+        /* FAQs/Accordion - Active/Open state: entire accordion gets purple background with white text */
+        .collapse[open],
+        .collapse:focus,
+        .collapse-open,
+        .collapse:has(input:checked) {
+            background-color: #6D28D9 !important;
+            border-color: #6D28D9 !important;
+        }
+        .collapse[open] > .collapse-title,
+        .collapse:focus > .collapse-title,
+        .collapse-open > .collapse-title,
+        .collapse:has(input:checked) > .collapse-title {
+            color: #ffffff !important;
+        }
+        .collapse[open] > .collapse-title::after,
+        .collapse:focus > .collapse-title::after,
+        .collapse-open > .collapse-title::after,
+        .collapse:has(input:checked) > .collapse-title::after {
+            color: #ffffff !important;
+        }
+        .collapse[open] > .collapse-content,
+        .collapse:focus > .collapse-content,
+        .collapse-open > .collapse-content,
+        .collapse:has(input:checked) > .collapse-content {
+            color: #ffffff !important;
+        }
+        .collapse[open] > .collapse-content p,
+        .collapse:focus > .collapse-content p,
+        .collapse-open > .collapse-content p,
+        .collapse:has(input:checked) > .collapse-content p {
+            color: #ffffff !important;
+        }
+        
         /* Main content area light mode */
         html:not([data-theme="dark"]) .bg-white { background-color: #ffffff !important; }
         html:not([data-theme="dark"]) #page-container h4 { color: #6D28D9 !important; }
+        
+        /* Status Distribution Chart - Light Mode: use #2B3674 text color */
+        html:not([data-theme="dark"]) #statusDistributionChart ~ ul li,
+        html:not([data-theme="dark"]) #statusDistributionChart ~ ul li * { color: #2B3674 !important; }
+        html:not([data-theme="dark"]) .text-lg.font-bold.text-white.mb-4 { color: #2B3674 !important; }
+        html:not([data-theme="dark"]) .text-xs.text-white.mt-2.text-center { color: #2B3674 !important; }
+        
+        /* Approved Hours Completion chart - Light Mode: use #2B3674 text color */
+        html:not([data-theme="dark"]) #hoursCompletionChart ~ div .text-white,
+        html:not([data-theme="dark"]) #hours-completion-label { color: #2B3674 !important; }
+        html:not([data-theme="dark"]) #hours-amount { color: #2B3674 !important; }
+        
         /* ========== END LIGHT MODE STYLES ========== */
         
         .bg-gradient-primary-purple { background-image: linear-gradient(to bottom, #bbacffff, #6D28D9); }
@@ -625,6 +705,37 @@
         [data-theme="dark"] .btn.bg-primary-purple:focus{outline:none!important;box-shadow:0 0 0 2px rgba(109,40,217,0.35)!important}
         [data-theme="dark"] .btn.bg-primary-purple:active{background-color:#4C1D95!important;color:#fff!important}
         [data-theme="dark"] .btn.bg-primary-purple svg{stroke:#fff!important}
+        
+        /* Notification dropdown and modal - Dark Mode */
+        [data-theme="dark"] .dropdown-content { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content li { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content li:hover { background-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content .notification-title { color: #f9fafb !important; }
+        [data-theme="dark"] .dropdown-content .notification-message,
+        [data-theme="dark"] .dropdown-content .notification-message p { color: #d1d5db !important; }
+        [data-theme="dark"] .dropdown-content .notification-time { color: #9ca3af !important; }
+        [data-theme="dark"] .dropdown-content .border-gray-200 { border-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content .text-primary-purple { color: #a78bfa !important; }
+        
+        /* All Notifications Modal - Dark Mode */
+        [data-theme="dark"] #all_notifications_modal .modal-box { background-color: #1f2937 !important; }
+        [data-theme="dark"] #all_notifications_modal ul { background-color: #1f2937 !important; }
+        [data-theme="dark"] #all_notifications_modal li { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] #all_notifications_modal li:hover { background-color: #374151 !important; }
+        [data-theme="dark"] #all_notifications_modal .notification-title { color: #f9fafb !important; }
+        [data-theme="dark"] #all_notifications_modal .notification-message,
+        [data-theme="dark"] #all_notifications_modal .notification-message p { color: #d1d5db !important; }
+        [data-theme="dark"] #all_notifications_modal .notification-time { color: #9ca3af !important; }
+        [data-theme="dark"] #all_notifications_modal .border-gray-200 { border-color: #374151 !important; }
+        [data-theme="dark"] #all_notifications_modal .text-primary-purple { color: #a78bfa !important; }
+        [data-theme="dark"] #all_notifications_modal .bg-purple-50 { background-color: #312e81 !important; }
+        [data-theme="dark"] #all_notifications_modal .text-text-header { color: #f9fafb !important; }
+        [data-theme="dark"] #all_notifications_modal .text-text-muted { color: #9ca3af !important; }
+        [data-theme="dark"] #all_notifications_modal .divider { border-color: #374151 !important; }
+        [data-theme="dark"] #all_notifications_modal #all-notifications-list { background-color: #1f2937 !important; }
+        [data-theme="dark"] #all_notifications_modal .space-y-2 > div,
+        [data-theme="dark"] #all_notifications_modal .space-y-2 > li { background-color: #1f2937 !important; }
+        
         [data-theme="dark"] .btn.bg-primary-purple span{color:#fff!important}
         [data-theme="dark"] .btn.bg-success-green,[data-theme="dark"] .btn-success-green{background-color:#4CAF50!important;color:#fff!important;border-color:transparent!important}
         [data-theme="dark"] .btn.bg-success-green:hover,[data-theme="dark"] .btn-success-green:hover{background-color:#45a049!important;color:#fff!important}
@@ -2888,12 +2999,23 @@
                         statusColor = 'text-orange-600';
                         statusHex = '#f97316';
                         break;
-                    default:
+                    case 'account_status':
+                    case 'inactive':
+                    case 'reactivated':
+                    case 'status_change':
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
-                        iconColor = 'text-gray-500';
-                        statusText = 'Notification'; // Default text
-                        statusColor = 'text-gray-700';
-                        statusHex = '#374151';
+                        iconColor = 'text-orange-500';
+                        statusText = 'Account Status';
+                        statusColor = 'text-orange-600';
+                        statusHex = '#f97316';
+                        break;
+                    default:
+                        // Default to orange for unknown types (often account-related)
+                        icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                        iconColor = 'text-orange-500';
+                        statusText = 'Notification';
+                        statusColor = 'text-orange-600';
+                        statusHex = '#f97316';
                 }
                 
                 const isUnread = !notif.is_read;
@@ -2942,15 +3064,15 @@
 
                 // 1. Build the inner content
                 const innerContent = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${iconColor} mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="${statusHex}" stroke-width="2" style="color: ${statusHex}; stroke: ${statusHex};">
                         ${icon}
                     </svg>
                     <div class="flex-1">
-                        <p class="text-sm font-semibold text-gray-900">
+                        <p class="text-sm font-semibold notification-title">
                             ${notif.title || `Your submission has been ${statusText}`}
                         </p>
-                        ${messageDetails}
-                        <p class="text-xs text-gray-500 mt-1">${notif.created_at}</p>
+                        <div class="notification-message">${messageDetails}</div>
+                        <p class="text-xs notification-time mt-1">${notif.created_at}</p>
                         ${reasonSection}
                     </div>
                 `;

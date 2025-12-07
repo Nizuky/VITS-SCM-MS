@@ -67,7 +67,7 @@
             
             <!-- Buttons -->
             <div class="px-4 py-3 bg-gray-900/30 border-t border-gray-700/50 flex flex-col sm:flex-row gap-2">
-                <button onclick="showPage('support')" class="btn btn-sm flex-1 sm:flex-none text-white border-0 text-xs font-semibold" style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">
+                <button onclick="showPage('support')" class="btn btn-sm flex-1 sm:flex-none text-white border-0 text-xs font-semibold bg-success-green hover:bg-green-600">
                     Contact Administrator
                 </button>
                 <button onclick="document.getElementById('deactivation_details_modal').showModal()" class="btn btn-sm btn-outline flex-1 sm:flex-none text-gray-300 border-gray-500 hover:bg-gray-700 hover:border-gray-500 text-xs font-semibold">
@@ -114,7 +114,7 @@
                 </div>
                 <div class="modal-action mt-4">
                     <form method="dialog">
-                        <button class="btn btn-sm text-white border-0" style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">Close</button>
+                        <button class="btn btn-sm text-white border-0 bg-gray-500 hover:bg-gray-600">Close</button>
                     </form>
                 </div>
             </div>
@@ -317,28 +317,34 @@
         const pendingCount = parseInt(window.__scms_pendingCount) || 0;
         const rejectedCount = parseInt(window.__scms_rejectedCount) || 0;
         
+        // Get current theme to determine legend color
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        const legendTextColor = isDarkMode ? '#FFFFFF' : '#2B3674';
+        
         // Override any global Chart defaults that might be setting dark text
         if (typeof Chart.defaults !== 'undefined') {
             Chart.overrides.doughnut = Chart.overrides.doughnut || {};
             Chart.overrides.doughnut.plugins = Chart.overrides.doughnut.plugins || {};
             Chart.overrides.doughnut.plugins.legend = Chart.overrides.doughnut.plugins.legend || {};
             Chart.overrides.doughnut.plugins.legend.labels = {
-                color: '#FFFFFF'
+                color: legendTextColor
             };
         }
         
-        // Custom plugin to force white legend text on every render
-        const whiteLegendPlugin = {
-            id: 'whiteLegendText',
+        // Custom plugin to set legend text color based on theme
+        const themeLegendPlugin = {
+            id: 'themeLegendText',
             afterUpdate: (chart) => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const textColor = currentTheme === 'dark' ? '#FFFFFF' : '#2B3674';
                 if (chart.legend && chart.legend.legendItems) {
                     chart.legend.legendItems.forEach(item => {
-                        item.fontColor = '#FFFFFF';
+                        item.fontColor = textColor;
                     });
                 }
                 // Force options update
                 if (chart.options.plugins.legend.labels) {
-                    chart.options.plugins.legend.labels.color = '#FFFFFF';
+                    chart.options.plugins.legend.labels.color = textColor;
                 }
             }
         };
@@ -346,7 +352,7 @@
         try {
             const chartInstance = new Chart(ctx, {
             type: 'doughnut',
-            plugins: [whiteLegendPlugin],
+            plugins: [themeLegendPlugin],
             data: {
                 labels: ['Approved', 'Verified', 'Pending', 'Rejected'],
                 datasets: [{
@@ -444,7 +450,7 @@
                     legend: {
                         display: true,
                         labels: {
-                        color: '#FFFFFF' // <--- Set the label text color to white
+                        color: legendTextColor // <--- Theme-aware label text color
                     }
                     },
                     tooltip: {
@@ -462,8 +468,7 @@
                                 const value = context.parsed || 0;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                 const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                return `${label}: ${value} records (${percentage}%)`;
-                            },
+                                return `${label}: ${value} records (${percentage}%)`;                            },
                             afterLabel: function(context) {
                                 return 'Click to view records';
                             }
@@ -483,26 +488,27 @@
         // Also force it in the legend items themselves
         if (chartInstance.legend && chartInstance.legend.legendItems) {
             chartInstance.legend.legendItems.forEach(item => {
-                item.fontColor = '#FFFFFF';
+                item.fontColor = legendTextColor;
             });
         }
         
-        // Trigger a full re-render with the white color
+        // Trigger a full re-render with the theme-aware color
         chartInstance.update('none');
         
-        // Force legend text to white with CSS - increased delay
+        // Force legend text color with CSS based on theme - increased delay
         setTimeout(() => {
+            const currentThemeColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#FFFFFF' : '#2B3674';
             const legendItems = canvas.parentElement.parentElement.querySelectorAll('.chartjs-legend li, [id*="legend"] li, canvas + * li, ul li');
             legendItems.forEach(item => {
-                item.style.setProperty('color', '#FFFFFF', 'important');
+                item.style.setProperty('color', currentThemeColor, 'important');
                 const spans = item.querySelectorAll('span');
-                spans.forEach(span => span.style.setProperty('color', '#FFFFFF', 'important'));
+                spans.forEach(span => span.style.setProperty('color', currentThemeColor, 'important'));
             });
             
             // Also try to find and style any generated legend elements
             const allLegendTexts = canvas.parentElement.parentElement.querySelectorAll('ul li span, ul li');
             allLegendTexts.forEach(el => {
-                el.style.setProperty('color', '#FFFFFF', 'important');
+                el.style.setProperty('color', currentThemeColor, 'important');
             });
         }, 500);
         
@@ -554,20 +560,35 @@
     fill: #ffffff !important;
 }
 
-/* Target any list items in flex containers (Chart.js legend) */
-div[class*="flex"] > ul > li,
-div[class*="flex"] > ul > li *,
-.flex-col ul li,
-.flex-col ul li * {
+/* Target any list items in flex containers (Chart.js legend) - Dark mode only */
+[data-theme="dark"] div[class*="flex"] > ul > li,
+[data-theme="dark"] div[class*="flex"] > ul > li *,
+[data-theme="dark"] .flex-col ul li,
+[data-theme="dark"] .flex-col ul li * {
     color: #ffffff !important;
 }
 
-/* Global override for the chart container */
-#statusDistributionChart ~ ul,
-#statusDistributionChart ~ ul *,
-#statusDistributionChart ~ div ul,
-#statusDistributionChart ~ div ul * {
+/* Global override for the chart container - Dark mode only */
+[data-theme="dark"] #statusDistributionChart ~ ul,
+[data-theme="dark"] #statusDistributionChart ~ ul *,
+[data-theme="dark"] #statusDistributionChart ~ div ul,
+[data-theme="dark"] #statusDistributionChart ~ div ul * {
     color: #ffffff !important;
+}
+
+/* Light mode: use #2B3674 text color for chart legend */
+html:not([data-theme="dark"]) div[class*="flex"] > ul > li,
+html:not([data-theme="dark"]) div[class*="flex"] > ul > li *,
+html:not([data-theme="dark"]) .flex-col ul li,
+html:not([data-theme="dark"]) .flex-col ul li * {
+    color: #2B3674 !important;
+}
+
+html:not([data-theme="dark"]) #statusDistributionChart ~ ul,
+html:not([data-theme="dark"]) #statusDistributionChart ~ ul *,
+html:not([data-theme="dark"]) #statusDistributionChart ~ div ul,
+html:not([data-theme="dark"]) #statusDistributionChart ~ div ul * {
+    color: #2B3674 !important;
 }
 </style>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/partials/student/dashboard-page.blade.php ENDPATH**/ ?>
