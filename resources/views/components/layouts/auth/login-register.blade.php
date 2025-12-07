@@ -598,6 +598,21 @@
                     background: rgba(255, 255, 255); 
                 } 
             }
+
+            /* Footer visibility for auth pages */
+            .scms-footer {
+                position: fixed;
+                bottom: 12px;
+                left: 0;
+                width: 100%;
+                z-index: 60; /* above auth-content-wrapper (z-index:10) */
+                text-align: center;
+                pointer-events: auto;
+                background: transparent;
+            }
+            @media (max-width: 640px) {
+                .scms-footer { bottom: 8px; font-size: 0.85em; }
+            }
         </style>
     </head>
     <body class="min-h-screen antialiased auth-page">
@@ -644,7 +659,7 @@
                 try { localStorage.removeItem('scms_force_logout'); } catch (_) {}
                 try { document.cookie = 'scms_force_logout_pending=; Max-Age=0; path=/'; } catch (_) {}
             })();
-            
+
             // Force enable input interaction after page load and on bfcache restoration
             (function() {
                 function enableInputs() {
@@ -655,7 +670,7 @@
                         input.style.webkitUserSelect = 'text';
                         input.removeAttribute('disabled');
                         input.removeAttribute('readonly');
-                        
+
                         // Remove any overlay elements that might be blocking
                         const parent = input.parentElement;
                         if (parent) {
@@ -665,7 +680,7 @@
                         }
                     });
                 }
-                
+
                 // Run on DOMContentLoaded
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', function() {
@@ -674,7 +689,7 @@
                 } else {
                     setTimeout(enableInputs, 100);
                 }
-                
+
                 // CRITICAL: Also run on pageshow for bfcache navigation (back/forward)
                 window.addEventListener('pageshow', function(event) {
                     // event.persisted is true when page is restored from bfcache
@@ -682,5 +697,6 @@
                 });
             })();
         </script>
+        @include('partials.footer_partial')
     </body>
 </html>

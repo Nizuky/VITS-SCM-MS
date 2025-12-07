@@ -788,4 +788,23 @@
                 }
             })();
     </script>
-</html>
+    <style>
+      /* Ensure the footer is visible above the fixed welcome card */
+      .scms-footer {
+        position: fixed;
+        bottom: 12px;
+        left: 0;
+        width: 100%;
+        z-index: 60; /* above welcome-content-wrapper z-index:10 */
+        pointer-events: auto;
+        text-align: center;
+        background: transparent;
+        -webkit-backdrop-filter: none;
+      }
+      @media (max-width: 640px) {
+        .scms-footer { bottom: 8px; font-size: 0.85em; }
+      }
+    </style>
+    @include('partials.footer_partial')
+  </body>
+  </html>
