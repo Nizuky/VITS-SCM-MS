@@ -198,6 +198,14 @@
         #sidebar.collapsed #sidebar-logo-light,
         #sidebar.collapsed #sidebar-logo-dark { margin: 0 auto; }
 
+          /* When sidebar is collapsed on desktop, show only the sun/moon icons
+              and hide the checkbox input and label text to keep the UI compact. */
+          #sidebar.collapsed #theme-toggle { display: none !important; }
+          #sidebar.collapsed #theme-label { display: none !important; }
+          #sidebar.collapsed #theme-toggle-container { justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem; }
+        #sidebar.collapsed #theme-icon-sun,
+        #sidebar.collapsed #theme-icon-moon { margin: 0 auto; }
+
         /* Sidebar header - Light Mode */
         html:not([data-theme="dark"]) #sidebar-logo-light { display: block; }
         html:not([data-theme="dark"]) #sidebar-logo-dark { display: none; }
@@ -218,6 +226,14 @@
         html:not([data-theme="dark"]) #theme-label { color: #374151 !important; }
         html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
         html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
+
+        /* Theme toggle hover - match menu hover treatment; remove border/outline on hover */
+        #theme-toggle-container:hover { background-color: #F5F3FF !important; color: #6D28D9 !important; border-radius: 0.5rem; border: none !important; box-shadow: none !important; outline: none !important; }
+        #theme-toggle-container:hover svg { stroke: #6D28D9 !important; color: #6D28D9 !important; }
+
+        /* Dark theme: subtler pale hover and lighter icon tint; remove border/outline */
+        [data-theme="dark"] #theme-toggle-container:hover { background-color: rgba(167,139,250,0.08) !important; color: #A78BFA !important; border: none !important; box-shadow: none !important; outline: none !important; }
+        [data-theme="dark"] #theme-toggle-container:hover svg { stroke: #A78BFA !important; color: #A78BFA !important; }
 
         /* Mobile Header Bar */
         #mobile-header {
@@ -246,6 +262,19 @@
         html:not([data-theme="dark"]) #sidebar .menu-text { color: #374151 !important; }
         html:not([data-theme="dark"]) #sidebar .menu a { color: #374151 !important; }
         html:not([data-theme="dark"]) #sidebar .menu a:hover { background-color: #f3f4f6; }
+        /* Non-active menu hover: very light purple background, icons/text use primary purple for contrast */
+        #sidebar .menu a:hover, #sidebar ul.menu a:hover, #sidebar .menu button:hover {
+            background-color: #F5F3FF !important; /* almost white, pale purple */
+            color: #6D28D9 !important; /* primary purple */
+        }
+        #sidebar .menu a:hover .menu-text, #sidebar ul.menu a:hover .menu-text, #sidebar .menu button:hover .menu-text {
+            color: #6D28D9 !important;
+        }
+        #sidebar .menu a:hover svg, #sidebar ul.menu a:hover svg, #sidebar .menu button:hover svg {
+            stroke: #6D28D9 !important;
+        }
+        /* Smooth color transition for hover */
+        #sidebar .menu a, #sidebar .menu button { transition: background-color .18s ease, color .18s ease; }
         html:not([data-theme="dark"]) #sidebar .active-nav { background-color: #6D28D9; color: #fff !important; }
         html:not([data-theme="dark"]) #sidebar .active-nav .menu-text { color: #fff !important; }
         html:not([data-theme="dark"]) #sidebar svg { stroke: #374151; }
@@ -253,6 +282,19 @@
         html:not([data-theme="dark"]) #collapse-text { color: #374151 !important; }
         html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
         html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }
+
+        /* Hover state for active nav: very light purple background, switch text/icon to primary purple for contrast */
+        #sidebar .active-nav:hover, #sidebar a.active-nav:hover,
+        [data-theme="dark"] #sidebar .active-nav:hover, [data-theme="dark"] #sidebar a.active-nav:hover {
+            background-color: #F5F3FF !important;
+            color: #6D28D9 !important;
+        }
+        #sidebar .active-nav:hover .menu-text, #sidebar a.active-nav:hover .menu-text {
+            color: #6D28D9 !important;
+        }
+        #sidebar .active-nav:hover svg, #sidebar a.active-nav:hover svg {
+            stroke: #6D28D9 !important;
+        }
 
         /* Dark mode for Data Management section - comprehensive fixes */
         /* Card backgrounds */

@@ -497,6 +497,19 @@
         html:not([data-theme="dark"]) #sidebar .menu-text { color: #374151 !important; }
         html:not([data-theme="dark"]) #sidebar .menu a { color: #374151 !important; }
         html:not([data-theme="dark"]) #sidebar .menu a:hover { background-color: #f3f4f6; }
+        /* Hover state for non-active nav items: very light purple bg, icons/text use primary purple */
+        #sidebar .menu a:hover, #sidebar ul.menu a:hover, #sidebar .menu button:hover {
+            background-color: #F5F3FF !important; /* almost white */
+            color: #6D28D9 !important;
+        }
+        #sidebar .menu a:hover .menu-text, #sidebar ul.menu a:hover .menu-text, #sidebar .menu button:hover .menu-text {
+            color: #6D28D9 !important;
+        }
+        #sidebar .menu a:hover svg, #sidebar ul.menu a:hover svg, #sidebar .menu button:hover svg {
+            stroke: #6D28D9 !important;
+        }
+        /* Smooth color transition for hover */
+        #sidebar .menu a, #sidebar .menu button { transition: background-color .18s ease, color .18s ease; }
         html:not([data-theme="dark"]) #sidebar .active-nav { background-color: #6D28D9; color: #fff !important; }
         html:not([data-theme="dark"]) #sidebar .active-nav .menu-text { color: #fff !important; }
         html:not([data-theme="dark"]) #sidebar svg { stroke: #374151; }
@@ -506,6 +519,18 @@
         html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
         html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }
         
+        /* Hover state for active nav: very light purple bg, switch text/icon to primary purple for contrast */
+        #sidebar .active-nav:hover, #sidebar a.active-nav:hover,
+        [data-theme="dark"] #sidebar .active-nav:hover, [data-theme="dark"] #sidebar a.active-nav:hover {
+            background-color: #F5F3FF !important;
+            color: #6D28D9 !important;
+        }
+        #sidebar .active-nav:hover .menu-text, #sidebar a.active-nav:hover .menu-text {
+            color: #6D28D9 !important;
+        }
+        #sidebar .active-nav:hover svg, #sidebar a.active-nav:hover svg {
+            stroke: #6D28D9 !important;
+        }
         /* Notification dropdown light mode */
         html:not([data-theme="dark"]) .dropdown-content { background-color: #ffffff !important; border: 1px solid #e5e7eb; }
         html:not([data-theme="dark"]) .dropdown-content li { color: #374151 !important; background-color: #ffffff; }
@@ -596,6 +621,14 @@
         html:not([data-theme="dark"]) #theme-toggle-container { color: #374151 !important; }
         html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
         html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
+
+        /* Theme toggle hover - match menu hover treatment; remove border/outline on hover */
+        #theme-toggle-container:hover { background-color: #F5F3FF !important; color: #6D28D9 !important; border-radius: 0.5rem; border: none !important; box-shadow: none !important; outline: none !important; }
+        #theme-toggle-container:hover svg { stroke: #6D28D9 !important; color: #6D28D9 !important; }
+
+        /* Dark theme: subtler pale hover and lighter icon tint; remove border/outline */
+        [data-theme="dark"] #theme-toggle-container:hover { background-color: rgba(167,139,250,0.08) !important; color: #A78BFA !important; border: none !important; box-shadow: none !important; outline: none !important; }
+        [data-theme="dark"] #theme-toggle-container:hover svg { stroke: #A78BFA !important; color: #A78BFA !important; }
         
         /* FAQs/Accordion - Active/Open state: entire accordion gets purple background with white text */
         .collapse[open],
@@ -713,6 +746,14 @@
         [data-theme="dark"] .sidebar-title-main,
         [data-theme="dark"] .sidebar-title-sub { color: #ffffff !important; }
         [data-theme="dark"] #sidebar-header { border-color: #374151 !important; }
+        
+          /* When sidebar is collapsed on desktop, show only the sun/moon icons
+              and hide the checkbox input and label text to keep the UI compact. */
+          #sidebar.collapsed #theme-toggle { display: none !important; }
+          #sidebar.collapsed #theme-label { display: none !important; }
+          #sidebar.collapsed #theme-toggle-container { justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem; }
+        #sidebar.collapsed #theme-icon-sun,
+        #sidebar.collapsed #theme-icon-moon { margin: 0 auto; }
         /* Mobile Header - Dark Mode */
         [data-theme="dark"] #mobile-header { background-color: #1f2937 !important; border-color: #374151 !important; }
         [data-theme="dark"] #mobile-page-title { color: #a78bfa !important; }
@@ -1355,13 +1396,13 @@
             <!-- Main Navigation -->
             <ul id="menu-list" class="menu p-0 my-4 flex-grow transition-all duration-300">
                 <li>
-                    <a class="py-3 pl-2 transition-all duration-300" id="nav-dashboard" onclick="showPage('dashboard')">
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" id="nav-dashboard" onclick="showPage('dashboard')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a class="py-3 pl-2 transition-all duration-300" id="nav-record-status" onclick="showPage('record-status')">
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" id="nav-record-status" onclick="showPage('record-status')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <span class="menu-text">Record Status</span>
                     </a>
@@ -1371,7 +1412,7 @@
             <!-- Bottom Navigation -->
             <ul class="menu p-0 transition-all duration-300">
                 <li>
-                    <a class="py-3 pl-2 transition-all duration-300" id="nav-support" onclick="showPage('support')">
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" id="nav-support" onclick="showPage('support')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -1379,7 +1420,7 @@
                     </a>
                 </li>
                 <li>
-                    <a class="py-3 pl-2 transition-all duration-300" id="nav-faqs" onclick="showPage('faqs')">
+                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" id="nav-faqs" onclick="showPage('faqs')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>

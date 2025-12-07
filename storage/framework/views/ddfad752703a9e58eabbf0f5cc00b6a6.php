@@ -223,6 +223,14 @@ table{overflow:visible!important}
 #sidebar.collapsed #sidebar-logo-light,
 #sidebar.collapsed #sidebar-logo-dark { margin: 0 auto; }
 
+/* When sidebar is collapsed on desktop, show only the sun/moon icons
+    and hide the checkbox input and label text to keep the UI compact. */
+#sidebar.collapsed #theme-toggle { display: none !important; }
+#sidebar.collapsed #theme-label { display: none !important; }
+#sidebar.collapsed #theme-toggle-container { justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem; }
+#sidebar.collapsed #theme-icon-sun,
+#sidebar.collapsed #theme-icon-moon { margin: 0 auto; }
+
 /* Sidebar header - Light Mode */
 html:not([data-theme="dark"]) #sidebar-logo-light { display: block; }
 html:not([data-theme="dark"]) #sidebar-logo-dark { display: none; }
@@ -271,10 +279,54 @@ html:not([data-theme="dark"]) #sidebar p { color: #6b7280 !important; }
 html:not([data-theme="dark"]) #sidebar .menu-text { color: #374151 !important; }
 html:not([data-theme="dark"]) #sidebar .menu a { color: #374151 !important; }
 html:not([data-theme="dark"]) #sidebar .menu a:hover { background-color: #f3f4f6; }
+/* Hover state for non-active nav items: very light purple bg, icons/text use primary purple */
+#sidebar .menu a:hover, #sidebar ul.menu a:hover, #sidebar .menu button:hover {
+    background-color: #F5F3FF !important; /* almost white */
+    color: #6D28D9 !important;
+}
+#sidebar .menu a:hover .menu-text, #sidebar ul.menu a:hover .menu-text, #sidebar .menu button:hover .menu-text {
+    color: #6D28D9 !important;
+}
+#sidebar .menu a:hover svg, #sidebar ul.menu a:hover svg, #sidebar .menu button:hover svg {
+    stroke: #6D28D9 !important;
+}
+/* Smooth color transition for hover */
+#sidebar .menu a, #sidebar .menu button { transition: background-color .18s ease, color .18s ease; }
 html:not([data-theme="dark"]) #sidebar .active-nav { background-color: #6D28D9; color: #fff !important; }
 html:not([data-theme="dark"]) #sidebar .active-nav .menu-text { color: #fff !important; }
 html:not([data-theme="dark"]) #sidebar svg { stroke: #374151; }
 html:not([data-theme="dark"]) #sidebar .active-nav svg { stroke: #fff; }
+#sidebar .active-nav, #sidebar a.active-nav {
+    background-color: #6D28D9 !important;
+    color: #ffffff !important;
+    border-radius: 0.5rem !important;
+}
+#sidebar .active-nav .menu-text, #sidebar a.active-nav .menu-text {
+    color: #ffffff !important;
+}
+#sidebar .active-nav svg, #sidebar a.active-nav svg {
+    stroke: #ffffff !important;
+}
+/* Dark theme: ensure active nav still appears prominent */
+[data-theme="dark"] #sidebar .active-nav, [data-theme="dark"] #sidebar a.active-nav {
+    background-color: #6D28D9 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] #sidebar .active-nav .menu-text, [data-theme="dark"] #sidebar a.active-nav .menu-text {
+    color: #ffffff !important;
+}
+/* Hover state for active nav: very light purple bg, switch text/icon to primary purple for contrast */
+#sidebar .active-nav:hover, #sidebar a.active-nav:hover,
+[data-theme="dark"] #sidebar .active-nav:hover, [data-theme="dark"] #sidebar a.active-nav:hover {
+    background-color: #F5F3FF !important;
+    color: #6D28D9 !important;
+}
+#sidebar .active-nav:hover .menu-text, #sidebar a.active-nav:hover .menu-text {
+    color: #6D28D9 !important;
+}
+#sidebar .active-nav:hover svg, #sidebar a.active-nav:hover svg {
+    stroke: #6D28D9 !important;
+}
 html:not([data-theme="dark"]) #collapse-text { color: #374151 !important; }
 html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
 html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }
@@ -477,7 +529,7 @@ body {
     #sidebar.collapsed #menu-list a,
     #sidebar.collapsed ul.menu a,
     #sidebar.collapsed ul.menu button {
-        justify-content: flex-start;
+        justify-content: center;
         padding: 0.75rem 0.5rem;
     }
     /* Show sidebar header text on mobile even when collapsed */
@@ -646,7 +698,7 @@ body {
                     </a>
                 </li>
                 <li>
-                    <a class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" 
+                    <a class="py-3 pl-2 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300" 
                        id="nav-settings" 
                        onclick="showPage('settings')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
