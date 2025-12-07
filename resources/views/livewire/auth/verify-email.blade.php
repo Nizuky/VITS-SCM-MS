@@ -37,7 +37,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function rendering(View $view): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+            // Use navigate: false to force full page reload for proper dashboard styling
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
 
             return;
         }

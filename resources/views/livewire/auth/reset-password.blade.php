@@ -102,7 +102,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         // Clean up any cached intended password for this token
         try { Cache::forget('profile:new_password:'.$this->token); } catch (\Throwable $e) { /* ignore */ }
         if ($redirect === 'profile') {
-            $this->redirect(route('dashboard', absolute: false).'#profile', navigate: true);
+            // Use navigate: false to force full page reload for proper dashboard styling
+            $this->redirect(route('dashboard', absolute: false).'#profile', navigate: false);
             return;
         }
 

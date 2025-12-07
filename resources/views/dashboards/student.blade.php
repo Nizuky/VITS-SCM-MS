@@ -9,16 +9,64 @@
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
         <style>
-            /* Force dark background immediately to prevent white flash */
+            /* CRITICAL: Reset auth layout artifacts and force dashboard styles IMMEDIATELY */
+            /* This must be first to prevent styling flash after login */
             html, body {
                 background-color: #0b0f19 !important;
+                background-image: none !important;
                 color: #fff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow-x: hidden !important;
+                /* Reset auth layout positioning */
+                position: static !important;
+            }
+            /* Remove any auth layout fixed/centered wrapper artifacts */
+            .auth-content-wrapper,
+            .welcome-content-wrapper,
+            #site-header {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            /* Reset body classes that auth layout might have set */
+            body.auth-page,
+            body.welcome-page {
+                background-image: url('{{ asset("storage/vits_bg_black.png") }}') !important;
+                background-color: #0b0f19 !important;
+                padding-top: 0 !important;
+            }
+            /* Ensure dashboard content is visible immediately */
+            body {
+                visibility: visible !important;
+                opacity: 1 !important;
             }
         </style>
         <script>
-            // Force dark theme only for students - set IMMEDIATELY
-            document.documentElement.setAttribute('data-theme', 'dark');
-            try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_){}
+            // CRITICAL: Clean up auth layout artifacts IMMEDIATELY on page load
+            // This prevents the styling flash after login redirect
+            (function() {
+                // Force dark theme only for students
+                document.documentElement.setAttribute('data-theme', 'dark');
+                try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_){}
+                
+                // Remove auth layout classes from body
+                document.body.classList.remove('auth-page', 'welcome-page');
+                
+                // Remove any auth layout fixed elements that might have persisted
+                var authElements = document.querySelectorAll('.auth-content-wrapper, .welcome-content-wrapper, #site-header');
+                authElements.forEach(function(el) {
+                    if (el && el.parentNode) {
+                        el.parentNode.removeChild(el);
+                    }
+                });
+                
+                // Remove any inline styles that auth layout might have set on body
+                document.body.style.removeProperty('padding-top');
+                document.body.style.removeProperty('background-image');
+                
+                // Force correct background
+                document.body.style.backgroundColor = '#0b0f19';
+            })();
         </script>
         <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
         <script>
@@ -104,6 +152,19 @@
         /* Collapsible sidebar styles */
         #sidebar {
             transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
+            /* Fixed positioning to stay in place while scrolling */
+            position: fixed !important;
+            top: 1rem;
+            left: 1rem;
+            height: calc(100vh - 2rem);
+            z-index: 100;
+        }
+        
+        /* Main content needs margin to account for fixed sidebar - DESKTOP ONLY */
+        @media (min-width: 769px) {
+            #page-container {
+                margin-left: 216px; /* 200px sidebar + 16px gap */
+            }
         }
 
         .menu-text,
@@ -118,6 +179,14 @@
             width: 80px !important;
             min-width: 80px !important;
             max-width: 80px !important;
+        }
+        
+        /* Adjust main content margin when sidebar is collapsed - DESKTOP ONLY */
+        @media (min-width: 769px) {
+            #sidebar.collapsed ~ #page-container,
+            body:has(#sidebar.collapsed) #page-container {
+                margin-left: 96px !important; /* 80px sidebar + 16px gap */
+            }
         }
 
         #sidebar.collapsed .menu-text,
@@ -295,6 +364,12 @@
                 padding-top: 4.5rem;
                 padding-left: 1rem;
                 padding-right: 1rem;
+            }
+            
+            /* Ensure no margin on mobile - sidebar is overlay */
+            #page-container {
+                margin-left: 0 !important;
+                width: 100% !important;
             }
 
             /* Make page title smaller on mobile */
@@ -913,7 +988,7 @@
 
     <div class="flex gap-4 min-h-screen p-4"> 
         <!-- Sidebar -->
-        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm sticky top-0 self-start h-screen overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
+        <aside id="sidebar" class="flex flex-col bg-white rounded-2xl p-4 shadow-sm overflow-hidden transition-all duration-300" style="width: 200px; min-width: 200px; max-width: 200px;">
             <!-- Mobile Close Button -->
             <button id="mobile-close-btn" class="md:hidden absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10" aria-label="Close menu">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -3843,16 +3918,27 @@
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot, { once: true }); }
         else { boot(); }
         
-        // Listen for Livewire navigation to ensure theme is applied after login
+        // Listen for Livewire navigation to ensure theme and layout are correct after login
         document.addEventListener('livewire:navigated', function() {
             try {
-                // Reapply theme immediately after Livewire navigation
-                var saved = localStorage.getItem('scms_theme');
-                if (saved === 'dark' || saved === 'light') {
-                    document.documentElement.setAttribute('data-theme', saved);
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                }
+                // CRITICAL: Clean up auth layout artifacts after Livewire navigation
+                document.body.classList.remove('auth-page', 'welcome-page');
+                
+                // Remove any auth layout elements that might have persisted
+                var authElements = document.querySelectorAll('.auth-content-wrapper, .welcome-content-wrapper, #site-header');
+                authElements.forEach(function(el) {
+                    if (el && el.parentNode) {
+                        el.parentNode.removeChild(el);
+                    }
+                });
+                
+                // Reset body inline styles from auth layout
+                document.body.style.removeProperty('padding-top');
+                
+                // For student dashboard, ALWAYS force dark theme
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('scms_student_theme', 'dark');
+                
                 // Reinitialize theme toggle if needed
                 initThemeToggle();
             } catch(_) {}
@@ -4691,6 +4777,11 @@
             if (savedState === 'true' && !isMobile()) {
                 sidebar.classList.add('collapsed');
                 collapseText.textContent = 'Show';
+                // Set initial margin for collapsed state (desktop only)
+                const pageContainer = document.getElementById('page-container');
+                if (pageContainer && !isMobile()) {
+                    pageContainer.style.marginLeft = '96px';
+                }
             }
             
             // Toggle collapse on button click (desktop)
@@ -4700,6 +4791,12 @@
                 sidebar.classList.toggle('collapsed');
                 const isCollapsed = sidebar.classList.contains('collapsed');
                 collapseText.textContent = isCollapsed ? 'Show' : 'Hide';
+                
+                // Update main content margin (desktop only)
+                const pageContainer = document.getElementById('page-container');
+                if (pageContainer && !isMobile()) {
+                    pageContainer.style.marginLeft = isCollapsed ? '96px' : '216px';
+                }
                 
                 // Save state to localStorage
                 localStorage.setItem('scms_student_sidebar_collapsed', isCollapsed);
@@ -4749,6 +4846,7 @@
             
             // Handle window resize
             window.addEventListener('resize', function() {
+                const pageContainer = document.getElementById('page-container');
                 if (!isMobile()) {
                     // Switching to desktop: close mobile sidebar and restore collapse state
                     closeMobileSidebar();
@@ -4756,7 +4854,13 @@
                     if (savedState === 'true') {
                         sidebar.classList.add('collapsed');
                         collapseText.textContent = 'Show';
+                        if (pageContainer) pageContainer.style.marginLeft = '96px';
+                    } else {
+                        if (pageContainer) pageContainer.style.marginLeft = '216px';
                     }
+                } else {
+                    // Switching to mobile: remove margin
+                    if (pageContainer) pageContainer.style.marginLeft = '';
                 }
             });
         })();

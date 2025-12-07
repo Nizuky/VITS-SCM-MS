@@ -112,7 +112,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         RateLimiter::clear($this->throttleKey());
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // Use navigate: false to force full page reload instead of SPA navigation
+        // This ensures the dashboard CSS loads fresh without auth layout artifacts
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
     }
 
     /**
