@@ -1730,7 +1730,6 @@
 
     <!-- DaisyUI toast root (bottom-right) -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
-
     <script>
     // --- Toast helper using DaisyUI ---
     function showToast(message, type = 'info') {
@@ -5763,5 +5762,6 @@
             </div>
         </form>
     </dialog>
+<?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>
 </html>

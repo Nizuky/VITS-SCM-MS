@@ -3832,5 +3832,6 @@
             }
         })();
     </script>
+    <?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>
 </html>
