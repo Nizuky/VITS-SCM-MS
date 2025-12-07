@@ -252,6 +252,21 @@ html:not([data-theme="dark"]) #theme-label { color: #374151 !important; }
 html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
 html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
 
+/* Prevent heavy dark tap/active highlight on long-press in light mode for notifications/dropdowns */
+html:not([data-theme="dark"]) .dropdown-content li,
+html:not([data-theme="dark"]) .dropdown-content li a,
+html:not([data-theme="dark"]) .dropdown-content .notification-message,
+html:not([data-theme="dark"]) .dropdown-content .notification-title {
+    -webkit-tap-highlight-color: transparent !important;
+    tap-highlight-color: transparent !important;
+}
+html:not([data-theme="dark"]) .dropdown-content li:active,
+html:not([data-theme="dark"]) .dropdown-content li a:active {
+    background-color: #f3f4f6 !important;
+    color: inherit !important;
+    box-shadow: none !important;
+}
+
 /* Mobile Header Bar */
 #mobile-header {
     display: none;
@@ -327,6 +342,14 @@ html:not([data-theme="dark"]) #sidebar .active-nav svg { stroke: #fff; }
 #sidebar .active-nav:hover svg, #sidebar a.active-nav:hover svg {
     stroke: #6D28D9 !important;
 }
+
+        /* Theme toggle hover - match menu hover treatment; remove border/outline on hover */
+        #theme-toggle-container:hover { background-color: #F5F3FF !important; color: #6D28D9 !important; border-radius: 0.5rem; border: none !important; box-shadow: none !important; outline: none !important; }
+        #theme-toggle-container:hover svg { stroke: #6D28D9 !important; color: #6D28D9 !important; }
+
+        /* Dark theme: subtler pale hover and lighter icon tint; remove border/outline */
+        [data-theme="dark"] #theme-toggle-container:hover { background-color: rgba(167,139,250,0.08) !important; color: #A78BFA !important; border: none !important; box-shadow: none !important; outline: none !important; }
+        [data-theme="dark"] #theme-toggle-container:hover svg { stroke: #A78BFA !important; color: #A78BFA !important; }
 html:not([data-theme="dark"]) #collapse-text { color: #374151 !important; }
 html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
 html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }

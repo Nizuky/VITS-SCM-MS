@@ -435,6 +435,59 @@
             }
         }
 
+        /* Small-screen dropdown adjustments (Edge mobile view/emulation) */
+        @media (max-width: 640px) {
+            /* If desktop dropdown is visible for any reason, constrain and anchor it to viewport */
+            #notification-dropdown-container .dropdown-content {
+                position: absolute !important;
+                right: 8px !important;
+                left: auto !important;
+                width: auto !important;
+                max-width: calc(100vw - 16px) !important;
+                margin-top: 6px !important;
+                box-sizing: border-box !important;
+                border-radius: 0.5rem !important;
+                overflow: hidden !important;
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+            }
+            /* Make the sticky headers inside the dropdown behave against viewport */
+            #notification-dropdown-container .dropdown-content li.sticky.top-0,
+            #notification-dropdown-container .dropdown-content li.sticky {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 20 !important;
+                background: inherit !important;
+            }
+            /* Ensure the See All button stretches full width */
+            #notification-dropdown-container .dropdown-content li.border-t a {
+                display: block !important;
+                width: 100% !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+        }
+
+        /* Make the mobile dropdown behave like a mobile sheet / panel */
+        @media (max-width: 640px) {
+            #mobile-notification-dropdown .dropdown-content {
+                position: fixed !important;
+                left: 8px !important;
+                right: 8px !important;
+                top: 64px !important; /* below mobile header */
+                width: auto !important;
+                max-width: calc(100vw - 16px) !important;
+                border-radius: 0.75rem !important;
+                max-height: calc(100vh - 96px) !important;
+                overflow-y: auto !important;
+                z-index: 1200 !important;
+            }
+            /* ensure desktop dropdown is hidden on very small screens */
+            #notification-dropdown-container {
+                display: none !important;
+            }
+        }
+
         /* Hide mobile close button on desktop */
         @media (min-width: 769px) {
             #mobile-close-btn {
@@ -823,6 +876,99 @@
         [data-theme="dark"] .dropdown-content .notification-time { color: #9ca3af !important; }
         [data-theme="dark"] .dropdown-content .border-gray-200 { border-color: #374151 !important; }
         [data-theme="dark"] .dropdown-content .text-primary-purple { color: #a78bfa !important; }
+
+        /* Make unread highlight (bg-purple-50) darker in dark mode so text remains readable */
+        [data-theme="dark"] .modal-box .bg-purple-50,
+        [data-theme="dark"] .modal-box li.bg-purple-50,
+        [data-theme="dark"] .dropdown-content .bg-purple-50,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50,
+        [data-theme="dark"] #all_notifications_modal li.bg-purple-50,
+        [data-theme="dark"] #all_notifications_modal .bg-purple-50,
+        [data-theme="dark"] #notifications-scroll .bg-purple-50,
+        [data-theme="dark"] #notifications-list .bg-purple-50 {
+            background-color: rgba(109,40,217,0.22) !important; /* stronger dark purple */
+            border-color: rgba(109,40,217,0.28) !important;
+        }
+        [data-theme="dark"] .modal-box .bg-purple-50 .notification-title,
+        [data-theme="dark"] .modal-box li.bg-purple-50 .notification-title,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50 .notification-title,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50 .notification-message,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50 .notification-time,
+        [data-theme="dark"] #all_notifications_modal li.bg-purple-50 .notification-title,
+        [data-theme="dark"] #all_notifications_modal li.bg-purple-50 .notification-message,
+        [data-theme="dark"] #all_notifications_modal li.bg-purple-50 .notification-time,
+        [data-theme="dark"] #notifications-scroll .bg-purple-50 .notification-title,
+        [data-theme="dark"] #notifications-scroll .bg-purple-50 .notification-message,
+        [data-theme="dark"] #notifications-scroll .bg-purple-50 .notification-time {
+            color: #ffffff !important;
+            opacity: 1 !important;
+        }
+
+        /* Stronger override for the inline rejection reason box (bg-red-100) in dark mode */
+        [data-theme="dark"] .reason-content,
+        [data-theme="dark"] .reason-content * {
+            background-color: rgba(185,28,28,0.12) !important; /* subtle dark red */
+            border-color: rgba(185,28,28,0.22) !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .reason-content p { color: #ffffff !important; }
+        /* Force notification row hover to primary purple in dark mode and ensure text is white */
+        [data-theme="dark"] .dropdown-content li:hover,
+        [data-theme="dark"] .dropdown-content li a:hover,
+        [data-theme="dark"] #all_notifications_modal li:hover,
+        [data-theme="dark"] #all_notifications_modal li a:hover,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50:hover,
+        [data-theme="dark"] #notifications-scroll .bg-purple-50:hover {
+            background-color: #6D28D9 !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .dropdown-content li:hover .notification-title,
+        [data-theme="dark"] .dropdown-content li:hover .notification-message,
+        [data-theme="dark"] .dropdown-content li:hover .notification-time,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-title,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-message,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-time,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50:hover .notification-title,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50:hover .notification-message,
+        [data-theme="dark"] .dropdown-content li.bg-purple-50:hover .notification-time {
+            color: #ffffff !important;
+        }
+        /* Also target common inner clickable containers (buttons/divs) used in notification items */
+        [data-theme="dark"] .dropdown-content li button:hover,
+        [data-theme="dark"] .dropdown-content li button:hover *,
+        [data-theme="dark"] .dropdown-content li div[role="button"]:hover,
+        [data-theme="dark"] .dropdown-content li div[role="button"]:hover *,
+        [data-theme="dark"] .dropdown-content li .flex.items-start:hover,
+        [data-theme="dark"] .dropdown-content li .flex.items-start:hover *,
+        [data-theme="dark"] #notifications-scroll div[role="button"]:hover,
+        [data-theme="dark"] #notifications-scroll div[role="button"]:hover *,
+        [data-theme="dark"] .modal-box li div[role="button"]:hover,
+        [data-theme="dark"] .modal-box li div[role="button"]:hover * {
+            background-color: #6D28D9 !important;
+            color: #ffffff !important;
+        }
+        /* If child element has its own bg utility, override it when parent is hovered */
+        [data-theme="dark"] .dropdown-content li:hover .bg-purple-50,
+        [data-theme="dark"] .dropdown-content li:hover .bg-red-100,
+        [data-theme="dark"] .modal-box li:hover .bg-purple-50,
+        [data-theme="dark"] .modal-box li:hover .bg-red-100 {
+            background-color: transparent !important;
+        }
+        /* Aggressive fallback: override any Tailwind 'bg-*' utility inside notification containers */
+        [data-theme="dark"] .dropdown-content [class*="bg-"] {
+            background-image: none !important;
+        }
+        [data-theme="dark"] .dropdown-content [class*="bg-purple"] {
+            background-color: rgba(109,40,217,0.22) !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .dropdown-content [class*="bg-red"] {
+            background-color: rgba(185,28,28,0.12) !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .modal-box [class*="bg-"] { background-image: none !important; }
+        [data-theme="dark"] .modal-box [class*="bg-purple"] { background-color: rgba(109,40,217,0.22) !important; color:#fff !important; }
+        [data-theme="dark"] .modal-box [class*="bg-red"] { background-color: rgba(185,28,28,0.12) !important; color:#fff !important; }
         /* Improve hover contrast for notifications in dark mode: make text clearly visible */
         [data-theme="dark"] .dropdown-content li:hover,
         [data-theme="dark"] .dropdown-content li a:hover,
@@ -1546,23 +1692,24 @@
                             <span id="notif-dot" class="indicator-item scms-notif-dot hidden" aria-hidden="true"></span>
                         </div>
                     </div>
-                    <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden max-h-[500px] overflow-y-auto">
-                        
-                        <li class="p-4 font-bold text-gray-700 border-b sticky top-0 bg-base-100 z-10">Notifications</li>
+                    <div tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden">
+                        <div class="p-4 font-bold text-gray-700 border-b bg-base-100">Notifications</div>
 
-                        <div id="notifications-list">
-                            <!-- Notifications will be loaded here dynamically -->
-                            <li>
-                                <div class="flex items-center justify-center p-8">
-                                    <span class="loading loading-spinner loading-md text-primary-purple"></span>
+                        <div id="notifications-scroll" class="max-h-[420px] overflow-y-auto">
+                            <div id="notifications-list">
+                                <!-- Notifications will be loaded here dynamically -->
+                                <div>
+                                    <div class="flex items-center justify-center p-8">
+                                        <span class="loading loading-spinner loading-md text-primary-purple"></span>
+                                    </div>
                                 </div>
-                            </li>
+                            </div>
                         </div>
-                        
-                        <li class="border-t border-gray-100 sticky bottom-0 bg-base-100">
-                            <a class="text-center text-sm py-2 hover:bg-gray-100" id="see-all-notifications">See All Notifications</a>
-                        </li>
-                    </ul>
+
+                        <div class="border-t border-gray-100 bg-base-100">
+                            <a class="text-center text-sm block py-2 hover:bg-gray-100" id="see-all-notifications">See All Notifications</a>
+                        </div>
+                    </div>
                 </div>
             </div>
            
@@ -3080,6 +3227,32 @@
                     }
                 } catch (err) {
                     console.error('Delegated view-reason handler error', err);
+                }
+            }, { passive: false });
+
+            // Ensure notification icon opens mobile dropdown on small screens
+            document.addEventListener('click', function(e) {
+                try {
+                    const notifBtn = e.target.closest('[aria-label="Notifications"]');
+                    if (!notifBtn) return;
+                    if (window.innerWidth <= 640) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const mobileDropdown = document.getElementById('mobile-notification-dropdown');
+                        const desktopDropdown = document.getElementById('notification-dropdown-container');
+                        if (desktopDropdown) desktopDropdown.classList.remove('dropdown-open');
+                        if (mobileDropdown) {
+                            mobileDropdown.classList.toggle('dropdown-open');
+                            // ensure mobile notifications list is populated (updateNotificationDropdown handles both lists)
+                            const mobileList = document.getElementById('mobile-notifications-list');
+                            if (mobileList && mobileList.children.length === 0) {
+                                // trigger reload
+                                if (typeof loadRecentNotifications === 'function') loadRecentNotifications();
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Mobile notification open handler error', err);
                 }
             }, { passive: false });
             
