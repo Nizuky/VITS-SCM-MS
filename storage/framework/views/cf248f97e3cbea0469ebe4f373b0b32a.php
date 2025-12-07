@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +8,41 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Student Contract Management System</title>
+        <script>
+            // CRITICAL: Apply saved theme IMMEDIATELY before any rendering
+            (function() {
+                try {
+                    var savedTheme = localStorage.getItem('scms_student_theme');
+                    // Default to light if no saved preference
+                    if (savedTheme !== 'dark' && savedTheme !== 'light') {
+                        savedTheme = 'light';
+                        localStorage.setItem('scms_student_theme', 'light');
+                    }
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } catch(e) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            })();
+        </script>
         <style>
             /* CRITICAL: Reset auth layout artifacts and force dashboard styles IMMEDIATELY */
             /* This must be first to prevent styling flash after login */
             html, body {
-                background-color: #0b0f19 !important;
-                background-image: none !important;
-                color: #fff !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow-x: hidden !important;
                 /* Reset auth layout positioning */
                 position: static !important;
+            }
+            /* Theme-specific backgrounds applied via data-theme */
+            :root:not([data-theme="dark"]) body,
+            html:not([data-theme="dark"]) body {
+                background-color: #EDF1FA !important;
+                color: #2B3674 !important;
+            }
+            [data-theme="dark"] body {
+                background-color: #0b0f19 !important;
+                color: #fff !important;
             }
             /* Remove any auth layout fixed/centered wrapper artifacts */
             .auth-content-wrapper,
@@ -31,8 +54,6 @@
             /* Reset body classes that auth layout might have set */
             body.auth-page,
             body.welcome-page {
-                background-image: url('<?php echo e(asset("storage/vits_bg_black.png")); ?>') !important;
-                background-color: #0b0f19 !important;
                 padding-top: 0 !important;
             }
             /* Ensure dashboard content is visible immediately */
@@ -45,12 +66,10 @@
             // CRITICAL: Clean up auth layout artifacts IMMEDIATELY on page load
             // This prevents the styling flash after login redirect
             (function() {
-                // Force dark theme only for students
-                document.documentElement.setAttribute('data-theme', 'dark');
-                try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_){}
-                
                 // Remove auth layout classes from body
-                document.body.classList.remove('auth-page', 'welcome-page');
+                if (document.body) {
+                    document.body.classList.remove('auth-page', 'welcome-page');
+                }
                 
                 // Remove any auth layout fixed elements that might have persisted
                 var authElements = document.querySelectorAll('.auth-content-wrapper, .welcome-content-wrapper, #site-header');
@@ -61,11 +80,10 @@
                 });
                 
                 // Remove any inline styles that auth layout might have set on body
-                document.body.style.removeProperty('padding-top');
-                document.body.style.removeProperty('background-image');
-                
-                // Force correct background
-                document.body.style.backgroundColor = '#0b0f19';
+                if (document.body) {
+                    document.body.style.removeProperty('padding-top');
+                    document.body.style.removeProperty('background-image');
+                }
             })();
         </script>
         <!-- Configure Tailwind BEFORE loading the CDN to avoid incorrect initial render -->
@@ -418,19 +436,97 @@
         .scms-badge--rejected { background-color: #FFD7DB !important; color: #CC525D !important; }
         /* Optional utility for static-looking inputs */
         .static-input { border: none !important; box-shadow: none !important; padding-left: 0 !important; background-color: transparent !important; cursor: default !important; }
-        /* Page background image - dark theme only for students */
+        
+        /* Page background - LIGHT MODE (default) */
         .bg-custom {
-            background-color: #0b0f19;
-            background-image: url('<?php echo e(asset("storage/vits_bg_black.png")); ?>');
+            background-color: #EDF1FA;
+            background-image: url('<?php echo e(asset("storage/vits_bg_white.png")); ?>');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
-        /* Force dark backgrounds on all white elements immediately */
-        .bg-white { background-color: #1f2937 !important; }
-        .bg-gray-100 { background-color: #374151 !important; }
-        .bg-base-100 { background-color: #111827 !important; }
+        /* Light mode element colors - base backgrounds only */
+        .bg-base-100 { background-color: #ffffff; }
+        
+        /* ========== LIGHT MODE SPECIFIC STYLES ========== */
+        /* Sidebar text colors for light mode */
+        html:not([data-theme="dark"]) #sidebar { background-color: #ffffff; }
+        html:not([data-theme="dark"]) #sidebar h2 { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) #sidebar p { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu-text { color: #374151 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu a { color: #374151 !important; }
+        html:not([data-theme="dark"]) #sidebar .menu a:hover { background-color: #f3f4f6; }
+        html:not([data-theme="dark"]) #sidebar .active-nav { background-color: #6D28D9; color: #fff !important; }
+        html:not([data-theme="dark"]) #sidebar .active-nav .menu-text { color: #fff !important; }
+        html:not([data-theme="dark"]) #sidebar svg { stroke: #374151; }
+        html:not([data-theme="dark"]) #sidebar .active-nav svg { stroke: #fff; }
+        html:not([data-theme="dark"]) #theme-label { color: #374151 !important; }
+        html:not([data-theme="dark"]) #collapse-text { color: #374151 !important; }
+        html:not([data-theme="dark"]) #collapse-btn { color: #374151 !important; }
+        html:not([data-theme="dark"]) #collapse-btn svg { stroke: #374151 !important; }
+        
+        /* Notification dropdown light mode */
+        html:not([data-theme="dark"]) .dropdown-content { background-color: #ffffff !important; border: 1px solid #e5e7eb; }
+        html:not([data-theme="dark"]) .dropdown-content li { color: #374151 !important; }
+        html:not([data-theme="dark"]) .dropdown-content p { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) .dropdown-content span { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .font-bold { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .font-semibold { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-gray-900 { color: #111827 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-sm { color: #374151 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-xs { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) .dropdown-content a { color: #374151 !important; }
+        html:not([data-theme="dark"]) .dropdown-content a:hover { background-color: #f3f4f6 !important; }
+        html:not([data-theme="dark"]) .dropdown-content svg { stroke: currentColor; }
+        html:not([data-theme="dark"]) .dropdown-content .text-blue-500 svg,
+        html:not([data-theme="dark"]) .dropdown-content .text-blue-500 { color: #3b82f6 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-green-500 svg,
+        html:not([data-theme="dark"]) .dropdown-content .text-green-500 { color: #22c55e !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-red-500 svg,
+        html:not([data-theme="dark"]) .dropdown-content .text-red-500 { color: #ef4444 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-orange-500 svg,
+        html:not([data-theme="dark"]) .dropdown-content .text-orange-500 { color: #f97316 !important; }
+        html:not([data-theme="dark"]) .dropdown-content .text-primary-purple { color: #6D28D9 !important; }
+        
+        /* Summary cards status text light mode */
+        html:not([data-theme="dark"]) .bg-gradient-approved .text-green-800 { color: #166534 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-verified .text-teal-800 { color: #115e59 !important; }
+        html:not([data-theme="dark"]) .bg-gradient-pending .text-yellow-800 { color: #854d0e !important; }
+        html:not([data-theme="dark"]) .bg-gradient-rejected .text-red-800 { color: #991b1b !important; }
+        html:not([data-theme="dark"]) .text-text-header { color: #2B3674 !important; }
+        html:not([data-theme="dark"]) .text-text-muted { color: #707EAE !important; }
+        
+        /* Modal backgrounds light mode */
+        html:not([data-theme="dark"]) .modal-box { background-color: #ffffff !important; }
+        html:not([data-theme="dark"]) .modal-box h3 { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .modal-box p { color: #374151 !important; }
+        html:not([data-theme="dark"]) .modal-box span { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) .modal-box li { color: #374151 !important; }
+        html:not([data-theme="dark"]) .modal-box .font-bold { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) .modal-box .font-semibold { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .modal-box { background-color: #ffffff !important; border: 1px solid #e5e7eb; }
+        html:not([data-theme="dark"]) #deactivation_details_modal h3 { color: #ea580c !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal h4 { color: #ca8a04 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal h5 { color: #374151 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal p { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal span { color: #374151 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .bg-yellow-900\/20 { background-color: #fef3c7 !important; border-color: #fbbf24 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .bg-gray-700\/50 { background-color: #f3f4f6 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-gray-200 { color: #374151 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-gray-300 { color: #4b5563 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-gray-400 { color: #6b7280 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-white { color: #1f2937 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-red-400 { color: #dc2626 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-orange-400 { color: #ea580c !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-yellow-400 { color: #ca8a04 !important; }
+        html:not([data-theme="dark"]) #deactivation_details_modal .text-yellow-500 { color: #eab308 !important; }
+        
+        /* Main content area light mode */
+        html:not([data-theme="dark"]) .bg-white { background-color: #ffffff !important; }
+        html:not([data-theme="dark"]) #page-container h4 { color: #6D28D9 !important; }
+        /* ========== END LIGHT MODE STYLES ========== */
+        
         .bg-gradient-primary-purple { background-image: linear-gradient(to bottom, #bbacffff, #6D28D9); }
         /* Gradients for summary cards */
         .bg-gradient-approved { background-image: linear-gradient(to bottom, #DCFCE7, #81FFAC); }
@@ -451,6 +547,23 @@
         /* Notification bell dot: force consistent color and visibility */
         .scms-notif-dot { width: 0.5rem; height: 0.5rem; background-color: #6D28D9 !important; border-radius: 9999px; box-sizing: content-box; }
         [data-theme="dark"] .scms-notif-dot { border: 2px solid #ffffff !important; }
+        
+        /* Notification dropdown dark mode styles */
+        [data-theme="dark"] .dropdown-content { background-color: #1f2937 !important; }
+        [data-theme="dark"] .dropdown-content li { color: #fff; }
+        [data-theme="dark"] .dropdown-content p,
+        [data-theme="dark"] .dropdown-content span { color: #d1d5db !important; }
+        [data-theme="dark"] .dropdown-content .text-gray-900,
+        [data-theme="dark"] .dropdown-content .font-semibold { color: #fff !important; }
+        [data-theme="dark"] .dropdown-content .text-gray-500,
+        [data-theme="dark"] .dropdown-content .text-gray-600 { color: #9ca3af !important; }
+        [data-theme="dark"] .dropdown-content .border-b,
+        [data-theme="dark"] .dropdown-content .border-t { border-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content .hover\:bg-purple-100:hover { background-color: rgba(109, 40, 217, 0.2) !important; }
+        [data-theme="dark"] .dropdown-content .hover\:bg-gray-100:hover { background-color: #374151 !important; }
+        [data-theme="dark"] .dropdown-content .bg-purple-50 { background-color: rgba(109, 40, 217, 0.1) !important; }
+        [data-theme="dark"] .dropdown-content .bg-red-100 { background-color: rgba(220, 38, 38, 0.2) !important; }
+        [data-theme="dark"] .dropdown-content .border-red-300 { border-color: #dc2626 !important; }
     </style>
     <style>
         /* Toast root tweaks: allow individual toasts to receive pointer events */
@@ -473,16 +586,21 @@
     <style>
         /* Dark theme styling - copied from admin.blade.php */
         [data-theme="dark"] body{color:#fff}
-        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
-        /* Only apply white to p/span/label if they don't have specific color classes */
-        [data-theme="dark"] p:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]),[data-theme="dark"] span:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]),[data-theme="dark"] label:not([class*="text-green"]):not([class*="text-yellow"]):not([class*="text-red"]):not([class*="text-teal"]):not([class*="text-blue"]):not([class*="text-purple"]){color:#fff!important}
+        [data-theme="dark"] .text-black,[data-theme="dark"] .text-gray-900,[data-theme="dark"] .text-gray-800,[data-theme="dark"] .text-gray-700,[data-theme="dark"] .text-gray-600,[data-theme="dark"] .text-gray-500,[data-theme="dark"] .text-text-header,[data-theme="dark"] .text-text-muted,[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6,[data-theme="dark"] p,[data-theme="dark"] span,[data-theme="dark"] label,[data-theme="dark"] td,[data-theme="dark"] th,[data-theme="dark"] a{color:#fff!important}
         [data-theme="dark"] .scms-badge--pending{background-color:#ff9d26ff!important;color:#ffffffff!important}
         [data-theme="dark"] .scms-badge--verified{background-color:#14B8A6!important;color:#ffffffff!important}
         [data-theme="dark"] .scms-badge--approved{background-color:#4CAF50!important;color:#ffffffff!important}
         [data-theme="dark"] .scms-badge--rejected{background-color:#b8000fff!important;color:#ffffffff!important}
         [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
+        [data-theme="dark"] .bg-gradient-verified{background-image:linear-gradient(to top,#6D28D9,#5EEAD4)}
         [data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#aeffeeff)}
+        [data-theme="dark"] .bg-gradient-approved{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
         [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
+        /* Dark mode status text colors for summary cards */
+        [data-theme="dark"] .bg-gradient-approved .text-green-800{color:#86efac!important}
+        [data-theme="dark"] .bg-gradient-verified .text-teal-800{color:#5eead4!important}
+        [data-theme="dark"] .bg-gradient-pending .text-yellow-800{color:#fde047!important}
+        [data-theme="dark"] .bg-gradient-rejected .text-red-800{color:#fca5a5!important}
         [data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('<?php echo e(asset("storage/vits_bg_black.png")); ?>')}
         [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
         [data-theme="dark"] .table th,[data-theme="dark"] .table td{border-color:#374151!important}
@@ -512,6 +630,21 @@
         [data-theme="dark"] .btn.bg-success-green:hover,[data-theme="dark"] .btn-success-green:hover{background-color:#45a049!important;color:#fff!important}
         [data-theme="dark"] .btn.bg-success-green:active,[data-theme="dark"] .btn-success-green:active{background-color:#3d9341!important;color:#fff!important}
         [data-theme="dark"] .btn.bg-success-green:focus,[data-theme="dark"] .btn-success-green:focus{outline:none!important;box-shadow:0 0 0 2px rgba(34,197,94,0.45)!important}
+        /* Dropdown styles from admin */
+        [data-theme="dark"] .dropdown-content{background-color:#1f2937!important;border:1px solid #374151}
+        [data-theme="dark"] .dropdown-content li a:hover{background-color:#6D28D9}
+        /* Activity calendar legend - light theme */
+        .activity-legend-0{background-color:#E5E7EB}
+        .activity-legend-1{background-color:#E5D4FF}
+        .activity-legend-2{background-color:#C9A9FF}
+        .activity-legend-3{background-color:#A475FF}
+        .activity-legend-4{background-color:#6D28D9}
+        /* Activity calendar legend - dark theme */
+        [data-theme="dark"] .activity-legend-0{background-color:#2c354aff}
+        [data-theme="dark"] .activity-legend-1{background-color:#411b7a}
+        [data-theme="dark"] .activity-legend-2{background-color:#5A3590}
+        [data-theme="dark"] .activity-legend-3{background-color:#804ED6}
+        [data-theme="dark"] .activity-legend-4{background-color:#A770FF}
     </style>
     <style>
         /* Custom Progress Stepper Styles - Horizontal inline */
@@ -1069,6 +1202,21 @@
                         </button>
                     </form>
                 </li>
+                <!-- Theme Toggle -->
+                <li>
+                    <label id="theme-toggle-container" class="py-3 pl-2 pr-2 w-full flex items-center gap-2 min-h-0 transition-all duration-300 cursor-pointer">
+                        <!-- Sun icon (light mode) -->
+                        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <!-- Moon icon (dark mode) -->
+                        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <span id="theme-label" class="menu-text">Light Mode</span>
+                        <input id="theme-toggle" type="checkbox" class="toggle toggle-primary toggle-sm ml-auto" />
+                    </label>
+                </li>
             </ul>
             
             <!-- Collapse button -->
@@ -1095,7 +1243,7 @@
                     </div>
                     <ul tabindex="0" class="dropdown-content z-[1000] menu p-0 shadow bg-base-100 rounded-box w-80 mt-4 overflow-hidden max-h-[500px] overflow-y-auto">
                         
-                        <li class="p-4 font-bold text-gray-700 dark:text-black border-b sticky top-0 bg-base-100 z-10">Notifications</li>
+                        <li class="p-4 font-bold text-gray-700 border-b sticky top-0 bg-base-100 z-10">Notifications</li>
 
                         <div id="notifications-list">
                             <!-- Notifications will be loaded here dynamically -->
@@ -1107,7 +1255,7 @@
                         </div>
                         
                         <li class="border-t border-gray-100 sticky bottom-0 bg-base-100">
-                            <a class="text-center text-sm py-2 hover:bg-gray-100 dark:hover:bg-gray-700" id="see-all-notifications">See All Notifications</a>
+                            <a class="text-center text-sm py-2 hover:bg-gray-100" id="see-all-notifications">See All Notifications</a>
                         </li>
                     </ul>
                 </div>
@@ -2670,7 +2818,7 @@
                 
                 if (!notifications || notifications.length === 0) {
                     list.innerHTML = `
-                        <li><div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">No notifications yet</div></li>
+                        <li><div class="p-4 text-center text-sm text-gray-500">No notifications yet</div></li>
                     `;
                     return;
                 }
@@ -2716,43 +2864,43 @@
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />';
                         iconColor = 'text-blue-500';
                         statusText = 'Verified';
-                        statusColor = 'text-blue-600 dark:text-blue-600';
+                        statusColor = 'text-blue-600';
                         statusHex = '#4a80f4ff';
                         break;
                     case 'approved':
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
                         iconColor = 'text-green-500';
                         statusText = 'Approved';
-                        statusColor = 'text-green-600 dark:text-green-600';
+                        statusColor = 'text-green-600';
                         statusHex = '#29bb5eff';
                         break;
                     case 'rejected':
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />';
                         iconColor = 'text-red-500';
                         statusText = 'Rejected';
-                        statusColor = 'text-red-600 dark:text-red-600';
+                        statusColor = 'text-red-600';
                         statusHex = '#f85050ff';
                         break;
                     case 'deleted':
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />';
                         iconColor = 'text-orange-500';
                         statusText = 'Record Deleted';
-                        statusColor = 'text-orange-600 dark:text-orange-600';
+                        statusColor = 'text-orange-600';
                         statusHex = '#f97316';
                         break;
                     default:
                         icon = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
                         iconColor = 'text-gray-500';
                         statusText = 'Notification'; // Default text
-                        statusColor = 'text-gray-700 dark:text-gray-700';
+                        statusColor = 'text-gray-700';
                         statusHex = '#374151';
                 }
                 
                 const isUnread = !notif.is_read;
-                const bgClass = isUnread ? 'bg-purple-50 dark:bg-purple-900/10' : '';
+                const bgClass = isUnread ? 'bg-purple-50' : '';
                 
                 // Use the 'message' field from your database
-                const messageDetails = notif.message ? `<p class="text-xs text-gray-700 dark:text-gray mt-1">${notif.message}</p>` : '';
+                const messageDetails = notif.message ? `<p class="text-xs text-gray-600 mt-1">${notif.message}</p>` : '';
                 
                 let reasonSection = '';
                 if (notif.type === 'rejected' && notif.rejection_reason) {
@@ -2765,7 +2913,7 @@
                                 </svg>
                                 View reason
                             </button>
-                            <div class="reason-content hidden mt-2 p-3 bg-red-100 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 rounded-lg">
+                            <div class="reason-content hidden mt-2 p-3 bg-red-100 border-2 border-red-300 rounded-lg">
                                 <p class="text-xs font-bold mb-1" style="color: #7f1d1d;">Rejection Reason:</p>
                                 <p class="text-sm whitespace-pre-wrap font-bold leading-relaxed" style="color: #991b1b;">${notif.rejection_reason}</p>
                             </div>
@@ -2798,11 +2946,11 @@
                         ${icon}
                     </svg>
                     <div class="flex-1">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-black">
+                        <p class="text-sm font-semibold text-gray-900">
                             ${notif.title || `Your submission has been ${statusText}`}
                         </p>
                         ${messageDetails}
-                        <p class="text-xs text-gray dark:text-gray mt-1">${notif.created_at}</p>
+                        <p class="text-xs text-gray-500 mt-1">${notif.created_at}</p>
                         ${reasonSection}
                     </div>
                 `;
@@ -2813,7 +2961,7 @@
                     // This notification is for a record. Use the SPA navigation.
                     return `
                         <li id="notif-${notif.id}" class="relative ${bgClass} p-0">
-                            <button onclick="goToRecord(${notif.social_contract_record_id})" class="flex items-start p-3 w-full text-left border-b border-gray-100 dark:border-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800/30 transition-all duration-200 cursor-pointer">
+                            <button onclick="goToRecord(${notif.social_contract_record_id})" class="flex items-start p-3 w-full text-left border-b border-gray-200 hover:bg-purple-100 transition-all duration-200 cursor-pointer">
                                 ${innerContent}
                             </button>
                             ${deleteBtn}
@@ -2834,7 +2982,7 @@
                     // If you have other links, we can add them here.
                     return `
                         <li id="notif-${notif.id}" class="relative ${bgClass}">
-                            <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
+                            <div class="flex items-start p-3 w-full border-b border-gray-200">
                                 ${innerContent}
                                 ${deleteBtn}
                             </div>
@@ -2844,7 +2992,7 @@
                     // Not clickable (e.g., a general announcement)
                     return `
                         <li id="notif-${notif.id}" class="relative ${bgClass}">
-                            <div class="flex items-start p-3 w-full border-b border-gray-100 dark:border-gray-300">
+                            <div class="flex items-start p-3 w-full border-b border-gray-200">
                                 ${innerContent}
                                 ${deleteBtn}
                             </div>
@@ -3566,9 +3714,63 @@
         }
 
         function initThemeToggle(){
-            // Students only use dark theme - no toggle needed
-            document.documentElement.setAttribute('data-theme', 'dark');
-            try { localStorage.setItem('scms_student_theme', 'dark'); } catch(_) {}
+            try {
+                var tg = document.getElementById('theme-toggle');
+                var lb = document.getElementById('theme-label');
+                var sunIcon = document.getElementById('theme-icon-sun');
+                var moonIcon = document.getElementById('theme-icon-moon');
+                
+                var applyTheme = function(mode) {
+                    document.documentElement.setAttribute('data-theme', mode);
+                    try {
+                        localStorage.setItem('scms_student_theme', mode);
+                    } catch(_) {}
+                    
+                    // Update label text
+                    if (lb) lb.textContent = (mode === 'dark') ? 'Dark Mode' : 'Light Mode';
+                    
+                    // Update toggle state
+                    if (tg) tg.checked = (mode === 'dark');
+                    
+                    // Update icons - show sun in dark mode (to switch to light), moon in light mode (to switch to dark)
+                    if (sunIcon && moonIcon) {
+                        if (mode === 'dark') {
+                            sunIcon.classList.remove('hidden');
+                            moonIcon.classList.add('hidden');
+                        } else {
+                            sunIcon.classList.add('hidden');
+                            moonIcon.classList.remove('hidden');
+                        }
+                    }
+                };
+                
+                // Load saved theme or default to light
+                var savedTheme = 'light';
+                try {
+                    savedTheme = localStorage.getItem('scms_student_theme');
+                    if (savedTheme !== 'dark' && savedTheme !== 'light') {
+                        savedTheme = 'light';
+                    }
+                } catch(_) {}
+                
+                applyTheme(savedTheme);
+                
+                // Handle toggle change
+                if (tg) {
+                    tg.addEventListener('change', function() {
+                        applyTheme(tg.checked ? 'dark' : 'light');
+                        
+                        // Reinitialize charts with new theme colors
+                        if (typeof renderCharts === 'function') {
+                            setTimeout(function() {
+                                renderCharts();
+                            }, 100);
+                        }
+                    });
+                }
+            } catch(e) {
+                console.error('Theme toggle error:', e);
+            }
         }
 
         function boot(){ 
@@ -3935,11 +4137,14 @@
                 // Reset body inline styles from auth layout
                 document.body.style.removeProperty('padding-top');
                 
-                // For student dashboard, ALWAYS force dark theme
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('scms_student_theme', 'dark');
+                // Apply saved theme preference (or default to light)
+                var savedTheme = localStorage.getItem('scms_student_theme');
+                if (savedTheme !== 'dark' && savedTheme !== 'light') {
+                    savedTheme = 'light';
+                }
+                document.documentElement.setAttribute('data-theme', savedTheme);
                 
-                // Reinitialize theme toggle if needed
+                // Reinitialize theme toggle
                 initThemeToggle();
             } catch(_) {}
         });
