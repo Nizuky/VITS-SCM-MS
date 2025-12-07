@@ -32,8 +32,29 @@
             </div>
         </div>
     </div>
-    <!-- Record Status Table -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+    
+    <!-- Mobile Controls (visible on mobile only) -->
+    <div class="lg:hidden px-4 mb-4 flex items-center gap-2">
+        <!-- Sort Dropdown for Mobile -->
+        <select id="mobile-sort-select" class="select select-bordered select-sm flex-1">
+            <option value="date-desc">Date (Newest First)</option>
+            <option value="date-asc">Date (Oldest First)</option>
+            <option value="eventname-asc">Event Name (A-Z)</option>
+            <option value="eventname-desc">Event Name (Z-A)</option>
+            <option value="status-asc">Status (A-Z)</option>
+            <option value="status-desc">Status (Z-A)</option>
+            <option value="hours-desc">Hours (High-Low)</option>
+            <option value="hours-asc">Hours (Low-High)</option>
+        </select>
+        
+        <!-- Delete Selected Button for Mobile -->
+        <button id="mobile-delete-selected" class="btn btn-error btn-sm" title="Delete selected pending records">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+    </div>
+
+    <!-- Desktop Table View (hidden on mobile) -->
+    <div class="hidden lg:block bg-white rounded-2xl p-6 shadow-sm flex-1 flex-col min-h-0">
          <div class="overflow-x-auto overflow-y-auto rounded-lg" style="max-height: calc(120vh - 280px);">
             <table class="table table-xs table-pin-rows">
                 <thead class="text-gray-600" style="height: 60px; background-color: #f9fafb !important;">
@@ -107,5 +128,22 @@
             </table>
         </div>
     </div>
+    
+    <!-- Mobile Card View (visible on mobile only) -->
+    <div class="lg:hidden flex flex-col gap-3 px-4" id="record-cards-container" style="max-height: calc(100vh - 350px); overflow-y: auto;">
+        <!-- Cards will be dynamically inserted here -->
+    </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<dialog id="delete_confirmation_modal" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Confirm Deletion</h3>
+        <p class="py-4">Are you sure you want to delete <span id="delete-count">0</span> pending record(s)? This action cannot be undone.</p>
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="document.getElementById('delete_confirmation_modal').close()">Cancel</button>
+            <button type="button" id="confirm-delete-btn" class="btn btn-error">Delete</button>
+        </div>
+    </form>
+</dialog>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/partials/student/record-status-page.blade.php ENDPATH**/ ?>

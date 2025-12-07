@@ -1496,6 +1496,144 @@
             width: 100%;
             overflow-x: auto;
         }
+        
+        /* Mobile Card Layout Styles */
+        .record-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .record-card:active {
+            transform: scale(0.98);
+        }
+        
+        .record-card.status-pending {
+            border-left-color: #F59E0B;
+        }
+        
+        .record-card.status-verified {
+            border-left-color: #14B8A6;
+        }
+        
+        .record-card.status-approved {
+            border-left-color: #10B981;
+        }
+        
+        .record-card.status-rejected {
+            border-left-color: #EF4444;
+        }
+        
+        .record-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .record-card-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1F2937;
+            flex: 1;
+            padding-right: 8px;
+        }
+        
+        .record-card-checkbox {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .record-card-checkbox:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .record-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .record-card-row {
+            display: flex;
+            align-items: flex-start;
+            font-size: 14px;
+        }
+        
+        .record-card-label {
+            font-weight: 500;
+            color: #6B7280;
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+        
+        .record-card-value {
+            color: #374151;
+            word-break: break-word;
+        }
+        
+        .record-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .record-card-date {
+            font-size: 12px;
+            color: #6B7280;
+        }
+        
+        .record-card-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Dark theme for mobile cards */
+        [data-theme="dark"] .record-card {
+            background: #1F2937;
+        }
+        
+        [data-theme="dark"] .record-card-title {
+            color: #F9FAFB;
+        }
+        
+        [data-theme="dark"] .record-card-label {
+            color: #9CA3AF;
+        }
+        
+        [data-theme="dark"] .record-card-value {
+            color: #E5E7EB;
+        }
+        
+        [data-theme="dark"] .record-card-footer {
+            border-top-color: #374151;
+        }
+        
+        [data-theme="dark"] .record-card-date {
+            color: #9CA3AF;
+        }
+        
+        /* Empty state for mobile cards */
+        .cards-empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6B7280;
+        }
+        
+        [data-theme="dark"] .cards-empty-state {
+            color: #9CA3AF;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -3857,6 +3995,9 @@
             
             function renderTable() {
                 tableBody.innerHTML = '';
+                const cardsContainer = document.getElementById('record-cards-container');
+                if (cardsContainer) cardsContainer.innerHTML = '';
+                
                 const query = (searchInput.value || '').toLowerCase().trim();
                 // filter
                 let filtered = allRecords.filter(r => {
@@ -3914,6 +4055,8 @@
                         return dateSortDirection === 'asc' ? da - db : db - da;
                     }
                 });
+                
+                // Render desktop table
                 filtered.forEach(rec => {
                     const formattedDate = normalizeDateString(rec.date);
                     const row = document.createElement('tr');
@@ -3941,8 +4084,208 @@
                     `;
                     tableBody.appendChild(row);
                 });
+                
+                // Render mobile cards
+                if (cardsContainer) {
+                    if (filtered.length === 0) {
+                        cardsContainer.innerHTML = '<div class="cards-empty-state">No records found</div>';
+                    } else {
+                        filtered.forEach(rec => {
+                            const formattedDate = normalizeDateString(rec.date);
+                            const statusClass = 'status-' + (rec.status || '').toLowerCase();
+                            const statusHtml = renderStatusBadge(rec.status, rec);
+                            
+                            const card = document.createElement('div');
+                            card.className = `record-card ${statusClass}`;
+                            card.dataset.recordId = rec.id;
+                            card.dataset.status = rec.status;
+                            
+                            card.innerHTML = `
+                                <div class="record-card-header">
+                                    <div class="record-card-title">${rec.event_name}</div>
+                                    <input type="checkbox" class="record-card-checkbox mobile-record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}>
+                                </div>
+                                <div class="record-card-info">
+                                    <div class="record-card-row">
+                                        <span class="record-card-label">Date:</span>
+                                        <span class="record-card-value">${formattedDate}</span>
+                                    </div>
+                                    <div class="record-card-row">
+                                        <span class="record-card-label">Venue:</span>
+                                        <span class="record-card-value">${rec.venue}</span>
+                                    </div>
+                                    <div class="record-card-row">
+                                        <span class="record-card-label">Organization:</span>
+                                        <span class="record-card-value">${rec.organization}</span>
+                                    </div>
+                                    <div class="record-card-row">
+                                        <span class="record-card-label">Supervisor:</span>
+                                        <span class="record-card-value">${rec.supervisor_name || '-'}</span>
+                                    </div>
+                                    <div class="record-card-row">
+                                        <span class="record-card-label">Hours:</span>
+                                        <span class="record-card-value">${rec.hours_rendered} hours</span>
+                                    </div>
+                                </div>
+                                <div class="record-card-footer">
+                                    <div class="record-card-status">${statusHtml}</div>
+                                </div>
+                            `;
+                            
+                            // Make card clickable to show details (except checkbox)
+                            card.addEventListener('click', function(e) {
+                                if (e.target.classList.contains('mobile-record-checkbox')) return;
+                                toggleRecordDetails(rec, card);
+                            });
+                            
+                            cardsContainer.appendChild(card);
+                        });
+                    }
+                }
             }
             searchInput.addEventListener('input', renderTable);
+            
+            // Mobile sort dropdown handler
+            const mobileSortSelect = document.getElementById('mobile-sort-select');
+            if (mobileSortSelect) {
+                mobileSortSelect.addEventListener('change', (e) => {
+                    const value = e.target.value;
+                    const [sortBy, direction] = value.split('-');
+                    
+                    // Reset all indicators
+                    resetAllSortIndicators();
+                    
+                    // Set sort column and direction
+                    if (sortBy === 'date') {
+                        currentSortBy = 'date';
+                        dateSortDirection = direction;
+                    } else if (sortBy === 'eventname') {
+                        currentSortBy = 'eventname';
+                        eventnameSortDirection = direction;
+                    } else if (sortBy === 'status') {
+                        currentSortBy = 'status';
+                        statusSortDirection = direction;
+                    } else if (sortBy === 'hours') {
+                        currentSortBy = 'hours';
+                        hoursSortDirection = direction;
+                    }
+                    
+                    renderTable();
+                });
+            }
+            
+            // Desktop delete selected handler
+            const deleteSelectedBtn = document.getElementById('delete-selected');
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', handleDeleteSelected);
+            }
+            
+            // Mobile delete selected handler
+            const mobileDeleteBtn = document.getElementById('mobile-delete-selected');
+            if (mobileDeleteBtn) {
+                mobileDeleteBtn.addEventListener('click', handleDeleteSelected);
+            }
+            
+            // Handle delete selected records (pending only)
+            function handleDeleteSelected() {
+                const desktopCheckboxes = Array.from(document.querySelectorAll('#record-table-body .record-checkbox:checked'));
+                const mobileCheckboxes = Array.from(document.querySelectorAll('.mobile-record-checkbox:checked'));
+                const allCheckboxes = [...desktopCheckboxes, ...mobileCheckboxes];
+                
+                if (allCheckboxes.length === 0) {
+                    showToast('Please select at least one record to delete', 'warning');
+                    return;
+                }
+                
+                // Get record IDs from selected checkboxes
+                const recordIds = [];
+                allCheckboxes.forEach(checkbox => {
+                    const parent = checkbox.closest('tr') || checkbox.closest('.record-card');
+                    if (parent) {
+                        const recordId = parent.dataset.recordId;
+                        const status = parent.dataset.status;
+                        if (status === 'Pending') {
+                            recordIds.push(recordId);
+                        }
+                    }
+                });
+                
+                if (recordIds.length === 0) {
+                    showToast('Only pending records can be deleted', 'warning');
+                    return;
+                }
+                
+                // Show confirmation modal
+                const modal = document.getElementById('delete_confirmation_modal');
+                const countSpan = document.getElementById('delete-count');
+                const confirmBtn = document.getElementById('confirm-delete-btn');
+                
+                if (modal && countSpan && confirmBtn) {
+                    countSpan.textContent = recordIds.length;
+                    modal.showModal();
+                    
+                    // Remove old event listeners and add new one
+                    const newConfirmBtn = confirmBtn.cloneNode(true);
+                    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                    
+                    newConfirmBtn.addEventListener('click', async () => {
+                        modal.close();
+                        
+                        try {
+                            // Delete records one by one
+                            let successCount = 0;
+                            let failCount = 0;
+                            
+                            for (const recordId of recordIds) {
+                                try {
+                                    await ensureCsrfCookie();
+                                    const response = await fetch(`${BASE_PATH}/api/social-contract/records/${recordId}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        },
+                                        credentials: 'same-origin'
+                                    });
+                                    
+                                    if (response.ok) {
+                                        successCount++;
+                                        // Remove from allRecords array
+                                        const index = allRecords.findIndex(r => r.id == recordId);
+                                        if (index > -1) {
+                                            allRecords.splice(index, 1);
+                                        }
+                                    } else {
+                                        failCount++;
+                                    }
+                                } catch (error) {
+                                    console.error('Error deleting record:', recordId, error);
+                                    failCount++;
+                                }
+                            }
+                            
+                            // Refresh the display
+                            renderTable();
+                            updateDashboardFromRecords(allRecords);
+                            
+                            // Show result message
+                            if (successCount > 0 && failCount === 0) {
+                                showToast(`Successfully deleted ${successCount} record(s)`, 'success');
+                            } else if (successCount > 0 && failCount > 0) {
+                                showToast(`Deleted ${successCount} record(s), ${failCount} failed`, 'warning');
+                            } else {
+                                showToast('Failed to delete records', 'error');
+                            }
+                            
+                        } catch (error) {
+                            console.error('Error in delete operation:', error);
+                            showToast('An error occurred while deleting records', 'error');
+                        }
+                    });
+                }
+            }
+            
             // Date sort toggle
             dateSortToggle.addEventListener('click', (e) => {
                 e.preventDefault();
