@@ -252,6 +252,21 @@ html:not([data-theme="dark"]) #theme-label { color: #374151 !important; }
 html:not([data-theme="dark"]) .toggle-primary { --tglbg: #6D28D9; background-color: #d1d5db; border-color: #9ca3af; }
 html:not([data-theme="dark"]) .toggle-primary:checked { background-color: #6D28D9; border-color: #6D28D9; }
 
+/* Prevent heavy dark tap/active highlight on long-press in light mode for notifications/dropdowns */
+html:not([data-theme="dark"]) .dropdown-content li,
+html:not([data-theme="dark"]) .dropdown-content li a,
+html:not([data-theme="dark"]) .dropdown-content .notification-message,
+html:not([data-theme="dark"]) .dropdown-content .notification-title {
+    -webkit-tap-highlight-color: transparent !important;
+    tap-highlight-color: transparent !important;
+}
+html:not([data-theme="dark"]) .dropdown-content li:active,
+html:not([data-theme="dark"]) .dropdown-content li a:active {
+    background-color: #f3f4f6 !important;
+    color: inherit !important;
+    box-shadow: none !important;
+}
+
 /* Mobile Header Bar */
 #mobile-header {
     display: none;

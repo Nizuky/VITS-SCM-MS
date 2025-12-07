@@ -235,6 +235,21 @@
         [data-theme="dark"] #theme-toggle-container:hover { background-color: rgba(167,139,250,0.08) !important; color: #A78BFA !important; border: none !important; box-shadow: none !important; outline: none !important; }
         [data-theme="dark"] #theme-toggle-container:hover svg { stroke: #A78BFA !important; color: #A78BFA !important; }
 
+        /* Prevent heavy dark tap/active highlight on long-press in light mode for notifications/dropdowns */
+        html:not([data-theme="dark"]) .dropdown-content li,
+        html:not([data-theme="dark"]) .dropdown-content li a,
+        html:not([data-theme="dark"]) .dropdown-content .notification-message,
+        html:not([data-theme="dark"]) .dropdown-content .notification-title {
+            -webkit-tap-highlight-color: transparent !important;
+            tap-highlight-color: transparent !important;
+        }
+        html:not([data-theme="dark"]) .dropdown-content li:active,
+        html:not([data-theme="dark"]) .dropdown-content li a:active {
+            background-color: #f3f4f6 !important;
+            color: inherit !important;
+            box-shadow: none !important;
+        }
+
         /* Mobile Header Bar */
         #mobile-header {
             display: none;

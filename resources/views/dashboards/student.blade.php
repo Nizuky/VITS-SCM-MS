@@ -535,6 +535,22 @@
         html:not([data-theme="dark"]) .dropdown-content { background-color: #ffffff !important; border: 1px solid #e5e7eb; }
         html:not([data-theme="dark"]) .dropdown-content li { color: #374151 !important; background-color: #ffffff; }
         html:not([data-theme="dark"]) .dropdown-content li:hover { background-color: #f3f4f6 !important; }
+        /* Notifications modal only: prevent heavy tap/active highlight on long-press (light mode) */
+        html:not([data-theme="dark"]) #all_notifications_modal .modal-box,
+        html:not([data-theme="dark"]) #all_notifications_modal li,
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-message,
+        html:not([data-theme="dark"]) #all_notifications_modal .notification-title {
+            -webkit-tap-highlight-color: transparent !important;
+            tap-highlight-color: transparent !important;
+        }
+        /* Ensure :active (long-press) state stays very light inside the modal */
+        html:not([data-theme="dark"]) #all_notifications_modal li:active,
+        html:not([data-theme="dark"]) #all_notifications_modal li a:active,
+        html:not([data-theme="dark"]) #all_notifications_modal .modal-box:active {
+            background-color: #FAFAFC !important; /* lighter active color */
+            color: inherit !important;
+            box-shadow: none !important;
+        }
         html:not([data-theme="dark"]) .dropdown-content .notification-title { color: #1f2937 !important; }
         html:not([data-theme="dark"]) .dropdown-content .notification-message,
         html:not([data-theme="dark"]) .dropdown-content .notification-message p { color: #4b5563 !important; }
@@ -807,6 +823,53 @@
         [data-theme="dark"] .dropdown-content .notification-time { color: #9ca3af !important; }
         [data-theme="dark"] .dropdown-content .border-gray-200 { border-color: #374151 !important; }
         [data-theme="dark"] .dropdown-content .text-primary-purple { color: #a78bfa !important; }
+        /* Improve hover contrast for notifications in dark mode: make text clearly visible */
+        [data-theme="dark"] .dropdown-content li:hover,
+        [data-theme="dark"] .dropdown-content li a:hover,
+        [data-theme="dark"] #all_notifications_modal li:hover,
+        [data-theme="dark"] #all_notifications_modal li a:hover {
+            background-color: #6D28D9 !important; /* primary purple hover */
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .dropdown-content li:hover .notification-title,
+        [data-theme="dark"] .dropdown-content li:hover .notification-message,
+        [data-theme="dark"] .dropdown-content li:hover .notification-time,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-title,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-message,
+        [data-theme="dark"] #all_notifications_modal li:hover .notification-time {
+            color: #ffffff !important;
+        }
+        /* Ensure links inside dropdowns inherit the hover color */
+        [data-theme="dark"] .dropdown-content li a,
+        [data-theme="dark"] .dropdown-content li a *,
+        [data-theme="dark"] #all_notifications_modal li a,
+        [data-theme="dark"] #all_notifications_modal li a * {
+            color: inherit !important;
+        }
+        /* Also override hover styles applied to inner buttons (Tailwind hover:bg-*) so dark hover is consistent */
+        [data-theme="dark"] .dropdown-content li button:hover,
+        [data-theme="dark"] .dropdown-content li button:focus,
+        [data-theme="dark"] #all_notifications_modal li button:hover,
+        [data-theme="dark"] #all_notifications_modal li button:focus,
+        [data-theme="dark"] .dropdown-content li .cursor-pointer:hover,
+        [data-theme="dark"] .dropdown-content li .cursor-pointer:focus {
+            background-color: #6D28D9 !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .dropdown-content li button:hover .notification-title,
+        [data-theme="dark"] .dropdown-content li button:hover .notification-message,
+        [data-theme="dark"] .dropdown-content li button:hover .notification-time,
+        [data-theme="dark"] #all_notifications_modal li button:hover .notification-title,
+        [data-theme="dark"] #all_notifications_modal li button:hover .notification-message,
+        [data-theme="dark"] #all_notifications_modal li button:hover .notification-time {
+            color: #ffffff !important;
+        }
+        /* Rejection reason box (bg-red-100) is light in light mode; provide a darker alternative in dark mode */
+        [data-theme="dark"] .reason-content {
+            background-color: rgba(220,38,38,0.06) !important; /* subtle dark red */
+            border-color: rgba(220,38,38,0.2) !important;
+        }
+        [data-theme="dark"] .reason-content p { color: #fca5a5 !important; }
         
         /* All Notifications Modal - Dark Mode */
         [data-theme="dark"] #all_notifications_modal .modal-box { background-color: #1f2937 !important; }
@@ -2982,6 +3045,43 @@
             
             // Make it globally accessible
             window.showRejectionReason = showRejectionReason;
+
+            // Delegated handler for 'View reason' controls (works for dropdown + modal list)
+            document.addEventListener('click', function(e) {
+                try {
+                    const btn = e.target.closest('.view-reason-btn');
+                    if (!btn) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // If there's an inline reason content sibling, toggle it (used in All Notifications modal)
+                    const listItem = btn.closest('li');
+                    if (listItem) {
+                        const reasonContent = listItem.querySelector('.reason-content');
+                        if (reasonContent) {
+                            const isHidden = reasonContent.classList.contains('hidden');
+                            if (isHidden) reasonContent.classList.remove('hidden');
+                            else reasonContent.classList.add('hidden');
+                            return;
+                        }
+                    }
+
+                    // Otherwise, open the global modal using data attribute if present
+                    const reason = btn.getAttribute('data-rejection-reason') || btn.dataset.rejectionReason;
+                    if (reason) {
+                        showRejectionReason(reason);
+                        return;
+                    }
+                    // Fallback: look for nearest element that contains the reason text
+                    const maybe = btn.closest('div') || btn.parentElement;
+                    const txt = maybe ? maybe.querySelector('.reason-content, .notification-message') : null;
+                    if (txt) {
+                        showRejectionReason(txt.textContent || txt.innerText || 'No specific reason provided.');
+                    }
+                } catch (err) {
+                    console.error('Delegated view-reason handler error', err);
+                }
+            }, { passive: false });
             
             // Navigate to a specific record
             async function goToRecord(recordId) {
@@ -3084,6 +3184,7 @@
                             const reasonBtn = notifEl.querySelector('.view-reason-btn');
                             if (reasonBtn) {
                                 reasonBtn.addEventListener('click', (e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     showRejectionReason(notif.rejection_reason);
                                 });
@@ -3185,15 +3286,17 @@
                             </div>
                         `;
                     } else {
-                        // For dropdown - opens modal
+                        // For dropdown - opens modal. Use an anchor (not a nested button) to avoid invalid nested <button> markup
+                        // Include the rejection reason on the anchor so delegated handler can read it
+                        const safeReason = (notif.rejection_reason || '').replace(/"/g, '&quot;');
                         reasonSection = `
-                            <button class="view-reason-btn text-xs text-primary-purple hover:underline mt-1 flex items-center gap-1" data-notif-id="${notif.id}">
+                            <a href="#" role="button" class="view-reason-btn text-xs text-primary-purple hover:underline mt-1 flex items-center gap-1" data-notif-id="${notif.id}" data-rejection-reason="${safeReason}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
                                 View reason
-                            </button>
+                            </a>
                         `;
                     }
                 }
@@ -3225,11 +3328,12 @@
                 // We use social_contract_record_id, which you already have in your table
                 if (notif.social_contract_record_id) {
                     // This notification is for a record. Use the SPA navigation.
+                    // Use a div with onclick (role=button) instead of a nested <button> to allow inner interactive elements (like view-reason anchors) to receive clicks.
                     return `
                         <li id="notif-${notif.id}" class="relative ${bgClass} p-0">
-                            <button onclick="goToRecord(${notif.social_contract_record_id})" class="flex items-start p-3 w-full text-left border-b border-gray-200 hover:bg-purple-100 transition-all duration-200 cursor-pointer">
+                            <div onclick="goToRecord(${notif.social_contract_record_id})" role="button" tabindex="0" class="flex items-start p-3 w-full text-left border-b border-gray-200 hover:bg-purple-100 transition-all duration-200 cursor-pointer">
                                 ${innerContent}
-                            </button>
+                            </div>
                             ${deleteBtn}
                         </li>
                     `;
@@ -3323,6 +3427,7 @@
                             if (reasonBtn && reasonContent) {
                                 console.debug('Attaching view-reason handler for notif (modal)', notif.id);
                                 reasonBtn.addEventListener('click', (e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     try {
                                         // Toggle the reason content
@@ -5350,5 +5455,20 @@
             });
         })();
     </script>
+    <!-- Rejection Reason Modal (used by notifications) -->
+    <dialog id="rejection_reason_modal" class="modal">
+        <form method="dialog" class="modal-box max-w-xl">
+            <div class="flex items-start justify-between">
+                <h3 class="font-bold text-lg">Rejection Reason</h3>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('rejection_reason_modal').close();">✕</button>
+            </div>
+            <div class="mt-4">
+                <p id="rejection-reason-text" class="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-200"></p>
+            </div>
+            <div class="modal-action">
+                <button type="button" class="btn btn-primary-purple" onclick="document.getElementById('rejection_reason_modal').close();">Close</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 </html>
