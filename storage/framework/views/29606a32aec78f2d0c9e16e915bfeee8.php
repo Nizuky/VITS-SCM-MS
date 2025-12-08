@@ -34,7 +34,14 @@
     
     <!-- Mobile Search (visible on mobile only) -->
     <div class="lg:hidden px-4 mb-4">
-        <input type="text" id="ticket-search-input-mobile" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered w-full rounded-lg mb-3" />
+        <div class="flex items-center gap-2 mb-3">
+            <input type="text" id="ticket-search-input-mobile" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered flex-1 min-w-0 rounded-lg" />
+            <button id="refresh-support-tickets-btn" class="btn btn-ghost btn-square h-10 w-10" title="Refresh tickets" onclick="refreshSupportTickets()" aria-label="Refresh tickets">
+                <svg id="refresh-support-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+            </button>
+        </div>
         <select id="mobile-admin-ticket-sort-select" class="select select-bordered select-sm w-full">
             <option value="id-desc">Ticket ID (Newest First)</option>
             <option value="id-asc">Ticket ID (Oldest First)</option>
@@ -50,8 +57,13 @@
     </div>
     
     <div class="flex-1 bg-transparent rounded-2xl p-4 shadow-none overflow-y-auto">
-        <div class="hidden lg:block mb-4">
-            <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered w-full rounded-lg" />
+        <div class="hidden lg:flex items-center gap-3 mb-4">
+            <input type="text" id="ticket-search-input" placeholder="Search tickets by ID, student name, type, or details..." class="input input-bordered flex-1 rounded-lg" />
+            <button id="refresh-support-tickets-btn" class="btn btn-ghost btn-square" title="Refresh tickets" onclick="refreshSupportTickets()">
+                <svg id="refresh-support-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+            </button>
         </div>
         
         <!-- Desktop Table View (hidden on mobile) -->

@@ -2,7 +2,7 @@
 <div id="data-management-page" class="page-content hidden flex flex-col">
     <div class="p-4">
         <h4 class="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-purple">Data Management</h4>
-        <p class="text-xs md:text-sm text-text-muted mt-2">&#9432 Manage rejected records and inactive accounts</p>
+        <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Manage rejected records and inactive accounts.</p>
     </div>
 
     <!-- Rejected Records Section -->
