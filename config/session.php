@@ -1,8 +1,9 @@
 <?php
 
 return [
-    // Session driver (database recommended for production)
-    'driver' => env('SESSION_DRIVER', 'database'),
+    // Session driver - defaults to 'file' for reliability
+    // Set SESSION_DRIVER=database in production when database is confirmed working
+    'driver' => env('SESSION_DRIVER', 'file'),
 
     // Minutes the session can remain idle before it expires
     // Set to 1 year (525600 minutes) but session keeper will ping to keep alive
