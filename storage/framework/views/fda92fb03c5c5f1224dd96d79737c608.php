@@ -441,10 +441,10 @@
                     </div>
                 </div>
 
-                <div id="followups" style="margin-top: 14px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <div id="followups" style="margin-top: 14px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
                         <!-- Student Exists Section -->
-                        <div id="student-exists" class="hidden followup-section" 
-                            style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
+                        <div id="student-exists" class="followup-section" 
+                          style="display: none; background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
                             <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Do you have an existing account?</p>
                             <div class="btn-group" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                                 <a href="#" onclick="event.preventDefault(); clearSessionAndLogin();" class="action-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
@@ -456,8 +456,8 @@
                             </div>
                         </div>
                         <!-- Non-Student Select Section -->
-                        <div id="nonstudent-select" class="hidden followup-section" 
-                            style="background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
+                        <div id="nonstudent-select" class="followup-section" 
+                          style="display: none; background: transparent; border-radius: 16px; padding: 16px 20px; width: 100%; margin-top: 16px;">
                             <p style="margin-bottom: 12px; font-weight: 600; font-size: 13px; color: rgba(255, 255, 255, 0.95); text-align: center;">Select your role</p>
                             <div class="btn-group" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                                 <button type="button" onclick="clearSessionAndGoToAdmin()" class="action-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
@@ -476,13 +476,12 @@
     </body>
     <script>
       // Simple toggle script (adapted from user-provided example)
-      (function(){
+        (function(){
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const studentExists = document.getElementById('student-exists');
         const nonstudentSelect = document.getElementById('nonstudent-select');
-        const studentReturn = document.getElementById('student-return');
-        const nonstudentReturn = document.getElementById('nonstudent-return');
+        const followups = document.getElementById('followups');
 
         function resetButtons(){
           if (yesBtn) {
@@ -495,6 +494,10 @@
             noBtn.style.color = 'rgba(255, 255, 255, 0.8)';
             noBtn.style.boxShadow = 'none';
           }
+          // hide followups container
+          if (followups) followups.style.display = 'none';
+          if (studentExists) studentExists.style.display = 'none';
+          if (nonstudentSelect) nonstudentSelect.style.display = 'none';
         }
 
         function showStudent(){
@@ -504,8 +507,9 @@
             yesBtn.style.color = 'white';
             yesBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
           }
-          if (studentExists) studentExists.classList.remove('hidden');
-          if (nonstudentSelect) nonstudentSelect.classList.add('hidden');
+          if (followups) followups.style.display = 'flex';
+          if (studentExists) studentExists.style.display = 'block';
+          if (nonstudentSelect) nonstudentSelect.style.display = 'none';
         }
 
         function showNonStudent(){
@@ -515,19 +519,18 @@
             noBtn.style.color = 'white';
             noBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
           }
-          if (nonstudentSelect) nonstudentSelect.classList.remove('hidden');
-          if (studentExists) studentExists.classList.add('hidden');
+          if (followups) followups.style.display = 'flex';
+          if (nonstudentSelect) nonstudentSelect.style.display = 'block';
+          if (studentExists) studentExists.style.display = 'none';
         }
 
         if (yesBtn) yesBtn.addEventListener('click', function(e){ e.preventDefault(); showStudent(); });
         if (noBtn) noBtn.addEventListener('click', function(e){ e.preventDefault(); showNonStudent(); });
 
-        if (studentReturn) studentReturn.addEventListener('click', function(e){ e.preventDefault(); if (studentExists){ studentExists.classList.add('hidden'); } resetButtons(); });
-        if (nonstudentReturn) nonstudentReturn.addEventListener('click', function(e){ e.preventDefault(); if (nonstudentSelect){ nonstudentSelect.classList.add('hidden'); } resetButtons(); });
-
-        // init: hide followups
-        if (studentExists) studentExists.classList.add('hidden');
-        if (nonstudentSelect) nonstudentSelect.classList.add('hidden');
+        // init: ensure followups and sections hidden
+        if (followups) followups.style.display = 'none';
+        if (studentExists) studentExists.style.display = 'none';
+        if (nonstudentSelect) nonstudentSelect.style.display = 'none';
       })();
 
       // Function to clear any existing session and go to login
