@@ -1,0 +1,58 @@
+### Multi-stage production Dockerfile (single-container with Nginx + PHP-FPM)
+FROM node:18-bullseye AS node_builder
+WORKDIR /app
+COPY package*.json ./
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git python3 build-essential && rm -rf /var/lib/apt/lists/* \
+    && if [ -f package-lock.json ]; then npm ci --silent; else npm install --silent; fi
+COPY . .
+RUN npm run build
+
+FROM composer:2 AS composer_builder
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+COPY . /app
+
+FROM php:8.2-fpm-bullseye
+ARG APP_ENV=production
+ENV APP_ENV=${APP_ENV}
+WORKDIR /var/www/html
+
+# Install system packages, nginx and supervisor
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        nginx \
+        supervisor \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libzip-dev \
+        zip \
+        unzip \
+        git \
+        curl \
+        default-mysql-client \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && pecl install redis || true \
+    && docker-php-ext-enable redis || true \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy application and built assets
+COPY --from=composer_builder /app /var/www/html
+COPY --from=node_builder /app/public/build /var/www/html/public/build
+
+# Nginx config and supervisord
+COPY docker/nginx/prod.conf /etc/nginx/sites-available/default
+COPY docker/supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Permissions
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+EXPOSE 80
+
+STOPSIGNAL SIGQUIT
+
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+    image: scms-app:dev
+    container_name: scms_app_dev
+    volumes:
+      - ./:/var/www/html:delegated
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    expose:
+      - "9000"
+    command: ["php-fpm"]
+
+  web:
+    image: nginx:stable
+    container_name: scms_web_dev
+    depends_on:
+      - app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  frontend:
+    image: node:18
+    container_name: scms_frontend
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html:cached
+    ports:
+      - "5173:5173"
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: scms
+      MYSQL_ROOT_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:

@@ -3,11 +3,11 @@
         'name' => 'nizuky/vits-scm-ms',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '4c65651ed959d285fae5cde9ebead122fe45ac1e',
+        'reference' => '190ecf0db2ae39406b0173e6d8cbeb9a1962799e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'dev' => true,
+        'dev' => false,
     ),
     'versions' => array(
         'bacon/bacon-qr-code' => array(
@@ -571,7 +571,7 @@
         'nizuky/vits-scm-ms' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '4c65651ed959d285fae5cde9ebead122fe45ac1e',
+            'reference' => '190ecf0db2ae39406b0173e6d8cbeb9a1962799e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
