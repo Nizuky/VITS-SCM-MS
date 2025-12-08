@@ -15,7 +15,12 @@ return new class extends Migration
     {
         Schema::table('social_contract_records', function (Blueprint $table) {
             if (!Schema::hasColumn('social_contract_records', 'rejected_at')) {
-                $table->timestamp('rejected_at')->nullable()->after('rejection_reason');
+                // Add after 'rejection_reason' when present, otherwise after 'status' to avoid ordering failures
+                if (Schema::hasColumn('social_contract_records', 'rejection_reason')) {
+                    $table->timestamp('rejected_at')->nullable()->after('rejection_reason');
+                } else {
+                    $table->timestamp('rejected_at')->nullable()->after('status');
+                }
             }
         });
     }
