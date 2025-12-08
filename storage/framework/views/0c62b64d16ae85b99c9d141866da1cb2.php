@@ -7,6 +7,7 @@
             </svg>
             <span class="whitespace-nowrap">Submit New Ticket</span>
         </button>
+        <br>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <label class="input input-bordered flex items-center gap-2 rounded-lg flex-1 sm:flex-initial">
@@ -24,7 +25,6 @@
             </div>
         </div>
     </div>
-    
     <!-- Mobile Sort Dropdown (visible on mobile only) -->
     <div class="lg:hidden px-4 mb-4">
         <select id="mobile-ticket-sort-select" class="select select-bordered select-sm w-full">

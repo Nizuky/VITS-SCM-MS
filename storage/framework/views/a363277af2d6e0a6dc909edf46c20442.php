@@ -16,6 +16,7 @@
                 </svg>
                 <span class="whitespace-nowrap">Export PDF</span>
             </button>
+            <br>
             
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <label class="input input-bordered flex items-center gap-2 rounded-lg flex-1 sm:flex-initial">

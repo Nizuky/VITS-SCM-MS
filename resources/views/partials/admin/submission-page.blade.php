@@ -4,10 +4,10 @@
     <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Review, filter, and manage student submissions and their approval status.</p>
     
     <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
-        <!-- Tabs -->
-        <div class="flex space-x-2 custom-tab-wrapper w-full md:w-auto" style="min-width: 220px;">
-            <a role="tab" class="custom-tab custom-tab-active whitespace-nowrap" onclick="filterSubmissions('Pending',this)">Pending</a>
-            <a role="tab" class="custom-tab whitespace-nowrap" onclick="filterSubmissions('Archived',this)">Archived</a>
+        <!-- Tabs (compact, centered on mobile without stretching) -->
+        <div class="inline-flex space-x-2 custom-tab-wrapper mx-auto md:mx-0">
+            <a role="tab" class="custom-tab custom-tab-active whitespace-nowrap px-3 py-2" onclick="filterSubmissions('Pending',this)">Pending</a>
+            <a role="tab" class="custom-tab whitespace-nowrap px-3 py-2" onclick="filterSubmissions('Archived',this)">Archived</a>
         </div>
         
         <!-- Search + Refresh (grouped on mobile) -->
