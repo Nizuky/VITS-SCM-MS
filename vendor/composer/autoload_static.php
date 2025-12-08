@@ -153,6 +153,8 @@ class ComposerStaticInit853c0c9547b07ecd144f44188458a63c
             'Doctrine\\Inflector\\' => 19,
             'Doctrine\\Common\\Lexer\\' => 22,
             'Dflydev\\DotAccessData\\' => 22,
+            'Database\\Seeders\\' => 17,
+            'Database\\Factories\\' => 19,
             'DASPRiD\\Enum\\' => 13,
         ),
         'C' => 
@@ -469,6 +471,14 @@ class ComposerStaticInit853c0c9547b07ecd144f44188458a63c
         'Dflydev\\DotAccessData\\' => 
         array (
             0 => __DIR__ . '/..' . '/dflydev/dot-access-data/src',
+        ),
+        'Database\\Seeders\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/database/seeders',
+        ),
+        'Database\\Factories\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/database/factories',
         ),
         'DASPRiD\\Enum\\' => 
         array (
