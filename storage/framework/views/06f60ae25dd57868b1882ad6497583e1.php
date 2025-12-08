@@ -43,7 +43,7 @@
 	$viteManifest = public_path('build/manifest.json');
 ?>
 
-<?php if(file_exists($viteManifest)): ?>
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(file_exists($viteManifest)): ?>
 	<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 <?php else: ?>
 	
@@ -59,12 +59,12 @@
 	</script>
 	
 	<?php $appCss = public_path('css/app.css'); ?>
-	<?php if(file_exists($appCss)): ?>
+	<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(file_exists($appCss)): ?>
 		<link rel="stylesheet" href="<?php echo e(asset('css/app.css')); ?>">
-	<?php endif; ?>
-<?php endif; ?>
+	<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-<?php if(class_exists('Flux\Flux')): ?>
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(class_exists('Flux\Flux')): ?>
     @fluxAppearance
-<?php endif; ?>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/partials/head.blade.php ENDPATH**/ ?>

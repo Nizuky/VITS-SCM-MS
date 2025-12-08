@@ -426,9 +426,9 @@
                 </div>
             </div>
             
-            <?php if(Route::has('login')): ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Route::has('login')): ?>
                 <div class="h-6"></div>
-            <?php endif; ?>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
             <!-- Pill toggle role selector (below the main card) -->
             <div class="w-full" style="margin-top: 20px; max-width: 480px; box-sizing: border-box;">

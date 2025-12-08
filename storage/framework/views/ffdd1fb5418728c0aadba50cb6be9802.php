@@ -28,10 +28,10 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<!--[if BLOCK]><![endif]--><?php if($status): ?>
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($status): ?>
     <div <?php echo e($attributes->merge(['class' => 'px-3 py-2 rounded bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'])); ?>>
         <?php echo e($status); ?>
 
     </div>
-<?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 <?php /**PATH C:\Users\janar\Herd\scms\resources\views/components/auth-session-status.blade.php ENDPATH**/ ?>
