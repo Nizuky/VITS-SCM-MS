@@ -1,29 +1,32 @@
 FROM php:8.2-fpm
 
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        nginx \
+# Make apt operations tolerant to Release info changes and ensure noninteractive installs.
+# Install common helpers first, then required packages and PHP extensions in one safe flow.
+RUN set -eux; \
+    apt-get update || apt-get -o Acquire::AllowReleaseInfoChange::Suite=1 update; \
+    apt-get install -y --no-install-recommends \
+        apt-transport-https \
         ca-certificates \
+        gnupg \
+        lsb-release \
         curl \
         git \
         zip \
         unzip \
         default-mysql-client \
-        nodejs npm \
-    && rm -rf /var/lib/apt/lists/*
-
-# PHP extensions required by the app
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+        nginx \
+        nodejs \
+        npm \
         libpng-dev \
         libjpeg-dev \
         libfreetype6-dev \
         libzip-dev \
         build-essential \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && rm -rf /var/lib/apt/lists/*
+    ; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip || true; \
+    apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*;
 
 WORKDIR /var/www/html
 

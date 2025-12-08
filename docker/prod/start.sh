@@ -4,12 +4,13 @@ set -e
 # Substitute PORT into nginx template (default 80)
 TEMPLATE=/etc/nginx/conf.d/default.conf.template
 DEST=/etc/nginx/conf.d/default.conf
-# Default to listening on 0.0.0.0:8080 unless PORT is provided
-PORT=${PORT:-0.0.0.0:8080}
+# Ensure we bind explicitly to 0.0.0.0:<PORT>. Platform provides a numeric PORT.
+NUM_PORT=${PORT:-8080}
+LISTEN_ADDR="0.0.0.0:${NUM_PORT}"
 
 if [ -f "$TEMPLATE" ]; then
-  echo "Using nginx template: substituting PORT=${PORT}"
-  sed "s/__PORT__/${PORT}/g" "$TEMPLATE" > "$DEST"
+  echo "Using nginx template: substituting LISTEN_ADDR=${LISTEN_ADDR}"
+  sed "s/__PORT__/${LISTEN_ADDR}/g" "$TEMPLATE" > "$DEST"
 else
   echo "No nginx template found at $TEMPLATE"
 fi
