@@ -42,17 +42,28 @@ RUN apt-get update \
 COPY --from=composer_builder /app /var/www/html
 COPY --from=node_builder /app/public/build /var/www/html/public/build
 
+
 # Nginx config and supervisord
-COPY docker/nginx/prod.conf /etc/nginx/sites-available/default
+# Use a template for the nginx config so the container can bind to the env PORT at runtime
+COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.template
 COPY docker/supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# copy entrypoint
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Permissions
 RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 80
+ENV PORT=80
+EXPOSE ${PORT}
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext-base \
+    && rm -rf /var/lib/apt/lists/*
 
 STOPSIGNAL SIGQUIT
 
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
