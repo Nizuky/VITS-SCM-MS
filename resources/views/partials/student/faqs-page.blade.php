@@ -1,5 +1,5 @@
 <div id="faqs-page" class="page-content hidden flex flex-col">
-  <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">Find answers to common questions about using the Social Contract Management System.</p>           
+  <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">&#9432 Find answers to common questions about using the Social Contract Management System.</p>           
     <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm overflow-y-auto space-y-4">
         <!-- FAQ 1 -->
         <div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg shadow-sm">

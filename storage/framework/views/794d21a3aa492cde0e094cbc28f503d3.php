@@ -1,5 +1,5 @@
 <div id="profile-page" class="page-content hidden flex-col">
-      <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">View and edit your profile information, contact details, and account settings.</p>
+      <p class="text-sm text-gray-600 mt-2 pb-6 text-center lg:text-left">&#9432 View and edit your profile information, contact details, and account settings.</p>
     <div class="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
         <div id="profile-view" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">

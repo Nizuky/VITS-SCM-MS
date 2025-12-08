@@ -1,7 +1,7 @@
 <!-- Students Information Page -->
 <div id="students-page" class="page-content hidden flex-col flex-1-dynamic">
-         <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Search, view, and manage student records and contact information.</p>
     <h1 class="text-4xl font-bold text-primary-purple px-4">Students Information</h1>
+    <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Search, view, and manage student records and contact information.</p>
     
     <!-- Search and Actions Bar -->
     <div class="flex items-center justify-between px-4 py-3 gap-4">

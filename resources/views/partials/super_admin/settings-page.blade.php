@@ -1,10 +1,9 @@
 <!-- Settings Page -->
 <div id="settings-page" class="page-content hidden">
-    <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Manage super admin preferences, account information, and security settings.</p>
-    <div class="flex items-center justify-between p-4">
+    <div class="flex items-center justify-between p-2">
         <h4 class="text-4xl font-bold text-primary-purple">Settings</h4>
     </div>
-    
+     <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Manage super admin preferences, account information, and security settings.</p>
     <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
         <!-- Change Name Section -->
         <div class="border-b border-gray-200 pb-6">

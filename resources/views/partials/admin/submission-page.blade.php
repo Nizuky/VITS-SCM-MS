@@ -1,7 +1,7 @@
 <!-- Submission Page -->
 <div id="submission-page" class="page-content hidden">
     <h1 class="text-4xl font-bold text-primary-purple px-4">Submission Management</h1>
-    <br>
+    <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Review, filter, and manage student submissions and their approval status.</p>
     
     <div class="flex flex-col md:flex-row justify-between items-center mb-4 px-4 gap-4 md:gap-0">
         <!-- Tabs -->

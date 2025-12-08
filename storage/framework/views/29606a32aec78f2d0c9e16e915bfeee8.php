@@ -3,7 +3,7 @@
     <div class="p-4 flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-4">
         <div>
             <h4 class="text-4xl font-bold text-primary-purple hidden lg:block">Support Tickets</h4>
-            <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">Review and resolve student support requests</p>
+            <p class="text-sm text-gray-600 mt-2 text-center lg:text-left">&#9432 Review and resolve student support requests</p>
         </div>
         <button onclick="refreshSupportTickets()" id="refresh-support-tickets-btn" class="btn btn-ghost btn-sm h-10 gap-2 mx-auto lg:mx-0" title="Refresh support tickets">
            <svg id="refresh-support-tickets-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
