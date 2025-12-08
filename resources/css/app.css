@@ -37,3 +37,14 @@
 	background-color: #4C1D95 !important; /* slightly deeper for active */
 	color: #ffffff !important;
 }
+
+/* Fix: mobile browsers often mishandle background-attachment: fixed.
+	 Ensure the dashboard background falls back to scroll on small/medium viewports
+	 so the background doesn't appear clipped/oversized on mobile. */
+@media (max-width: 1024px) {
+	.bg-custom {
+		background-attachment: scroll !important;
+		background-position: center top !important;
+		background-size: cover !important;
+	}
+}
