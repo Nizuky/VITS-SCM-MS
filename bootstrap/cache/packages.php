@@ -31,6 +31,13 @@
       0 => 'Livewire\\LivewireServiceProvider',
     ),
   ),
+  'livewire/volt' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Livewire\\Volt\\VoltServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
