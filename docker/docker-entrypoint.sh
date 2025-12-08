@@ -1,21 +1,63 @@
 #!/usr/bin/env sh
-set -e
+set -euo pipefail
 
 # Default port if not supplied
 : ${PORT:=80}
 
-# Replace placeholder in nginx config template
+# Template nginx config if template exists
 if [ -f /etc/nginx/conf.d/default.template ]; then
   echo "Templating nginx config with PORT=${PORT}"
-  # envsubst is provided by gettext-base
   export PORT
+  # envsubst is provided by gettext-base in the image
   envsubst '${PORT}' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf
 fi
 
-# Ensure php-fpm socket directory exists if using unix socket
-if [ -S /run/php/php-fpm.sock ] || [ -d /run/php ]; then
+# Write Aiven CA if provided via env (raw PEM or base64)
+CERT_PATH="/etc/ssl/certs/aiven-ca.pem"
+if [ -n "${AIVEN_CA_CERT:-}" ]; then
+  mkdir -p "$(dirname "$CERT_PATH")"
+  printf '%s\n' "$AIVEN_CA_CERT" > "$CERT_PATH"
+  chmod 644 "$CERT_PATH"
+  echo "Wrote AIVEN CA to $CERT_PATH"
+elif [ -n "${AIVEN_CA_B64:-}" ]; then
+  mkdir -p "$(dirname "$CERT_PATH")"
+  printf '%s' "$AIVEN_CA_B64" | base64 -d > "$CERT_PATH"
+  chmod 644 "$CERT_PATH"
+  echo "Wrote AIVEN CA (from base64) to $CERT_PATH"
+fi
+
+# Ensure php-fpm runtime dir exists
+if [ -d /run/php ] || [ -S /run/php/php-fpm.sock ]; then
   mkdir -p /run/php || true
 fi
 
-# Exec supervisord in foreground
+# Run Laravel artisan tasks if php is available
+if command -v php >/dev/null 2>&1; then
+  echo "Caching config and routes (if available)"
+  # Use guards so failures don't break container startup in non-PHP contexts
+  php artisan config:cache || true
+  php artisan route:cache || true
+  php artisan optimize || true
+
+  # Ensure public storage symlink exists
+  if [ ! -e /var/www/html/public/storage ]; then
+    php artisan storage:link || true
+  fi
+
+  # Run migrations: control with env vars
+  # RUN_MIGRATIONS=true (default: true)
+  # MIGRATE_FRESH=true to run migrate:fresh --seed
+  RUN_MIGRATIONS=${RUN_MIGRATIONS:-true}
+  MIGRATE_FRESH=${MIGRATE_FRESH:-false}
+  if [ "$RUN_MIGRATIONS" = "true" ]; then
+    echo "Running migrations..."
+    if [ "$MIGRATE_FRESH" = "true" ]; then
+      php artisan migrate:fresh --seed --force || true
+    else
+      php artisan migrate --force || true
+    fi
+  fi
+fi
+
+# Finally, exec supervisord to run php-fpm and nginx
 exec /usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
