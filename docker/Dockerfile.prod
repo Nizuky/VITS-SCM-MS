@@ -10,7 +10,9 @@ RUN npm run build
 FROM composer:2 AS composer_builder
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+# Clear composer cache and do a fresh install to avoid dependency mismatches
+RUN composer clear-cache \
+    && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 COPY . /app
 
 FROM php:8.2-fpm-bullseye
