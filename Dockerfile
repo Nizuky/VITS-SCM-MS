@@ -55,6 +55,14 @@ RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Make php-fpm listen on all interfaces inside the container so other containers (nginx) can reach it
+RUN if [ -f /etc/php/8.2/fpm/pool.d/www.conf ]; then \
+            sed -i "s/listen = 127.0.0.1:9000/listen = 9000/" /etc/php/8.2/fpm/pool.d/www.conf || true; \
+        fi \
+        && if [ -f /usr/local/etc/php-fpm.d/www.conf ]; then \
+            sed -i "s/listen = 127.0.0.1:9000/listen = 9000/" /usr/local/etc/php-fpm.d/www.conf || true; \
+        fi
+
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
