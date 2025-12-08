@@ -1143,6 +1143,10 @@ body {
                 if (data.success) {
                     allTickets = data.tickets || [];
                     renderTicketsTable();
+                    // Also load student counts for quick-stats
+                    if (typeof loadStudentCounts === 'function') {
+                        loadStudentCounts();
+                    }
                 } else {
                     console.error('Failed to load tickets:', data.message);
                 }
@@ -1769,7 +1773,24 @@ body {
             if (!tickets || tickets.length === 0) {
                 if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">No tickets found.</td></tr>';
                 if (cardsContainer) cardsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No tickets found.</div>';
+                // Update counts to zero when no tickets
+                const pendingEl = document.getElementById('pending-tickets-count');
+                const totalEl = document.getElementById('total-tickets-count');
+                if (pendingEl) pendingEl.textContent = '0';
+                if (totalEl) totalEl.textContent = '0';
                 return;
+            }
+
+            // Update quick-stats counts
+            try {
+                const totalCount = tickets.length;
+                const pendingCount = tickets.filter(t => (t.status || '').toLowerCase() === 'pending').length;
+                const pendingEl = document.getElementById('pending-tickets-count');
+                const totalEl = document.getElementById('total-tickets-count');
+                if (pendingEl) pendingEl.textContent = pendingCount;
+                if (totalEl) totalEl.textContent = totalCount;
+            } catch (e) {
+                console.error('Error updating ticket counts', e);
             }
 
             let statusBadges = {
@@ -1839,6 +1860,56 @@ body {
 
                     cardsContainer.appendChild(card);
                 });
+            }
+        }
+
+        // Load student counts for quick-stats (verified / unverified)
+        async function loadStudentCounts() {
+            try {
+                const response = await fetch(`${BASE_PATH}/super-admin/api/students`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (!response.ok) {
+                    console.warn('Failed to fetch students list, status:', response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                // Try multiple possible payload shapes
+                const students = Array.isArray(data) ? data : (data.students || data.data || []);
+
+                if (!Array.isArray(students)) {
+                    console.warn('Unexpected students payload format', data);
+                    return;
+                }
+
+                let verified = 0, unverified = 0;
+                students.forEach(s => {
+                    // Heuristics to determine verification
+                    const isVerified = !!(
+                        s.verified === true ||
+                        s.is_verified === true ||
+                        (s.verified_at && s.verified_at !== null) ||
+                        (s.status && String(s.status).toLowerCase() === 'verified') ||
+                        (s.status && String(s.status).toLowerCase() === 'active')
+                    );
+                    if (isVerified) verified++; else unverified++;
+                });
+
+                const verifiedEl = document.getElementById('verified-students-count');
+                const unverifiedEl = document.getElementById('unverified-students-count');
+                if (verifiedEl) verifiedEl.textContent = verified;
+                if (unverifiedEl) unverifiedEl.textContent = unverified;
+            } catch (err) {
+                console.error('Error loading student counts', err);
             }
         }
 
@@ -3861,10 +3932,33 @@ body {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-text-muted">No students found.</td></tr>';
                 return;
             }
+
+            // Update verified / unverified counts for quick-stats (if present)
+            try {
+                var verifiedCount = students.filter(function(s) {
+                    var st = (s.status || '').toString().toLowerCase();
+                    return !!(s.email_verified_at || s.is_verified || s.verified || st === 'verified');
+                }).length;
+                var totalCount = students.length;
+                var unverifiedCount = totalCount - verifiedCount;
+                var verifiedEl = document.getElementById('students-verified-count');
+                var unverifiedEl = document.getElementById('students-unverified-count');
+                if (verifiedEl) verifiedEl.textContent = verifiedCount;
+                if (unverifiedEl) unverifiedEl.textContent = unverifiedCount;
+                // Active / Inactive counts
+                var activeCount = students.filter(function(s) { return (s.status || '').toString().toLowerCase() === 'active'; }).length;
+                var inactiveCount = totalCount - activeCount;
+                var activeEl = document.getElementById('students-active-count');
+                var inactiveEl = document.getElementById('students-inactive-count');
+                if (activeEl) activeEl.textContent = activeCount;
+                if (inactiveEl) inactiveEl.textContent = inactiveCount;
+            } catch (e) {
+                console.error('Error updating student counts', e);
+            }
             
             var html = '';
             students.forEach(function(student) {
-                var status = student.status || 'active';
+                var status = (student.status || 'active').toString().toLowerCase();
                 var statusBadge = '';
                 
                 if (status === 'active') {

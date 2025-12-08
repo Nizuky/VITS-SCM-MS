@@ -2,8 +2,53 @@
 <div id="students-page" class="page-content hidden flex-col flex-1-dynamic">
     <h1 class="text-4xl font-bold text-primary-purple px-4">Students Information</h1>
     <p class="text-sm text-gray-600 mt-2 pl-4 pb-6 text-center lg:text-left">&#9432 Search, view, and manage student records and contact information.</p>
-    
-    <!-- Search and Actions Bar -->
+
+    <!-- Student stats (2x2 grid on mobile) -->
+    <div class="px-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 w-full">
+            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-sm text-gray-500">Verified Students</div>
+                    <div class="text-2xl font-bold text-primary-purple"><span id="students-verified-count">0</span></div>
+                </div>
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-sm text-gray-500">Unverified Students</div>
+                    <div class="text-2xl font-bold text-primary-purple"><span id="students-unverified-count">0</span></div>
+                </div>
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-sm text-gray-500">Active Students</div>
+                    <div class="text-2xl font-bold text-primary-purple"><span id="students-active-count">0</span></div>
+                </div>
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-sm text-gray-500">Inactive Students</div>
+                    <div class="text-2xl font-bold text-primary-purple"><span id="students-inactive-count">0</span></div>
+                </div>
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Search and Actions Bar -->
     <div class="flex items-center justify-between px-4 py-3 gap-4">
         <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
