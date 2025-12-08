@@ -37,7 +37,32 @@
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+@php
+	// Use Vite-built assets when available. If the build manifest is missing (e.g. build failed),
+	// fall back to the Tailwind CDN so styles still work in deployed environments.
+	$viteManifest = public_path('build/manifest.json');
+@endphp
+
+@if (file_exists($viteManifest))
+	@vite(['resources/css/app.css', 'resources/js/app.js'])
+@else
+	{{-- Fallback: Tailwind CDN (works when built assets are missing). --}}
+	<script>
+		if (!window.__TAILWIND_FALLBACK_LOADED__) {
+			// Insert the Tailwind CDN script dynamically so it runs early
+			var s = document.createElement('script');
+			s.src = 'https://cdn.tailwindcss.com';
+			s.defer = false;
+			document.head.appendChild(s);
+			window.__TAILWIND_FALLBACK_LOADED__ = true;
+		}
+	</script>
+	{{-- Optional: include app specific custom CSS that relies on CSS variables (if present in public/css) --}}
+	@php $appCss = public_path('css/app.css'); @endphp
+	@if (file_exists($appCss))
+		<link rel="stylesheet" href="{{ asset('css/app.css') }}">
+	@endif
+@endif
 
 @if(class_exists('Flux\Flux'))
     @fluxAppearance

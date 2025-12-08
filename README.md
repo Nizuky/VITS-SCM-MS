@@ -48,3 +48,7 @@ Notes & recommendations
 - Do not commit `.env` to the repo. Use secrets or environment variables in CI and production.
 - For smaller images consider using multi-stage builds and removing build-only dependencies.
 - If you prefer Kubernetes deployments or GHCR, update the workflow to push to your target registry and adjust permissions.
+
+Tailwind CDN fallback
+- The Blade layout now falls back to the official Tailwind CDN when Vite-built assets are missing (useful if a build step fails during deploy). This keeps basic Tailwind utilities working in production even if `public/build/manifest.json` is absent.
+- Note: plugins that run at build-time (for example `daisyui` custom themes) may not be available via the CDN fallback. For full feature parity, ensure `npm run build` completes successfully during your CI pipeline so `@vite` assets are used.
