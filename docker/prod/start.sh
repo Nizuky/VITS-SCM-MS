@@ -4,7 +4,8 @@ set -e
 # Substitute PORT into nginx template (default 80)
 TEMPLATE=/etc/nginx/conf.d/default.conf.template
 DEST=/etc/nginx/conf.d/default.conf
-PORT=${PORT:-80}
+# Default to listening on 0.0.0.0:8080 unless PORT is provided
+PORT=${PORT:-0.0.0.0:8080}
 
 if [ -f "$TEMPLATE" ]; then
   echo "Using nginx template: substituting PORT=${PORT}"
