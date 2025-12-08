@@ -18,25 +18,30 @@ ARG APP_ENV=production
 ENV APP_ENV=${APP_ENV}
 WORKDIR /var/www/html
 
-# Install system packages, nginx and supervisor
+# Install system packages, nginx, supervisor and build deps required for PHP extensions
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         nginx \
         supervisor \
+        build-essential \
+        autoconf \
+        pkg-config \
+        libonig-dev \
         libpng-dev \
         libjpeg-dev \
         libfreetype6-dev \
         libzip-dev \
+        zlib1g-dev \
         zip \
         unzip \
         git \
         curl \
         default-mysql-client \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && pecl install redis || true \
-    && docker-php-ext-enable redis || true \
-    && rm -rf /var/lib/apt/lists/*
+     && apt-get install -y --no-install-recommends php-redis || true \
+     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+     && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip \
+     && if ! php -m | grep -q '^redis$'; then pecl install redis && docker-php-ext-enable redis || true; fi \
+     && rm -rf /var/lib/apt/lists/*
 
 # Copy application and built assets
 COPY --from=composer_builder /app /var/www/html

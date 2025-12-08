@@ -7,9 +7,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/var/www/html:delegated
+      - ./storage/certs:/var/www/html/storage/certs:ro
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
+      - DB_SSL_CA=/var/www/html/storage/certs/aiven-ca.pem
     expose:
       - "9000"
 
@@ -35,7 +37,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
 volumes:
   db_data:

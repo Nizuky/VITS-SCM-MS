@@ -7,9 +7,11 @@ services:
     container_name: scms_app_dev
     volumes:
       - ./:/var/www/html:delegated
+      - ./storage/certs:/var/www/html/storage/certs:ro
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - DB_SSL_CA=/var/www/html/storage/certs/aiven-ca.pem
     expose:
       - "9000"
     command: ["php-fpm"]
@@ -43,7 +45,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
 volumes:
   db_data:
