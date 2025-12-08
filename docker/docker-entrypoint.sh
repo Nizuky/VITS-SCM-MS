@@ -31,6 +31,16 @@ if [ -d /run/php ] || [ -S /run/php/php-fpm.sock ]; then
   mkdir -p /run/php || true
 fi
 
+# Ensure all Laravel storage directories exist (safety net)
+mkdir -p /var/www/html/storage/framework/cache/data || true
+mkdir -p /var/www/html/storage/framework/sessions || true
+mkdir -p /var/www/html/storage/framework/views || true
+mkdir -p /var/www/html/storage/logs || true
+mkdir -p /var/www/html/storage/app/public || true
+mkdir -p /var/www/html/bootstrap/cache || true
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+
 # Run Laravel artisan tasks if php is available
 if command -v php >/dev/null 2>&1; then
   echo "Caching config and routes (if available)"
