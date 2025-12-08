@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         // 2) Then run hand-written seeders here
         $this->call([
             SuperAdminSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }
