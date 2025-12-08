@@ -3,7 +3,7 @@
         'name' => 'nizuky/vits-scm-ms',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '2f3819627ff939051f74edfc542a567d5dda9e46',
+        'reference' => '5598cdc0e4e890ff91721b3c5a29c7afaada58e7',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -571,7 +571,7 @@
         'nizuky/vits-scm-ms' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '2f3819627ff939051f74edfc542a567d5dda9e46',
+            'reference' => '5598cdc0e4e890ff91721b3c5a29c7afaada58e7',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
