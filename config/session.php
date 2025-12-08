@@ -2,15 +2,12 @@
 
 return [
     // Session driver - defaults to 'file' for reliability
-    // Set SESSION_DRIVER=database in production when database is confirmed working
     'driver' => env('SESSION_DRIVER', 'file'),
 
     // Minutes the session can remain idle before it expires
-    // Set to 1 year (525600 minutes) but session keeper will ping to keep alive
-    'lifetime' => env('SESSION_LIFETIME', 525600),
+    'lifetime' => env('SESSION_LIFETIME', 120),
 
     // Set to false so sessions persist across browser close
-    // Sessions will only expire after 'lifetime' minutes of inactivity
     'expire_on_close' => false,
 
     // Session encryption (false for better performance)
@@ -25,18 +22,18 @@ return [
     // Store (for redis)
     'store' => env('SESSION_STORE', null),
 
-    // Lottery for garbage collection (run less frequently)
+    // Lottery for garbage collection
     'lottery' => [2, 100],
 
     // Cookie name
-    'cookie' => env('SESSION_COOKIE', str_replace([' ', ':'], '_', env('APP_NAME', 'laravel')).'_session'),
+    'cookie' => env('SESSION_COOKIE', 'vits_session'),
 
     // Cookie path, domain, secure, httpOnly, sameSite
     'path' => '/',
     'domain' => env('SESSION_DOMAIN', null),
-    'secure' => env('SESSION_SECURE_COOKIE', false),
+    'secure' => env('SESSION_SECURE_COOKIE', null),
     'http_only' => true,
-    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+    'same_site' => 'lax',
 
     // Partitioned cookies (for Chrome's CHIPS)
     'partitioned' => false,
