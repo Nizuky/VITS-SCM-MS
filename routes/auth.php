@@ -48,8 +48,16 @@ Route::middleware('guest:superadmin')->group(function () {
             return redirect()->route('superadmin.dashboard');
         }
         
-        $admin = App\Models\SuperAdmin::first();
-        $defaultName = $admin ? $admin->name : null;
+        // Try to get default admin name, but don't fail if database is unavailable
+        $defaultName = null;
+        try {
+            $admin = App\Models\SuperAdmin::first();
+            $defaultName = $admin ? $admin->name : null;
+        } catch (\Throwable $e) {
+            // Database not ready yet or connection issue - just use null
+            \Log::warning('Could not fetch SuperAdmin for login page: ' . $e->getMessage());
+        }
+        
         return view('auth.super-admin-login', ['defaultAdminName' => $defaultName]);
     })->name('superadmin.login');
 
