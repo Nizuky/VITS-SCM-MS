@@ -43,6 +43,13 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 
 # Run Laravel artisan tasks if php is available
 if command -v php >/dev/null 2>&1; then
+  echo "Clearing all caches..."
+  # Clear all caches first to ensure fresh start
+  php artisan view:clear || true
+  php artisan config:clear || true
+  php artisan cache:clear || true
+  php artisan route:clear || true
+  
   echo "Caching config and routes (if available)"
   # Use guards so failures don't break container startup in non-PHP contexts
   php artisan config:cache || true
