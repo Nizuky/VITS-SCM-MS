@@ -697,6 +697,24 @@
                 });
             })();
         </script>
+        
+        <script>
+            // Livewire CSRF token configuration
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ensure Livewire uses the CSRF token from meta tag
+                if (typeof window.Livewire !== 'undefined') {
+                    window.Livewire.hook('request', ({ options }) => {
+                        const token = document.querySelector('meta[name="csrf-token"]');
+                        if (token) {
+                            options.headers = options.headers || {};
+                            options.headers['X-CSRF-TOKEN'] = token.content;
+                        }
+                    });
+                }
+            });
+        </script>
+        
         @include('partials.footer_partial')
     </body>
 </html>
+
