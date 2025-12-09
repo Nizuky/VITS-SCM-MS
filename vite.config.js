@@ -11,8 +11,10 @@ export default defineConfig({
         }),
     ],
     build: {
-        // IMPORTANT: Using esbuild (NOT terser) - built-in, no separate install needed
+        // CRITICAL: Explicitly using esbuild minification, NOT terser
         minify: 'esbuild',
+        // Explicitly disable terser (should not be used)
+        terserOptions: undefined,
         // Optimize chunk size
         chunkSizeWarningLimit: 1000,
         rollupOptions: {

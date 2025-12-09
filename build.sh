@@ -28,12 +28,16 @@ chmod -R 775 storage bootstrap/cache
 # Clear npm cache and node_modules to force fresh build
 rm -rf node_modules
 rm -rf .vite
+rm -rf dist
 rm -rf node_modules/.vite
 npm cache clean --force 2>/dev/null || true
 
-# Log vite.config.js contents to verify correct configuration
-echo "=== VITE CONFIG CHECK ==="
-grep -A 2 "minify:" vite.config.js || echo "minify setting not found"
+# Explicitly remove terser if it somehow got installed
+npm uninstall terser --no-save 2>/dev/null || true
+
+# Log FULL vite.config.js to verify correct configuration
+echo "=== FULL VITE CONFIG ==="
+cat vite.config.js
 echo "========================="
 
 npm ci
