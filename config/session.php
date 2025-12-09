@@ -4,8 +4,8 @@ return [
     // Session driver - use 'cookie' for Laravel Cloud, 'file' for local
     'driver' => env('SESSION_DRIVER', 'cookie'),
 
-    // Minutes the session can remain idle before it expires (5 minutes for minimal caching)
-    'lifetime' => env('SESSION_LIFETIME', 5),
+    // Minutes the session can remain idle before it expires
+    'lifetime' => env('SESSION_LIFETIME', 120),
 
     // Set to false so sessions persist across browser close
     'expire_on_close' => false,
