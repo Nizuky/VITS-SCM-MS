@@ -1,8 +1,8 @@
 <?php
 
 return [
-    // Session driver - defaults to 'file' for reliability
-    'driver' => env('SESSION_DRIVER', 'file'),
+    // Session driver - use 'cookie' for Laravel Cloud, 'file' for local
+    'driver' => env('SESSION_DRIVER', 'cookie'),
 
     // Minutes the session can remain idle before it expires
     'lifetime' => env('SESSION_LIFETIME', 120),
@@ -10,8 +10,8 @@ return [
     // Set to false so sessions persist across browser close
     'expire_on_close' => false,
 
-    // Session encryption (false for better performance)
-    'encrypt' => false,
+    // Session encryption (true for cookie driver security)
+    'encrypt' => env('SESSION_DRIVER', 'cookie') === 'cookie',
 
     // Session file location (for file driver)
     'files' => storage_path('framework/sessions'),
