@@ -49,12 +49,16 @@ if command -v php >/dev/null 2>&1; then
   php artisan config:clear || true
   php artisan cache:clear || true
   php artisan route:clear || true
+  php artisan event:clear || true
+  
+  echo "Publishing Livewire assets to public directory..."
+  # Ensure Livewire assets are available
+  php artisan vendor:publish --tag=livewire:assets --force || true
   
   echo "Caching config and routes (if available)"
   # Use guards so failures don't break container startup in non-PHP contexts
   php artisan config:cache || true
   php artisan route:cache || true
-  php artisan optimize || true
 
   # Ensure public storage symlink exists
   if [ ! -e /var/www/html/public/storage ]; then

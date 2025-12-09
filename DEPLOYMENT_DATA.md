@@ -153,7 +153,7 @@ ADMIN_NAME="Site Admin"
 ### Session Configuration
 ```env
 SESSION_DRIVER=cookie
-SESSION_LIFETIME=120
+SESSION_LIFETIME=5
 SESSION_ENCRYPT=true
 SESSION_SECURE_COOKIE=true
 SESSION_DOMAIN=.laravel.cloud
@@ -163,7 +163,7 @@ SESSION_HTTP_ONLY=true
 
 ### Session Features
 - **Driver:** Cookie-based (optimized for Laravel Cloud distributed environment)
-- **Lifetime:** 120 minutes (2 hours of inactivity)
+- **Lifetime:** 5 minutes (minimal caching for security)
 - **Encryption:** Enabled (encrypted session data)
 - **Secure Cookies:** HTTPS only
 - **Domain:** `.laravel.cloud` (allows subdomain access)
@@ -205,7 +205,7 @@ The application uses multiple authentication guards:
 
 ## 📧 Mail Configuration
 
-### SMTP Settings
+### Production SMTP Settings (Gmail)
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -217,17 +217,38 @@ MAIL_FROM_ADDRESS=vitsscmms@gmail.com
 MAIL_FROM_NAME="VITS"
 ```
 
+### Development/Testing Settings (Mailtrap)
+```env
+MAIL_MAILER=mailtrap
+MAILTRAP_HOST=smtp.mailtrap.io
+MAILTRAP_PORT=2525
+MAILTRAP_USERNAME=your_mailtrap_username
+MAILTRAP_PASSWORD=your_mailtrap_password
+MAILTRAP_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=vitsscmms@gmail.com
+MAIL_FROM_NAME="VITS"
+```
+
 ### Mail Features
-- **Provider:** Gmail SMTP
-- **Encryption:** TLS (port 587)
+- **Production Provider:** Gmail SMTP
+- **Testing Provider:** Mailtrap (for development/staging)
+- **Encryption:** TLS (port 587 for Gmail, 2525 for Mailtrap)
 - **From Address:** vitsscmms@gmail.com
 - **From Name:** VITS
+- **Timeout:** Default (no custom timeout)
 
 ### Email Use Cases
 1. **Student Email Verification** - Sent when students register
 2. **Password Reset Links** - For all user types (students, admins, super admins)
 3. **Admin Notifications** - Password change confirmations
 4. **System Notifications** - Critical system alerts
+
+### Testing Emails
+To test email sending in production, ensure:
+- `MAIL_MAILER=smtp` (for Gmail) or `MAIL_MAILER=mailtrap` (for testing)
+- Gmail App Password is valid (if using Gmail)
+- Mailtrap credentials are correct (if using Mailtrap)
+- From address matches authenticated account
 
 ---
 
@@ -297,6 +318,41 @@ RUN_MIGRATIONS=true
 RUN_SEEDERS=true
 MIGRATE_FRESH=false
 ```
+
+---
+
+## 🗂️ Cache Configuration
+
+### Cache Settings
+```env
+CACHE_STORE=file
+CACHE_TTL=300
+CACHE_PREFIX=vits_scm_ms_cache_
+```
+
+### Cache Features
+- **Driver:** File-based (suitable for single-server deployments)
+- **TTL:** 300 seconds (5 minutes) for minimal caching
+- **Path:** `storage/framework/cache/data`
+- **Prefix:** Application-specific to prevent collisions
+
+### Cache Clearing Strategy
+The application automatically clears all caches on deployment:
+- Config cache (`php artisan config:clear`)
+- Route cache (`php artisan route:clear`)
+- View cache (`php artisan view:clear`)
+- Application cache (`php artisan cache:clear`)
+- Event cache (`php artisan event:clear`)
+
+After clearing, it rebuilds optimized caches:
+- Config cache (`php artisan config:cache`)
+- Route cache (`php artisan route:cache`)
+
+### Available Cache Stores
+- **file** (default) - Local filesystem cache
+- **array** - In-memory cache (request lifetime only)
+- **database** - Database-backed cache
+- **redis** - Redis-backed cache (requires Redis setup)
 
 ---
 

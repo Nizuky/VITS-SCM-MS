@@ -9,6 +9,10 @@ composer install --no-dev --prefer-dist --optimize-autoloader
 # Publish Livewire assets to public directory
 php artisan vendor:publish --tag=livewire:assets --force
 
+# Ensure public/vendor/livewire directory exists and is writable
+mkdir -p public/vendor/livewire
+chmod -R 775 public/vendor
+
 # Ensure storage directories exist
 mkdir -p storage/framework/sessions
 mkdir -p storage/framework/views
