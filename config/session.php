@@ -29,11 +29,11 @@ return [
     'cookie' => env('SESSION_COOKIE', 'vits_session'),
 
     // Cookie path, domain, secure, httpOnly, sameSite
-    'path' => '/',
+    'path' => env('SESSION_PATH', '/'),
     'domain' => env('SESSION_DOMAIN', null),
-    'secure' => env('SESSION_SECURE_COOKIE', null),
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
     'http_only' => true,
-    'same_site' => 'lax',
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
     // Partitioned cookies (for Chrome's CHIPS)
     'partitioned' => false,

@@ -25,6 +25,9 @@ class KeepSessionAlive
             
             // Update last activity timestamp
             session()->put('last_keep_alive', now());
+            
+            // Touch the session to prevent expiration
+            session()->save();
         }
         
         return $next($request);
