@@ -25,6 +25,11 @@ mkdir -p storage/framework/cache/data
 mkdir -p storage/logs
 chmod -R 775 storage bootstrap/cache
 
+# Clear npm cache and node_modules to force fresh build
+rm -rf node_modules
+rm -rf .vite
+npm cache clean --force 2>/dev/null || true
+
 npm ci
 npm run build
 
