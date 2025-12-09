@@ -5,7 +5,7 @@ return [
     'driver' => env('SESSION_DRIVER', 'cookie'),
 
     // Minutes the session can remain idle before it expires
-    'lifetime' => env('SESSION_LIFETIME', 120),
+    'lifetime' => env('SESSION_LIFETIME', 525600),
 
     // Set to false so sessions persist across browser close
     'expire_on_close' => false,
