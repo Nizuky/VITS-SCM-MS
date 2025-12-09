@@ -250,18 +250,28 @@ function formatName(input) {
     // Capitalize first letter of each word
     value = value.replace(/\b\w/g, function(l){ return l.toUpperCase() });
     
-    // Update input value
-    input.value = value;
-    
-    // Trigger Livewire update
-    input.dispatchEvent(new Event('input'));
+    // Only update if value changed (prevent infinite loop)
+    if (input.value !== value) {
+        input.value = value;
+        // Update Livewire model directly without triggering oninput again
+        const component = input.closest('[wire\\:id]');
+        if (component && window.Livewire) {
+            const componentId = component.getAttribute('wire:id');
+            const livewireComponent = window.Livewire.find(componentId);
+            if (livewireComponent) {
+                livewireComponent.set('name', value);
+            }
+        }
+    }
 }
 
 function formatStudentId(input) {
     const errorMsg = document.getElementById('student-id-error');
     
-    // Remove all non-numeric characters
-    let value = input.value.replace(/\D/g, '');
+    // Remove all non-numeric characters except dash
+    let value = input.value.replace(/[^0-9-]/g, '');
+    // Remove all dashes to reformat
+    value = value.replace(/-/g, '');
     
     // Get current year's last 2 digits
     const currentYear = new Date().getFullYear();
@@ -275,7 +285,15 @@ function formatStudentId(input) {
             if (errorMsg) errorMsg.style.display = 'block';
             setTimeout(() => {
                 input.value = '';
-                input.dispatchEvent(new Event('input'));
+                // Update Livewire directly
+                const component = input.closest('[wire\\:id]');
+                if (component && window.Livewire) {
+                    const componentId = component.getAttribute('wire:id');
+                    const livewireComponent = window.Livewire.find(componentId);
+                    if (livewireComponent) {
+                        livewireComponent.set('student_id', '');
+                    }
+                }
             }, 500);
             return;
         } else {
@@ -294,11 +312,19 @@ function formatStudentId(input) {
         value = value.substring(0, 2) + '-' + value.substring(2);
     }
     
-    // Update input value
-    input.value = value;
-    
-    // Trigger Livewire update
-    input.dispatchEvent(new Event('input'));
+    // Only update if value changed (prevent infinite loop)
+    if (input.value !== value) {
+        input.value = value;
+        // Update Livewire model directly without triggering oninput again
+        const component = input.closest('[wire\\:id]');
+        if (component && window.Livewire) {
+            const componentId = component.getAttribute('wire:id');
+            const livewireComponent = window.Livewire.find(componentId);
+            if (livewireComponent) {
+                livewireComponent.set('student_id', value);
+            }
+        }
+    }
 }
 
 function formatRegisterEmail(input) {
