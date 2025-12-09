@@ -3,6 +3,7 @@
     <head>
         @include('partials.head')
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        @livewireStyles
         <style>
             /* ===========================================
                AUTH LAYOUT - PURE CSS, NO JS DEPENDENCY
@@ -714,7 +715,7 @@
             });
         </script>
         
-        @include('partials.footer_partial')
+        @livewireScripts
     </body>
 </html>
 
