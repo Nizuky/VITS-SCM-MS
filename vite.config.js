@@ -21,9 +21,9 @@ export default defineConfig({
                 },
             },
         },
-        // Minification - use esbuild (built-in) instead of terser
+        // Use esbuild for minification (built-in, fast, no extra dependencies)
         minify: 'esbuild',
-        // Source maps (disable in production for smaller size)
+        // Source maps disabled for smaller production builds
         sourcemap: false,
     },
     server: {
