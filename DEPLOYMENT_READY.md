@@ -84,14 +84,16 @@ MAIL_FROM_NAME="VITS"
 bash build.sh
 ```
 
-### Deploy Command (Option 1 - Recommended):
+### Deploy Command (RECOMMENDED - Let Docker Handle It):
 ```bash
-echo "Migrations handled by docker-entrypoint.sh"
+echo "Migrations and seeders handled by docker-entrypoint.sh on container startup"
 ```
 
-### Deploy Command (Option 2 - Manual):
+**Why this works:** The `docker-entrypoint.sh` has database wait logic that waits up to 60 seconds for the database to be ready. Deploy commands run BEFORE the container starts, when the database might not be accessible yet.
+
+### Alternative - If You Must Run in Deploy (NOT RECOMMENDED):
 ```bash
-php artisan migrate --force && php artisan db:seed --force
+timeout=60; until php artisan db:show --quiet 2>/dev/null || [ $timeout -eq 0 ]; do echo "Waiting for database..."; sleep 2; timeout=$((timeout-2)); done && php artisan migrate --force && php artisan db:seed --force || echo "Database not ready, will retry on container startup"
 ```
 
 ## What Happens on Deployment

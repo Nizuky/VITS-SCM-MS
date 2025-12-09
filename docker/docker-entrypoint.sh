@@ -83,15 +83,24 @@ if command -v php >/dev/null 2>&1; then
 
   # Run migrations: control with env vars
   # RUN_MIGRATIONS=true (default: true)
+  # RUN_SEEDERS=true (default: true) - run seeders after migrations
   # MIGRATE_FRESH=true to run migrate:fresh --seed
   RUN_MIGRATIONS=${RUN_MIGRATIONS:-true}
+  RUN_SEEDERS=${RUN_SEEDERS:-true}
   MIGRATE_FRESH=${MIGRATE_FRESH:-false}
+  
   if [ "$RUN_MIGRATIONS" = "true" ]; then
     echo "Running migrations..."
     if [ "$MIGRATE_FRESH" = "true" ]; then
       php artisan migrate:fresh --seed --force || true
     else
       php artisan migrate --force || true
+      
+      # Run seeders separately if not using migrate:fresh
+      if [ "$RUN_SEEDERS" = "true" ]; then
+        echo "Running database seeders..."
+        php artisan db:seed --force || true
+      fi
     fi
   fi
 fi
