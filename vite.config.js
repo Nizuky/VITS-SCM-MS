@@ -11,6 +11,8 @@ export default defineConfig({
         }),
     ],
     build: {
+        // IMPORTANT: Using esbuild (NOT terser) - built-in, no separate install needed
+        minify: 'esbuild',
         // Optimize chunk size
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
@@ -21,8 +23,6 @@ export default defineConfig({
                 },
             },
         },
-        // Use esbuild for minification (built-in, fast, no extra dependencies)
-        minify: 'esbuild',
         // Source maps disabled for smaller production builds
         sourcemap: false,
     },
