@@ -1,0 +1,3 @@
+# Force Laravel Cloud to invalidate build cache
+# Updated: 2025-12-09 - Using esbuild instead of terser
+BUILD_CACHE_BUST=20251209_v2
