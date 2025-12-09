@@ -43,3 +43,11 @@ echo "========================="
 npm ci
 npm run build
 
+# Run database migrations and seeders
+echo "Running database migrations and seeders..."
+php artisan migrate --force
+php artisan db:seed --force --class=SuperAdminSeeder
+php artisan db:seed --force --class=AdminUserSeeder
+
+echo "Build completed successfully!"
+
