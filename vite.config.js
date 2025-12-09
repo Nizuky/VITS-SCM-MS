@@ -21,14 +21,8 @@ export default defineConfig({
                 },
             },
         },
-        // Minification
-        minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true, // Remove console.logs in production
-                drop_debugger: true,
-            },
-        },
+        // Minification - use esbuild (built-in) instead of terser
+        minify: 'esbuild',
         // Source maps (disable in production for smaller size)
         sourcemap: false,
     },

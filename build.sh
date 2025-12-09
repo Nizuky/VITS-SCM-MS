@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Convert .env to Unix line endings if it exists (fix Windows CRLF issues)
+if [ -f .env ]; then
+    dos2unix .env 2>/dev/null || sed -i 's/\r$//' .env 2>/dev/null || true
+fi
+
 # Clear composer cache and remove vendor to force fresh install
 rm -rf vendor
 composer clear-cache
