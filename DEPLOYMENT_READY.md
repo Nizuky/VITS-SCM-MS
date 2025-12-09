@@ -30,6 +30,8 @@
 
 ## Laravel Cloud Environment Variables
 
+**IMPORTANT:** Without the `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` environment variables, the SuperAdmin account will NOT be created during seeding.
+
 Copy these **exact values** to your Laravel Cloud Custom Environment Variables:
 
 ```env
@@ -58,6 +60,11 @@ DB_PASSWORD=QXkqdoO9xir8FToisMwb
 # Cache & Queue
 CACHE_STORE=file
 QUEUE_CONNECTION=sync
+
+# Super Admin Credentials (REQUIRED for seeding)
+SUPERADMIN_EMAIL=janarafael.sanandres@gmail.com
+SUPERADMIN_PASSWORD=softdev2025
+SUPERADMIN_NAME="Super Admin"
 
 # Mail Configuration
 MAIL_MAILER=smtp
@@ -112,6 +119,17 @@ php artisan migrate --force && php artisan db:seed --force
 - Fresh configuration with no stale cache
 
 ## Testing After Deployment
+
+### Important: Ensure SuperAdmin Account Exists
+Before testing super admin login, verify these environment variables are set:
+- `SUPERADMIN_EMAIL=janarafael.sanandres@gmail.com`
+- `SUPERADMIN_PASSWORD=softdev2025`
+- `SUPERADMIN_NAME="Super Admin"`
+
+Then run seeders to create the account:
+```bash
+php artisan db:seed --force
+```
 
 ### 1. Test Session Persistence
 Visit: `https://vits-scm-ms-main-xkjcnp.laravel.cloud/test-session.php`
