@@ -10,6 +10,28 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        // Optimize chunk size
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                // Manual chunks for better caching
+                manualChunks: {
+                    'vendor': ['axios'],
+                },
+            },
+        },
+        // Minification
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true, // Remove console.logs in production
+                drop_debugger: true,
+            },
+        },
+        // Source maps (disable in production for smaller size)
+        sourcemap: false,
+    },
     server: {
         // Bind to all interfaces so hosting platforms (Render, Docker, etc.) can reach the dev server
         host: '0.0.0.0',

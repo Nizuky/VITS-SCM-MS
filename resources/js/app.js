@@ -3,7 +3,17 @@
 
 // Example: set up axios defaults if used
 import axios from 'axios';
+
+// Performance optimizations
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.timeout = 10000; // 10 second timeout
+axios.defaults.maxRedirects = 5;
+
+// Enable HTTP compression
+axios.defaults.headers.common['Accept-Encoding'] = 'gzip, deflate, br';
+
+// Connection keep-alive
+axios.defaults.headers.common['Connection'] = 'keep-alive';
 
 // Configure CSRF token for axios and fetch requests
 const csrfToken = document.querySelector('meta[name="csrf-token"]');

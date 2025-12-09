@@ -92,6 +92,34 @@ return [
 
     /*
     |---------------------------------------------------------------------------
+    | Inject Assets
+    |---------------------------------------------------------------------------
+    |
+    | By default, Livewire injects its JavaScript and CSS into the <head> and
+    | before </body> on pages containing Livewire components. By disabling this,
+    | you need to manually include @livewireStyles and @livewireScripts.
+    |
+    */
+
+    'inject_assets' => true,
+
+    /*
+    |---------------------------------------------------------------------------
+    | Update Queue
+    |---------------------------------------------------------------------------
+    |
+    | By default, Livewire will queue updates to reduce the number of requests.
+    | This improves performance by batching multiple updates into one request.
+    |
+    */
+
+    'update_queue' => [
+        'enabled' => true,
+        'batch_delay' => 100, // milliseconds
+    ],
+
+    /*
+    |---------------------------------------------------------------------------
     | Eloquent Model Binding
     |---------------------------------------------------------------------------
     |
