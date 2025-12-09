@@ -12,7 +12,17 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.admin-login');
+        // Try to get default admin name, but don't fail if database is unavailable
+        $defaultName = null;
+        try {
+            $admin = \App\Models\AdminUser::first();
+            $defaultName = $admin ? $admin->name : null;
+        } catch (\Throwable $e) {
+            // Database not ready yet or connection issue - just use null
+            \Log::warning('Could not fetch AdminUser for login page: ' . $e->getMessage());
+        }
+        
+        return view('auth.admin-login', ['defaultAdminName' => $defaultName]);
     }
 
     public function login(Request $request)
