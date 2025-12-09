@@ -27,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Exclude specific routes from CSRF verification
         // All dashboard API routes are excluded since they use session-based auth
+        // NOTE: Livewire routes (/livewire/update, /livewire/upload) should NOT be excluded
+        // They need CSRF tokens which are sent via headers
         $middleware->validateCsrfTokens(except: [
             // Student dashboard routes - all CRUD operations
             '/api/social-contract/records',

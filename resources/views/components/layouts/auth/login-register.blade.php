@@ -716,6 +716,19 @@
         </script>
         
         @livewireScripts
+        
+        <script>
+            // Ensure Livewire sends CSRF token with all requests
+            document.addEventListener('livewire:init', () => {
+                Livewire.hook('request', ({ options }) => {
+                    const token = document.querySelector('meta[name="csrf-token"]');
+                    if (token) {
+                        options.headers = options.headers || {};
+                        options.headers['X-CSRF-TOKEN'] = token.content;
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
 
