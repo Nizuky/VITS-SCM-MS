@@ -578,6 +578,12 @@
       // Function to clear session and redirect to Admin login
       function clearSessionAndGoToAdmin() {
         try {
+          // Show loading state
+          var btn = event.target;
+          var originalText = btn.innerHTML;
+          btn.innerHTML = 'Loading...';
+          btn.disabled = true;
+          
           // Clear all storage except theme preferences
           var adminTheme = localStorage.getItem('scms_admin_theme');
           var superadminTheme = localStorage.getItem('scms_superadmin_theme');
@@ -592,12 +598,20 @@
         }
         
         // Redirect to Admin login
-        window.location.href = '{{ route('admin.login') }}';
+        var url = '{{ route('admin.login') }}';
+        console.log('Redirecting to:', url);
+        window.location.href = url;
       }
 
       // Function to clear session and redirect to Super Admin login
       function clearSessionAndGoToSuperAdmin() {
         try {
+          // Show loading state
+          var btn = event.target;
+          var originalText = btn.innerHTML;
+          btn.innerHTML = 'Loading...';
+          btn.disabled = true;
+          
           // Clear all storage except theme preferences
           var adminTheme = localStorage.getItem('scms_admin_theme');
           var superadminTheme = localStorage.getItem('scms_superadmin_theme');
@@ -611,8 +625,10 @@
           console.log('Error clearing storage:', e); 
         }
         
-        // Redirect to super admin login
-        window.location.href = '{{ route('superadmin.login') }}';
+        // Redirect to super admin login with explicit URL
+        var url = '{{ route('superadmin.login') }}';
+        console.log('Redirecting to:', url);
+        window.location.href = url;
       }
 
             // Header show/hide on scroll: hide when scrolling down, show when scrolling up
