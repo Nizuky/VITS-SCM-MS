@@ -576,50 +576,62 @@
       }
 
       // Function to clear session and redirect to Admin login
-      async function clearSessionAndGoToAdmin() {
+      function clearSessionAndGoToAdmin() {
         try {
-          // Clear all storage to force re-login
-          localStorage.clear();
-          sessionStorage.clear();
+          // Send logout request via beacon (non-blocking)
+          var logoutUrl = '{{ route('admin.logout') }}';
+          var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          var formData = new FormData();
+          formData.append('_token', csrfToken);
           
-          // Call logout endpoint to clear server session
-          await fetch('{{ route('admin.logout') }}', {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-              'Accept': 'application/json'
-            },
-            credentials: 'same-origin'
-          }).catch(() => {});
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(logoutUrl, formData);
+          }
+          
+          // Clear all storage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
+          var studentTheme = localStorage.getItem('scms_student_theme');
+          localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
+          if (studentTheme) localStorage.setItem('scms_student_theme', studentTheme);
+          sessionStorage.clear();
         } catch(e) { 
           console.log('Error clearing storage:', e); 
         }
         
-        // Redirect to Admin login
+        // Redirect to Admin login immediately
         window.location.href = '{{ route('admin.login') }}';
       }
 
       // Function to clear session and redirect to Super Admin login
-      async function clearSessionAndGoToSuperAdmin() {
+      function clearSessionAndGoToSuperAdmin() {
         try {
-          // Clear all storage to force re-login
-          localStorage.clear();
-          sessionStorage.clear();
+          // Send logout request via beacon (non-blocking)
+          var logoutUrl = '{{ route('superadmin.logout') }}';
+          var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          var formData = new FormData();
+          formData.append('_token', csrfToken);
           
-          // Call logout endpoint to clear server session
-          await fetch('{{ route('superadmin.logout') }}', {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-              'Accept': 'application/json'
-            },
-            credentials: 'same-origin'
-          }).catch(() => {});
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(logoutUrl, formData);
+          }
+          
+          // Clear all storage except theme preferences
+          var adminTheme = localStorage.getItem('scms_admin_theme');
+          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
+          var studentTheme = localStorage.getItem('scms_student_theme');
+          localStorage.clear();
+          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
+          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
+          if (studentTheme) localStorage.setItem('scms_student_theme', studentTheme);
+          sessionStorage.clear();
         } catch(e) { 
           console.log('Error clearing storage:', e); 
         }
         
-        // Redirect to super admin login
+        // Redirect to super admin login immediately
         window.location.href = '{{ route('superadmin.login') }}';
       }
 
