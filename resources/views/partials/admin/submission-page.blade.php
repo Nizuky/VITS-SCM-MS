@@ -37,37 +37,37 @@
                         <th class="text-center" style="min-width: 90px; width: 90px; height: 60px; white-space: nowrap;">
                             <button id="studentid-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student ID">
                                 Student ID
-                                <span id="studentid-sort-indicator">⇅</span>
+                                <span id="studentid-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" style="min-width: 140px; width: 140px; height: 60px; white-space: nowrap;">
                             <button id="studentname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Student Name">
                                 Student Name
-                                <span id="studentname-sort-indicator">⇅</span>
+                                <span id="studentname-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" style="min-width: 110px; width: 110px; height: 60px; white-space: nowrap;">
                             <button id="eventname-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Event Name">
                                 Event Name
-                                <span id="eventname-sort-indicator">⇅</span>
+                                <span id="eventname-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" style="min-width: 140px; width: 140px; height: 60px;">
                             <button id="organization-sort-toggle" class="btn btn-ghost btn-xs gap-1 flex-col font-bold" title="Sort by Organization/Supervisor">
                                 <span style="white-space: nowrap;">Organization/Supervisor</span>
-                                <span id="organization-sort-indicator">⇅</span>
+                                <span id="organization-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" style="min-width: 80px; width: 80px; height: 60px; white-space: nowrap;">
                             <button id="hours-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Hours Rendered">
                                 Hours
-                                <span id="hours-sort-indicator">⇅</span>
+                                <span id="hours-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" style="min-width: 80px; width: 80px; height: 60px; white-space: nowrap;">
                             <button id="date-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Date">
                                 Date
-                                <span id="date-sort-indicator">⇅</span>
+                                <span id="date-sort-indicator">&#8645;</span>
                             </button>
                         </th>
                         <th class="text-center" id="action-status-header" style="min-width: 180px; width: 180px; height: 60px;">
@@ -78,7 +78,7 @@
                                 <div class="flex items-center justify-center gap-1">
                                     <button id="status-sort-toggle" class="btn btn-ghost btn-xs gap-1 font-bold" title="Sort by Status">
                                         Status
-                                        <span id="status-sort-indicator">⇅</span>
+                                        <span id="status-sort-indicator">&#8645;</span>
                                     </button>
                                     <div class="dropdown dropdown-bottom dropdown-end" id="status-filter-dropdown">
                                         <div tabindex="0" role="button" class="btn btn-ghost btn-xs m-1" title="Filter by status">
