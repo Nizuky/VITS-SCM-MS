@@ -1961,7 +1961,7 @@
             var s = r.dataset.status;
             var v = r.dataset.venue;
             var org = r.dataset.organization;
-            var supervisorName = r.dataset.supervisorName || '';
+            var supervisorName = r.dataset.supervisorName || '-';
             var en = r.cells[2].textContent;
             var dt = r.cells[5].textContent;
             var hr = r.cells[4].textContent;
