@@ -53,18 +53,40 @@
 
 <script>
 // Auto-logout super admin session when page is closed or navigated away
-window.addEventListener('beforeunload', function() {
-    // Send logout request synchronously before page unloads
-    if (navigator.sendBeacon) {
-        navigator.sendBeacon('{{ route("superadmin.logout") }}', new FormData());
-    }
-});
+// CRITICAL: Super admins should NEVER have persistent sessions
+let isInternalNavigation = false;
 
-// Also logout on page visibility change (tab close, browser back)
-window.addEventListener('pagehide', function() {
-    if (navigator.sendBeacon) {
-        navigator.sendBeacon('{{ route("superadmin.logout") }}', new FormData());
+// Track internal navigation (form submissions within the site)
+const superAdminForm = document.getElementById('superadmin-login-form');
+if (superAdminForm) {
+    superAdminForm.addEventListener('submit', function() {
+        isInternalNavigation = true;
+    });
+}
+
+function superAdminLogout() {
+    if (!isInternalNavigation) {
+        // Send logout beacon - works even as page is unloading
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('{{ route("superadmin.logout") }}', new FormData());
+        } else {
+            // Fallback for older browsers
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{{ route("superadmin.logout") }}', false); // synchronous
+            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            xhr.send();
+        }
     }
+}
+
+// Fire on all possible exit events
+window.addEventListener('beforeunload', superAdminLogout);
+window.addEventListener('pagehide', superAdminLogout);
+window.addEventListener('unload', superAdminLogout);
+
+// Handle browser back button
+window.addEventListener('popstate', function() {
+    superAdminLogout();
 });
 
     (function(){

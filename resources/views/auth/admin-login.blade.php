@@ -72,19 +72,34 @@
 
 <script>
 // Auto-logout admin session when page is closed or navigated away
-window.addEventListener('beforeunload', function() {
-    // Send logout request synchronously before page unloads
-    if (navigator.sendBeacon) {
-        navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
-    }
-});
+// CRITICAL: Admins should NEVER have persistent sessions
+let isInternalAdminNav = false;
 
-// Also logout on page visibility change (tab close, browser back)
-window.addEventListener('pagehide', function() {
-    if (navigator.sendBeacon) {
-        navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+// Track internal navigation (form submissions)
+const adminLoginForm = document.getElementById('admin-login-form');
+if (adminLoginForm) {
+    adminLoginForm.addEventListener('submit', function() {
+        isInternalAdminNav = true;
+    });
+}
+
+function adminLogout() {
+    if (!isInternalAdminNav) {
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+        } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{{ route("admin.logout") }}', false);
+            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            xhr.send();
+        }
     }
-});
+}
+
+window.addEventListener('beforeunload', adminLogout);
+window.addEventListener('pagehide', adminLogout);
+window.addEventListener('unload', adminLogout);
+window.addEventListener('popstate', adminLogout);
 
 (function(){
     const form = document.getElementById('admin-login-form');

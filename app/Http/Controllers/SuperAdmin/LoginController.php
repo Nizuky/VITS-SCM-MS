@@ -188,6 +188,20 @@ class LoginController extends Controller
         $request->session()->put('auth_guard', 'superadmin');
         $request->session()->put('superadmin_session_active', true);
         $request->session()->put('last_activity', time());
+        $request->session()->put('remembered', false); // Explicitly disable remember me
+        
+        // Ensure no remember cookie exists
+        try {
+            $guard = Auth::guard('superadmin');
+            if (method_exists($guard, 'getRecallerName')) {
+                $recaller = $guard->getRecallerName();
+                \Cookie::queue(\Cookie::forget(
+                    $recaller,
+                    config('session.path', '/'),
+                    config('session.domain')
+                ));
+            }
+        } catch (\Throwable $e) { /* ignore */ }
         
         // Force immediate session write to prevent race conditions
         $request->session()->save();

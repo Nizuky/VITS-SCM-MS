@@ -1162,8 +1162,8 @@ body {
 
             currentTicketId = ticketId;
             document.getElementById('modal-ticket-id').textContent = ticket.id;
-            document.getElementById('modal-ticket-student').textContent = ticket.student_name || 'N/A';
-            document.getElementById('modal-ticket-student-id').textContent = ticket.student_id || 'N/A';
+            document.getElementById('modal-ticket-student').textContent = ticket.student_name || '-';
+            document.getElementById('modal-ticket-student-id').textContent = ticket.student_id || '-';
             document.getElementById('modal-ticket-type').textContent = ticket.type;
             document.getElementById('modal-ticket-details').textContent = ticket.details;
             document.getElementById('modal-ticket-submitted').textContent = ticket.submitted_at || ticket.date;
@@ -1204,7 +1204,7 @@ body {
                             dateStr = dateValue;
                         }
                     }
-                    const eventName = record.event_name || record.organization || 'No event name';
+                    const eventName = record.event_name || record.organization || '-';
                     const venue = record.venue || 'No venue';
                     const status = record.status || 'Unknown';
                     linkedRecordElement.textContent = `${dateStr} - ${eventName} at ${venue} (${status})`;
@@ -1811,8 +1811,8 @@ body {
 
                     tr.innerHTML = `
                         <td class="font-medium text-text-header" style="min-width: 80px; width: 80px; white-space: nowrap;">${ticket.id}</td>
-                        <td class="text-text-header" style="min-width: 90px; width: 90px; white-space: nowrap;">${ticket.student_id || 'N/A'}</td>
-                        <td class="text-text-header" style="min-width: 150px; width: 150px; white-space: nowrap;">${ticket.student_name || 'N/A'}</td>
+                        <td class="text-text-header" style="min-width: 90px; width: 90px; white-space: nowrap;">${ticket.student_id || '-'}</td>
+                        <td class="text-text-header" style="min-width: 150px; width: 150px; white-space: nowrap;">${ticket.student_name || '-'}</td>
                         <td class="text-text-header" style="min-width: 120px; width: 120px; white-space: nowrap;">${ticket.type}</td>
                         <td class="text-text-muted text-sm" style="min-width: 200px; width: 200px;" title="${ticket.details}">${shortDetails}</td>
                         <td style="min-width: 90px; width: 90px;">
@@ -1850,8 +1850,8 @@ body {
                         </div>
                         <div class="ticket-card-title">${ticket.type}</div>
                         <div class="ticket-card-info">
-                            <div class="ticket-card-row"><span class="ticket-card-label">Student ID:</span><span class="ticket-card-value">${ticket.student_id || 'N/A'}</span></div>
-                            <div class="ticket-card-row"><span class="ticket-card-label">Student:</span><span class="ticket-card-value">${ticket.student_name || 'N/A'}</span></div>
+                            <div class="ticket-card-row"><span class="ticket-card-label">Student ID:</span><span class="ticket-card-value">${ticket.student_id || '-'}</span></div>
+                            <div class="ticket-card-row"><span class="ticket-card-label">Student:</span><span class="ticket-card-value">${ticket.student_name || '-'}</span></div>
                             <div class="ticket-card-row"><span class="ticket-card-label">Details:</span><span class="ticket-card-value">${shortDetails}</span></div>
                             <div class="ticket-card-row"><span class="ticket-card-label">Date:</span><span class="ticket-card-value">${ticket.date}</span></div>
                         </div>
@@ -2794,13 +2794,13 @@ body {
                         'data-rejection-reason="' + rejectionReason + '" ' +
                         'data-action-date="' + actionDateStr + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">' + (record.student_id || 'â€”') + '</td>' +
-                        '<td class="text-center" style="min-width: 160px; width: 160px; white-space: nowrap;">' + (record.student_name || 'â€”') + '</td>' +
-                        '<td class="text-center" style="min-width: 130px; width: 130px; white-space: nowrap;">' + (record.event_name || 'â€”') + '</td>' +
+                        '<td class="text-center" style="min-width: 90px; width: 90px; white-space: nowrap;">' + (record.student_id || '-') + '</td>' +
+                        '<td class="text-center" style="min-width: 160px; width: 160px; white-space: nowrap;">' + (record.student_name || '-') + '</td>' +
+                        '<td class="text-center" style="min-width: 130px; width: 130px; white-space: nowrap;">' + (record.event_name || '-') + '</td>' +
                         '<td class="text-center" style="min-width: 160px; width: 160px;">' + 
                             '<div class="flex flex-col items-center">' +
-                                '<span class="font-medium">' + (record.organization || 'â€”') + '</span>' +
-                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || 'â€”') + '</span>' +
+                                '<span class="font-medium">' + (record.organization || '-') + '</span>' +
+                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '-') + '</span>' +
                             '</div>' +
                         '</td>' +
                         '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.hours_rendered || 0) + ' hours</td>' +
@@ -3830,8 +3830,8 @@ body {
                         bVal = parseInt(b.approved_hours) || 0;
                         break;
                     case 'status':
-                        aVal = (a.status || 'active').toLowerCase();
-                        bVal = (b.status || 'active').toLowerCase();
+                        aVal = (a.status || '-').toLowerCase();
+                        bVal = (b.status || '-').toLowerCase();
                         break;
                     default:
                         return 0;
@@ -3958,7 +3958,7 @@ body {
             
             var html = '';
             students.forEach(function(student) {
-                var status = (student.status || 'active').toString().toLowerCase();
+                var status = (student.status || '-').toString().toLowerCase();
                 var statusBadge = '';
                 
                 if (status === 'active') {
@@ -4064,7 +4064,7 @@ body {
             document.getElementById('edit-student-id').value = student.student_id || '';
             document.getElementById('edit-student-email').value = student.email || '';
             document.getElementById('edit-student-approved-hours').value = (student.approved_hours || 0) + ' hours';
-            document.getElementById('edit-student-status').value = student.status || 'active';
+            document.getElementById('edit-student-status').value = student.status || '-';
             
             // Update inactive warning box
             updateInactiveWarning(student);
@@ -4097,7 +4097,7 @@ body {
             document.getElementById('view-student-email-verified').innerHTML = verifiedBadge;
             
             // Status badge with countdown if inactive
-            var status = student.status || 'active';
+            var status = student.status || '-';
             var statusHtml = '';
             
             if (status === 'active') {

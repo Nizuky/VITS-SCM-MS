@@ -1490,13 +1490,13 @@
                         'data-action-date="' + actionDateStr + '" ' +
                         'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || '—') + '</td>' +
-                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || '—') + '</td>' +
-                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || '-') + '</td>' +
+                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || '-') + '</td>' +
+                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || '-') + '</td>' +
                         '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + 
                             '<div class="flex flex-col items-center">' +
-                                '<span class="font-medium">' + (record.organization || '—') + '</span>' +
-                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
+                                '<span class="font-medium">' + (record.organization || '-') + '</span>' +
+                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '-') + '</span>' +
                             '</div>' +
                         '</td>' +
                         '<td class="text-center" style="min-width: 50px; width: 50px; white-space: nowrap;">' + (record.hours_rendered || 0) + ' hours</td>' +

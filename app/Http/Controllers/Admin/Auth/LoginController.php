@@ -102,6 +102,21 @@ class LoginController extends Controller
                 $request->session()->put('auth_guard', 'admin');
                 $request->session()->put('admin_session_active', true);
                 $request->session()->put('last_activity', time());
+                $request->session()->put('remembered', false); // Explicitly disable remember me
+                
+                // Ensure no remember cookie exists
+                try {
+                    $guard = Auth::guard('admin');
+                    if (method_exists($guard, 'getRecallerName')) {
+                        $recaller = $guard->getRecallerName();
+                        \Cookie::queue(\Cookie::forget(
+                            $recaller,
+                            config('session.path', '/'),
+                            config('session.domain')
+                        ));
+                    }
+                } catch (\Throwable $e) { /* ignore */ }
+                
                 $request->session()->save();
                 
                 // Log successful login
