@@ -112,8 +112,17 @@
                 }
             }).catch(err => {
                 setLoading(false);
-                // show error banner
-                let msg = 'Invalid user';
+                // show error banner with actual error message from server
+                let msg = 'Login failed';
+                
+                // Try to get the actual error message from the server response
+                if (err && err.message) {
+                    msg = err.message;
+                } else if (typeof err === 'string') {
+                    msg = err;
+                }
+                
+                console.error('SuperAdmin login error:', err); // Log for debugging
                 
                 let existing = document.querySelector('.superadmin-error-banner');
                 if (!existing){
