@@ -1,9 +1,20 @@
 #!/bin/bash
 set -e
 
-# Convert .env to Unix line endings if it exists (fix Windows CRLF issues)
+# CRITICAL: Convert .env to Unix line endings FIRST (fix Windows CRLF issues)
+# This must run before anything else that might source .env
 if [ -f .env ]; then
-    dos2unix .env 2>/dev/null || sed -i 's/\r$//' .env 2>/dev/null || true
+    echo "Converting .env to Unix line endings..."
+    # Try multiple methods to ensure conversion happens
+    if command -v dos2unix &> /dev/null; then
+        dos2unix .env
+    elif command -v sed &> /dev/null; then
+        sed -i 's/\r$//' .env
+    else
+        # Fallback: use tr to remove carriage returns
+        tr -d '\r' < .env > .env.tmp && mv .env.tmp .env
+    fi
+    echo ".env line endings converted successfully"
 fi
 
 # Clear composer cache and remove vendor to force fresh install
@@ -43,11 +54,8 @@ echo "========================="
 npm ci
 npm run build
 
-# Run database migrations and seeders
-echo "Running database migrations and seeders..."
-php artisan migrate --force
-php artisan db:seed --force --class=SuperAdminSeeder
-php artisan db:seed --force --class=AdminUserSeeder
-
+# NOTE: Database migrations and seeding are NOT run during build
+# They should be run separately after deployment via Laravel Cloud's post-deployment hooks
+# or manually via SSH/console to avoid timeout issues during the build process
 echo "Build completed successfully!"
 
