@@ -72,4 +72,3 @@ class MySqlConnector extends BaseMySqlConnector
         return $connection;
     }
 }
-}
