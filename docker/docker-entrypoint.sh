@@ -80,21 +80,31 @@ if command -v php >/dev/null 2>&1; then
   # Wait for database if DB_HOST is set (with timeout)
   if [ -n "${DB_HOST:-}" ] && [ "${DB_HOST}" != "127.0.0.1" ] && [ "${DB_HOST}" != "localhost" ]; then
     echo "Waiting for database connection to ${DB_HOST}:${DB_PORT:-3306}..."
-    MAX_TRIES=30
-    TRY=0
-    while [ $TRY -lt $MAX_TRIES ]; do
-      if php artisan db:show --quiet 2>/dev/null; then
-        echo "Database connection successful!"
-        break
-      fi
-      TRY=$((TRY + 1))
-      if [ $TRY -eq $MAX_TRIES ]; then
-        echo "Warning: Database not ready after $MAX_TRIES attempts. Continuing without migrations."
-        break
-      fi
-      echo "Attempt $TRY/$MAX_TRIES failed. Waiting 2 seconds..."
-      sleep 2
-    done
+    
+    # Use the dedicated wait-for-db script
+    if [ -f /usr/local/bin/wait-for-db.sh ]; then
+      /usr/local/bin/wait-for-db.sh 60 || {
+        echo "ERROR: Database connection failed after waiting"
+        echo "Proceeding anyway - migrations will fail if database is unreachable"
+      }
+    else
+      # Fallback to old method if script not found
+      MAX_TRIES=60
+      TRY=0
+      while [ $TRY -lt $MAX_TRIES ]; do
+        if php artisan db:show --quiet 2>/dev/null; then
+          echo "Database connection successful!"
+          break
+        fi
+        TRY=$((TRY + 1))
+        if [ $TRY -eq $MAX_TRIES ]; then
+          echo "Warning: Database not ready after $MAX_TRIES attempts. Continuing without migrations."
+          break
+        fi
+        echo "Attempt $TRY/$MAX_TRIES failed. Waiting 2 seconds..."
+        sleep 2
+      done
+    fi
   fi
 
   # Run migrations: control with env vars

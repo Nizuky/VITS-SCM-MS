@@ -52,6 +52,10 @@ RUN apt-get update \
 COPY --from=composer_builder /app /var/www/html
 COPY --from=node_builder /app/public/build /var/www/html/public/build
 
+# Copy docker scripts
+COPY docker/wait-for-db.sh /usr/local/bin/wait-for-db.sh
+RUN chmod +x /usr/local/bin/wait-for-db.sh
+
 # Ensure storage & cache dirs exist and are writable by www-data
 RUN mkdir -p /var/www/html/storage/framework/cache/data \
     && mkdir -p /var/www/html/storage/framework/sessions \
