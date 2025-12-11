@@ -17,10 +17,16 @@ class ForceUpdateSuperAdmin extends Command
         $this->newLine();
         
         try {
+            // Disable foreign key checks
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            
             // Delete all existing super admins
             $deleted = SuperAdmin::count();
             SuperAdmin::truncate();
             $this->warn("Deleted {$deleted} existing super admin(s)");
+            
+            // Re-enable foreign key checks
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             
             // Create new super admin with exact credentials
             $admin = SuperAdmin::create([
