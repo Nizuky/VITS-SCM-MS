@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
             __DIR__.'/../routes/web.php',
             __DIR__.'/../routes/auth.php',
             __DIR__.'/../routes/test-db.php',
+            __DIR__.'/../routes/emergency.php',
         ],
         api: null,
         commands: null,

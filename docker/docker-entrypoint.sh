@@ -50,22 +50,19 @@ if command -v php >/dev/null 2>&1; then
   if [ -f /usr/local/bin/startup-health-check.sh ]; then
     /usr/local/bin/startup-health-check.sh || {
       echo "=========================================="
-      echo "HEALTH CHECK FAILED - CANNOT START"
+      echo "HEALTH CHECK FAILED - DATABASE UNREACHABLE"
       echo "=========================================="
       echo "Database connection is not working."
-      echo "Application will not function properly."
+      echo "Application will NOT function properly."
       echo ""
       echo "To diagnose, SSH into container and run:"
+      echo "  php artisan env:show-db"
       echo "  /usr/local/bin/test-db-connection.sh"
       echo "  php artisan db:verify-config"
       echo ""
-      echo "Common fixes:"
-      echo "  1. Verify DB_HOST in Laravel Cloud environment"
-      echo "  2. Check database firewall allows your app's IP"
-      echo "  3. Confirm database service is running"
+      echo "CONTINUING ANYWAY to allow diagnosis..."
+      echo "Check Laravel Cloud environment variables!"
       echo ""
-      echo "Exiting with error..."
-      exit 1
     }
   fi
   echo ""
