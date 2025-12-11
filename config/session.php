@@ -1,17 +1,17 @@
 <?php
 
 return [
-    // Session driver - use 'cookie' for Laravel Cloud, 'file' for local
+    // Session driver - use 'cookie' for Laravel Cloud (stateless), 'file' for local
     'driver' => env('SESSION_DRIVER', 'cookie'),
 
-    // Minutes the session can remain idle before it expires
+    // Minutes the session can remain idle before it expires (1 year)
     'lifetime' => env('SESSION_LIFETIME', 525600),
 
     // Set to false so sessions persist across browser close
     'expire_on_close' => false,
 
     // Session encryption (true for cookie driver security)
-    'encrypt' => env('SESSION_DRIVER', 'cookie') === 'cookie',
+    'encrypt' => true,
 
     // Session file location (for file driver)
     'files' => storage_path('framework/sessions'),
@@ -25,14 +25,23 @@ return [
     // Lottery for garbage collection
     'lottery' => [2, 100],
 
-    // Cookie name
-    'cookie' => env('SESSION_COOKIE', 'vits_session'),
+    // Cookie name - unique to avoid conflicts
+    'cookie' => env('SESSION_COOKIE', 'vits_scms_session'),
 
-    // Cookie path, domain, secure, httpOnly, sameSite
-    'path' => env('SESSION_PATH', '/'),
+    // Cookie path - root path
+    'path' => '/',
+    
+    // Domain - null allows cookie to work on any subdomain
+    // For Laravel Cloud, leave as null or set to the exact domain
     'domain' => env('SESSION_DOMAIN', null),
-    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
+    
+    // Secure cookie - MUST be true for HTTPS sites (Laravel Cloud uses HTTPS)
+    'secure' => env('SESSION_SECURE_COOKIE', true),
+    
+    // HTTP only - prevents JavaScript access to session cookie
     'http_only' => true,
+    
+    // SameSite - 'lax' allows normal navigation, 'none' required for cross-site
     'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
     // Partitioned cookies (for Chrome's CHIPS)
