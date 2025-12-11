@@ -48,7 +48,7 @@ Route::get('/emergency-diagnostic', function () {
     
     // Expected vs Actual
     $expectedHost = 'db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
-    $expectedDatabase = 'Cloud - vits_scm_ms'; // Will be quoted in .env as "Cloud - vits_scm_ms"
+    $expectedDatabase = 'vits_scm_ms';
     $expectedUsername = 'jsthylbkmmff6jnv';
     
     $diagnostics['comparison'] = [
