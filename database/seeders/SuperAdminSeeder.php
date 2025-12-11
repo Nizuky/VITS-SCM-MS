@@ -17,9 +17,9 @@ class SuperAdminSeeder extends Seeder
         $name = env('SUPERADMIN_NAME', 'adminAlex');
 
         SuperAdmin::updateOrCreate([
-            'email' => $email,
-        ], [
             'name' => $name,
+        ], [
+            'email' => $email,
             'password' => Hash::make($password),
             'email_verified_at' => now(),
         ]);

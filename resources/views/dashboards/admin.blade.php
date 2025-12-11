@@ -3831,6 +3831,19 @@
                 console.error('Theme toggle error:', e);
             }
         })();
+
+        // Auto-logout admin when page is closed, browser back, or tab closed
+        window.addEventListener('beforeunload', function() {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+            }
+        });
+
+        window.addEventListener('pagehide', function() {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+            }
+        });
     </script>
     <?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>

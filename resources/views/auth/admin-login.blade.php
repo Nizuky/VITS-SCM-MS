@@ -71,6 +71,21 @@
 </x-layouts.auth.login-register>
 
 <script>
+// Auto-logout admin session when page is closed or navigated away
+window.addEventListener('beforeunload', function() {
+    // Send logout request synchronously before page unloads
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+    }
+});
+
+// Also logout on page visibility change (tab close, browser back)
+window.addEventListener('pagehide', function() {
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon('{{ route("admin.logout") }}', new FormData());
+    }
+});
+
 (function(){
     const form = document.getElementById('admin-login-form');
     const btn = document.getElementById('admin-login-btn');
