@@ -2148,14 +2148,14 @@
             
             // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
-                document.getElementById('hours-sort-indicator').textContent = 'â‡…';
-                document.getElementById('studentid-sort-indicator').textContent = 'â‡…';
-                document.getElementById('date-sort-indicator').textContent = 'â‡…';
-                document.getElementById('studentname-sort-indicator').textContent = 'â‡…';
-                document.getElementById('eventname-sort-indicator').textContent = 'â‡…';
-                document.getElementById('organization-sort-indicator').textContent = 'â‡…';
+                document.getElementById('hours-sort-indicator').textContent = '⇅';
+                document.getElementById('studentid-sort-indicator').textContent = '⇅';
+                document.getElementById('date-sort-indicator').textContent = '⇅';
+                document.getElementById('studentname-sort-indicator').textContent = '⇅';
+                document.getElementById('eventname-sort-indicator').textContent = '⇅';
+                document.getElementById('organization-sort-indicator').textContent = '⇅';
                 var statusIndicator = document.getElementById('status-sort-indicator');
-                if (statusIndicator) statusIndicator.textContent = 'â‡…';
+                if (statusIndicator) statusIndicator.textContent = '⇅';
             }
             
             // Hours sort toggle event listener
