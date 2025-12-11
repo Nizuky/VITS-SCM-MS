@@ -60,10 +60,14 @@ if command -v php >/dev/null 2>&1; then
   php artisan config:cache || true
   php artisan route:cache || true
 
-  # Ensure public storage symlink exists
-  if [ ! -e /var/www/html/public/storage ]; then
-    php artisan storage:link || true
-  fi
+  # Ensure public storage symlink exists (force recreate if broken)
+  echo "Creating storage symlink..."
+  rm -f /var/www/html/public/storage 2>/dev/null || true
+  php artisan storage:link --force || true
+  
+  # Ensure storage/app/public exists for uploaded files
+  mkdir -p /var/www/html/storage/app/public || true
+  chown -R www-data:www-data /var/www/html/storage/app/public 2>/dev/null || true
 
   # Wait for database if DB_HOST is set (with timeout)
   if [ -n "${DB_HOST:-}" ] && [ "${DB_HOST}" != "127.0.0.1" ] && [ "${DB_HOST}" != "localhost" ]; then
