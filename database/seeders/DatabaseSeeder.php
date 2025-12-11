@@ -38,14 +38,17 @@ class DatabaseSeeder extends Seeder
                 require_once $file;
                 $class = 'Database\\Seeders\\Dumps\\' . $seederName;
                 if (class_exists($class)) {
+                    echo "Running seeder: {$class}\n";
                     $this->call([$class]);
                 }
             }
         }
 
         // 2) Then run hand-written seeders here
+        // NOTE: SuperAdminsTableSeeder from dumps already ran above
+        // SuperAdminSeeder will run AFTER and update the account if needed
+        echo "Running manual seeders...\n";
         $this->call([
-            SuperAdminSeeder::class,
             AdminUserSeeder::class,
         ]);
     }
