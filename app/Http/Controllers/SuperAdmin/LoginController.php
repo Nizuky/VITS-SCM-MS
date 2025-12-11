@@ -42,10 +42,47 @@ class LoginController extends Controller
         try {
             $identifier = trim((string) $request->input('name'));
             
-            // Wrap database query in try-catch to handle timeouts
-            $admin = SuperAdmin::where('name', $identifier)
-                ->orWhere('email', $identifier)
-                ->first();
+            // Retry logic for database queries (up to 3 attempts)
+            $maxRetries = 3;
+            $retryDelay = 1000000; // 1 second in microseconds
+            $admin = null;
+            $lastException = null;
+            
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    // Wrap database query with retry logic
+                    $admin = SuperAdmin::where('name', $identifier)
+                        ->orWhere('email', $identifier)
+                        ->first();
+                    break; // Success, exit retry loop
+                } catch (\PDOException $e) {
+                    $lastException = $e;
+                    \Log::warning("SuperAdmin login database query attempt {$attempt} failed", [
+                        'error' => $e->getMessage(),
+                        'identifier' => $identifier,
+                        'attempt' => $attempt
+                    ]);
+                    
+                    if ($attempt < $maxRetries) {
+                        // Wait before retrying (exponential backoff)
+                        usleep($retryDelay * $attempt);
+                        
+                        // Try to reconnect
+                        try {
+                            \DB::reconnect();
+                        } catch (\Exception $reconnectException) {
+                            \Log::warning('Database reconnect failed', [
+                                'error' => $reconnectException->getMessage()
+                            ]);
+                        }
+                    }
+                }
+            }
+            
+            // If all retries failed, throw the last exception
+            if ($admin === null && $lastException !== null) {
+                throw $lastException;
+            }
                 
             $passwordOk = false;
             if ($admin) {

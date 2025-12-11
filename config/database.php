@@ -24,8 +24,14 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 // Pass SSL CA to PDO when provided (useful for Aiven TLS connections)
                 defined('PDO::MYSQL_ATTR_SSL_CA') ? PDO::MYSQL_ATTR_SSL_CA : null => env('DB_SSL_CA') ?: null,
-                // Set connection timeout to 10 seconds for cloud environments
-                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 10),
+                // Set connection timeout to 30 seconds for cloud environments
+                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 30),
+                // MySQL specific connection timeout
+                defined('PDO::MYSQL_ATTR_CONNECT_TIMEOUT') ? PDO::MYSQL_ATTR_CONNECT_TIMEOUT : null => 30,
+                // MySQL specific read timeout  
+                defined('PDO::MYSQL_ATTR_READ_TIMEOUT') ? PDO::MYSQL_ATTR_READ_TIMEOUT : null => 30,
+                // MySQL specific write timeout
+                defined('PDO::MYSQL_ATTR_WRITE_TIMEOUT') ? PDO::MYSQL_ATTR_WRITE_TIMEOUT : null => 30,
                 // Set persistent connections off to avoid stale connections
                 PDO::ATTR_PERSISTENT => false,
                 // Enable error mode

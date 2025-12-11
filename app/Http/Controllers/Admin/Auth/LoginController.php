@@ -47,11 +47,48 @@ class LoginController extends Controller
         ]);
 
         try {
-            // Attempt login with database query wrapped in try-catch to handle timeouts
-            $loginAttempt = Auth::guard('admin')->attempt([
-                'name' => $credentials['name'], 
-                'password' => $credentials['password']
-            ], false);
+            // Attempt login with retry logic for database connection
+            $maxRetries = 3;
+            $retryDelay = 1000000; // 1 second in microseconds
+            $loginAttempt = false;
+            $lastException = null;
+            
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    $loginAttempt = Auth::guard('admin')->attempt([
+                        'name' => $credentials['name'], 
+                        'password' => $credentials['password']
+                    ], false);
+                    break; // Success, exit retry loop
+                } catch (\PDOException $e) {
+                    $lastException = $e;
+                    \Log::warning("Admin login database query attempt {$attempt} failed", [
+                        'error' => $e->getMessage(),
+                        'name' => $credentials['name'],
+                        'attempt' => $attempt,
+                        'ip' => $request->ip()
+                    ]);
+                    
+                    if ($attempt < $maxRetries) {
+                        // Wait before retrying (exponential backoff)
+                        usleep($retryDelay * $attempt);
+                        
+                        // Try to reconnect
+                        try {
+                            \DB::reconnect();
+                        } catch (\Exception $reconnectException) {
+                            \Log::warning('Database reconnect failed', [
+                                'error' => $reconnectException->getMessage()
+                            ]);
+                        }
+                    }
+                }
+            }
+            
+            // If all retries failed, throw the last exception
+            if (!$loginAttempt && $lastException !== null) {
+                throw $lastException;
+            }
 
             if ($loginAttempt) {
                 // Clear rate limiter on successful login
