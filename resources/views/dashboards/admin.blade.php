@@ -1459,7 +1459,7 @@
                 var dataStatus = isPending ? 'Pending' : 'Archived';
                 var dataArchiveStatus = isPending ? '' : status;
                 
-                var dateStr = record.date ? formatDate(record.date) : 'â€”';
+                var dateStr = record.date ? formatDate(record.date) : '—';
                 
                 // Get action date based on status - use the actual timestamp fields
                 var actionDateStr = '';
@@ -1490,13 +1490,13 @@
                         'data-action-date="' + actionDateStr + '" ' +
                         'data-rejection-reason="' + (record.rejection_reason || '') + '" ' +
                         'class="hover cursor-pointer" onclick="openDetailsModal(this)">' +
-                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || 'â€”') + '</td>' +
-                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || 'â€”') + '</td>' +
-                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || 'â€”') + '</td>' +
+                        '<td class="text-center" style="min-width: 70px; width: 70px; white-space: nowrap;">' + (record.student_id || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + (record.student_name || '—') + '</td>' +
+                        '<td class="text-center" style="min-width: 110px; width: 110px; white-space: nowrap;">' + (record.event_name || '—') + '</td>' +
                         '<td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">' + 
                             '<div class="flex flex-col items-center">' +
-                                '<span class="font-medium">' + (record.organization || 'â€”') + '</span>' +
-                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || 'â€”') + '</span>' +
+                                '<span class="font-medium">' + (record.organization || '—') + '</span>' +
+                                '<span class="text-xs text-gray-500">' + (record.supervisor_name || '—') + '</span>' +
                             '</div>' +
                         '</td>' +
                         '<td class="text-center" style="min-width: 50px; width: 50px; white-space: nowrap;">' + (record.hours_rendered || 0) + ' hours</td>' +
@@ -2148,14 +2148,14 @@
             
             // Helper function to reset all indicators (double arrow for inactive)
             function resetAllSortIndicators() {
-                document.getElementById('hours-sort-indicator').textContent = '⇅';
-                document.getElementById('studentid-sort-indicator').textContent = '⇅';
-                document.getElementById('date-sort-indicator').textContent = '⇅';
-                document.getElementById('studentname-sort-indicator').textContent = '⇅';
-                document.getElementById('eventname-sort-indicator').textContent = '⇅';
-                document.getElementById('organization-sort-indicator').textContent = '⇅';
+                document.getElementById('hours-sort-indicator').textContent = '?';
+                document.getElementById('studentid-sort-indicator').textContent = '?';
+                document.getElementById('date-sort-indicator').textContent = '?';
+                document.getElementById('studentname-sort-indicator').textContent = '?';
+                document.getElementById('eventname-sort-indicator').textContent = '?';
+                document.getElementById('organization-sort-indicator').textContent = '?';
                 var statusIndicator = document.getElementById('status-sort-indicator');
-                if (statusIndicator) statusIndicator.textContent = '⇅';
+                if (statusIndicator) statusIndicator.textContent = '?';
             }
             
             // Hours sort toggle event listener
@@ -2167,7 +2167,7 @@
                     currentSortBy = 'hours';
                     hoursSortDirection = hoursSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    hoursSortIndicator.textContent = hoursSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'hours');
                 });
             }
@@ -2181,7 +2181,7 @@
                     currentSortBy = 'studentid';
                     studentIdSortDirection = studentIdSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    studentIdSortIndicator.textContent = studentIdSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentid');
                 });
             }
@@ -2195,7 +2195,7 @@
                     currentSortBy = 'date';
                     dateSortDirection = dateSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    dateSortIndicator.textContent = dateSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'date');
                 });
             }
@@ -2209,7 +2209,7 @@
                     currentSortBy = 'studentname';
                     studentNameSortDirection = studentNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    studentNameSortIndicator.textContent = studentNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'studentname');
                 });
             }
@@ -2223,7 +2223,7 @@
                     currentSortBy = 'eventname';
                     eventNameSortDirection = eventNameSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    eventNameSortIndicator.textContent = eventNameSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'eventname');
                 });
             }
@@ -2237,7 +2237,7 @@
                     currentSortBy = 'organization';
                     organizationSortDirection = organizationSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    organizationSortIndicator.textContent = organizationSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'organization');
                 });
             }
@@ -2251,7 +2251,7 @@
                     currentSortBy = 'status';
                     statusSortDirection = statusSortDirection === 'asc' ? 'desc' : 'asc';
                     resetAllSortIndicators();
-                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? 'â†‘' : 'â†“';
+                    statusSortIndicator.textContent = statusSortDirection === 'asc' ? '↑' : '↓';
                     renderSubmissions(allSubmissions, 'status');
                 });
             }
@@ -3184,7 +3184,7 @@
                     return `
                         <tr class="${isEligible ? 'bg-red-50' : ''}">
                             <td class="text-center">${account.name}</td>
-                            <td class="text-center">${account.student_id || 'â€”'}</td>
+                            <td class="text-center">${account.student_id || '—'}</td>
                             <td class="text-center">${account.email}</td>
                             <td class="text-center">${account.inactive_at}</td>
                             <td class="text-center">
