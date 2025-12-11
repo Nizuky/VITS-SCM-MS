@@ -46,35 +46,75 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::guard('admin')->attempt(['name' => $credentials['name'], 'password' => $credentials['password']], false)) {
-            // Clear rate limiter on successful login
-            RateLimiter::clear($key);
-            
-            // Regenerate CSRF token (not the entire session) to prevent session fixation
-            $request->session()->regenerateToken();
-            
-            // Mark this session as an active admin session
-            // IMPORTANT: never use remember_me for admins - always expire on tab close
-            $request->session()->put('auth_guard', 'admin');
-            $request->session()->put('admin_session_active', true);
-            $request->session()->put('last_activity', time());
-            $request->session()->save();
-            
-            // Log successful login
-            \Log::info('Admin login successful', [
-                'admin_id' => Auth::guard('admin')->id(),
-                'admin_name' => $credentials['name'],
-                'ip' => $request->ip(),
-                'session_id' => $request->session()->getId()
+        try {
+            // Attempt login with database query wrapped in try-catch to handle timeouts
+            $loginAttempt = Auth::guard('admin')->attempt([
+                'name' => $credentials['name'], 
+                'password' => $credentials['password']
+            ], false);
+
+            if ($loginAttempt) {
+                // Clear rate limiter on successful login
+                RateLimiter::clear($key);
+                
+                // Regenerate CSRF token (not the entire session) to prevent session fixation
+                $request->session()->regenerateToken();
+                
+                // Mark this session as an active admin session
+                // IMPORTANT: never use remember_me for admins - always expire on tab close
+                $request->session()->put('auth_guard', 'admin');
+                $request->session()->put('admin_session_active', true);
+                $request->session()->put('last_activity', time());
+                $request->session()->save();
+                
+                // Log successful login
+                \Log::info('Admin login successful', [
+                    'admin_id' => Auth::guard('admin')->id(),
+                    'admin_name' => $credentials['name'],
+                    'ip' => $request->ip(),
+                    'session_id' => $request->session()->getId()
+                ]);
+                
+                $redirect = route('admin.dashboard');
+
+                if ($request->expectsJson()) {
+                    return response()->json(['redirect' => $redirect, 'success' => true]);
+                }
+
+                return redirect()->intended($redirect);
+            }
+        } catch (\PDOException $e) {
+            // Database connection error
+            \Log::error('Admin login database error', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
             ]);
             
-            $redirect = route('admin.dashboard');
-
             if ($request->expectsJson()) {
-                return response()->json(['redirect' => $redirect, 'success' => true]);
+                return response()->json([
+                    'message' => 'Unable to connect to the database. Please try again in a moment.'
+                ], 503);
             }
-
-            return redirect()->intended($redirect);
+            
+            return back()->withErrors([
+                'name' => 'Unable to connect to the database. Please try again in a moment.'
+            ])->withInput($request->only('name'));
+        } catch (\Exception $e) {
+            // General error
+            \Log::error('Admin login error', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
+            ]);
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'An error occurred during login. Please try again.'
+                ], 500);
+            }
+            
+            return back()->withErrors([
+                'name' => 'An error occurred during login. Please try again.'
+            ])->withInput($request->only('name'));
         }
         
         // Increment rate limiter on failed attempt

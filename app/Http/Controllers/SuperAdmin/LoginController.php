@@ -39,44 +39,81 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $identifier = trim((string) $request->input('name'));
-        $admin = SuperAdmin::where('name', $identifier)
-            ->orWhere('email', $identifier)
-            ->first();
-        $passwordOk = false;
-        if ($admin) {
-            $stored = (string) $admin->password;
-            $provided = (string) $request->input('password');
-            $providedTrim = trim($provided);
-            $storedTrim = trim($stored);
+        try {
+            $identifier = trim((string) $request->input('name'));
+            
+            // Wrap database query in try-catch to handle timeouts
+            $admin = SuperAdmin::where('name', $identifier)
+                ->orWhere('email', $identifier)
+                ->first();
+                
+            $passwordOk = false;
+            if ($admin) {
+                $stored = (string) $admin->password;
+                $provided = (string) $request->input('password');
+                $providedTrim = trim($provided);
+                $storedTrim = trim($stored);
 
-            // if stored value looks like bcrypt
-            if (preg_match('/^\$2y\$|^\$2a\$|^\$2b\$/', $storedTrim)) {
-                try {
-                    $passwordOk = Hash::check($providedTrim, $storedTrim);
-                } catch (\RuntimeException $e) {
-                    // fall through to legacy checks
-                    $passwordOk = false;
-                }
-            } else {
-                // legacy plaintext exact match
-                if ($providedTrim === $storedTrim) {
-                    $passwordOk = true;
-                }
-
-                // legacy md5 match (common old pattern)
-                if (! $passwordOk && strlen($storedTrim) === 32 && ctype_xdigit($storedTrim)) {
-                    if (md5($providedTrim) === $storedTrim) {
+                // if stored value looks like bcrypt
+                if (preg_match('/^\$2y\$|^\$2a\$|^\$2b\$/', $storedTrim)) {
+                    try {
+                        $passwordOk = Hash::check($providedTrim, $storedTrim);
+                    } catch (\RuntimeException $e) {
+                        // fall through to legacy checks
+                        $passwordOk = false;
+                    }
+                } else {
+                    // legacy plaintext exact match
+                    if ($providedTrim === $storedTrim) {
                         $passwordOk = true;
                     }
-                }
 
-                // if legacy matched, upgrade to bcrypt
-                if ($passwordOk) {
-                    $admin->password = Hash::make($providedTrim);
-                    $admin->save();
+                    // legacy md5 match (common old pattern)
+                    if (! $passwordOk && strlen($storedTrim) === 32 && ctype_xdigit($storedTrim)) {
+                        if (md5($providedTrim) === $storedTrim) {
+                            $passwordOk = true;
+                        }
+                    }
+
+                    // if legacy matched, upgrade to bcrypt
+                    if ($passwordOk) {
+                        $admin->password = Hash::make($providedTrim);
+                        $admin->save();
+                    }
                 }
             }
+        } catch (\PDOException $e) {
+            // Database connection error
+            \Log::error('SuperAdmin login database error', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Unable to connect to the database. Please try again in a moment.'
+                ], 503);
+            }
+            
+            return back()->withErrors([
+                'name' => 'Unable to connect to the database. Please try again in a moment.'
+            ])->withInput($request->only('name'));
+        } catch (\Exception $e) {
+            // General error
+            \Log::error('SuperAdmin login error', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'An error occurred during login. Please try again.'
+                ], 500);
+            }
+            
+            return back()->withErrors([
+                'name' => 'An error occurred during login. Please try again.'
+            ])->withInput($request->only('name'));
         }
 
         if (! $admin || ! $passwordOk) {
