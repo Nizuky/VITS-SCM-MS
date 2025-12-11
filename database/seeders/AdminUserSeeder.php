@@ -10,25 +10,27 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $env = env('APP_ENV', 'production');
-
-        $email = env('ADMIN_EMAIL', 'admin@scms.test');
-        $password = env('ADMIN_PASSWORD', 'admin123456');
-        $name = env('ADMIN_NAME', 'Site Admin');
-
-        if ($env === 'production' && (empty(env('ADMIN_EMAIL')) || empty(env('ADMIN_PASSWORD')))) {
-            if ($this->command) {
-                $this->command->info('ADMIN_EMAIL or ADMIN_PASSWORD not set — skipping AdminUser seeding for production.');
-            }
-            return;
-        }
-
+        // Admin 1: admin1 / raf12345
         AdminUser::updateOrCreate([
-            'email' => $email,
+            'name' => 'admin1',
         ], [
-            'name' => $name,
-            'password' => Hash::make($password),
+            'email' => 'admin1@scms.test',
+            'password' => Hash::make('raf12345'),
             'email_verified_at' => now(),
         ]);
+
+        // Admin 2: admin2 / dek12345
+        AdminUser::updateOrCreate([
+            'name' => 'admin2',
+        ], [
+            'email' => 'admin2@scms.test',
+            'password' => Hash::make('dek12345'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Log success for debugging
+        if ($this->command) {
+            $this->command->info('AdminUsers seeded: admin1, admin2');
+        }
     }
 }

@@ -89,9 +89,9 @@ The application includes the following database tables:
 **Purpose:** System-wide administrative access, manages all aspects of the platform
 
 ```
+Username/Name: adminAlex
 Email: janarafael.sanandres@gmail.com
-Password: softdev2025
-Name: Super Admin
+Password: softdev12345
 Guard: superadmin
 Email Verified: Yes (auto-verified on seed)
 ```
@@ -107,13 +107,23 @@ Email Verified: Yes (auto-verified on seed)
 - Access super admin dashboard with comprehensive statistics
 - Change super admin credentials
 
-### Regular Administrator Account
+### Regular Administrator Accounts
 **Purpose:** Department/unit-level administrative access
 
+**Admin 1:**
 ```
-Email: admin@scms.test
-Password: admin123456
-Name: Site Admin
+Username/Name: admin1
+Email: admin1@scms.test
+Password: raf12345
+Guard: admin
+Email Verified: Yes (auto-verified on seed)
+```
+
+**Admin 2:**
+```
+Username/Name: admin2
+Email: admin2@scms.test
+Password: dek12345
 Guard: admin
 Email Verified: Yes (auto-verified on seed)
 ```
@@ -127,24 +137,15 @@ Email Verified: Yes (auto-verified on seed)
 - Access admin dashboard with department statistics
 - Change admin credentials
 
-### Environment Variables for Seeding
-The seeders require these environment variables:
+### Environment Variables for Seeding (Optional Override)
+The seeders use these defaults but can be overridden via environment variables:
 
 **Super Admin:**
 ```env
 SUPERADMIN_EMAIL=janarafael.sanandres@gmail.com
-SUPERADMIN_PASSWORD=softdev2025
-SUPERADMIN_NAME="Super Admin"
+SUPERADMIN_PASSWORD=softdev12345
+SUPERADMIN_NAME="adminAlex"
 ```
-
-**Regular Admin:**
-```env
-ADMIN_EMAIL=admin@scms.test
-ADMIN_PASSWORD=admin123456
-ADMIN_NAME="Site Admin"
-```
-
-> **Note:** In production, if these environment variables are not set, the seeders will skip account creation to prevent security issues.
 
 ---
 

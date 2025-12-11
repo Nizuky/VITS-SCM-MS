@@ -10,19 +10,11 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $env = env('APP_ENV', 'production');
-
+        // Create the Super Admin account
+        // Uses environment variables if set, otherwise defaults
         $email = env('SUPERADMIN_EMAIL', 'janarafael.sanandres@gmail.com');
-        $password = env('SUPERADMIN_PASSWORD', 'softdev2025');
-        $name = env('SUPERADMIN_NAME', 'Super Admin');
-
-        if ($env === 'production' && (empty(env('SUPERADMIN_EMAIL')) || empty(env('SUPERADMIN_PASSWORD')))) {
-            // In production we require credentials to be provided via environment variables.
-            if ($this->command) {
-                $this->command->info('SUPERADMIN_EMAIL or SUPERADMIN_PASSWORD not set — skipping SuperAdmin seeding for production.');
-            }
-            return;
-        }
+        $password = env('SUPERADMIN_PASSWORD', 'softdev12345');
+        $name = env('SUPERADMIN_NAME', 'adminAlex');
 
         SuperAdmin::updateOrCreate([
             'email' => $email,
@@ -31,5 +23,10 @@ class SuperAdminSeeder extends Seeder
             'password' => Hash::make($password),
             'email_verified_at' => now(),
         ]);
+
+        // Log success for debugging
+        if ($this->command) {
+            $this->command->info("SuperAdmin seeded: {$name} ({$email})");
+        }
     }
 }
