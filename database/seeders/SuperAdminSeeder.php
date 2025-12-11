@@ -13,7 +13,7 @@ class SuperAdminSeeder extends Seeder
         // Create the Super Admin account
         // Uses environment variables if set, otherwise defaults
         $email = env('SUPERADMIN_EMAIL', 'janarafael.sanandres@gmail.com');
-        $password = env('SUPERADMIN_PASSWORD', 'softdev12345');
+        $password = env('SUPERADMIN_PASSWORD', 'softdev2025');
         $name = env('SUPERADMIN_NAME', 'adminAlex');
 
         SuperAdmin::updateOrCreate([
