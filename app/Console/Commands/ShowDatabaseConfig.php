@@ -59,13 +59,29 @@ class ShowDatabaseConfig extends Command
             return 1;
         }
         
-        $expectedHost = 'db-a08bd7ae-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
+        $expectedHost = 'db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
+        $expectedDatabase = 'Cloud - vits_scm_ms';
+        $expectedUsername = 'jsthylbkmmff6jnv';
+        
         if (env('DB_HOST') !== $expectedHost) {
             $this->warn('⚠️  WARNING: DB_HOST does not match expected value');
             $this->line('  Current: ' . env('DB_HOST'));
             $this->line('  Expected: ' . $expectedHost);
             $this->newLine();
-            $this->line('If this is correct for your setup, ignore this warning.');
+        }
+        
+        if (env('DB_DATABASE') !== $expectedDatabase) {
+            $this->warn('⚠️  WARNING: DB_DATABASE does not match expected value');
+            $this->line('  Current: ' . env('DB_DATABASE'));
+            $this->line('  Expected: ' . $expectedDatabase);
+            $this->newLine();
+        }
+        
+        if (env('DB_USERNAME') !== $expectedUsername) {
+            $this->warn('⚠️  WARNING: DB_USERNAME does not match expected value');
+            $this->line('  Current: ' . env('DB_USERNAME'));
+            $this->line('  Expected: ' . $expectedUsername);
+            $this->newLine();
         }
         
         return 0;

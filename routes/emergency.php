@@ -47,11 +47,20 @@ Route::get('/emergency-diagnostic', function () {
     }
     
     // Expected vs Actual
-    $expectedHost = 'db-a08bd7ae-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
+    $expectedHost = 'db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
+    $expectedDatabase = 'Cloud - vits_scm_ms';
+    $expectedUsername = 'jsthylbkmmff6jnv';
+    
     $diagnostics['comparison'] = [
         'expected_db_host' => $expectedHost,
         'actual_db_host' => env('DB_HOST', 'NOT SET'),
-        'matches' => env('DB_HOST') === $expectedHost,
+        'host_matches' => env('DB_HOST') === $expectedHost,
+        'expected_db_database' => $expectedDatabase,
+        'actual_db_database' => env('DB_DATABASE', 'NOT SET'),
+        'database_matches' => env('DB_DATABASE') === $expectedDatabase,
+        'expected_db_username' => $expectedUsername,
+        'actual_db_username' => env('DB_USERNAME', 'NOT SET'),
+        'username_matches' => env('DB_USERNAME') === $expectedUsername,
     ];
     
     // Connection test (with timeout)
@@ -144,16 +153,20 @@ Route::get('/emergency-diagnostic', function () {
     $html .= '<div class="status-box warning">';
     $html .= '<strong>1. Go to Laravel Cloud Dashboard</strong><br>';
     $html .= '<strong>2. Navigate to: Your App → Environment Variables</strong><br>';
-    $html .= '<strong>3. Set DB_HOST to EXACTLY:</strong><br>';
-    $html .= '<code style="background: #1a1a1a; padding: 5px; display: block; margin: 10px 0;">' . htmlspecialchars($expectedHost) . '</code>';
-    $html .= '<strong>4. Verify these are also set:</strong><br>';
+    $html .= '<strong>3. Set these EXACT values:</strong><br>';
     $html .= '<code style="background: #1a1a1a; padding: 5px; display: block; margin: 10px 0;">';
+    $html .= 'DB_HOST=db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud<br>';
     $html .= 'DB_PORT=3306<br>';
-    $html .= 'DB_DATABASE=main<br>';
-    $html .= 'DB_USERNAME=jsthyIbkmmrf6jnv<br>';
-    $html .= 'DB_PASSWORD=QXkqdoO9xir8FToisMwb<br>';
+    $html .= 'DB_DATABASE=Cloud - vits_scm_ms<br>';
+    $html .= 'DB_USERNAME=jsthylbkmmff6jnv<br>';
+    $html .= 'DB_PASSWORD=QXkqWoO9xir8FToisMWb<br>';
     $html .= 'DB_TIMEOUT=5';
     $html .= '</code>';
+    $html .= '<strong style="color: #ff6b6b;">⚠️ CRITICAL:</strong><br>';
+    $html .= '- Host ends in <strong>...7aa...</strong> NOT ...7ae...<br>';
+    $html .= '- Username has lowercase L and F: jsthy<strong>l</strong>bkmm<strong>ff</strong>6jnv<br>';
+    $html .= '- Password has capital W: QXkq<strong>W</strong>oO9xir8FToisM<strong>W</strong>b<br>';
+    $html .= '- Database name has a SPACE: Cloud - vits_scm_ms<br><br>';
     $html .= '<strong>5. Redeploy the application</strong>';
     $html .= '</div>';
     
