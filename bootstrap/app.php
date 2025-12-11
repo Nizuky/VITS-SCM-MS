@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withProviders([
         App\Providers\AppServiceProvider::class,
+        App\Providers\DatabaseServiceProvider::class,
         Livewire\LivewireServiceProvider::class,
         Livewire\Volt\VoltServiceProvider::class,
         App\Providers\FortifyViewServiceProvider::class,

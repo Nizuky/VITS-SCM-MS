@@ -21,6 +21,15 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Set SQL mode to handle database names with special characters
+            'modes' => [
+                'ONLY_FULL_GROUP_BY',
+                'STRICT_TRANS_TABLES',
+                'NO_ZERO_IN_DATE',
+                'NO_ZERO_DATE',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_ENGINE_SUBSTITUTION',
+            ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 // Pass SSL CA to PDO when provided (useful for Aiven TLS connections)
                 defined('PDO::MYSQL_ATTR_SSL_CA') ? PDO::MYSQL_ATTR_SSL_CA : null => env('DB_SSL_CA') ?: null,
@@ -37,6 +46,8 @@ return [
                 PDO::ATTR_PERSISTENT => false,
                 // Enable error mode
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                // Initialize command to properly set database with backticks
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
             ]) : [],
         ],
     ],
