@@ -110,7 +110,7 @@
         .scms-badge--verified{background-color:#B2F5EA!important;color:#0D9488!important}
         .scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
         .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
-        .bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
+        .bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("storage/vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
         #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
         #toast-root .alert{pointer-events:auto}
         .scms-toast{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 0.875rem;border-radius:9999px;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,0.18),0 2px 6px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.08);max-width:520px}
