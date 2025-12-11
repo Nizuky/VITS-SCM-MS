@@ -124,7 +124,7 @@
                 <form method="dialog">
                     <button class="btn">Cancel</button>
                 </form>
-                <button onclick="window.location.href='{{ route('superadmin.logout.beacon') }}'" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
+                <button onclick="window.location.href='<?php echo e(route('superadmin.logout.beacon')); ?>'" class="btn bg-danger-red hover:bg-danger-red-hover text-white">
                     Yes, log out
                 </button>
             </div>
@@ -765,3 +765,4 @@
     </dialog>
 
     <!-- Toast Container -->
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views\partials\super_admin\modals.blade.php ENDPATH**/ ?>

@@ -148,6 +148,8 @@ Route::middleware(['auth:superadmin', \App\Http\Middleware\EnsureSuperAdminSessi
         Route::get('super-admin/api/students', [App\Http\Controllers\SuperAdminStudentController::class, 'index'])->name('superadmin.students.index');
         Route::put('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'update'])->name('superadmin.students.update');
         Route::delete('super-admin/api/students/{id}', [App\Http\Controllers\SuperAdminStudentController::class, 'destroy'])->name('superadmin.students.destroy');
+        Route::post('super-admin/api/students/{id}/warning', [App\Http\Controllers\SuperAdminStudentController::class, 'sendWarning'])->name('superadmin.students.warning');
+        Route::post('super-admin/api/students/{id}/message', [App\Http\Controllers\SuperAdminStudentController::class, 'sendMessage'])->name('superadmin.students.message');
 
         // Super-admin Support Tickets API endpoints
         Route::get('super-admin/api/support-tickets', [App\Http\Controllers\SuperAdminDashboardController::class, 'getSupportTickets'])->name('superadmin.support-tickets.index');

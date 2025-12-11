@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\StudentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -262,6 +263,163 @@ class SuperAdminStudentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete student account'
+            ], 500);
+        }
+    }
+
+    /**
+     * Send a warning to a student
+     */
+    public function sendWarning(Request $request, $id)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in send warning');
+            }
+
+            $validated = $request->validate([
+                'warning_level' => ['required', 'integer', 'in:1,2,3'],
+                'message' => ['required', 'string', 'max:1000'],
+            ]);
+
+            $student = User::findOrFail($id);
+
+            // Determine warning type based on level
+            $warningTypes = [
+                1 => ['type' => 'warning', 'label' => 'First Warning', 'color' => 'yellow'],
+                2 => ['type' => 'warning', 'label' => 'Second Warning', 'color' => 'orange'],
+                3 => ['type' => 'danger', 'label' => 'Third Warning (Final)', 'color' => 'red'],
+            ];
+
+            $warningInfo = $warningTypes[$validated['warning_level']];
+
+            // Update student's warning level
+            $student->warning_level = $validated['warning_level'];
+            
+            // If third warning, flag account for deletion
+            if ($validated['warning_level'] >= 3) {
+                $student->flagged_for_deletion = true;
+            }
+            
+            $student->save();
+
+            // Create notification for the student
+            StudentNotification::create([
+                'user_id' => $student->id,
+                'title' => $warningInfo['label'],
+                'type' => $warningInfo['type'],
+                'message' => $validated['message'],
+                'is_read' => false,
+            ]);
+
+            Log::info('Super Admin sent warning to student', [
+                'super_admin_id' => auth()->guard('superadmin')->id(),
+                'student_id' => $student->id,
+                'warning_level' => $validated['warning_level'],
+                'flagged_for_deletion' => $student->flagged_for_deletion,
+            ]);
+
+            $responseMessage = "Warning sent successfully.";
+            if ($validated['warning_level'] >= 3) {
+                $responseMessage .= " Account has been flagged for possible deletion.";
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $responseMessage,
+                'warning_level' => $student->warning_level,
+                'flagged_for_deletion' => $student->flagged_for_deletion,
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Student not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to send warning', [
+                'student_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send warning'
+            ], 500);
+        }
+    }
+
+    /**
+     * Send a message to a student (without warning)
+     */
+    public function sendMessage(Request $request, $id)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in send message');
+            }
+
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'message' => ['required', 'string', 'max:2000'],
+            ]);
+
+            $student = User::findOrFail($id);
+
+            // Create notification for the student
+            StudentNotification::create([
+                'user_id' => $student->id,
+                'title' => $validated['title'],
+                'type' => 'info',
+                'message' => $validated['message'],
+                'is_read' => false,
+            ]);
+
+            Log::info('Super Admin sent message to student', [
+                'super_admin_id' => auth()->guard('superadmin')->id(),
+                'student_id' => $student->id,
+                'title' => $validated['title'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Message sent successfully to ' . $student->name,
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Student not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to send message', [
+                'student_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send message'
             ], 500);
         }
     }

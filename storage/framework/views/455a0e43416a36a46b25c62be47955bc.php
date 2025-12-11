@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -29,7 +29,7 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css" rel="stylesheet" type="text/css">
-@php
+<?php
     $iconCandidates = ['storage/vits_white.png', 'vits_white.png', 'storage/vits_whites.png', 'vits_whites.png', 'vitswhite.png', 'vitslogo.png', 'public/storage/vits_white.png', 'storage/vits_header.png'];
     $iconUrl = null;
     $iconMTime = null;
@@ -53,10 +53,10 @@ tailwind=typeof tailwind==='object'?tailwind:{};tailwind.config={theme:{extend:{
     if ($iconUrl && $iconMTime) {
         $iconUrl .= '?v=' . $iconMTime;
     }
-@endphp
-<link rel="icon" href="{{ $iconUrl }}" sizes="any">
-<link rel="icon" href="{{ $iconUrl }}" type="image/png">
-<link rel="shortcut icon" href="{{ $iconUrl }}" type="image/png">
+?>
+<link rel="icon" href="<?php echo e($iconUrl); ?>" sizes="any">
+<link rel="icon" href="<?php echo e($iconUrl); ?>" type="image/png">
+<link rel="shortcut icon" href="<?php echo e($iconUrl); ?>" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -115,7 +115,7 @@ body{font-family:'Inter',sans-serif}
 .scms-badge--approved{background-color:#C8E6C9!important;color:#2E7D32!important}
 .scms-badge--rejected{background-color:#FFD7DB!important;color:#CC525D!important}
 .scms-badge--for-approval{background-color:#FFF4DE!important;color:#E29C44!important}
-.bg-custom{background-color:#EDF1FA;background-image:url('{{ asset("vits_bg_white.png") }}');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
+.bg-custom{background-color:#EDF1FA;background-image:url('<?php echo e(asset("vits_bg_white.png")); ?>');background-repeat:no-repeat;background-size:cover;background-position:center;background-attachment:fixed}
 #toast-root{position:fixed;right:1rem;bottom:1rem;z-index:2000;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
 #toast-root .alert{pointer-events:auto}
 .scms-toast{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 0.875rem;border-radius:9999px;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,0.18),0 2px 6px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.08);max-width:520px}
@@ -138,7 +138,7 @@ body{font-family:'Inter',sans-serif}
 [data-theme="dark"] .bg-gradient-pending{background-image:linear-gradient(to top,#6D28D9,#FFE0A2)}
 [data-theme="dark"] .bg-gradient-accepted{background-image:linear-gradient(to top,#6D28D9,#81FFAC)}
 [data-theme="dark"] .bg-gradient-rejected{background-image:linear-gradient(to top,#6D28D9,#FFB7BE)}
-[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('{{ asset("storage/vits_bg_black.png") }}')}
+[data-theme="dark"] .bg-custom{background-color:#0b0f19;background-image:url('<?php echo e(asset("storage/vits_bg_black.png")); ?>')}
 [data-theme="dark"] .table thead,[data-theme="dark"] .table thead tr,[data-theme="dark"] .table thead th{background-color:#374151!important}
 [data-theme="dark"] .table th,[data-theme="dark"] .table td{border-color:#374151!important}
 [data-theme="dark"] .bg-white{background-color:#1f2937!important}
@@ -710,11 +710,11 @@ body {
     border-top-color: #374151;
 }
 </style>
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 
 <body class="min-h-screen bg-custom">
-@php
+<?php
     $BASE_PATH = rtrim(parse_url(url('/'), PHP_URL_PATH) ?? '', '/');
     $fullName = trim(auth('superadmin')->user()->name ?? 'Super Admin');
     
@@ -741,7 +741,7 @@ body {
     
     if (!$initials)
         $initials = 'SA';
-@endphp
+?>
 
     <!-- Mobile Header Bar -->
     <header id="mobile-header" class="fixed top-0 left-0 right-0 z-[998] bg-white shadow-md px-4 py-3 flex items-center justify-between">
@@ -774,8 +774,8 @@ body {
 
             <!-- Logo Header Section -->
             <div id="sidebar-header" class="flex flex-col items-center gap-2 pb-4 border-b border-gray-200 mb-2 text-center">
-                <img id="sidebar-logo-light" src="{{ asset('storage/vits_purple.png') }}" alt="VITS Logo" class="h-10 w-10 object-contain" />
-                <img id="sidebar-logo-dark" src="{{ asset('storage/vits_white.png') }}" alt="VITS Logo" class="h-10 w-10 object-contain hidden" />
+                <img id="sidebar-logo-light" src="<?php echo e(asset('storage/vits_purple.png')); ?>" alt="VITS Logo" class="h-10 w-10 object-contain" />
+                <img id="sidebar-logo-dark" src="<?php echo e(asset('storage/vits_white.png')); ?>" alt="VITS Logo" class="h-10 w-10 object-contain hidden" />
                 <div id="sidebar-title-text" class="flex flex-col leading-tight">
                     <span class="text-sm font-bold text-primary-purple sidebar-title-main">VITS Social Contract</span>
                     <span class="text-xs font-semibold text-primary-purple sidebar-title-sub">Management</span>
@@ -787,12 +787,12 @@ body {
             <div id="avatar-section" class="flex flex-col items-center text-center p-4 border-b border-gray-200 transition-all duration-300">
                 <div id="avatar-container" class="avatar placeholder mb-3 transition-all duration-300">
                     <div id="avatar-circle" class="w-24 h-24 rounded-full ring ring-[#6D28D9] ring-offset-2 ring-offset-base-100 bg-[#6D28D9] text-white flex items-center justify-center select-none transition-all duration-300" 
-                         title="{{ $fullName }}" 
-                         aria-label="{{ $fullName }}">
-                        <span id="avatar-initials" class="text-3xl font-bold leading-none transition-all duration-300">{{ $initials }}</span>
+                         title="<?php echo e($fullName); ?>" 
+                         aria-label="<?php echo e($fullName); ?>">
+                        <span id="avatar-initials" class="text-3xl font-bold leading-none transition-all duration-300"><?php echo e($initials); ?></span>
                     </div>
                 </div>
-                <h2 id="admin-name" class="font-bold text-lg transition-opacity duration-300">{{ $fullName }}</h2>
+                <h2 id="admin-name" class="font-bold text-lg transition-opacity duration-300"><?php echo e($fullName); ?></h2>
                 <p id="admin-role" class="text-sm text-gray-500 transition-opacity duration-300">Super Administrator</p>
             </div>
 
@@ -847,11 +847,11 @@ body {
                 </li>
                 <li>
                     <form id="logout-form-visible" 
-                          action="{{ route('superadmin.logout') }}" 
+                          action="<?php echo e(route('superadmin.logout')); ?>" 
                           method="POST" 
                           class="m-0 p-0 w-full flex" 
                           novalidate>
-                        @csrf
+                        <?php echo csrf_field(); ?>
                         <button id="logout-button-visible" 
                                 type="button" 
                                 class="py-3 pl-2 pr-0 w-full text-left flex items-center gap-2 min-h-0 transition-all duration-300"
@@ -896,32 +896,32 @@ body {
         <main class="flex-1 flex flex-col gap-6 min-w-0" id="page-container">
             
             <!-- Flash Messages -->
-            @if(session('success'))
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
                 <div class="alert alert-success shadow-lg mx-4" id="flash-message">
                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>{{ session('success') }}</span>
+                    <span><?php echo e(session('success')); ?></span>
                 </div>
-            @endif
-            @if(session('error'))
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
                 <div class="alert alert-error shadow-lg mx-4" id="flash-message">
                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>{{ session('error') }}</span>
+                    <span><?php echo e(session('error')); ?></span>
                 </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             
-            @include('partials.super_admin.dashboard-page')
+            <?php echo $__env->make('partials.super_admin.dashboard-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             
-            @include('partials.super_admin.submission-page')
+            <?php echo $__env->make('partials.super_admin.submission-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             
-            @include('partials.super_admin.students-page')
+            <?php echo $__env->make('partials.super_admin.students-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.super_admin.settings-page')
+            <?php echo $__env->make('partials.super_admin.settings-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            @include('partials.super_admin.support-page')
+            <?php echo $__env->make('partials.super_admin.support-page', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </main>
     </div>
 
-    @include('partials.super_admin.modals')
+    <?php echo $__env->make('partials.super_admin.modals', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <!-- Toast Container -->
     <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>
 
@@ -931,7 +931,7 @@ body {
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
         var lastSubmissionsData = null; // Track last loaded data to prevent unnecessary updates
-        var BASE_PATH = @json($BASE_PATH);
+        var BASE_PATH = <?php echo json_encode($BASE_PATH, 15, 512) ?>;
         var recordToDelete = null; // Store record ID for deletion
         
         // Request cache to prevent duplicate API calls
@@ -5332,7 +5332,7 @@ body {
     </script>
 
     <!-- Session Keeper: Keeps session alive and CSRF token fresh -->
-    <script src="{{ asset('js/session-keeper.js') }}"></script>
+    <script src="<?php echo e(asset('js/session-keeper.js')); ?>"></script>
     <script>
         // Initialize Session Keeper for Super Admin Dashboard
         if (window.SessionKeeper) {
@@ -5574,16 +5574,17 @@ body {
         // Auto-logout super admin when page is closed, browser back, or tab closed
         window.addEventListener('beforeunload', function() {
             if (navigator.sendBeacon) {
-                navigator.sendBeacon('{{ route("superadmin.logout") }}', new FormData());
+                navigator.sendBeacon('<?php echo e(route("superadmin.logout")); ?>', new FormData());
             }
         });
 
         window.addEventListener('pagehide', function() {
             if (navigator.sendBeacon) {
-                navigator.sendBeacon('{{ route("superadmin.logout") }}', new FormData());
+                navigator.sendBeacon('<?php echo e(route("superadmin.logout")); ?>', new FormData());
             }
         });
     </script>
     <?php include resource_path('views/partials/footer_partial.php'); ?>
 </body>
 </html>
+<?php /**PATH C:\Users\janar\Herd\scms\resources\views\dashboards\super_admin.blade.php ENDPATH**/ ?>
