@@ -43,6 +43,33 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 
 # Run Laravel artisan tasks if php is available
 if command -v php >/dev/null 2>&1; then
+  # CRITICAL: Run startup health check first
+  echo "=========================================="
+  echo "STARTUP HEALTH CHECK"
+  echo "=========================================="
+  if [ -f /usr/local/bin/startup-health-check.sh ]; then
+    /usr/local/bin/startup-health-check.sh || {
+      echo "=========================================="
+      echo "HEALTH CHECK FAILED - CANNOT START"
+      echo "=========================================="
+      echo "Database connection is not working."
+      echo "Application will not function properly."
+      echo ""
+      echo "To diagnose, SSH into container and run:"
+      echo "  /usr/local/bin/test-db-connection.sh"
+      echo "  php artisan db:verify-config"
+      echo ""
+      echo "Common fixes:"
+      echo "  1. Verify DB_HOST in Laravel Cloud environment"
+      echo "  2. Check database firewall allows your app's IP"
+      echo "  3. Confirm database service is running"
+      echo ""
+      echo "Exiting with error..."
+      exit 1
+    }
+  fi
+  echo ""
+  
   echo "Clearing all caches..."
   # Clear all caches first to ensure fresh start
   php artisan view:clear || true

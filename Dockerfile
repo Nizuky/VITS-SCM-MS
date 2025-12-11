@@ -54,7 +54,9 @@ COPY --from=node_builder /app/public/build /var/www/html/public/build
 
 # Copy docker scripts
 COPY docker/wait-for-db.sh /usr/local/bin/wait-for-db.sh
-RUN chmod +x /usr/local/bin/wait-for-db.sh
+COPY docker/test-db-from-shell.sh /usr/local/bin/test-db-connection.sh
+COPY docker/startup-health-check.sh /usr/local/bin/startup-health-check.sh
+RUN chmod +x /usr/local/bin/wait-for-db.sh /usr/local/bin/test-db-connection.sh /usr/local/bin/startup-health-check.sh
 
 # Ensure storage & cache dirs exist and are writable by www-data
 RUN mkdir -p /var/www/html/storage/framework/cache/data \

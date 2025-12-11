@@ -24,14 +24,15 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 // Pass SSL CA to PDO when provided (useful for Aiven TLS connections)
                 defined('PDO::MYSQL_ATTR_SSL_CA') ? PDO::MYSQL_ATTR_SSL_CA : null => env('DB_SSL_CA') ?: null,
-                // Set connection timeout to 30 seconds for cloud environments
-                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 30),
-                // MySQL specific connection timeout
-                defined('PDO::MYSQL_ATTR_CONNECT_TIMEOUT') ? PDO::MYSQL_ATTR_CONNECT_TIMEOUT : null => 30,
-                // MySQL specific read timeout  
-                defined('PDO::MYSQL_ATTR_READ_TIMEOUT') ? PDO::MYSQL_ATTR_READ_TIMEOUT : null => 30,
-                // MySQL specific write timeout
-                defined('PDO::MYSQL_ATTR_WRITE_TIMEOUT') ? PDO::MYSQL_ATTR_WRITE_TIMEOUT : null => 30,
+                // Set connection timeout to 5 seconds for faster failure detection
+                // This fails fast and allows retry logic to kick in
+                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 5),
+                // MySQL specific connection timeout (5 seconds for fast failure)
+                defined('PDO::MYSQL_ATTR_CONNECT_TIMEOUT') ? PDO::MYSQL_ATTR_CONNECT_TIMEOUT : null => 5,
+                // MySQL specific read timeout (10 seconds for queries)
+                defined('PDO::MYSQL_ATTR_READ_TIMEOUT') ? PDO::MYSQL_ATTR_READ_TIMEOUT : null => 10,
+                // MySQL specific write timeout (10 seconds for writes)
+                defined('PDO::MYSQL_ATTR_WRITE_TIMEOUT') ? PDO::MYSQL_ATTR_WRITE_TIMEOUT : null => 10,
                 // Set persistent connections off to avoid stale connections
                 PDO::ATTR_PERSISTENT => false,
                 // Enable error mode
