@@ -31,10 +31,7 @@ class ForceUpdateSuperAdmin extends Command
             // Create new super admin with exact credentials
             $admin = SuperAdmin::create([
                 'name' => 'adminAlex',
-                'email' => 'janarafael.sanandres@gmail.com',                docker-compose down
-                docker-compose up --build -d
-                php artisan config:clear
-                php artisan cache:clear
+                'email' => 'janarafael.sanandres@gmail.com',
                 'password' => Hash::make('softdev2025'),
                 'email_verified_at' => now(),
             ]);
