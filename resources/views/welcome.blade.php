@@ -576,59 +576,51 @@
       }
 
       // Function to clear session and redirect to Admin login
-      function clearSessionAndGoToAdmin() {
+      async function clearSessionAndGoToAdmin() {
         try {
-          // Show loading state
-          var btn = event.target;
-          var originalText = btn.innerHTML;
-          btn.innerHTML = 'Loading...';
-          btn.disabled = true;
-          
-          // Clear all storage except theme preferences
-          var adminTheme = localStorage.getItem('scms_admin_theme');
-          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
-          var studentTheme = localStorage.getItem('scms_student_theme');
+          // Clear all storage to force re-login
           localStorage.clear();
-          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
-          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
-          if (studentTheme) localStorage.setItem('scms_student_theme', studentTheme);
           sessionStorage.clear();
+          
+          // Call logout endpoint to clear server session
+          await fetch('{{ route('admin.logout') }}', {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+          }).catch(() => {});
         } catch(e) { 
           console.log('Error clearing storage:', e); 
         }
         
         // Redirect to Admin login
-        var url = '{{ route('admin.login') }}';
-        console.log('Redirecting to:', url);
-        window.location.href = url;
+        window.location.href = '{{ route('admin.login') }}';
       }
 
       // Function to clear session and redirect to Super Admin login
-      function clearSessionAndGoToSuperAdmin() {
+      async function clearSessionAndGoToSuperAdmin() {
         try {
-          // Show loading state
-          var btn = event.target;
-          var originalText = btn.innerHTML;
-          btn.innerHTML = 'Loading...';
-          btn.disabled = true;
-          
-          // Clear all storage except theme preferences
-          var adminTheme = localStorage.getItem('scms_admin_theme');
-          var superadminTheme = localStorage.getItem('scms_superadmin_theme');
-          var studentTheme = localStorage.getItem('scms_student_theme');
+          // Clear all storage to force re-login
           localStorage.clear();
-          if (adminTheme) localStorage.setItem('scms_admin_theme', adminTheme);
-          if (superadminTheme) localStorage.setItem('scms_superadmin_theme', superadminTheme);
-          if (studentTheme) localStorage.setItem('scms_student_theme', studentTheme);
           sessionStorage.clear();
+          
+          // Call logout endpoint to clear server session
+          await fetch('{{ route('superadmin.logout') }}', {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+          }).catch(() => {});
         } catch(e) { 
           console.log('Error clearing storage:', e); 
         }
         
-        // Redirect to super admin login with explicit URL
-        var url = '{{ route('superadmin.login') }}';
-        console.log('Redirecting to:', url);
-        window.location.href = url;
+        // Redirect to super admin login
+        window.location.href = '{{ route('superadmin.login') }}';
       }
 
             // Header show/hide on scroll: hide when scrolling down, show when scrolling up
