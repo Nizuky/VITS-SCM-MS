@@ -221,17 +221,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
             <div class="relative">
                 <input
                     wire:model="email"
-                    type="text"
+                    type="email"
                     required
                     autofocus
-                    autocomplete="off"
-                    placeholder="PLV Email address"
-                    class="w-full pr-32"
+                    autocomplete="email"
+                    placeholder="Enter your PLV email (e.g., student@plv.edu.ph)"
+                    class="w-full"
                     id="login-email-input"
-                    oninput="formatLoginEmail(this)"
-                    onpaste="handleEmailPaste(event)"
                 />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none select-none">@plv.edu.ph</span>
             </div>
         </div>
 
@@ -294,93 +291,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
     @endif
     
     <script>
-    function formatLoginEmail(input) {
-        let value = input.value;
-        
-        // If value contains @, cut everything from @ onwards
-        if (value.includes('@')) {
-            value = value.split('@')[0];
-        }
-        
-        // Remove all characters except letters (no numbers or special characters)
-        value = value.replace(/[^a-zA-Z]/g, '');
-        
-        // Update display value
-        input.value = value;
-        
-        // Update Livewire with full email
-        if (value) {
-            window.Livewire.find(input.closest('[wire\\:id]').getAttribute('wire:id')).set('email', value + '@plv.edu.ph');
-        }
-    }
-    
-    function handleEmailPaste(event) {
-        event.preventDefault();
-        
-        // Get pasted text
-        const pastedText = (event.clipboardData || window.clipboardData).getData('text');
-        
-        // Extract username before @
-        let username = pastedText;
-        if (pastedText.includes('@')) {
-            username = pastedText.split('@')[0];
-        }
-        
-        // Remove all characters except letters (no numbers or special characters)
-        username = username.replace(/[^a-zA-Z]/g, '');
-        
-        // Set the cleaned value
-        const input = event.target;
-        input.value = username;
-        
-        // Trigger input event for any listeners
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    
-    // Handle autofill and form submit
-    document.addEventListener('DOMContentLoaded', function() {
-        const emailInput = document.getElementById('login-email-input');
-        const form = document.querySelector('form[wire\\:submit="login"]');
-        
-        // Check for autofill after a short delay
-        if (emailInput) {
-            setTimeout(function() {
-                if (emailInput.value && emailInput.value.includes('@')) {
-                    const username = emailInput.value.split('@')[0];
-                    emailInput.value = username;
-                    // Update Livewire with full email
-                    const component = emailInput.closest('[wire\\:id]');
-                    if (component && window.Livewire) {
-                        window.Livewire.find(component.getAttribute('wire:id')).set('email', username + '@plv.edu.ph');
-                    }
-                }
-            }, 100);
-            
-            // Also check on change event (for autofill)
-            emailInput.addEventListener('change', function() {
-                if (this.value && this.value.includes('@')) {
-                    const username = this.value.split('@')[0];
-                    this.value = username;
-                    // Update Livewire with full email
-                    const component = this.closest('[wire\\:id]');
-                    if (component && window.Livewire) {
-                        window.Livewire.find(component.getAttribute('wire:id')).set('email', username + '@plv.edu.ph');
-                    }
-                }
-            });
-            
-            // On blur, ensure Livewire has full email
-            emailInput.addEventListener('blur', function() {
-                if (this.value && !this.value.includes('@')) {
-                    const component = this.closest('[wire\\:id]');
-                    if (component && window.Livewire) {
-                        window.Livewire.find(component.getAttribute('wire:id')).set('email', this.value + '@plv.edu.ph');
-                    }
-                }
-            });
-        }
-    });
-    
     // Password toggle
     document.addEventListener('click', function(e) {
         if (e.target.closest('.toggle-password')) {
