@@ -364,6 +364,78 @@ After clearing, it rebuilds optimized caches:
 
 ---
 
+## 🗄️ Database Migrations
+
+### Migration Verification
+
+**All 30 migrations must run successfully for the application to work.**
+
+After deployment, verify migrations with:
+```bash
+php /var/www/html/scripts/verify_migrations.php
+```
+
+### Required Tables
+
+| Table Name | Purpose |
+|------------|---------|
+| `users` | Student accounts |
+| `social_contracts` | Contract templates |
+| `social_contract_records` | Student submissions |
+| `social_contract_approvals` | Approval workflow |
+| `verifications` | Verification records |
+| `approvals` | Approval records |
+| `transaction_logs` | Activity logs |
+| `archives` | Archived data |
+| `super_admins` | Super admin accounts |
+| `admin_users` | Regular admin accounts |
+| `superadmin_activity_logs` | Admin activity tracking |
+| `password_resets` | Legacy password resets (admin/superadmin) |
+| `password_reset_tokens` | Modern password resets (students) |
+| `super_admin_password_change_tokens` | Super admin password changes |
+| `admin_password_change_tokens` | Admin password changes |
+| `student_notifications` | Student notifications |
+| `support_tickets` | Support system |
+| `sessions` | Session storage |
+| `cache` | Cache storage |
+| `cache_locks` | Cache locking |
+| `migrations` | Migration tracking |
+
+### Migration Troubleshooting
+
+**If migrations fail:**
+
+1. Check database connection:
+   ```bash
+   php artisan db:show
+   ```
+
+2. Check migration status:
+   ```bash
+   php artisan migrate:status
+   ```
+
+3. Run migrations manually:
+   ```bash
+   php artisan migrate --force
+   ```
+
+4. If database is corrupted, reset (⚠️ DESTRUCTIVE):
+   ```bash
+   php artisan migrate:fresh --seed --force
+   ```
+
+### Password Reset Tables
+
+Two separate password reset systems:
+
+1. **`password_reset_tokens`** - For student users (Laravel 11 standard)
+2. **`password_resets`** - For admin/super admin users (custom implementation)
+
+Both tables are created by migrations and required for forgot password functionality.
+
+---
+
 ## 🌱 Database Seeders
 
 ### Seeder Execution Order

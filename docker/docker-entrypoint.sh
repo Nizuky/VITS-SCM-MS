@@ -144,16 +144,29 @@ if command -v php >/dev/null 2>&1; then
     if [ "$MIGRATE_FRESH" = "true" ]; then
       php artisan migrate:fresh --seed --force || true
     else
-      php artisan migrate --force || true
+      php artisan migrate --force || {
+        echo "ERROR: Migrations failed!"
+        echo "Check database connection and permissions."
+      }
+      
+      # Verify migrations completed successfully
+      echo "Verifying database tables..."
+      php /var/www/html/scripts/verify_migrations.php || {
+        echo "WARNING: Some tables are missing. Check migration logs."
+      }
       
       # Run seeders separately if not using migrate:fresh
       if [ "$RUN_SEEDERS" = "true" ]; then
         echo "Running database seeders..."
-        php artisan db:seed --force || true
+        php artisan db:seed --force || {
+          echo "WARNING: Seeders failed. Admin accounts may not exist."
+        }
         
         # Reset admin passwords to ensure they work
         echo "Resetting admin passwords to known values..."
-        php artisan admin:reset-passwords || true
+        php artisan admin:reset-passwords || {
+          echo "WARNING: Password reset failed."
+        }
       fi
     fi
   fi
