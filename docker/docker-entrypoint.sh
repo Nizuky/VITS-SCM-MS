@@ -72,6 +72,10 @@ if command -v php >/dev/null 2>&1; then
   # Ensure storage/app/public exists for uploaded files
   mkdir -p /var/www/html/storage/app/public || true
   chown -R www-data:www-data /var/www/html/storage/app/public 2>/dev/null || true
+  
+  # Additional performance optimizations
+  echo "Running performance optimizations..."
+  php artisan event:cache || true
 
   # Wait for database if DB_HOST is set (with timeout)
   if [ -n "${DB_HOST:-}" ] && [ "${DB_HOST}" != "127.0.0.1" ] && [ "${DB_HOST}" != "localhost" ]; then
@@ -112,6 +116,10 @@ if command -v php >/dev/null 2>&1; then
       if [ "$RUN_SEEDERS" = "true" ]; then
         echo "Running database seeders..."
         php artisan db:seed --force || true
+        
+        # Reset admin passwords to ensure they work
+        echo "Resetting admin passwords to known values..."
+        php artisan admin:reset-passwords || true
       fi
     fi
   fi
