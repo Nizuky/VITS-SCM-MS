@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetSuperAdmin::class,
         \App\Console\Commands\DeleteOldRejectedRecords::class,
         \App\Console\Commands\DeleteInactiveAccounts::class,
+        \App\Console\Commands\CheckSuperAdmin::class,
     ];
 
     /**
