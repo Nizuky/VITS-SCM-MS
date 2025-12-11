@@ -55,10 +55,14 @@ if command -v php >/dev/null 2>&1; then
   # Ensure Livewire assets are available
   php artisan vendor:publish --tag=livewire:assets --force || true
   
-  echo "Caching config and routes (if available)"
-  # Use guards so failures don't break container startup in non-PHP contexts
+  echo "Optimizing application for production..."
+  # Cache all configuration, routes, and views for maximum performance
   php artisan config:cache || true
   php artisan route:cache || true
+  php artisan view:cache || true
+  
+  # Run optimize command for additional performance boost
+  php artisan optimize || true
 
   # Ensure public storage symlink exists (force recreate if broken)
   echo "Creating storage symlink..."
