@@ -48,7 +48,7 @@ Route::get('/emergency-diagnostic', function () {
     
     // Expected vs Actual
     $expectedHost = 'db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud';
-    $expectedDatabase = 'Cloud - vits_scm_ms';
+    $expectedDatabase = 'Cloud - vits_scm_ms'; // Will be quoted in .env as "Cloud - vits_scm_ms"
     $expectedUsername = 'jsthylbkmmff6jnv';
     
     $diagnostics['comparison'] = [
@@ -157,7 +157,7 @@ Route::get('/emergency-diagnostic', function () {
     $html .= '<code style="background: #1a1a1a; padding: 5px; display: block; margin: 10px 0;">';
     $html .= 'DB_HOST=db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud<br>';
     $html .= 'DB_PORT=3306<br>';
-    $html .= 'DB_DATABASE=Cloud - vits_scm_ms<br>';
+    $html .= 'DB_DATABASE="Cloud - vits_scm_ms"<br>';
     $html .= 'DB_USERNAME=jsthylbkmmff6jnv<br>';
     $html .= 'DB_PASSWORD=QXkqWoO9xir8FToisMWb<br>';
     $html .= 'DB_TIMEOUT=5';
@@ -166,7 +166,8 @@ Route::get('/emergency-diagnostic', function () {
     $html .= '- Host ends in <strong>...7aa...</strong> NOT ...7ae...<br>';
     $html .= '- Username has lowercase L and F: jsthy<strong>l</strong>bkmm<strong>ff</strong>6jnv<br>';
     $html .= '- Password has capital W: QXkq<strong>W</strong>oO9xir8FToisM<strong>W</strong>b<br>';
-    $html .= '- Database name has a SPACE: Cloud - vits_scm_ms<br><br>';
+    $html .= '- Database name has a SPACE and MUST be in quotes: "Cloud - vits_scm_ms"<br>';
+    $html .= '- .env parser requires quotes for values with spaces<br><br>';
     $html .= '<strong>5. Redeploy the application</strong>';
     $html .= '</div>';
     

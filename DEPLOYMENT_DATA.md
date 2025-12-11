@@ -45,17 +45,18 @@ APP_TIMEZONE=Asia/Manila
 DB_CONNECTION=mysql
 DB_HOST=db-a08bd7aa-1588-4461-97c3-bde906d54852.ap-southeast-1.public.db.laravel.cloud
 DB_PORT=3306
-DB_DATABASE=Cloud - vits_scm_ms
+DB_DATABASE="Cloud - vits_scm_ms"
 DB_USERNAME=jsthylbkmmff6jnv
 DB_PASSWORD=QXkqWoO9xir8FToisMWb
 DB_TIMEOUT=5
 ```
 
 **⚠️ CRITICAL NOTES:**
-- Database name contains a space: `Cloud - vits_scm_ms`
+- Database name contains a space and MUST be quoted: `"Cloud - vits_scm_ms"`
 - Host ends in `...7aa...` NOT `...7ae...`
 - Username has lowercase 'l' and 'f': `jsthylbkmmff6jnv`
 - Password has capital 'W': `QXkqWoO9xir8FToisMWb`
+- .env files require quotes around values with spaces
 
 ### Database Features
 - **Cluster Type:** Laravel Cloud MySQL 8 Managed Database
