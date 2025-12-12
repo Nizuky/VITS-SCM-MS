@@ -299,8 +299,16 @@
                     <label class="label">
                         <span class="label-text font-semibold">Warning Level</span>
                     </label>
-                    <div id="view-student-warning-level" class="px-3 py-2">
-                        <span class="badge badge-success">No Warnings</span>
+                    <div class="flex items-center gap-3">
+                        <div id="view-student-warning-level" class="px-3 py-2">
+                            <span class="badge badge-success">No Warnings</span>
+                        </div>
+                        <button type="button" id="clear-warnings-btn" class="btn btn-sm btn-outline btn-success hidden" onclick="clearStudentWarnings()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Clear Warnings
+                        </button>
                     </div>
                 </div>
                 

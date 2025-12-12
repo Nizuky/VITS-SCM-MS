@@ -4489,6 +4489,7 @@ body {
         // Display warning level badge in view modal
         function updateWarningLevelDisplay(warningLevel) {
             var container = document.getElementById('view-student-warning-level');
+            var clearBtn = document.getElementById('clear-warnings-btn');
             if (!container) return;
             
             var badges = {
@@ -4499,6 +4500,66 @@ body {
             };
             
             container.innerHTML = badges[warningLevel] || badges[0];
+            
+            // Show/hide clear warnings button based on warning level
+            if (clearBtn) {
+                if (warningLevel > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+        }
+        
+        // Clear all warnings for a student
+        async function clearStudentWarnings() {
+            var studentId = window.currentViewingStudentId;
+            if (!studentId) {
+                showToast('Student not found', 'error');
+                return;
+            }
+            
+            var clearBtn = document.getElementById('clear-warnings-btn');
+            var originalContent = clearBtn.innerHTML;
+            clearBtn.disabled = true;
+            clearBtn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Clearing...';
+            
+            try {
+                var response = await fetch(BASE_PATH + '/super-admin/api/students/' + studentId + '/clear-warning', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                var data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message || 'Warnings cleared successfully', 'success');
+                    
+                    // Update the warning level display
+                    updateWarningLevelDisplay(0);
+                    
+                    // Update the student data in memory
+                    var student = allStudents.find(s => s.id === studentId);
+                    if (student) {
+                        student.warning_level = 0;
+                        student.flagged_for_deletion = false;
+                    }
+                } else {
+                    showToast(data.message || 'Failed to clear warnings', 'error');
+                }
+            } catch (error) {
+                console.error('Error clearing warnings:', error);
+                showToast('Error clearing warnings', 'error');
+            } finally {
+                clearBtn.disabled = false;
+                clearBtn.innerHTML = originalContent;
+            }
         }
         
         // ============================================

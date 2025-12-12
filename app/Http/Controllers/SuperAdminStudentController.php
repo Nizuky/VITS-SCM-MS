@@ -423,4 +423,67 @@ class SuperAdminStudentController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Clear all warnings from a student
+     */
+    public function clearWarning(Request $request, $id)
+    {
+        try {
+            // Ensure session marker is present
+            if (!$request->session()->has('superadmin_session_active')) {
+                $request->session()->put('superadmin_session_active', true);
+                $request->session()->save();
+                Log::info('Restored missing superadmin session marker in clear warning');
+            }
+
+            $student = User::findOrFail($id);
+            
+            $previousWarningLevel = $student->warning_level ?? 0;
+
+            // Clear warning level and deletion flag
+            $student->warning_level = 0;
+            $student->flagged_for_deletion = false;
+            $student->save();
+
+            // Optionally send notification to student
+            StudentNotification::create([
+                'user_id' => $student->id,
+                'title' => 'Warnings Cleared',
+                'type' => 'success',
+                'message' => 'Your account warnings have been cleared by the administrator. Your account is now in good standing.',
+                'is_read' => false,
+            ]);
+
+            Log::info('Super Admin cleared warnings for student', [
+                'super_admin_id' => auth()->guard('superadmin')->id(),
+                'student_id' => $student->id,
+                'previous_warning_level' => $previousWarningLevel,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All warnings cleared successfully for ' . $student->name,
+                'warning_level' => 0,
+                'flagged_for_deletion' => false,
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Student not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to clear warning', [
+                'student_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear warnings: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
