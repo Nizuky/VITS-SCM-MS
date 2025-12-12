@@ -5,6 +5,16 @@ echo "====================================="
 echo "Running Laravel Cloud Deploy Commands"
 echo "====================================="
 
+# Ensure all storage directories exist with correct permissions
+echo "Creating storage directories..."
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/framework/cache/data
+mkdir -p storage/logs
+mkdir -p storage/app/public
+mkdir -p bootstrap/cache
+chmod -R 775 storage bootstrap/cache || true
+
 # Clear all Laravel caches (without database access)
 # NOTE: Skip cache:clear as it may try to use database driver
 echo "Clearing application caches..."
