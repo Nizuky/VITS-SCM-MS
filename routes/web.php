@@ -1,33 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    try {
+    // Check if welcome view exists before trying to render
+    if (View::exists('welcome')) {
         return view('welcome');
-    } catch (\InvalidArgumentException $e) {
-        // Fallback for debugging - list available views
-        $viewPath = resource_path('views');
-        $exists = file_exists($viewPath);
-        $welcomeExists = file_exists($viewPath . '/welcome.blade.php');
-        $files = $exists ? scandir($viewPath) : [];
-        
-        return response()->json([
-            'error' => 'View [welcome] not found',
-            'debug' => [
-                'resource_path' => $viewPath,
-                'resource_path_exists' => $exists,
-                'welcome_blade_exists' => $welcomeExists,
-                'base_path' => base_path(),
-                'storage_path' => storage_path(),
-                'view_paths' => config('view.paths'),
-                'compiled_path' => config('view.compiled'),
-                'files_in_views' => $files,
-            ],
-        ], 500);
     }
+    
+    // Fallback: redirect to login page if welcome view is not available
+    return redirect()->route('login');
 })->name('home');
 
 // Student dashboard route (web guard)
