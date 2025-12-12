@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         App\Providers\AppServiceProvider::class,
         App\Providers\SessionDriverProvider::class, // Auto-fallback to cookie if DB unavailable
+        App\Providers\DatabaseMigrationProvider::class, // Auto-add missing columns on Laravel Cloud
         Livewire\LivewireServiceProvider::class,
         Livewire\Volt\VoltServiceProvider::class,
         App\Providers\FortifyViewServiceProvider::class,
