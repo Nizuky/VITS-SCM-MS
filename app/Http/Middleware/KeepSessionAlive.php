@@ -18,16 +18,21 @@ class KeepSessionAlive
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check all guards for authenticated users
-        if (auth()->guard('web')->check() || 
-            auth()->guard('admin')->check() || 
-            auth()->guard('superadmin')->check()) {
-            
-            // Update last activity timestamp
-            session()->put('last_keep_alive', now());
-            
-            // Touch the session to prevent expiration
-            session()->save();
+        // Check all guards for authenticated users (with database fallback)
+        try {
+            if (auth()->guard('web')->check() || 
+                auth()->guard('admin')->check() || 
+                auth()->guard('superadmin')->check()) {
+                
+                // Update last activity timestamp
+                session()->put('last_keep_alive', now());
+                
+                // Touch the session to prevent expiration
+                session()->save();
+            }
+        } catch (\Exception $e) {
+            // Database unavailable, skip keep-alive logic
+            // This prevents 500 errors when database is down
         }
         
         return $next($request);
