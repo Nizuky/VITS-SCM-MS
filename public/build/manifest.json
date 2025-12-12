@@ -1,6 +1,10 @@
 {
+  "_vendor-ngrFHoWO.js": {
+    "file": "assets/vendor-ngrFHoWO.js",
+    "name": "vendor"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-6hp-d179.css",
+    "file": "assets/app-HZpP5f0Q.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -8,9 +12,12 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-CJnoK8nr.js",
+    "file": "assets/app-CDfpeiKo.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_vendor-ngrFHoWO.js"
+    ]
   }
 }
