@@ -3,7 +3,7 @@
 <dialog id="activity_details_modal" class="modal">
     <div class="modal-box w-11/12 max-w-2xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <h3 class="font-bold text-lg text-text-header mb-4">Activity on <span id="activity-date-header"></span></h3>
@@ -96,7 +96,7 @@
 <dialog id="submission_details_modal" class="modal">
     <div class="modal-box w-11/12 max-w-2xl p-6 relative">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <h3 class="font-bold text-lg text-text-header mb-6">Social Contract Record</h3>
@@ -159,7 +159,7 @@
 <dialog id="confirm_delete_record_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -207,7 +207,7 @@
 <dialog id="confirm_delete_account_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -258,7 +258,7 @@
 <dialog id="confirm_delete_all_records_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -308,7 +308,7 @@
 <dialog id="confirm_delete_all_accounts_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -359,7 +359,7 @@
 <dialog id="status_records_modal" class="modal">
     <div class="modal-box w-11/12 max-w-5xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-6">

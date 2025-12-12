@@ -2,7 +2,7 @@
 <dialog id="add_record_modal" class="modal">
     <div class="modal-box p-6 max-w-lg rounded-2xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
 
         <h3 class="font-bold text-xl mb-6 text-center text-text-header">Create a record</h3>
@@ -87,7 +87,7 @@
 <dialog id="status_records_modal" class="modal">
     <div class="modal-box w-11/12 max-w-5xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-6">
@@ -161,7 +161,7 @@
 <dialog id="rejection_reason_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -197,7 +197,7 @@
 <dialog id="delete_pending_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -248,7 +248,7 @@
 <dialog id="delete_ticket_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -298,7 +298,7 @@
 <dialog id="mark_done_ticket_modal" class="modal">
     <div class="modal-box max-w-md">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center gap-3 mb-4">
@@ -348,7 +348,7 @@
 <dialog id="all_notifications_modal" class="modal">
     <div class="modal-box max-w-2xl max-h-[80vh]">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         
         <div class="flex items-center justify-between mb-4">
@@ -424,7 +424,7 @@
 <dialog id="submit_ticket_modal" class="modal">
     <div class="modal-box p-6 max-w-lg rounded-2xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         <h3 class="font-bold text-xl mb-6 text-center text-text-header">Submit New Support Ticket</h3>
         <form id="submit-ticket-form" class="space-y-4">
@@ -496,7 +496,7 @@
 <dialog id="ticket_details_modal" class="modal">
     <div class="modal-box p-6 max-w-2xl rounded-2xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         <h3 class="font-bold text-2xl mb-6 text-center text-primary-purple">Ticket Details</h3>
         
@@ -555,7 +555,7 @@
 <dialog id="export_options_modal" class="modal">
     <div class="modal-box p-6 max-w-sm rounded-2xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </form>
         <h3 class="font-bold text-xl mb-6 text-center text-text-header">Export Approved Records</h3>
         <div class="space-y-4">
