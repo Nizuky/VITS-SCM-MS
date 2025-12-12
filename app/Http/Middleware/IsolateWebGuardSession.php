@@ -74,23 +74,3 @@ class IsolateWebGuardSession
         }
     }
 }
-                }
-            }
-        }
-        
-        if ($wasSuperAdminLoggedIn && !Auth::guard('superadmin')->check()) {
-            // Super admin was logged out during registration - restore their session
-            if ($superAdminUserId) {
-                $superAdminUser = \App\Models\SuperAdmin::find($superAdminUserId);
-                if ($superAdminUser) {
-                    Auth::guard('superadmin')->login($superAdminUser, true);
-                    if ($superAdminSessionMarker) {
-                        session(['superadmin_session_active' => true]);
-                    }
-                }
-            }
-        }
-        
-        return $response;
-    }
-}
