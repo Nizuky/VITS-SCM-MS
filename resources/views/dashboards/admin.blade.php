@@ -859,6 +859,39 @@
 
     <!-- Scripts -->
     <script>
+        // ============================================
+        // SESSION SECURITY - PREVENT BACK BUTTON ACCESS
+        // ============================================
+        (function() {
+            // Check session on page show (handles back/forward cache)
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page was loaded from bfcache (back/forward button)
+                    // Verify session is still valid
+                    fetch(`${window.BASE_PATH || ''}/admin/api/dashboard-stats`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    }).then(function(response) {
+                        if (response.status === 401 || response.status === 419) {
+                            // Session expired, force reload to trigger login redirect
+                            window.location.href = '{{ route("admin.login") }}';
+                        }
+                    }).catch(function() {
+                        // Network error, force reload
+                        window.location.reload();
+                    });
+                }
+            });
+            
+            // Prevent caching via JavaScript as additional layer
+            window.addEventListener('unload', function() {});
+        })();
+        
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data

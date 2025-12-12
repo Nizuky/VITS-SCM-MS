@@ -927,6 +927,39 @@ body {
 
     <!-- Scripts -->
     <script>
+        // ============================================
+        // SESSION SECURITY - PREVENT BACK BUTTON ACCESS
+        // ============================================
+        (function() {
+            // Check session on page show (handles back/forward cache)
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page was loaded from bfcache (back/forward button)
+                    // Verify session is still valid
+                    fetch(`${window.BASE_PATH || ''}/super-admin/api/dashboard-stats`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    }).then(function(response) {
+                        if (response.status === 401 || response.status === 419) {
+                            // Session expired, force reload to trigger login redirect
+                            window.location.href = '<?php echo e(route("superadmin.login")); ?>';
+                        }
+                    }).catch(function() {
+                        // Network error, force reload
+                        window.location.reload();
+                    });
+                }
+            });
+            
+            // Prevent caching via JavaScript as additional layer
+            window.addEventListener('unload', function() {});
+        })();
+        
         // Global variables
         var activeRow = null;
         var allSubmissions = []; // Store all submissions data
@@ -4219,7 +4252,9 @@ body {
             // Reset send button
             var sendBtn = document.getElementById('send-message-btn');
             sendBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg> Send Message';
-            sendBtn.classList.remove('btn-error', 'btn-warning');
+            sendBtn.classList.remove('btn-error', 'btn-warning', 'text-white');
+            sendBtn.style.backgroundColor = '';
+            sendBtn.style.borderColor = '';
             sendBtn.classList.add('bg-primary-purple', 'hover:bg-primary-purple-hover');
         }
         
@@ -4237,7 +4272,9 @@ body {
                 // Reset send button
                 var sendBtn = document.getElementById('send-message-btn');
                 sendBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg> Send Message';
-                sendBtn.classList.remove('btn-error', 'btn-warning');
+                sendBtn.classList.remove('btn-error', 'btn-warning', 'text-white');
+                sendBtn.style.backgroundColor = '';
+                sendBtn.style.borderColor = '';
                 sendBtn.classList.add('bg-primary-purple', 'hover:bg-primary-purple-hover');
             } else {
                 document.getElementById('msg-type-message').classList.remove('btn-active');
@@ -4282,16 +4319,22 @@ body {
         // Update send button styling based on warning level
         function updateSendButtonForWarning() {
             var sendBtn = document.getElementById('send-message-btn');
-            sendBtn.classList.remove('bg-primary-purple', 'hover:bg-primary-purple-hover', 'btn-error', 'btn-warning');
+            sendBtn.classList.remove('bg-primary-purple', 'hover:bg-primary-purple-hover', 'btn-error', 'btn-warning', 'text-white');
+            sendBtn.style.backgroundColor = '';
+            sendBtn.style.borderColor = '';
             
             if (selectedWarningLevel === 3) {
                 sendBtn.classList.add('btn-error');
                 sendBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Issue Final Warning';
             } else if (selectedWarningLevel === 2) {
-                sendBtn.classList.add('btn-warning');
+                sendBtn.style.backgroundColor = '#F97316';
+                sendBtn.style.borderColor = '#F97316';
+                sendBtn.classList.add('text-white');
                 sendBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Issue 2nd Warning';
             } else if (selectedWarningLevel === 1) {
-                sendBtn.classList.add('btn-warning');
+                sendBtn.style.backgroundColor = '#EAB308';
+                sendBtn.style.borderColor = '#EAB308';
+                sendBtn.classList.add('text-white');
                 sendBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Issue 1st Warning';
             } else {
                 sendBtn.classList.add('bg-primary-purple', 'hover:bg-primary-purple-hover');

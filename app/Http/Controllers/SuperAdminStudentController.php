@@ -354,7 +354,7 @@ class SuperAdminStudentController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send warning'
+                'message' => 'Failed to send warning: ' . $e->getMessage()
             ], 500);
         }
     }

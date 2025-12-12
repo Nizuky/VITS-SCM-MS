@@ -4,11 +4,11 @@ return [
     // Session driver - use 'cookie' for Laravel Cloud (stateless), 'file' for local
     'driver' => env('SESSION_DRIVER', 'cookie'),
 
-    // Minutes the session can remain idle before it expires (1 year)
-    'lifetime' => env('SESSION_LIFETIME', 525600),
+    // Minutes the session can remain idle before it expires (1 hour)
+    'lifetime' => env('SESSION_LIFETIME', 60),
 
-    // Set to false so sessions persist across browser close
-    'expire_on_close' => false,
+    // Set to true so sessions expire when browser is closed (security)
+    'expire_on_close' => true,
 
     // Session encryption (true for cookie driver security)
     'encrypt' => true,
