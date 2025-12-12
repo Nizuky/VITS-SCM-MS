@@ -375,10 +375,11 @@
       21 => 'Illuminate\\Validation\\ValidationServiceProvider',
       22 => 'Illuminate\\View\\ViewServiceProvider',
       23 => 'App\\Providers\\AppServiceProvider',
-      24 => 'Livewire\\LivewireServiceProvider',
-      25 => 'Livewire\\Volt\\VoltServiceProvider',
-      26 => 'App\\Providers\\FortifyViewServiceProvider',
-      27 => 'App\\Providers\\VoltServiceProvider',
+      24 => 'App\\Providers\\SessionDriverProvider',
+      25 => 'Livewire\\LivewireServiceProvider',
+      26 => 'Livewire\\Volt\\VoltServiceProvider',
+      27 => 'App\\Providers\\FortifyViewServiceProvider',
+      28 => 'App\\Providers\\VoltServiceProvider',
     ),
     'aliases' => 
     array (
