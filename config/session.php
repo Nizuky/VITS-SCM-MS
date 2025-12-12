@@ -1,9 +1,9 @@
 <?php
 
 return [
-    // Session driver - use 'cookie' for Laravel Cloud (stateless), 'file' for local
-    // CRITICAL: On Laravel Cloud, MUST use 'cookie' driver to avoid database dependency
-    'driver' => env('SESSION_DRIVER', env('APP_ENV') === 'production' ? 'cookie' : 'cookie'),
+    // Session driver - use 'file' for production (cookie causes 400 errors with large sessions)
+    // File driver stores sessions on disk instead of in cookies, preventing size issues
+    'driver' => env('SESSION_DRIVER', env('APP_ENV') === 'production' ? 'file' : 'file'),
 
     // Minutes the session can remain idle before it expires (1 hour)
     'lifetime' => env('SESSION_LIFETIME', 60),
@@ -11,7 +11,7 @@ return [
     // Set to true so sessions expire when browser is closed (security)
     'expire_on_close' => true,
 
-    // Session encryption (true for cookie driver security)
+    // Session encryption (true for security)
     'encrypt' => true,
 
     // Session file location (for file driver)

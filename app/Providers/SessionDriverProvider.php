@@ -14,11 +14,11 @@ class SessionDriverProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Force file-based cache and cookie session in production to avoid database dependency
-        // This runs before boot() and ensures config is set early
+        // Force file-based cache and file session in production to avoid database dependency
+        // Cookie sessions cause "400 Bad Request" when session data gets too large
         if (env('APP_ENV') === 'production' || env('LARAVEL_CLOUD')) {
-            // Force session to cookie (no database needed)
-            Config::set('session.driver', 'cookie');
+            // Force session to file (cookie sessions cause 400 errors with large data)
+            Config::set('session.driver', 'file');
             
             // Force cache to file (no database needed)  
             Config::set('cache.default', 'file');
