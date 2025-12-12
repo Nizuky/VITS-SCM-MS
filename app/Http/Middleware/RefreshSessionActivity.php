@@ -20,8 +20,17 @@ class RefreshSessionActivity
     public function handle(Request $request, Closure $next): Response
     {
         // Update last activity timestamp in session
-        if ($request->hasSession()) {
-            $request->session()->put('last_activity', time());
+        // Wrapped in try-catch to handle session storage failures gracefully
+        try {
+            if ($request->hasSession()) {
+                $request->session()->put('last_activity', time());
+            }
+        } catch (\Exception $e) {
+            // Log error but don't block the request
+            \Log::warning('Failed to update session activity', [
+                'error' => $e->getMessage(),
+                'url' => $request->url()
+            ]);
         }
 
         return $next($request);

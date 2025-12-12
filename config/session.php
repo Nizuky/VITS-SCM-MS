@@ -2,7 +2,8 @@
 
 return [
     // Session driver - use 'cookie' for Laravel Cloud (stateless), 'file' for local
-    'driver' => env('SESSION_DRIVER', 'cookie'),
+    // CRITICAL: On Laravel Cloud, MUST use 'cookie' driver to avoid database dependency
+    'driver' => env('SESSION_DRIVER', env('APP_ENV') === 'production' ? 'cookie' : 'cookie'),
 
     // Minutes the session can remain idle before it expires (1 hour)
     'lifetime' => env('SESSION_LIFETIME', 60),
