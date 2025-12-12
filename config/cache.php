@@ -13,6 +13,8 @@ return [
     | using the cache library. This connection is utilized if another
     | isn't explicitly specified when running a cache operation.
     |
+    | NOTE: Using 'file' as default to avoid database dependency issues on Laravel Cloud
+    |
     */
 
     'default' => env('CACHE_STORE', 'file'),

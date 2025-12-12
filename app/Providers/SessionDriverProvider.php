@@ -14,31 +14,46 @@ class SessionDriverProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Force file-based cache and cookie session in production to avoid database dependency
+        // This runs before boot() and ensures config is set early
+        if (env('APP_ENV') === 'production' || env('LARAVEL_CLOUD')) {
+            // Force session to cookie (no database needed)
+            Config::set('session.driver', 'cookie');
+            
+            // Force cache to file (no database needed)  
+            Config::set('cache.default', 'file');
+        }
     }
 
     /**
      * Bootstrap services.
      * 
-     * Automatically switch to cookie driver if database is unavailable.
+     * Automatically switch to cookie/file drivers if database is unavailable.
      * This prevents 500 errors on Laravel Cloud when database connection fails.
      */
     public function boot(): void
     {
-        // Only check if session driver is set to 'database'
+        // Double-check: if session driver is still 'database', verify DB is available
         if (config('session.driver') === 'database') {
             try {
-                // Quick check if database is available (with 1 second timeout)
                 DB::connection()->getPdo();
-                
-                // Additionally check if sessions table exists
                 if (!DB::getSchemaBuilder()->hasTable('sessions')) {
-                    // Table doesn't exist, fall back to cookie
-                    $this->fallbackToCookieDriver('sessions table does not exist');
+                    $this->fallbackSessionToCookie('sessions table does not exist');
                 }
             } catch (\Exception $e) {
-                // Database not available, fall back to cookie driver
-                $this->fallbackToCookieDriver($e->getMessage());
+                $this->fallbackSessionToCookie($e->getMessage());
+            }
+        }
+        
+        // Double-check: if cache driver is still 'database', verify DB is available
+        if (config('cache.default') === 'database') {
+            try {
+                DB::connection()->getPdo();
+                if (!DB::getSchemaBuilder()->hasTable('cache')) {
+                    $this->fallbackCacheToFile('cache table does not exist');
+                }
+            } catch (\Exception $e) {
+                $this->fallbackCacheToFile($e->getMessage());
             }
         }
     }
@@ -46,14 +61,24 @@ class SessionDriverProvider extends ServiceProvider
     /**
      * Fall back to cookie session driver
      */
-    private function fallbackToCookieDriver(string $reason): void
+    private function fallbackSessionToCookie(string $reason): void
     {
         Config::set('session.driver', 'cookie');
         
         Log::warning('Session driver automatically changed from database to cookie', [
             'reason' => $reason,
-            'original_driver' => 'database',
-            'new_driver' => 'cookie'
+        ]);
+    }
+    
+    /**
+     * Fall back to file cache driver
+     */
+    private function fallbackCacheToFile(string $reason): void
+    {
+        Config::set('cache.default', 'file');
+        
+        Log::warning('Cache driver automatically changed from database to file', [
+            'reason' => $reason,
         ]);
     }
 }

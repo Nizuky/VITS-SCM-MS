@@ -6,12 +6,14 @@ echo "Running Laravel Cloud Deploy Commands"
 echo "====================================="
 
 # Clear all Laravel caches (without database access)
+# NOTE: Skip cache:clear as it may try to use database driver
 echo "Clearing application caches..."
 php artisan config:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 php artisan event:clear || true
-php artisan cache:clear || true
+# DO NOT run cache:clear during build - it tries to access database
+# php artisan cache:clear || true
 
 # Verify welcome view exists before caching
 if [ -f "resources/views/welcome.blade.php" ]; then
@@ -19,6 +21,10 @@ if [ -f "resources/views/welcome.blade.php" ]; then
 else
     echo "✗ WARNING: welcome.blade.php not found!"
 fi
+
+# Verify resources/views directory structure
+echo "Checking views directory..."
+ls -la resources/views/ || true
 
 # Cache configuration (using environment variables, not database)
 echo "Caching configuration..."
