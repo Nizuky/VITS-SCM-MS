@@ -5,7 +5,29 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
+    try {
+        return view('welcome');
+    } catch (\InvalidArgumentException $e) {
+        // Fallback for debugging - list available views
+        $viewPath = resource_path('views');
+        $exists = file_exists($viewPath);
+        $welcomeExists = file_exists($viewPath . '/welcome.blade.php');
+        $files = $exists ? scandir($viewPath) : [];
+        
+        return response()->json([
+            'error' => 'View [welcome] not found',
+            'debug' => [
+                'resource_path' => $viewPath,
+                'resource_path_exists' => $exists,
+                'welcome_blade_exists' => $welcomeExists,
+                'base_path' => base_path(),
+                'storage_path' => storage_path(),
+                'view_paths' => config('view.paths'),
+                'compiled_path' => config('view.compiled'),
+                'files_in_views' => $files,
+            ],
+        ], 500);
+    }
 })->name('home');
 
 // Student dashboard route (web guard)
