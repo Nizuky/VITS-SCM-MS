@@ -68,7 +68,7 @@ if command -v php >/dev/null 2>&1; then
   echo ""
   
   echo "Clearing all caches..."
-  # Clear all caches first to ensure fresh start
+  # Clear all caches first to ensure fresh start (especially view cache)
   php artisan view:clear || true
   php artisan config:clear || true
   php artisan cache:clear || true
