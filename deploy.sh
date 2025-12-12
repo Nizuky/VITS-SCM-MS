@@ -26,9 +26,9 @@ fi
 echo "Checking views directory..."
 ls -la resources/views/ || true
 
-# Cache configuration (using environment variables, not database)
-echo "Caching configuration..."
-php artisan config:cache || true
+# DO NOT cache config during build - paths may be different at runtime
+# Let Laravel resolve config at runtime for Laravel Cloud
+# php artisan config:cache || true
 
 # DO NOT cache views during build - let runtime handle it
 # php artisan view:cache

@@ -6,12 +6,17 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    // Check if welcome view exists before trying to render
-    if (View::exists('welcome')) {
-        return view('welcome');
+    // Try to render welcome view, fallback to login if any error
+    try {
+        if (View::exists('welcome')) {
+            return view('welcome');
+        }
+    } catch (\Throwable $e) {
+        // Log the error for debugging
+        \Illuminate\Support\Facades\Log::error('Welcome view error: ' . $e->getMessage());
     }
     
-    // Fallback: redirect to login page if welcome view is not available
+    // Fallback: redirect to login page
     return redirect()->route('login');
 })->name('home');
 
