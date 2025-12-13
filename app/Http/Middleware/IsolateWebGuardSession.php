@@ -32,8 +32,16 @@ class IsolateWebGuardSession
             // Store their user IDs and session markers
             $adminUserId = $wasAdminLoggedIn ? Auth::guard('admin')->id() : null;
             $superAdminUserId = $wasSuperAdminLoggedIn ? Auth::guard('superadmin')->id() : null;
-            $adminSessionMarker = session('admin_session_active');
-            $superAdminSessionMarker = session('superadmin_session_active');
+            
+            // Safely get session markers (wrapped in try-catch for ephemeral filesystems)
+            $adminSessionMarker = null;
+            $superAdminSessionMarker = null;
+            try {
+                $adminSessionMarker = session('admin_session_active');
+                $superAdminSessionMarker = session('superadmin_session_active');
+            } catch (\Exception $e) {
+                // Session not available, continue without markers
+            }
             
             // Process the request (Fortify will create user and auto-login on web guard)
             $response = $next($request);
@@ -47,7 +55,11 @@ class IsolateWebGuardSession
                     if ($adminUser) {
                         Auth::guard('admin')->login($adminUser, true);
                         if ($adminSessionMarker) {
-                            session(['admin_session_active' => true]);
+                            try {
+                                session(['admin_session_active' => true]);
+                            } catch (\Exception $e) {
+                                // Session write failed, continue anyway
+                            }
                         }
                     }
                 }
@@ -60,7 +72,11 @@ class IsolateWebGuardSession
                     if ($superAdminUser) {
                         Auth::guard('superadmin')->login($superAdminUser, true);
                         if ($superAdminSessionMarker) {
-                            session(['superadmin_session_active' => true]);
+                            try {
+                                session(['superadmin_session_active' => true]);
+                            } catch (\Exception $e) {
+                                // Session write failed, continue anyway
+                            }
                         }
                     }
                 }
