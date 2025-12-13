@@ -50,8 +50,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '/super-admin/api/*',
         ]);
         
-        // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)
-        $middleware->append(App\Http\Middleware\ForcePendingLogout::class);
+        // NOTE: ForcePendingLogout middleware removed - it caused session errors on Laravel Cloud
+        // with ephemeral filesystems. The client-side logout handling is sufficient.
         
         // NOTE: RefreshSessionActivity middleware removed - it caused issues with ephemeral filesystems
         // on Laravel Cloud when SESSION_DRIVER=file. Laravel's built-in session handling is sufficient.
