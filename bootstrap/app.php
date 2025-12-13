@@ -53,8 +53,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Global middleware to enforce logout if the client set a pending flag (fallback when beacon is dropped)
         $middleware->append(App\Http\Middleware\ForcePendingLogout::class);
         
-        // Global middleware to refresh session activity on every request
-        $middleware->append(App\Http\Middleware\RefreshSessionActivity::class);
+        // NOTE: RefreshSessionActivity middleware removed - it caused issues with ephemeral filesystems
+        // on Laravel Cloud when SESSION_DRIVER=file. Laravel's built-in session handling is sufficient.
         
         // CRITICAL: Isolate web guard session during registration to prevent
         // Fortify's auto-login from affecting admin/superadmin sessions
