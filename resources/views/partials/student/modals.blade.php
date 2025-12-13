@@ -586,5 +586,109 @@
     <form method="dialog" class="modal-backdrop"> <button>close</button> </form>
 </dialog>
 
+<!-- Edit Record Modal -->
+<dialog id="edit_record_modal" class="modal">
+    <div class="modal-box p-6 max-w-lg rounded-2xl">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </form>
+
+        <h3 class="font-bold text-xl mb-2 text-center text-text-header">Edit Record</h3>
+        <p class="text-sm text-gray-500 text-center mb-4">Changes are auto-saved as you type</p>
+        
+        <!-- Auto-save status indicator -->
+        <div id="edit-autosave-status" class="flex items-center justify-center gap-2 mb-4 text-sm">
+            <span id="edit-status-icon" class="hidden">
+                <!-- Saving spinner -->
+                <svg id="edit-saving-icon" class="animate-spin h-4 w-4 text-primary-purple hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <!-- Saved checkmark -->
+                <svg id="edit-saved-icon" class="h-4 w-4 text-green-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <!-- Error icon -->
+                <svg id="edit-error-icon" class="h-4 w-4 text-red-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </span>
+            <span id="edit-status-text" class="text-gray-500">Ready to edit</span>
+        </div>
+        
+        <form id="edit-record-form" class="space-y-4">
+            <input type="hidden" id="edit-record-id" />
+            
+            <label class="form-control w-full">
+                <div class="label">
+                    <span class="label-text font-semibold">Event name</span>
+                </div>
+                <input type="text" id="edit-event-name" placeholder="Enter event name here" class="input input-bordered w-full rounded-lg" required data-field="event_name" />
+            </label>
+
+            <label class="form-control w-full">
+                <div class="label">
+                    <span class="label-text font-semibold">Venue</span>
+                </div>
+                <input type="text" id="edit-venue" placeholder="Enter venue here" class="input input-bordered w-full rounded-lg" required data-field="venue" />
+            </label>
+            
+            <div class="flex gap-4">
+                <label class="form-control flex-1">
+                    <div class="label">
+                        <span class="label-text font-semibold">Date</span>
+                    </div>
+                    <label class="input input-bordered flex items-center gap-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                        </svg>
+                        <input type="date" id="edit-date" class="grow" required data-field="date" />
+                    </label>
+                </label>
+
+                <label class="form-control w-40">
+                    <div class="label">
+                        <span class="label-text font-semibold">Hours Rendered</span>
+                    </div>
+                    <input id="edit-hours-rendered" type="number" min="0" step="1" value="0" class="input input-bordered w-full text-center" data-field="hours_rendered" />
+                </label>
+            </div>
+
+            <label class="form-control w-full">
+                <div class="label">
+                    <span class="label-text font-semibold">Name of Organizing Committee or Supervisor</span>
+                </div>
+                <input type="text" id="edit-organization" placeholder="Enter the name here" class="input input-bordered w-full rounded-lg" required data-field="organization" />
+            </label>
+
+            <label class="form-control w-full">
+                <div class="label">
+                    <span class="label-text font-semibold">Supervisor Name</span>
+                </div>
+                <input type="text" id="edit-supervisor-name" placeholder="Enter supervisor name here" class="input input-bordered w-full rounded-lg" data-field="supervisor_name" />
+            </label>
+
+            <div class="mt-8 pt-4 flex justify-center gap-3">
+                <button type="button" class="btn btn-ghost rounded-lg" onclick="document.getElementById('edit_record_modal').close()">
+                    Close
+                </button>
+                <button type="button" id="edit-save-now-btn" class="btn bg-primary-purple hover:bg-primary-purple-hover text-white rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Now
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
 <!-- DaisyUI toast root (bottom-right) -->
 <div id="toast-root" class="toast toast-bottom toast-end fixed bottom-4 right-4 z-[5000] space-y-2"></div>

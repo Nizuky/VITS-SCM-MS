@@ -4291,6 +4291,16 @@
                     // Add action date if available
                     let statusHtml = renderStatusBadge(rec.status, rec);
                     
+                    // Edit button only for pending records
+                    let editBtnHtml = '';
+                    if (rec.status === 'Pending') {
+                        editBtnHtml = `<button class="btn btn-ghost btn-xs edit-record-btn" onclick="event.stopPropagation(); openEditRecordModal(${rec.id})" title="Edit Record">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>`;
+                    }
+                    
                     row.innerHTML = `
                         <td class="text-center" style="min-width: 50px; width: 50px;"><input type="checkbox" class="record-checkbox" ${rec.status !== 'Pending' ? 'disabled' : ''}></td>
                         <td class="text-center" style="min-width: 80px; width: 80px; white-space: nowrap;">${formattedDate}</td>
@@ -4299,7 +4309,12 @@
                         <td class="text-center" style="min-width: 140px; width: 140px; white-space: nowrap;">${rec.organization}</td>
                         <td class="text-center" style="min-width: 120px; width: 120px; white-space: nowrap;">${rec.supervisor_name || '-'}</td>
                         <td class="text-center" style="min-width: 50px; width: 50px; white-space: nowrap;">${rec.hours_rendered} hours</td>
-                        <td class="text-center" style="min-width: 180px; width: 180px;">${statusHtml}</td>
+                        <td class="text-center" style="min-width: 180px; width: 180px;">
+                            <div class="flex items-center justify-center gap-2">
+                                ${statusHtml}
+                                ${editBtnHtml}
+                            </div>
+                        </td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -4348,6 +4363,12 @@
                                 </div>
                                 <div class="record-card-footer">
                                     <div class="record-card-status">${statusHtml}</div>
+                                    ${rec.status === 'Pending' ? `
+                                    <button class="btn btn-ghost btn-xs edit-record-btn" onclick="event.stopPropagation(); openEditRecordModal(${rec.id})" title="Edit Record">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>` : ''}
                                 </div>
                             `;
                             
@@ -4362,6 +4383,10 @@
                     }
                 }
             }
+            
+            // Make renderTable globally accessible for edit modal updates
+            window.renderTable = renderTable;
+            
             searchInput.addEventListener('input', renderTable);
             
             // Mobile sort dropdown handler
@@ -5005,6 +5030,263 @@
                 console.error('Theme toggle error:', e);
             }
         }
+
+        // ==================== EDIT RECORD WITH DEBOUNCED AUTO-SAVE ====================
+        
+        // Edit record state
+        let editRecordData = null;
+        let editDebounceTimer = null;
+        let editPendingChanges = {};
+        let isEditSaving = false;
+        const EDIT_DEBOUNCE_DELAY = 800; // 800ms debounce
+        
+        // Open edit modal and populate with record data
+        window.openEditRecordModal = function(recordId) {
+            // Find record in allRecords
+            const record = allRecords.find(r => r.id === recordId);
+            if (!record) {
+                showToast('Record not found', 'error');
+                return;
+            }
+            
+            if (record.status !== 'Pending') {
+                showToast('Only pending records can be edited', 'warning');
+                return;
+            }
+            
+            // Store current record data
+            editRecordData = { ...record };
+            editPendingChanges = {};
+            
+            // Populate form fields
+            document.getElementById('edit-record-id').value = record.id;
+            document.getElementById('edit-event-name').value = record.event_name || '';
+            document.getElementById('edit-venue').value = record.venue || '';
+            
+            // Format date for input (YYYY-MM-DD)
+            let dateValue = record.date || '';
+            if (dateValue && dateValue.includes('T')) {
+                dateValue = dateValue.substring(0, 10);
+            } else if (dateValue && dateValue.includes('-')) {
+                // Check if already in YYYY-MM-DD format
+                const parts = dateValue.split('-');
+                if (parts[0].length === 2) {
+                    // It's MM-DD-YYYY, convert to YYYY-MM-DD
+                    dateValue = `${parts[2]}-${parts[0]}-${parts[1]}`;
+                }
+            }
+            document.getElementById('edit-date').value = dateValue;
+            document.getElementById('edit-hours-rendered').value = record.hours_rendered || 0;
+            document.getElementById('edit-organization').value = record.organization || '';
+            document.getElementById('edit-supervisor-name').value = record.supervisor_name || '';
+            
+            // Reset status indicator
+            updateEditStatus('ready');
+            
+            // Open modal
+            document.getElementById('edit_record_modal').showModal();
+            
+            // Attach input listeners for auto-save
+            attachEditInputListeners();
+        };
+        
+        // Update edit status indicator
+        function updateEditStatus(status, message = null) {
+            const statusIcon = document.getElementById('edit-status-icon');
+            const savingIcon = document.getElementById('edit-saving-icon');
+            const savedIcon = document.getElementById('edit-saved-icon');
+            const errorIcon = document.getElementById('edit-error-icon');
+            const statusText = document.getElementById('edit-status-text');
+            
+            // Hide all icons
+            savingIcon.classList.add('hidden');
+            savedIcon.classList.add('hidden');
+            errorIcon.classList.add('hidden');
+            
+            if (status === 'ready') {
+                statusIcon.classList.add('hidden');
+                statusText.textContent = 'Ready to edit';
+                statusText.className = 'text-gray-500';
+            } else if (status === 'typing') {
+                statusIcon.classList.remove('hidden');
+                savingIcon.classList.add('hidden');
+                savedIcon.classList.add('hidden');
+                statusText.textContent = 'Typing...';
+                statusText.className = 'text-gray-500';
+            } else if (status === 'saving') {
+                statusIcon.classList.remove('hidden');
+                savingIcon.classList.remove('hidden');
+                statusText.textContent = 'Saving...';
+                statusText.className = 'text-primary-purple';
+            } else if (status === 'saved') {
+                statusIcon.classList.remove('hidden');
+                savedIcon.classList.remove('hidden');
+                statusText.textContent = message || 'Saved!';
+                statusText.className = 'text-green-600';
+            } else if (status === 'error') {
+                statusIcon.classList.remove('hidden');
+                errorIcon.classList.remove('hidden');
+                statusText.textContent = message || 'Error saving';
+                statusText.className = 'text-red-600';
+            }
+        }
+        
+        // Attach input listeners with debounce
+        function attachEditInputListeners() {
+            const editForm = document.getElementById('edit-record-form');
+            const inputs = editForm.querySelectorAll('input[data-field]');
+            
+            inputs.forEach(input => {
+                // Remove existing listeners
+                input.removeEventListener('input', handleEditInput);
+                // Add new listener
+                input.addEventListener('input', handleEditInput);
+            });
+            
+            // Save Now button handler
+            const saveNowBtn = document.getElementById('edit-save-now-btn');
+            if (saveNowBtn) {
+                saveNowBtn.onclick = function() {
+                    // Cancel pending debounce and save immediately
+                    if (editDebounceTimer) {
+                        clearTimeout(editDebounceTimer);
+                        editDebounceTimer = null;
+                    }
+                    saveEditChanges(true);
+                };
+            }
+        }
+        
+        // Handle input changes with debounce
+        function handleEditInput(e) {
+            const field = e.target.dataset.field;
+            const value = e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
+            
+            // Track changes
+            if (editRecordData[field] !== value) {
+                editPendingChanges[field] = value;
+            } else {
+                delete editPendingChanges[field];
+            }
+            
+            // Show typing status
+            updateEditStatus('typing');
+            
+            // Clear existing timer
+            if (editDebounceTimer) {
+                clearTimeout(editDebounceTimer);
+            }
+            
+            // Set new debounce timer
+            editDebounceTimer = setTimeout(() => {
+                saveEditChanges(false);
+            }, EDIT_DEBOUNCE_DELAY);
+        }
+        
+        // Save changes via AJAX
+        async function saveEditChanges(immediate = false) {
+            // Skip if no changes or already saving
+            if (Object.keys(editPendingChanges).length === 0) {
+                if (immediate) {
+                    updateEditStatus('saved', 'No changes to save');
+                    setTimeout(() => updateEditStatus('ready'), 1500);
+                }
+                return;
+            }
+            
+            if (isEditSaving) {
+                return;
+            }
+            
+            isEditSaving = true;
+            updateEditStatus('saving');
+            
+            const recordId = document.getElementById('edit-record-id').value;
+            
+            try {
+                const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                const response = await fetch(`${BASE_PATH}/api/social-contract/records/${recordId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(editPendingChanges),
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to save changes');
+                }
+                
+                const result = await response.json();
+                
+                // Update local record data
+                Object.assign(editRecordData, editPendingChanges);
+                
+                // Update allRecords array
+                const recordIndex = allRecords.findIndex(r => r.id === parseInt(recordId));
+                if (recordIndex !== -1) {
+                    Object.assign(allRecords[recordIndex], editPendingChanges);
+                }
+                
+                // Clear pending changes
+                editPendingChanges = {};
+                
+                // Update status
+                updateEditStatus('saved', 'Changes saved!');
+                
+                // Refresh the table to show updated data
+                renderTable();
+                
+                // Reset status after a delay
+                setTimeout(() => {
+                    if (!isEditSaving && Object.keys(editPendingChanges).length === 0) {
+                        updateEditStatus('ready');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error saving record:', error);
+                updateEditStatus('error', error.message || 'Failed to save');
+                
+                // Show toast for critical errors
+                if (error.message.includes('duplicate') || error.message.includes('processed')) {
+                    showToast(error.message, 'error');
+                }
+            } finally {
+                isEditSaving = false;
+            }
+        }
+        
+        // Clean up when modal closes
+        document.getElementById('edit_record_modal').addEventListener('close', function() {
+            // Clear any pending debounce timer
+            if (editDebounceTimer) {
+                clearTimeout(editDebounceTimer);
+                editDebounceTimer = null;
+            }
+            
+            // Save any pending changes before closing
+            if (Object.keys(editPendingChanges).length > 0 && !isEditSaving) {
+                saveEditChanges(true);
+            }
+            
+            // Reset state
+            editRecordData = null;
+            editPendingChanges = {};
+        });
+        
+        // Make renderTable globally accessible for edit updates
+        window.renderTable = typeof renderTable !== 'undefined' ? renderTable : function() {
+            console.warn('renderTable not yet initialized');
+        };
+        
+        // ==================== END EDIT RECORD ====================
 
         function boot(){ 
             // Theme is already set synchronously in <head>, no need to check again

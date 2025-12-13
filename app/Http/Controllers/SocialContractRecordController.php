@@ -191,4 +191,80 @@ class SocialContractRecordController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
+
+    /**
+     * Update a pending record (students can only edit pending records)
+     */
+    public function update(int $id, Request $request)
+    {
+        // Ensure we're working with the web guard (student)
+        $user = Auth::guard('web')->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
+        $record = SocialContractRecord::query()
+            ->whereKey($id)
+            ->whereHas('socialContract', fn($q) => $q->where('student_id', $user->getKey()))
+            ->firstOrFail();
+
+        // Only pending records can be edited
+        if ($record->status !== 'Pending') {
+            return response()->json([
+                'message' => 'Only pending records can be edited.',
+                'errors' => ['status' => ['This record has already been processed and cannot be edited.']]
+            ], 422);
+        }
+
+        $data = $request->validate([
+            'date' => ['sometimes', 'date'],
+            'event_name' => ['sometimes', 'string', 'max:255'],
+            'venue' => ['sometimes', 'string', 'max:255'],
+            'organization' => ['sometimes', 'string', 'max:255'],
+            'supervisor_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'hours_rendered' => ['sometimes', 'integer', 'min:0'],
+        ]);
+
+        // Check for duplicate if key fields are being changed
+        if (isset($data['date']) || isset($data['event_name']) || isset($data['venue']) || isset($data['organization'])) {
+            $checkData = [
+                'date' => $data['date'] ?? $record->date,
+                'event_name' => $data['event_name'] ?? $record->event_name,
+                'venue' => $data['venue'] ?? $record->venue,
+                'organization' => $data['organization'] ?? $record->organization,
+            ];
+            
+            $existingRecord = $record->socialContract->records()
+                ->where('id', '!=', $record->id)
+                ->where('date', $checkData['date'])
+                ->where('event_name', $checkData['event_name'])
+                ->where('venue', $checkData['venue'])
+                ->where('organization', $checkData['organization'])
+                ->first();
+
+            if ($existingRecord) {
+                return response()->json([
+                    'message' => 'A record with the same event name, date, venue, and organization already exists.',
+                    'errors' => ['duplicate' => ['This would create a duplicate record.']]
+                ], 422);
+            }
+        }
+
+        $record->update($data);
+
+        \Illuminate\Support\Facades\Log::debug('SocialContractRecord updated', [
+            'record_id' => $record->id,
+            'user_id' => $user->getKey(),
+            'updated_fields' => array_keys($data),
+        ]);
+
+        return response()->json([
+            'message' => 'Record updated successfully',
+            'record' => $record->fresh()
+        ])
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
+    }
 }

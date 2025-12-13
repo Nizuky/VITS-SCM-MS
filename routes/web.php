@@ -142,6 +142,7 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
         Route::post('/api/social-contracts', [\App\Http\Controllers\SocialContractController::class, 'store'])->name('social-contracts.store');
         Route::get('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'index'])->name('social-contract.records.index');
         Route::post('/api/social-contract/records', [\App\Http\Controllers\SocialContractRecordController::class, 'store'])->name('social-contract.records.store');
+        Route::put('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'update'])->name('social-contract.records.update');
         Route::delete('/api/social-contract/records/{id}', [\App\Http\Controllers\SocialContractRecordController::class, 'destroy'])->name('social-contract.records.destroy');
 
         // Student notifications
