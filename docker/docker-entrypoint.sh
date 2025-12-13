@@ -80,13 +80,15 @@ if command -v php >/dev/null 2>&1; then
   php artisan vendor:publish --tag=livewire:assets --force || true
   
   echo "Optimizing application for production..."
+  # IMPORTANT: Do NOT cache config in production on Laravel Cloud
+  # This prevents SESSION_DRIVER from being properly read from env
   # Cache all configuration, routes, and views for maximum performance
-  php artisan config:cache || true
+  # php artisan config:cache || true  # DISABLED - causes session driver issues
   php artisan route:cache || true
   php artisan view:cache || true
   
-  # Run optimize command for additional performance boost
-  php artisan optimize || true
+  # Run optimize command for additional performance boost (but skip config cache)
+  php artisan optimize --skip-config || true
 
   # Ensure public storage symlink exists (force recreate if broken)
   echo "Creating storage symlink..."
