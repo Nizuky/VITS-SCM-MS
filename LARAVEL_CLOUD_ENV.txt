@@ -14,8 +14,8 @@ APP_TIMEZONE=Asia/Manila
 # ===========================
 # Session Configuration
 # ===========================
-SESSION_DRIVER=cookie
-SESSION_LIFETIME=5
+SESSION_DRIVER=database
+SESSION_LIFETIME=60
 SESSION_ENCRYPT=true
 SESSION_SECURE_COOKIE=true
 SESSION_DOMAIN=.laravel.cloud

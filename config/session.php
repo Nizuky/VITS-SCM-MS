@@ -1,9 +1,11 @@
 <?php
 
 return [
-    // Session driver - use 'file' for production (cookie causes 400 errors with large sessions)
-    // File driver stores sessions on disk instead of in cookies, preventing size issues
-    'driver' => env('SESSION_DRIVER', env('APP_ENV') === 'production' ? 'file' : 'file'),
+    // Session driver - use 'database' for production on Laravel Cloud (ephemeral filesystem!)
+    // 'file' causes "No such file or directory" errors when containers restart
+    // 'cookie' can cause 400 errors with large sessions
+    // 'database' is reliable and persists across container restarts
+    'driver' => env('SESSION_DRIVER', 'database'),
 
     // Minutes the session can remain idle before it expires (1 hour)
     'lifetime' => env('SESSION_LIFETIME', 60),
