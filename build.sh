@@ -54,6 +54,17 @@ echo "========================="
 npm ci
 npm run build
 
+# Clear all Laravel caches to ensure fresh deployment
+echo "Clearing all Laravel caches..."
+php artisan view:clear || true
+php artisan cache:clear || true
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan event:clear || true
+
+echo "Running optimize (without config cache)..."
+php artisan optimize --skip-config || true
+
 # NOTE: Database migrations and seeding are NOT run during build
 # They should be run separately after deployment via Laravel Cloud's post-deployment hooks
 # or manually via SSH/console to avoid timeout issues during the build process
